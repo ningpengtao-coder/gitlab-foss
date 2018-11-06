@@ -97,6 +97,7 @@ module Gitlab
           }
           .merge(services_usage)
           .merge(approximate_counts)
+          .merge(reports_usage)
         }.tap do |data|
           if Feature.enabled?(:group_overview_security_dashboard)
             data[:counts][:user_preferences] = user_preferences_usage
@@ -143,6 +144,13 @@ module Gitlab
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
+      def reports_usage
+        results = count(::Ci::JobArtifact.with_reports.group(:file_type), fallback: Hash.new(-1))
+        ::Ci::JobArtifact.report_file_types.each_with_object({}) do |(type, id), response|
+          response[:"#{type}_reports"] = results[id] || 0
+        end
+      end
+
       def services_usage
         types = {
           SlackService: :projects_slack_notifications_active,
@@ -175,7 +183,11 @@ module Gitlab
         {} # augmented in EE
       end
 
-      def count(relation, fallback: -1)
+      def count(relation, fallback: -1, count_params: nil)
+        if count_params
+          return relation.count(count_params)
+        end
+
         relation.count
       rescue ActiveRecord::StatementInvalid
         fallback

@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+  # frozen_string_literal: true
 
 require 'spec_helper'
 
@@ -173,6 +173,29 @@ describe Ci::JobArtifact do
       it "expects #{file_type} to be included" do
         expect(described_class.file_formats).to include(subject[file_type.to_sym])
       end
+    end
+  end
+
+  describe '.report_file_types' do
+    EXPECTED_REPORT_TYPES =
+      %w[
+        junit
+        codequality
+        sast
+        dependency_scanning
+        container_scanning
+        dast
+        license_management
+        performance
+      ].freeze
+
+    subject { described_class.report_file_types }
+
+    it 'returns file types that correspond to reports' do
+      # If this test fails chances are you've added a new
+      # artifact file_type and must decide whether or not
+      # it's a report.
+      expect(subject.keys).to match_array(EXPECTED_REPORT_TYPES)
     end
   end
 
