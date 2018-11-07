@@ -1,25 +1,25 @@
 <script>
-  import userAvatarImage from '../../vue_shared/components/user_avatar/user_avatar_image.vue';
-  import limitWarning from './limit_warning_component.vue';
-  import totalTime from './total_time_component.vue';
+import userAvatarImage from '../../vue_shared/components/user_avatar/user_avatar_image.vue';
+import limitWarning from './limit_warning_component.vue';
+import totalTime from './total_time_component.vue';
 
-  export default {
-    components: {
-      userAvatarImage,
-      limitWarning,
-      totalTime,
+export default {
+  components: {
+    userAvatarImage,
+    limitWarning,
+    totalTime,
+  },
+  props: {
+    items: {
+      type: Array,
+      default: () => [],
     },
-    props: {
-      items: {
-        type: Array,
-        default: () => [],
-      },
-      stage: {
-        type: Object,
-        default: () => ({}),
-      },
+    stage: {
+      type: Object,
+      default: () => ({}),
     },
-  };
+  },
+};
 </script>
 <template>
   <div>
@@ -38,8 +38,8 @@
           <user-avatar-image :img-src="issue.author.avatarUrl"/>
           <h5 class="item-title issue-title">
             <a
-              class="issue-title"
               :href="issue.url"
+              class="issue-title"
             >
               {{ issue.title }}
             </a>
@@ -73,4 +73,3 @@
     </ul>
   </div>
 </template>
-

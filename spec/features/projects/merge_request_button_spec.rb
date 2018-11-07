@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Merge Request button' do
+describe 'Merge Request button' do
   shared_examples 'Merge request button only shown when allowed' do
     let(:user) { create(:user) }
     let(:project) { create(:project, :public, :repository) }
@@ -22,8 +22,8 @@ feature 'Merge Request button' do
 
       it 'shows Create merge request button' do
         href = project_new_merge_request_path(project,
-                                              merge_request: { source_branch: 'feature',
-                                                               target_branch: 'master' })
+                                              merge_request_source_branch: 'feature',
+                                              merge_request: { target_branch: 'master' })
 
         visit url
 
@@ -41,6 +41,18 @@ feature 'Merge Request button' do
           visit url
 
           within('#content-body') do
+            expect(page).not_to have_link(label)
+          end
+        end
+      end
+
+      context 'when the project is archived' do
+        it 'hides the link' do
+          project.update!(archived: true)
+
+          visit url
+
+          within("#content-body") do
             expect(page).not_to have_link(label)
           end
         end
@@ -65,8 +77,8 @@ feature 'Merge Request button' do
 
         it 'shows Create merge request button' do
           href = project_new_merge_request_path(forked_project,
-                                                merge_request: { source_branch: 'feature',
-                                                                 target_branch: 'master' })
+                                                merge_request_source_branch: 'feature',
+                                                merge_request: { target_branch: 'master' })
 
           visit fork_url
 

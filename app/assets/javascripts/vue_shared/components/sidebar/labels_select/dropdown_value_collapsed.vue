@@ -14,7 +14,10 @@ export default {
   },
   computed: {
     labelsList() {
-      const labelsString = this.labels.slice(0, 5).map(label => label.title).join(', ');
+      const labelsString = this.labels
+        .slice(0, 5)
+        .map(label => label.title)
+        .join(', ');
 
       if (this.labels.length > 5) {
         return sprintf(s__('LabelSelect|%{labelsString}, and %{remainingLabelCount} more'), {
@@ -26,16 +29,22 @@ export default {
       return labelsString;
     },
   },
+  methods: {
+    handleClick() {
+      this.$emit('onValueClick');
+    },
+  },
 };
 </script>
 
 <template>
   <div
     v-tooltip
+    :title="labelsList"
     class="sidebar-collapsed-icon"
     data-placement="left"
     data-container="body"
-    :title="labelsList"
+    @click="handleClick"
   >
     <i
       aria-hidden="true"

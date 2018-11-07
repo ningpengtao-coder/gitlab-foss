@@ -10,7 +10,6 @@ Milestones allow you to organize issues and merge requests into a cohesive group
 
 - **Project milestones** can be assigned to issues or merge requests in that project only.
 - **Group milestones** can be assigned to any issue or merge request of any project in that group.
-- In the [future](https://gitlab.com/gitlab-org/gitlab-ce/issues/36862), you will be able to assign group milestones to issues and merge reqeusts of projects in [subgroups](../../group/subgroups/index.md).
 
 ## Creating milestones
 
@@ -69,7 +68,8 @@ From [project issue boards](../issue_board.md), you can filter by both group mil
 
 When filtering by milestone, in addition to choosing a specific project milestone or group milestone, you can choose a special milestone filter.
 
-- **No Milestone**: Show issues or merge requests with no assigned milestone.
+- **None**: Show issues or merge requests with no assigned milestone.
+- **Any**: Show issues or merge requests that have an assigned milestone.
 - **Upcoming**: Show issues or merge requests that have been assigned the open milestone that has the next upcoming due date (i.e. nearest due date in the future).
 - **Started**: Show issues or merge requests that have an assigned milestone with a start date that is before today.
 

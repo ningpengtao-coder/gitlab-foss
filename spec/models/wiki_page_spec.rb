@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe WikiPage do
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :wiki_repo) }
   let(:user) { project.owner }
   let(:wiki) { ProjectWiki.new(project, user) }
 
@@ -77,7 +77,7 @@ describe WikiPage do
   end
 
   describe "#initialize" do
-    context "when initialized with an existing gollum page" do
+    context "when initialized with an existing page" do
       before do
         create_page("test page", "test content")
         @page = wiki.wiki.page(title: "test page")
@@ -126,23 +126,34 @@ describe WikiPage do
     end
   end
 
-  before do
-    @wiki_attr = { title: "Index", content: "Home Page", format: "markdown" }
-  end
-
   describe "#create" do
+    let(:wiki_attr) do
+      {
+        title: "Index",
+        content: "Home Page",
+        format: "markdown",
+        message: 'Custom Commit Message'
+      }
+    end
+
     after do
       destroy_page("Index")
     end
 
     context "with valid attributes" do
       it "saves the wiki page" do
-        subject.create(@wiki_attr)
+        subject.create(wiki_attr)
         expect(wiki.find_page("Index")).not_to be_nil
       end
 
       it "returns true" do
-        expect(subject.create(@wiki_attr)).to eq(true)
+        expect(subject.create(wiki_attr)).to eq(true)
+      end
+
+      it 'saves the wiki page with message' do
+        subject.create(wiki_attr)
+
+        expect(wiki.find_page("Index").message).to eq 'Custom Commit Message'
       end
     end
   end
@@ -457,6 +468,12 @@ describe WikiPage do
   end
 
   describe '#historical?' do
+    let(:page) { wiki.find_page('Update') }
+    let(:old_version) { page.versions.last.id }
+    let(:old_page) { wiki.find_page('Update', old_version) }
+    let(:latest_version) { page.versions.first.id }
+    let(:latest_page) { wiki.find_page('Update', latest_version) }
+
     before do
       create_page('Update', 'content')
       @page = wiki.find_page('Update')
@@ -468,23 +485,27 @@ describe WikiPage do
     end
 
     it 'returns true when requesting an old version' do
-      old_version = @page.versions.last.id
-      old_page = wiki.find_page('Update', old_version)
-
-      expect(old_page.historical?).to eq true
+      expect(old_page.historical?).to be_truthy
     end
 
     it 'returns false when requesting latest version' do
-      latest_version = @page.versions.first.id
-      latest_page = wiki.find_page('Update', latest_version)
-
-      expect(latest_page.historical?).to eq false
+      expect(latest_page.historical?).to be_falsy
     end
 
     it 'returns false when version is nil' do
-      latest_page = wiki.find_page('Update', nil)
+      expect(latest_page.historical?).to be_falsy
+    end
 
-      expect(latest_page.historical?).to eq false
+    it 'returns false when the last version is nil' do
+      expect(old_page).to receive(:last_version) { nil }
+
+      expect(old_page.historical?).to be_falsy
+    end
+
+    it 'returns false when the version is nil' do
+      expect(old_page).to receive(:version) { nil }
+
+      expect(old_page.historical?).to be_falsy
     end
   end
 
@@ -554,6 +575,16 @@ describe WikiPage do
     end
   end
 
+  describe '#hook_attrs' do
+    it 'adds absolute urls for images in the content' do
+      create_page("test page", "test![WikiPage_Image](/uploads/abc/WikiPage_Image.png)")
+      page = wiki.wiki.page(title: "test page")
+      wiki_page = described_class.new(wiki, page, true)
+
+      expect(wiki_page.hook_attrs['content']).to eq("test![WikiPage_Image](#{Settings.gitlab.url}/uploads/abc/WikiPage_Image.png)")
+    end
+  end
+
   private
 
   def remove_temp_repo(path)
@@ -561,7 +592,7 @@ describe WikiPage do
   end
 
   def commit_details
-    Gitlab::Git::Wiki::CommitDetails.new(user.name, user.email, "test commit")
+    Gitlab::Git::Wiki::CommitDetails.new(user.id, user.username, user.name, user.email, "test commit")
   end
 
   def create_page(name, content)

@@ -26,7 +26,7 @@ describe IssuesFinder do
     let(:issues) { described_class.new(search_user, params.reverse_merge(scope: scope, state: 'opened')).execute }
 
     before(:context) do
-      project1.add_master(user)
+      project1.add_maintainer(user)
       project2.add_developer(user)
       project2.add_developer(user2)
       project3.add_developer(user)
@@ -53,6 +53,40 @@ describe IssuesFinder do
 
         it 'returns issues assigned to that user' do
           expect(issues).to contain_exactly(issue1, issue2)
+        end
+      end
+
+      context 'filtering by no assignee' do
+        let(:params) { { assignee_id: 'None' } }
+
+        it 'returns issues not assigned to any assignee' do
+          expect(issues).to contain_exactly(issue4)
+        end
+
+        it 'returns issues not assigned to any assignee' do
+          params[:assignee_id] = 0
+
+          expect(issues).to contain_exactly(issue4)
+        end
+
+        it 'returns issues not assigned to any assignee' do
+          params[:assignee_id] = 'none'
+
+          expect(issues).to contain_exactly(issue4)
+        end
+      end
+
+      context 'filtering by any assignee' do
+        let(:params) { { assignee_id: 'Any' } }
+
+        it 'returns issues assigned to any assignee' do
+          expect(issues).to contain_exactly(issue1, issue2, issue3)
+        end
+
+        it 'returns issues assigned to any assignee' do
+          params[:assignee_id] = 'any'
+
+          expect(issues).to contain_exactly(issue1, issue2, issue3)
         end
       end
 
@@ -110,10 +144,30 @@ describe IssuesFinder do
       end
 
       context 'filtering by no milestone' do
-        let(:params) { { milestone_title: Milestone::None.title } }
+        let(:params) { { milestone_title: 'None' } }
 
         it 'returns issues with no milestone' do
           expect(issues).to contain_exactly(issue2, issue3, issue4)
+        end
+
+        it 'returns issues with no milestone (deprecated)' do
+          params[:milestone_title] = Milestone::None.title
+
+          expect(issues).to contain_exactly(issue2, issue3, issue4)
+        end
+      end
+
+      context 'filtering by any milestone' do
+        let(:params) { { milestone_title: 'Any' } }
+
+        it 'returns issues with any assigned milestone' do
+          expect(issues).to contain_exactly(issue1)
+        end
+
+        it 'returns issues with any assigned milestone (deprecated)' do
+          params[:milestone_title] = Milestone::Any.title
+
+          expect(issues).to contain_exactly(issue1)
         end
       end
 
@@ -318,6 +372,22 @@ describe IssuesFinder do
       end
 
       context 'filtering by reaction name' do
+        context 'user searches by no reaction' do
+          let(:params) { { my_reaction_emoji: 'None' } }
+
+          it 'returns issues that the user did not react to' do
+            expect(issues).to contain_exactly(issue2, issue4)
+          end
+        end
+
+        context 'user searches by any reaction' do
+          let(:params) { { my_reaction_emoji: 'Any' } }
+
+          it 'returns issues that the user reacted to' do
+            expect(issues).to contain_exactly(issue1, issue3)
+          end
+        end
+
         context 'user searches by "thumbsup" reaction' do
           let(:params) { { my_reaction_emoji: 'thumbsup' } }
 
@@ -372,7 +442,7 @@ describe IssuesFinder do
     end
 
     context 'personal scope' do
-      let(:scope) { 'assigned-to-me' }
+      let(:scope) { 'assigned_to_me' }
 
       it 'returns issue assigned to the user' do
         expect(issues).to contain_exactly(issue1, issue2)

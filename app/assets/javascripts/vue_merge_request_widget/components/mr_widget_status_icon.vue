@@ -1,48 +1,47 @@
 <script>
-  import ciIcon from '../../vue_shared/components/ci_icon.vue';
-  import loadingIcon from '../../vue_shared/components/loading_icon.vue';
+import ciIcon from '../../vue_shared/components/ci_icon.vue';
 
-  export default {
-    components: {
-      ciIcon,
-      loadingIcon,
+export default {
+  components: {
+    ciIcon,
+  },
+  props: {
+    status: {
+      type: String,
+      required: true,
     },
-    props: {
-      status: {
-        type: String,
-        required: true,
-      },
-      showDisabledButton: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
+    showDisabledButton: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
-    computed: {
-      isLoading() {
-        return this.status === 'loading';
-      },
-      statusObj() {
-        return {
-          group: this.status,
-          icon: `status_${this.status}`,
-        };
-      },
+  },
+  computed: {
+    isLoading() {
+      return this.status === 'loading';
     },
-  };
+    statusObj() {
+      return {
+        group: this.status,
+        icon: `status_${this.status}`,
+      };
+    },
+  },
+};
 </script>
 <template>
-  <div class="space-children flex-container-block append-right-10">
+  <div class="space-children d-flex append-right-10 widget-status-icon">
     <div
       v-if="isLoading"
       class="mr-widget-icon"
     >
-      <loading-icon />
+      <gl-loading-icon />
     </div>
 
     <ci-icon
       v-else
       :status="statusObj"
+      :size="24"
     />
 
     <button

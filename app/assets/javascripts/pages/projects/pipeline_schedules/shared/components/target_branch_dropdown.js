@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 export default class TargetBranchDropdown {
   constructor() {
     this.$dropdown = $('.js-target-branch-dropdown');
@@ -24,8 +26,7 @@ export default class TargetBranchDropdown {
   }
 
   formatBranchesList() {
-    return this.$dropdown.data('data')
-      .map(val => ({ name: val }));
+    return this.$dropdown.data('data').map(val => ({ name: val }));
   }
 
   setDropdownToggle() {

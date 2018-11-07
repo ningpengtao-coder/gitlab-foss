@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Banzai
   # Class for rendering multiple objects (e.g. Note instances) in a single pass,
   # using +render_field+ to benefit from caching in the database. Rendering and
@@ -13,14 +15,13 @@ module Banzai
   # As an example, rendering the attribute `note` would place the unredacted
   # HTML into `note_html` and the redacted HTML into `redacted_note_html`.
   class ObjectRenderer
-    attr_reader :project, :user
+    attr_reader :context
 
-    # project - A Project to use for redacting Markdown.
+    # default_project - A default Project to use for redacting Markdown.
     # user - The user viewing the Markdown/HTML documents, if any.
     # redaction_context - A Hash containing extra attributes to use during redaction
-    def initialize(project, user = nil, redaction_context = {})
-      @project = project
-      @user = user
+    def initialize(default_project: nil, user: nil, redaction_context: {})
+      @context = RenderContext.new(default_project, user)
       @redaction_context = base_context.merge(redaction_context)
     end
 
@@ -39,6 +40,7 @@ module Banzai
         redacted_data = redacted[index]
         object.__send__("redacted_#{attribute}_html=", redacted_data[:document].to_html(save_options).html_safe) # rubocop:disable GitlabSecurity/PublicSend
         object.user_visible_reference_count = redacted_data[:visible_reference_count] if object.respond_to?(:user_visible_reference_count)
+        object.total_reference_count = redacted_data[:total_reference_count] if object.respond_to?(:total_reference_count)
       end
     end
 
@@ -48,17 +50,21 @@ module Banzai
       pipeline = HTML::Pipeline.new([])
 
       objects.map do |object|
-        pipeline.to_document(Banzai.render_field(object, attribute))
+        document = pipeline.to_document(Banzai.render_field(object, attribute))
+
+        context.associate_document(document, object)
+
+        document
       end
     end
 
     def post_process_documents(documents, objects, attribute)
       # Called here to populate cache, refer to IssuableExtractor docs
-      IssuableExtractor.new(project, user).extract(documents)
+      IssuableExtractor.new(context).extract(documents)
 
       documents.zip(objects).map do |document, object|
-        context = context_for(object, attribute)
-        Banzai::Pipeline[:post_process].to_document(document, context)
+        pipeline_context = context_for(document, object, attribute)
+        Banzai::Pipeline[:post_process].to_document(document, pipeline_context)
       end
     end
 
@@ -66,20 +72,21 @@ module Banzai
     #
     # Returns an Array containing the redacted documents.
     def redact_documents(documents)
-      redactor = Redactor.new(project, user)
+      redactor = Redactor.new(context)
 
       redactor.redact(documents)
     end
 
     # Returns a Banzai context for the given object and attribute.
-    def context_for(object, attribute)
-      @redaction_context.merge(object.banzai_render_context(attribute))
+    def context_for(document, object, attribute)
+      @redaction_context.merge(object.banzai_render_context(attribute)).merge(
+        project: context.project_for_node(document)
+      )
     end
 
     def base_context
       {
-        current_user: user,
-        project: project,
+        current_user: context.current_user,
         skip_redaction: true
       }
     end

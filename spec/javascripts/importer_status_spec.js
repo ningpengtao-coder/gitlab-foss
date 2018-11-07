@@ -29,23 +29,49 @@ describe('Importer Status', () => {
       `);
       spyOn(ImporterStatus.prototype, 'initStatusPage').and.callFake(() => {});
       spyOn(ImporterStatus.prototype, 'setAutoUpdate').and.callFake(() => {});
-      instance = new ImporterStatus('', importUrl);
+      instance = new ImporterStatus({
+        jobsUrl: '',
+        importUrl,
+      });
     });
 
-    it('sets table row to active after post request', (done) => {
+    it('sets table row to active after post request', done => {
       mock.onPost(importUrl).reply(200, {
         id: 1,
         full_path: '/full_path',
       });
 
-      instance.addToImport({
-        currentTarget: document.querySelector('.js-add-to-import'),
-      })
-      .then(() => {
-        expect(document.querySelector('tr').classList.contains('active')).toEqual(true);
-        done();
-      })
-      .catch(done.fail);
+      instance
+        .addToImport({
+          currentTarget: document.querySelector('.js-add-to-import'),
+        })
+        .then(() => {
+          expect(document.querySelector('tr').classList.contains('table-active')).toEqual(true);
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('shows error message after failed POST request', done => {
+      appendSetFixtures('<div class="flash-container"></div>');
+
+      mock.onPost(importUrl).reply(422, {
+        errors: 'You forgot your lunch',
+      });
+
+      instance
+        .addToImport({
+          currentTarget: document.querySelector('.js-add-to-import'),
+        })
+        .then(() => {
+          const flashMessage = document.querySelector('.flash-text');
+
+          expect(flashMessage.textContent.trim()).toEqual(
+            'An error occurred while importing project: You forgot your lunch',
+          );
+          done();
+        })
+        .catch(done.fail);
     });
   });
 
@@ -65,18 +91,23 @@ describe('Importer Status', () => {
 
       spyOn(ImporterStatus.prototype, 'initStatusPage').and.callFake(() => {});
       spyOn(ImporterStatus.prototype, 'setAutoUpdate').and.callFake(() => {});
-      instance = new ImporterStatus(jobsUrl);
+      instance = new ImporterStatus({
+        jobsUrl,
+      });
     });
 
     function setupMock(importStatus) {
-      mock.onGet(jobsUrl).reply(200, [{
-        id: 1,
-        import_status: importStatus,
-      }]);
+      mock.onGet(jobsUrl).reply(200, [
+        {
+          id: 1,
+          import_status: importStatus,
+        },
+      ]);
     }
 
     function expectJobStatus(done, status) {
-      instance.autoUpdate()
+      instance
+        .autoUpdate()
         .then(() => {
           expect(document.querySelector('#project_1').innerText.trim()).toEqual(status);
           done();
@@ -84,22 +115,22 @@ describe('Importer Status', () => {
         .catch(done.fail);
     }
 
-    it('sets the job status to done', (done) => {
+    it('sets the job status to done', done => {
       setupMock('finished');
-      expectJobStatus(done, 'done');
+      expectJobStatus(done, 'Done');
     });
 
-    it('sets the job status to scheduled', (done) => {
+    it('sets the job status to scheduled', done => {
       setupMock('scheduled');
-      expectJobStatus(done, 'scheduled');
+      expectJobStatus(done, 'Scheduled');
     });
 
-    it('sets the job status to started', (done) => {
+    it('sets the job status to started', done => {
       setupMock('started');
-      expectJobStatus(done, 'started');
+      expectJobStatus(done, 'Started');
     });
 
-    it('sets the job status to custom status', (done) => {
+    it('sets the job status to custom status', done => {
       setupMock('custom status');
       expectJobStatus(done, 'custom status');
     });

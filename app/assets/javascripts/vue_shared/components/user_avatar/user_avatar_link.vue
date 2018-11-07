@@ -1,5 +1,4 @@
 <script>
-
 /* This is a re-usable vue component for rendering a user avatar wrapped in
   a clickable link (likely to the user's profile). The link, image, and
   tooltip can be configured by props passed to this component.
@@ -18,12 +17,14 @@
 
 */
 
+import { GlLink } from '@gitlab-org/gitlab-ui';
 import userAvatarImage from './user_avatar_image.vue';
 import tooltip from '../../directives/tooltip';
 
 export default {
   name: 'UserAvatarLink',
   components: {
+    GlLink,
     userAvatarImage,
   },
   directives: {
@@ -83,9 +84,9 @@ export default {
 </script>
 
 <template>
-  <a
-    class="user-avatar-link"
-    :href="linkHref">
+  <gl-link
+    :href="linkHref"
+    class="user-avatar-link">
     <user-avatar-image
       :img-src="imgSrc"
       :img-alt="imgAlt"
@@ -99,5 +100,5 @@ export default {
       :title="tooltipText"
       :tooltip-placement="tooltipPlacement"
     >{{ username }}</span>
-  </a>
+  </gl-link>
 </template>

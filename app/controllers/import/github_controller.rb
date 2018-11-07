@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Import::GithubController < Import::BaseController
   before_action :verify_import_enabled
   before_action :provider_auth, only: [:status, :jobs, :create]
@@ -18,21 +20,22 @@ class Import::GithubController < Import::BaseController
   end
 
   def personal_access_token
-    session[access_token_key] = params[:personal_access_token]
+    session[access_token_key] = params[:personal_access_token]&.strip
     redirect_to status_import_url
   end
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def status
     @repos = client.repos
-    @already_added_projects = current_user.created_projects.where(import_type: provider)
+    @already_added_projects = find_already_added_projects(provider)
     already_added_projects_names = @already_added_projects.pluck(:import_source)
 
     @repos.reject! { |repo| already_added_projects_names.include? repo.full_name }
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def jobs
-    jobs = current_user.created_projects.where(import_type: provider).to_json(only: [:id, :import_status])
-    render json: jobs
+    render json: find_jobs(provider)
   end
 
   def create
@@ -42,12 +45,14 @@ class Import::GithubController < Import::BaseController
     target_namespace = find_or_create_namespace(namespace_path, current_user.namespace_path)
 
     if can?(current_user, :create_projects, target_namespace)
-      project = Gitlab::LegacyGithubImport::ProjectCreator.new(repo, project_name, target_namespace, current_user, access_params, type: provider).execute
+      project = Gitlab::LegacyGithubImport::ProjectCreator
+                  .new(repo, project_name, target_namespace, current_user, access_params, type: provider)
+                  .execute(extra_project_attrs)
 
       if project.persisted?
         render json: ProjectSerializer.new.represent(project)
       else
-        render json: { errors: project.errors.full_messages }, status: :unprocessable_entity
+        render json: { errors: project_save_error(project) }, status: :unprocessable_entity
       end
     else
       render json: { errors: 'This namespace has already been taken! Please choose another one.' }, status: :unprocessable_entity
@@ -73,15 +78,15 @@ class Import::GithubController < Import::BaseController
   end
 
   def new_import_url
-    public_send("new_import_#{provider}_url") # rubocop:disable GitlabSecurity/PublicSend
+    public_send("new_import_#{provider}_url", extra_import_params) # rubocop:disable GitlabSecurity/PublicSend
   end
 
   def status_import_url
-    public_send("status_import_#{provider}_url") # rubocop:disable GitlabSecurity/PublicSend
+    public_send("status_import_#{provider}_url", extra_import_params) # rubocop:disable GitlabSecurity/PublicSend
   end
 
   def callback_import_url
-    public_send("callback_import_#{provider}_url") # rubocop:disable GitlabSecurity/PublicSend
+    public_send("callback_import_#{provider}_url", extra_import_params) # rubocop:disable GitlabSecurity/PublicSend
   end
 
   def provider_unauthorized
@@ -98,14 +103,16 @@ class Import::GithubController < Import::BaseController
     { github_access_token: session[access_token_key] }
   end
 
-  # The following methods are overriden in subclasses
+  # The following methods are overridden in subclasses
   def provider
     :github
   end
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def logged_in_with_provider?
     current_user.identities.exists?(provider: provider)
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def provider_auth
     if session[access_token_key].blank?
@@ -114,6 +121,14 @@ class Import::GithubController < Import::BaseController
   end
 
   def client_options
+    {}
+  end
+
+  def extra_project_attrs
+    {}
+  end
+
+  def extra_import_params
     {}
   end
 end

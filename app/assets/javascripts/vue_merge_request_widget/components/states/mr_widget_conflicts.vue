@@ -1,27 +1,27 @@
 <script>
-  import statusIcon from '../mr_widget_status_icon.vue';
+import statusIcon from '../mr_widget_status_icon.vue';
 
-  export default {
-    name: 'MRWidgetConflicts',
-    components: {
-      statusIcon,
-    },
-    props: {
-      /* TODO: This is providing all store and service down when it
+export default {
+  name: 'MRWidgetConflicts',
+  components: {
+    statusIcon,
+  },
+  props: {
+    /* TODO: This is providing all store and service down when it
       only needs a few props */
-      mr: {
-        type: Object,
-        required: true,
-        default: () => ({}),
-      },
+    mr: {
+      type: Object,
+      required: true,
+      default: () => ({}),
     },
-  };
+  },
+};
 </script>
 <template>
   <div class="mr-widget-body media">
     <status-icon
-      status="warning"
       :show-disabled-button="true"
+      status="warning"
     />
 
     <div class="media-body space-children">
@@ -43,13 +43,13 @@ To merge this request, first rebase locally.`) }}
         <a
           v-if="mr.canMerge && mr.conflictResolutionPath"
           :href="mr.conflictResolutionPath"
-          class="js-resolve-conflicts-button btn btn-default btn-xs"
+          class="js-resolve-conflicts-button btn btn-default btn-sm"
         >
           {{ s__("mrWidget|Resolve conflicts") }}
         </a>
         <button
           v-if="mr.canMerge"
-          class="js-merge-locally-button btn btn-default btn-xs"
+          class="js-merge-locally-button btn btn-default btn-sm"
           data-toggle="modal"
           data-target="#modal_merge_info"
         >

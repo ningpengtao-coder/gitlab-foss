@@ -1,9 +1,11 @@
+import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
 import Activities from '~/activities';
 import { localTimeAgo } from '~/lib/utils/datetime_utility';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import flash from '~/flash';
 import ActivityCalendar from './activity_calendar';
+import UserOverviewBlock from './user_overview_block';
 
 /**
  * UserTabs
@@ -60,26 +62,34 @@ import ActivityCalendar from './activity_calendar';
  * </div>
  */
 
-const CALENDAR_TEMPLATE = `
-  <div class="clearfix calendar">
-    <div class="js-contrib-calendar"></div>
-    <div class="calendar-hint">
-      Summary of issues, merge requests, push events, and comments
+const CALENDAR_TEMPLATES = {
+  activity: `
+    <div class="clearfix calendar">
+      <div class="js-contrib-calendar"></div>
+      <div class="calendar-hint bottom-right"></div>
     </div>
-  </div>
-`;
+  `,
+  overview: `
+    <div class="clearfix calendar">
+      <div class="calendar-hint"></div>
+      <div class="js-contrib-calendar prepend-top-20"></div>
+    </div>
+  `,
+};
+
+const CALENDAR_PERIOD_6_MONTHS = 6;
+const CALENDAR_PERIOD_12_MONTHS = 12;
 
 export default class UserTabs {
   constructor({ defaultAction, action, parentEl }) {
     this.loaded = {};
-    this.defaultAction = defaultAction || 'activity';
+    this.defaultAction = defaultAction || 'overview';
     this.action = action || this.defaultAction;
     this.$parentEl = $(parentEl) || $(document);
     this.windowLocation = window.location;
-    this.$parentEl.find('.nav-links a')
-      .each((i, navLink) => {
-        this.loaded[$(navLink).attr('data-action')] = false;
-      });
+    this.$parentEl.find('.nav-links a').each((i, navLink) => {
+      this.loaded[$(navLink).attr('data-action')] = false;
+    });
     this.actions = Object.keys(this.loaded);
     this.bindEvents();
 
@@ -115,8 +125,7 @@ export default class UserTabs {
   }
 
   activateTab(action) {
-    return this.$parentEl.find(`.nav-links .js-${action}-tab a`)
-      .tab('show');
+    return this.$parentEl.find(`.nav-links .js-${action}-tab a`).tab('show');
   }
 
   setTab(action, endpoint) {
@@ -125,6 +134,8 @@ export default class UserTabs {
     }
     if (action === 'activity') {
       this.loadActivities();
+    } else if (action === 'overview') {
+      this.loadOverviewTab();
     }
 
     const loadableActions = ['groups', 'contributed', 'projects', 'snippets'];
@@ -136,7 +147,8 @@ export default class UserTabs {
   loadTab(action, endpoint) {
     this.toggleLoading(true);
 
-    return axios.get(endpoint)
+    return axios
+      .get(endpoint)
       .then(({ data }) => {
         const tabSelector = `div#${action}`;
         this.$parentEl.find(tabSelector).html(data.html);
@@ -154,46 +166,105 @@ export default class UserTabs {
     if (this.loaded.activity) {
       return;
     }
-    const $calendarWrap = this.$parentEl.find('.user-calendar');
+
+    this.loadActivityCalendar('activity');
+
+    // eslint-disable-next-line no-new
+    new Activities('#activity');
+
+    this.loaded.activity = true;
+  }
+
+  loadOverviewTab() {
+    if (this.loaded.overview) {
+      return;
+    }
+
+    this.loadActivityCalendar('overview');
+
+    UserTabs.renderMostRecentBlocks('#js-overview .activities-block', {
+      requestParams: { limit: 5 },
+    });
+    UserTabs.renderMostRecentBlocks('#js-overview .projects-block', {
+      requestParams: { limit: 10, skip_pagination: true },
+    });
+
+    this.loaded.overview = true;
+  }
+
+  static renderMostRecentBlocks(container, options) {
+    // eslint-disable-next-line no-new
+    new UserOverviewBlock({
+      container,
+      url: $(`${container} .overview-content-list`).data('href'),
+      ...options,
+    });
+  }
+
+  loadActivityCalendar(action) {
+    const monthsAgo = action === 'overview' ? CALENDAR_PERIOD_6_MONTHS : CALENDAR_PERIOD_12_MONTHS;
+    const $calendarWrap = this.$parentEl.find('.tab-pane.active .user-calendar');
     const calendarPath = $calendarWrap.data('calendarPath');
     const calendarActivitiesPath = $calendarWrap.data('calendarActivitiesPath');
     const utcOffset = $calendarWrap.data('utcOffset');
     let utcFormatted = 'UTC';
     if (utcOffset !== 0) {
-      utcFormatted = `UTC${utcOffset > 0 ? '+' : ''}${(utcOffset / 3600)}`;
+      utcFormatted = `UTC${utcOffset > 0 ? '+' : ''}${utcOffset / 3600}`;
     }
 
-    axios.get(calendarPath)
+    axios
+      .get(calendarPath)
       .then(({ data }) => {
-        $calendarWrap.html(CALENDAR_TEMPLATE);
-        $calendarWrap.find('.calendar-hint').append(`(Timezone: ${utcFormatted})`);
+        $calendarWrap.html(CALENDAR_TEMPLATES[action]);
+
+        let calendarHint = '';
+
+        if (action === 'activity') {
+          calendarHint = sprintf(
+            __(
+              'Summary of issues, merge requests, push events, and comments (Timezone: %{utcFormatted})',
+            ),
+            { utcFormatted },
+          );
+        } else if (action === 'overview') {
+          calendarHint = __('Issues, merge requests, pushes and comments.');
+        }
+
+        $calendarWrap.find('.calendar-hint').text(calendarHint);
 
         // eslint-disable-next-line no-new
-        new ActivityCalendar('.js-contrib-calendar', data, calendarActivitiesPath, utcOffset);
+        new ActivityCalendar(
+          '.tab-pane.active .js-contrib-calendar',
+          '.tab-pane.active .user-calendar-activities',
+          data,
+          calendarActivitiesPath,
+          utcOffset,
+          0,
+          monthsAgo,
+        );
       })
       .catch(() => flash(__('There was an error loading users activity calendar.')));
-
-    // eslint-disable-next-line no-new
-    new Activities();
-    this.loaded.activity = true;
   }
 
   toggleLoading(status) {
-    return this.$parentEl.find('.loading-status .loading')
-      .toggle(status);
+    return this.$parentEl.find('.loading-status .loading').toggleClass('hide', !status);
   }
 
   setCurrentAction(source) {
     let newState = source;
     newState = newState.replace(/\/+$/, '');
     newState += this.windowLocation.search + this.windowLocation.hash;
-    history.replaceState({
-      url: newState,
-    }, document.title, newState);
+    window.history.replaceState(
+      {
+        url: newState,
+      },
+      document.title,
+      newState,
+    );
     return newState;
   }
 
   getCurrentAction() {
-    return this.$parentEl.find('.nav-links .active a').data('action');
+    return this.$parentEl.find('.nav-links a.active').data('action');
   }
 }

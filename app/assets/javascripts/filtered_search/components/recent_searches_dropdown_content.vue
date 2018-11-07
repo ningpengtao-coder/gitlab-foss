@@ -21,9 +21,11 @@ export default {
   },
   computed: {
     processedItems() {
-      return this.items.map((item) => {
-        const { tokens, searchToken }
-          = FilteredSearchTokenizer.processTokens(item, this.allowedKeys);
+      return this.items.map(item => {
+        const { tokens, searchToken } = FilteredSearchTokenizer.processTokens(
+          item,
+          this.allowedKeys,
+        );
 
         const resultantTokens = tokens.map(token => ({
           prefix: `${token.key}:`,
@@ -72,9 +74,9 @@ export default {
           @click="onItemActivated(item.text)">
           <span>
             <span
+              v-for="(token, tokenIndex) in item.tokens"
+              :key="`dropdown-token-${tokenIndex}`"
               class="filtered-search-history-dropdown-token"
-              v-for="(token, index) in item.tokens"
-              :key="`dropdown-token-${index}`"
             >
               <span class="name">{{ token.prefix }}</span>
               <span class="value">{{ token.suffix }}</span>

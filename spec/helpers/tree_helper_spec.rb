@@ -3,11 +3,12 @@ require 'spec_helper'
 describe TreeHelper do
   let(:project) { create(:project, :repository) }
   let(:repository) { project.repository }
-  let(:sha) { 'ce369011c189f62c815f5971d096b26759bab0d1' }
+  let(:sha) { 'c1c67abbaf91f624347bb3ae96eabe3a1b742478' }
 
   describe '.render_tree' do
     before do
       @id = sha
+      @path = ""
       @project = project
       @lfs_blob_ids = []
     end
@@ -28,6 +29,49 @@ describe TreeHelper do
 
       expect(html).to have_selector('.tree-truncated-warning', count: 1)
       expect(html).to have_selector('.tree-item-file-name', count: 1)
+    end
+  end
+
+  describe '.fast_project_blob_path' do
+    it 'generates the same path as project_blob_path' do
+      blob_path = repository.tree(sha, 'with space').entries.first.path
+      fast_path = fast_project_blob_path(project, blob_path)
+      std_path  = project_blob_path(project, blob_path)
+
+      expect(fast_path).to eq(std_path)
+    end
+
+    it 'generates the same path with encoded file names' do
+      tree = repository.tree(sha, 'encoding')
+      blob_path = tree.entries.find { |entry| entry.path == 'encoding/テスト.txt' }.path
+      fast_path = fast_project_blob_path(project, blob_path)
+      std_path  = project_blob_path(project, blob_path)
+
+      expect(fast_path).to eq(std_path)
+    end
+
+    it 'respects a configured relative URL' do
+      allow(Gitlab.config.gitlab).to receive(:relative_url_root).and_return('/gitlab/root')
+      blob_path = repository.tree(sha, '').entries.first.path
+      fast_path = fast_project_blob_path(project, blob_path)
+
+      expect(fast_path).to start_with('/gitlab/root')
+    end
+  end
+
+  describe '.fast_project_tree_path' do
+    let(:tree_path) { repository.tree(sha, 'with space').path }
+    let(:fast_path) { fast_project_tree_path(project, tree_path) }
+    let(:std_path) { project_tree_path(project, tree_path) }
+
+    it 'generates the same path as project_tree_path' do
+      expect(fast_path).to eq(std_path)
+    end
+
+    it 'respects a configured relative URL' do
+      allow(Gitlab.config.gitlab).to receive(:relative_url_root).and_return('/gitlab/root')
+
+      expect(fast_path).to start_with('/gitlab/root')
     end
   end
 
@@ -59,6 +103,15 @@ describe TreeHelper do
         it "returns the flattened path with the root path suffix removed" do
           expect(subject).to match('path/correct')
         end
+      end
+    end
+
+    context 'when the root path contains a plus character' do
+      let(:root_path) { 'gtk/C++' }
+      let(:tree_item) { double(flat_path: 'gtk/C++/glade') }
+
+      it 'returns the flattened path' do
+        expect(subject).to eq('glade')
       end
     end
   end

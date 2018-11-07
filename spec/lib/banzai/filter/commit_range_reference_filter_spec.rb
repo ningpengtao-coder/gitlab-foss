@@ -60,6 +60,7 @@ describe Banzai::Filter::CommitRangeReferenceFilter do
       exp = act = "See #{commit1.id.reverse}...#{commit2.id}"
 
       allow(project.repository).to receive(:commit).with(commit1.id.reverse)
+      allow(project.repository).to receive(:commit).with(commit2.id)
       expect(reference_filter(act).to_html).to eq exp
     end
 
@@ -231,6 +232,22 @@ describe Banzai::Filter::CommitRangeReferenceFilter do
 
       exp = act = "Fixed #{project2.to_reference}@#{commit1.id}...#{commit2.id.reverse}"
       expect(reference_filter(act).to_html).to eq exp
+    end
+  end
+
+  context 'group context' do
+    let(:context) { { project: nil, group: create(:group) } }
+
+    it 'ignores internal references' do
+      exp = act = "See #{range.to_reference}"
+
+      expect(reference_filter(act, context).to_html).to eq exp
+    end
+
+    it 'links to a full-path reference' do
+      reference = "#{project.full_path}@#{commit1.short_id}...#{commit2.short_id}"
+
+      expect(reference_filter("See #{reference}", context).css('a').first.text).to eql(reference)
     end
   end
 end

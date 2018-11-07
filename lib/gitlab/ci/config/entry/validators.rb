@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     class Config
@@ -48,6 +50,12 @@ module Gitlab
             def validate_each(record, attribute, value)
               unless validate_duration(value)
                 record.errors.add(attribute, 'should be a duration')
+              end
+
+              if options[:limit]
+                unless validate_duration_limit(value, options[:limit])
+                  record.errors.add(attribute, 'should not exceed the limit')
+                end
               end
             end
           end
@@ -127,6 +135,20 @@ module Gitlab
               return validate_regexp(value) if look_like_regexp?(value)
 
               true
+            end
+          end
+
+          class ArrayOfStringsOrStringValidator < RegexpValidator
+            def validate_each(record, attribute, value)
+              unless validate_array_of_strings_or_string(value)
+                record.errors.add(attribute, 'should be an array of strings or a string')
+              end
+            end
+
+            private
+
+            def validate_array_of_strings_or_string(values)
+              validate_array_of_strings(values) || validate_string(values)
             end
           end
 

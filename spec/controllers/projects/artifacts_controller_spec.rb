@@ -19,10 +19,44 @@ describe Projects::ArtifactsController do
   end
 
   describe 'GET download' do
-    it 'sends the artifacts file' do
-      expect(controller).to receive(:send_file).with(job.artifacts_file.path, hash_including(disposition: 'attachment')).and_call_original
+    def download_artifact(extra_params = {})
+      params = { namespace_id: project.namespace, project_id: project, job_id: job }.merge(extra_params)
 
-      get :download, namespace_id: project.namespace, project_id: project, job_id: job
+      get :download, params
+    end
+
+    context 'when no file type is supplied' do
+      it 'sends the artifacts file' do
+        expect(controller).to receive(:send_file).with(job.artifacts_file.path, hash_including(disposition: 'attachment')).and_call_original
+
+        download_artifact
+      end
+    end
+
+    context 'when a file type is supplied' do
+      context 'when an invalid file type is supplied' do
+        let(:file_type) { 'invalid' }
+
+        it 'returns 404' do
+          download_artifact(file_type: file_type)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when codequality file type is supplied' do
+        let(:file_type) { 'codequality' }
+
+        before do
+          create(:ci_job_artifact, :codequality, job: job)
+        end
+
+        it 'sends the codequality report' do
+          expect(controller).to receive(:send_file).with(job.job_artifacts_codequality.file.path, hash_including(disposition: 'attachment')).and_call_original
+
+          download_artifact(file_type: file_type)
+        end
+      end
     end
   end
 
@@ -145,7 +179,21 @@ describe Projects::ArtifactsController do
       context 'when using local file storage' do
         it_behaves_like 'a valid file' do
           let(:job) { create(:ci_build, :success, :artifacts, pipeline: pipeline) }
+          let(:store) { ObjectStorage::Store::LOCAL }
           let(:archive_path) { JobArtifactUploader.root }
+        end
+      end
+
+      context 'when using remote file storage' do
+        before do
+          stub_artifacts_object_storage
+        end
+
+        it_behaves_like 'a valid file' do
+          let!(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
+          let!(:job) { create(:ci_build, :success, pipeline: pipeline) }
+          let(:store) { ObjectStorage::Store::REMOTE }
+          let(:archive_path) { 'https://' }
         end
       end
     end

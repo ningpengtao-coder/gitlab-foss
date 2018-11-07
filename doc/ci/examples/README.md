@@ -4,8 +4,8 @@ comments: false
 
 # GitLab CI/CD Examples
 
-A collection of `.gitlab-ci.yml` template files is maintained at the [GitLab CI/CD YAML project][gitlab-ci-templates]. When you create a new file via the UI,
-GitLab will give you the option to choose one of the templates existent on this project.
+A collection of [`.gitlab-ci.yml` template files][gitlab-ci-templates] is maintained in GitLab. When you create a new file via the UI,
+GitLab will give you the option to choose one of these templates.
 If your favorite programming language or framework are missing we would love your
 help by sending a merge request with a new `.gitlab-ci.yml` to this project.
 
@@ -19,7 +19,9 @@ There's also a collection of repositories with [example projects](https://gitlab
   - [How to test and deploy Laravel/PHP applications with GitLab CI/CD and Envoy](laravel_with_gitlab_and_envoy/index.md)
 - **Ruby**: [Test and deploy a Ruby application to Heroku](test-and-deploy-ruby-application-to-heroku.md)
 - **Python**: [Test and deploy a Python application to Heroku](test-and-deploy-python-application-to-heroku.md)
-- **Java**: [Continuous Delivery of a Spring Boot application with GitLab CI and Kubernetes](https://about.gitlab.com/2016/12/14/continuous-delivery-of-a-spring-boot-application-with-gitlab-ci-and-kubernetes/)
+- **Java**:
+  - [Deploy a Spring Boot application to Cloud Foundry with GitLab CI/CD](deploy_spring_boot_to_cloud_foundry/index.md)
+  - [Continuous Delivery of a Spring Boot application with GitLab CI and Kubernetes](https://about.gitlab.com/2016/12/14/continuous-delivery-of-a-spring-boot-application-with-gitlab-ci-and-kubernetes/)
 - **Scala**: [Test a Scala application](test-scala-application.md)
 - **Clojure**: [Test a Clojure application](test-clojure-application.md)
 - **Elixir**:
@@ -32,34 +34,49 @@ There's also a collection of repositories with [example projects](https://gitlab
 - **Debian**: [Continuous Deployment with GitLab: how to build and deploy a Debian Package with GitLab CI](https://about.gitlab.com/2016/10/12/automated-debian-package-build-with-gitlab-ci/)
 - **Maven**: [How to deploy Maven projects to Artifactory with GitLab CI/CD](artifactory_and_gitlab/index.md)
 
+### Game development
+
+- [DevOps and Game Dev with GitLab CI/CD](devops_and_game_dev_with_gitlab_ci_cd/index.md)
+
 ### Miscellaneous
 
 - [Using `dpl` as deployment tool](deployment/README.md)
 - [The `.gitlab-ci.yml` file for GitLab itself](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab-ci.yml)
 
-### Code quality analysis
+## Test Reports
 
-[Analyze code quality with the Code Climate CLI](code_climate.md).
+[Collect test reports in Verify stage](../junit_test_reports.md).
 
-### Static Application Security Testing (SAST)
+## Code Quality analysis
 
-- **(Ultimate)** [Scan your code for vulnerabilities](https://docs.gitlab.com/ee/ci/examples/sast.html)
-- [Scan your Docker images for vulnerabilities](sast_docker.md)
+**(Starter)** [Analyze your project's Code Quality](code_quality.md).
 
-### Dynamic Application Security Testing (DAST)
+## Static Application Security Testing (SAST)
+
+**(Ultimate)** [Scan your code for vulnerabilities](https://docs.gitlab.com/ee/ci/examples/sast.html)
+
+## Dependency Scanning
+
+**(Ultimate)** [Scan your dependencies for vulnerabilities](https://docs.gitlab.com/ee/ci/examples/dependency_scanning.html)
+
+## Container Scanning
+
+[Scan your Docker images for vulnerabilities](container_scanning.md)
+
+## Dynamic Application Security Testing (DAST)
 
 Scan your app for vulnerabilities with GitLab [Dynamic Application Security Testing (DAST)](dast.md).
 
-### Browser Performance Testing with Sitespeed.io
+## Browser Performance Testing with Sitespeed.io
 
 Analyze your [browser performance with Sitespeed.io](browser_performance.md).
 
-### GitLab CI/CD for Review Apps
+## GitLab CI/CD for Review Apps
 
 - [Example project](https://gitlab.com/gitlab-examples/review-apps-nginx/) that shows how to use GitLab CI/CD for [Review Apps](../review_apps/index.html).
 - [Dockerizing GitLab Review Apps](https://about.gitlab.com/2017/07/11/dockerizing-review-apps/)
 
-### GitLab CI/CD for GitLab Pages
+## GitLab CI/CD for GitLab Pages
 
 See the documentation on [GitLab Pages](../../user/project/pages/index.md) for a complete overview.
 
@@ -70,4 +87,4 @@ language users and GitLab by sending a merge request with a guide for that langu
 You may want to apply for the [GitLab Community Writers Program](https://about.gitlab.com/community-writers/)
 to get paid for writing complete articles for GitLab.
 
-[gitlab-ci-templates]: https://gitlab.com/gitlab-org/gitlab-ci-yml
+[gitlab-ci-templates]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/lib/gitlab/ci/templates

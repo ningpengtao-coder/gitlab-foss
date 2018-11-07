@@ -10,13 +10,16 @@ describe Gitlab::Checks::ChangeAccess do
     let(:ref) { 'refs/heads/master' }
     let(:changes) { { oldrev: oldrev, newrev: newrev, ref: ref } }
     let(:protocol) { 'ssh' }
+    let(:timeout) { Gitlab::GitAccess::INTERNAL_TIMEOUT }
+    let(:logger) { Gitlab::Checks::TimedLogger.new(timeout: timeout) }
 
     subject(:change_access) do
       described_class.new(
         changes,
         project: project,
         user_access: user_access,
-        protocol: protocol
+        protocol: protocol,
+        logger: logger
       )
     end
 
@@ -27,6 +30,19 @@ describe Gitlab::Checks::ChangeAccess do
     context 'without failed checks' do
       it "doesn't raise an error" do
         expect { subject.exec }.not_to raise_error
+      end
+    end
+
+    context 'when time limit was reached' do
+      it 'raises a TimeoutError' do
+        logger = Gitlab::Checks::TimedLogger.new(start_time: timeout.ago, timeout: timeout)
+        access = described_class.new(changes,
+                                     project: project,
+                                     user_access: user_access,
+                                     protocol: protocol,
+                                     logger: logger)
+
+        expect { access.exec }.to raise_error(Gitlab::Checks::TimedLogger::TimeoutError)
       end
     end
 
@@ -52,9 +68,9 @@ describe Gitlab::Checks::ChangeAccess do
       context 'with protected tag' do
         let!(:protected_tag) { create(:protected_tag, project: project, name: 'v*') }
 
-        context 'as master' do
+        context 'as maintainer' do
           before do
-            project.add_master(user)
+            project.add_maintainer(user)
           end
 
           context 'deletion' do
@@ -132,19 +148,29 @@ describe Gitlab::Checks::ChangeAccess do
           expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, 'You are not allowed to push code to protected branches on this project.')
         end
 
+        context 'when project repository is empty' do
+          let(:project) { create(:project) }
+
+          it 'raises an error if the user is not allowed to push to protected branches' do
+            expect(user_access).to receive(:can_push_to_branch?).and_return(false)
+
+            expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /Ask a project Owner or Maintainer to create a default branch/)
+          end
+        end
+
         context 'branch deletion' do
           let(:newrev) { '0000000000000000000000000000000000000000' }
           let(:ref) { 'refs/heads/feature' }
 
           context 'if the user is not allowed to delete protected branches' do
             it 'raises an error' do
-              expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, 'You are not allowed to delete protected branches from this project. Only a project master or owner can delete a protected branch.')
+              expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, 'You are not allowed to delete protected branches from this project. Only a project maintainer or owner can delete a protected branch.')
             end
           end
 
           context 'if the user is allowed to delete protected branches' do
             before do
-              project.add_master(user)
+              project.add_maintainer(user)
             end
 
             context 'through the web interface' do

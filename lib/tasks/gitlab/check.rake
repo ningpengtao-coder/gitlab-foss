@@ -1,6 +1,7 @@
 namespace :gitlab do
   desc 'GitLab | Check the configuration of GitLab and its environment'
   task check: %w{gitlab:gitlab_shell:check
+                 gitlab:gitaly:check
                  gitlab:sidekiq:check
                  gitlab:incoming_email:check
                  gitlab:ldap:check
@@ -44,10 +45,6 @@ namespace :gitlab do
       start_checking "GitLab Shell"
 
       check_gitlab_shell
-      check_repo_base_exists
-      check_repo_base_is_not_symlink
-      check_repo_base_user_and_group
-      check_repo_base_permissions
       check_repos_hooks_directory_is_link
       check_gitlab_shell_self_test
 
@@ -56,116 +53,6 @@ namespace :gitlab do
 
     # Checks
     ########################
-
-    def check_repo_base_exists
-      puts "Repo base directory exists?"
-
-      Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
-        print "#{name}... "
-
-        if File.exist?(repo_base_path)
-          puts "yes".color(:green)
-        else
-          puts "no".color(:red)
-          puts "#{repo_base_path} is missing".color(:red)
-          try_fixing_it(
-            "This should have been created when setting up GitLab Shell.",
-            "Make sure it's set correctly in config/gitlab.yml",
-            "Make sure GitLab Shell is installed correctly."
-          )
-          for_more_information(
-            see_installation_guide_section "GitLab Shell"
-          )
-          fix_and_rerun
-        end
-      end
-    end
-
-    def check_repo_base_is_not_symlink
-      puts "Repo storage directories are symlinks?"
-
-      Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
-        print "#{name}... "
-
-        unless File.exist?(repo_base_path)
-          puts "can't check because of previous errors".color(:magenta)
-          break
-        end
-
-        unless File.symlink?(repo_base_path)
-          puts "no".color(:green)
-        else
-          puts "yes".color(:red)
-          try_fixing_it(
-            "Make sure it's set to the real directory in config/gitlab.yml"
-          )
-          fix_and_rerun
-        end
-      end
-    end
-
-    def check_repo_base_permissions
-      puts "Repo paths access is drwxrws---?"
-
-      Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
-        print "#{name}... "
-
-        unless File.exist?(repo_base_path)
-          puts "can't check because of previous errors".color(:magenta)
-          break
-        end
-
-        if File.stat(repo_base_path).mode.to_s(8).ends_with?("2770")
-          puts "yes".color(:green)
-        else
-          puts "no".color(:red)
-          try_fixing_it(
-            "sudo chmod -R ug+rwX,o-rwx #{repo_base_path}",
-            "sudo chmod -R ug-s #{repo_base_path}",
-            "sudo find #{repo_base_path} -type d -print0 | sudo xargs -0 chmod g+s"
-          )
-          for_more_information(
-            see_installation_guide_section "GitLab Shell"
-          )
-          fix_and_rerun
-        end
-      end
-    end
-
-    def check_repo_base_user_and_group
-      gitlab_shell_ssh_user = Gitlab.config.gitlab_shell.ssh_user
-      puts "Repo paths owned by #{gitlab_shell_ssh_user}:root, or #{gitlab_shell_ssh_user}:#{Gitlab.config.gitlab_shell.owner_group}?"
-
-      Gitlab.config.repositories.storages.each do |name, repository_storage|
-        repo_base_path = repository_storage['path']
-        print "#{name}... "
-
-        unless File.exist?(repo_base_path)
-          puts "can't check because of previous errors".color(:magenta)
-          break
-        end
-
-        user_id = uid_for(gitlab_shell_ssh_user)
-        root_group_id = gid_for('root')
-        group_ids = [root_group_id, gid_for(Gitlab.config.gitlab_shell.owner_group)]
-        if File.stat(repo_base_path).uid == user_id && group_ids.include?(File.stat(repo_base_path).gid)
-          puts "yes".color(:green)
-        else
-          puts "no".color(:red)
-          puts "  User id for #{gitlab_shell_ssh_user}: #{user_id}. Groupd id for root: #{root_group_id}".color(:blue)
-          try_fixing_it(
-            "sudo chown -R #{gitlab_shell_ssh_user}:root #{repo_base_path}"
-          )
-          for_more_information(
-            see_installation_guide_section "GitLab Shell"
-          )
-          fix_and_rerun
-        end
-      end
-    end
 
     def check_repos_hooks_directory_is_link
       print "hooks directories in repos are links: ... "
@@ -242,6 +129,26 @@ namespace :gitlab do
 
     def gitlab_shell_patch_version
       Gitlab::Shell.version_required.split('.')[2].to_i
+    end
+  end
+
+  namespace :gitaly do
+    desc 'GitLab | Check the health of Gitaly'
+    task check: :gitlab_environment do
+      warn_user_is_not_gitlab
+      start_checking 'Gitaly'
+
+      Gitlab::HealthChecks::GitalyCheck.readiness.each do |result|
+        print "#{result.labels[:shard]} ... "
+
+        if result.success
+          puts 'OK'.color(:green)
+        else
+          puts "FAIL: #{result.message}".color(:red)
+        end
+      end
+
+      finished_checking 'Gitaly'
     end
   end
 
@@ -383,14 +290,6 @@ namespace :gitlab do
     end
   end
 
-  namespace :repo do
-    desc "GitLab | Check the integrity of the repositories managed by GitLab"
-    task check: :gitlab_environment do
-      puts "This task is deprecated. Please use gitlab:git:fsck instead".color(:red)
-      Rake::Task["gitlab:git:fsck"].execute
-    end
-  end
-
   namespace :orphans do
     desc 'Gitlab | Check for orphaned namespaces and repositories'
     task check: :gitlab_environment do
@@ -417,26 +316,6 @@ namespace :gitlab do
       checks = [SystemCheck::Orphans::RepositoryCheck]
 
       SystemCheck.run('Orphans', checks)
-    end
-  end
-
-  namespace :user do
-    desc "GitLab | Check the integrity of a specific user's repositories"
-    task :check_repos, [:username] => :gitlab_environment do |t, args|
-      username = args[:username] || prompt("Check repository integrity for username? ".color(:blue))
-      user = User.find_by(username: username)
-      if user
-        repo_dirs = user.authorized_projects.map do |p|
-          File.join(
-            p.repository_storage_path,
-            "#{p.disk_path}.git"
-          )
-        end
-
-        repo_dirs.each { |repo_dir| check_repo_integrity(repo_dir) }
-      else
-        puts "\nUser '#{username}' not found".color(:red)
-      end
     end
   end
 

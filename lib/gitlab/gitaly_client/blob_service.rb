@@ -13,7 +13,7 @@ module Gitlab
           oid: oid,
           limit: limit
         )
-        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_blob, request)
+        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_blob, request, timeout: GitalyClient.fast_timeout)
 
         data = ''
         blob = nil
@@ -43,7 +43,7 @@ module Gitlab
           blob_ids: blob_ids
         )
 
-        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_lfs_pointers, request)
+        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_lfs_pointers, request, timeout: GitalyClient.medium_timeout)
 
         map_lfs_pointers(response)
       end
@@ -66,13 +66,13 @@ module Gitlab
           :blob_service,
           :get_blobs,
           request,
-          timeout: GitalyClient.default_timeout
+          timeout: GitalyClient.fast_timeout
         )
 
         GitalyClient::BlobsStitcher.new(response)
       end
 
-      def get_new_lfs_pointers(revision, limit, not_in)
+      def get_new_lfs_pointers(revision, limit, not_in, dynamic_timeout = nil)
         request = Gitaly::GetNewLFSPointersRequest.new(
           repository: @gitaly_repo,
           revision: encode_binary(revision),
@@ -85,7 +85,20 @@ module Gitlab
           request.not_in_refs += not_in
         end
 
-        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_new_lfs_pointers, request)
+        timeout =
+          if dynamic_timeout
+            [dynamic_timeout, GitalyClient.medium_timeout].min
+          else
+            GitalyClient.medium_timeout
+          end
+
+        response = GitalyClient.call(
+          @gitaly_repo.storage_name,
+          :blob_service,
+          :get_new_lfs_pointers,
+          request,
+          timeout: timeout
+        )
 
         map_lfs_pointers(response)
       end
@@ -96,7 +109,7 @@ module Gitlab
           revision: encode_binary(revision)
         )
 
-        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_all_lfs_pointers, request)
+        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_all_lfs_pointers, request, timeout: GitalyClient.medium_timeout)
 
         map_lfs_pointers(response)
       end

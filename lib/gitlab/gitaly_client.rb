@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 
 require 'gitaly'
@@ -23,7 +25,7 @@ module Gitlab
         stacks = most_invoked_stack.join('\n') if most_invoked_stack
 
         msg = "GitalyClient##{call_site} called #{invocation_count} times from single request. Potential n+1?"
-        msg << "\nThe following call site called into Gitaly #{max_call_stack} times:\n#{stacks}\n" if stacks
+        msg = "#{msg}\nThe following call site called into Gitaly #{max_call_stack} times:\n#{stacks}\n" if stacks
 
         super(msg)
       end
@@ -83,6 +85,10 @@ module Gitlab
       end
     end
 
+    def self.random_storage
+      Gitlab.config.repositories.storages.keys.sample
+    end
+
     def self.address(storage)
       params = Gitlab.config.repositories.storages[storage]
       raise "storage not found: #{storage.inspect}" if params.nil?
@@ -119,6 +125,9 @@ module Gitlab
     #
     def self.call(storage, service, rpc, request, remote_storage: nil, timeout: nil)
       start = Gitlab::Metrics::System.monotonic_time
+      request_hash = request.is_a?(Google::Protobuf::MessageExts) ? request.to_h : {}
+      @current_call_id ||= SecureRandom.uuid
+
       enforce_gitaly_request_limits(:call)
 
       kwargs = request_kwargs(storage, timeout, remote_storage: remote_storage)
@@ -135,6 +144,10 @@ module Gitlab
       gitaly_controller_action_duration_seconds.observe(
         current_transaction_labels.merge(gitaly_service: service.to_s, rpc: rpc.to_s),
         duration)
+
+      add_call_details(id: @current_call_id, feature: service, duration: duration, request: request_hash)
+
+      @current_call_id = nil
     end
 
     def self.handle_grpc_unavailable!(ex)
@@ -163,10 +176,29 @@ module Gitlab
     end
     private_class_method :current_transaction_labels
 
+    # For some time related tasks we can't rely on `Time.now` since it will be
+    # affected by Timecop in some tests, and the clock of some gitaly-related
+    # components (grpc's c-core and gitaly server) use system time instead of
+    # timecop's time, so tests will fail.
+    # `Time.at(Process.clock_gettime(Process::CLOCK_REALTIME))` will circumvent
+    # timecop.
+    def self.real_time
+      Time.at(Process.clock_gettime(Process::CLOCK_REALTIME))
+    end
+    private_class_method :real_time
+
+    def self.authorization_token(storage)
+      token = token(storage).to_s
+      issued_at = real_time.to_i.to_s
+      hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, token, issued_at)
+
+      "v2.#{hmac}.#{issued_at}"
+    end
+    private_class_method :authorization_token
+
     def self.request_kwargs(storage, timeout, remote_storage: nil)
-      encoded_token = Base64.strict_encode64(token(storage).to_s)
       metadata = {
-        'authorization' => "Bearer #{encoded_token}",
+        'authorization' => "Bearer #{authorization_token(storage)}",
         'client_name' => CLIENT_NAME
       }
 
@@ -175,6 +207,8 @@ module Gitlab
       metadata['call_site'] = feature.to_s if feature
       metadata['gitaly-servers'] = address_metadata(remote_storage) if remote_storage
 
+      metadata.merge!(server_feature_flags)
+
       result = { metadata: metadata }
 
       # nil timeout indicates that we should use the default
@@ -182,15 +216,18 @@ module Gitlab
 
       return result unless timeout > 0
 
-      # Do not use `Time.now` for deadline calculation, since it
-      # will be affected by Timecop in some tests, but grpc's c-core
-      # uses system time instead of timecop's time, so tests will fail
-      # `Time.at(Process.clock_gettime(Process::CLOCK_REALTIME))` will
-      # circumvent timecop
-      deadline = Time.at(Process.clock_gettime(Process::CLOCK_REALTIME)) + timeout
+      deadline = real_time + timeout
       result[:deadline] = deadline
 
       result
+    end
+
+    SERVER_FEATURE_FLAGS = %w[gogit_findcommit].freeze
+
+    def self.server_feature_flags
+      SERVER_FEATURE_FLAGS.map do |f|
+        ["gitaly-feature-#{f.tr('_', '-')}", feature_enabled?(f).to_s]
+      end.to_h
     end
 
     def self.token(storage)
@@ -223,10 +260,21 @@ module Gitlab
       when MigrationStatus::OPT_OUT
         true
       when MigrationStatus::OPT_IN
-        opt_into_all_features?
+        opt_into_all_features? && !explicit_opt_in_required.include?(feature_name)
       else
         false
       end
+    rescue => ex
+      # During application startup feature lookups in SQL can fail
+      Rails.logger.warn "exception while checking Gitaly feature status for #{feature_name}: #{ex}"
+      false
+    end
+
+    # We have a mechanism to let GitLab automatically opt in to all Gitaly
+    # features. We want to be able to exclude some features from automatic
+    # opt-in. This function has an override in EE.
+    def self.explicit_opt_in_required
+      []
     end
 
     # opt_into_all_features? returns true when the current environment
@@ -252,12 +300,16 @@ module Gitlab
           feature_stack.unshift(feature)
           begin
             start = Gitlab::Metrics::System.monotonic_time
+            @current_call_id = SecureRandom.uuid
+            call_details = { id: @current_call_id }
             yield is_enabled
           ensure
             total_time = Gitlab::Metrics::System.monotonic_time - start
             gitaly_migrate_call_duration_seconds.observe({ gitaly_enabled: is_enabled, feature: feature }, total_time)
             feature_stack.shift
             Thread.current[:gitaly_feature_stack] = nil if feature_stack.empty?
+
+            add_call_details(call_details.merge(feature: feature, duration: total_time))
           end
         end
       end
@@ -266,7 +318,7 @@ module Gitlab
     # Ensures that Gitaly is not being abuse through n+1 misuse etc
     def self.enforce_gitaly_request_limits(call_site)
       # Only count limits in request-response environments (not sidekiq for example)
-      return unless RequestStore.active?
+      return unless Gitlab::SafeRequestStore.active?
 
       # This is this actual number of times this call was made. Used for information purposes only
       actual_call_count = increment_call_count("gitaly_#{call_site}_actual")
@@ -290,7 +342,7 @@ module Gitlab
     end
 
     def self.allow_n_plus_1_calls
-      return yield unless RequestStore.active?
+      return yield unless Gitlab::SafeRequestStore.active?
 
       begin
         increment_call_count(:gitaly_call_count_exception_block_depth)
@@ -301,25 +353,25 @@ module Gitlab
     end
 
     def self.get_call_count(key)
-      RequestStore.store[key] || 0
+      Gitlab::SafeRequestStore[key] || 0
     end
     private_class_method :get_call_count
 
     def self.increment_call_count(key)
-      RequestStore.store[key] ||= 0
-      RequestStore.store[key] += 1
+      Gitlab::SafeRequestStore[key] ||= 0
+      Gitlab::SafeRequestStore[key] += 1
     end
     private_class_method :increment_call_count
 
     def self.decrement_call_count(key)
-      RequestStore.store[key] -= 1
+      Gitlab::SafeRequestStore[key] -= 1
     end
     private_class_method :decrement_call_count
 
     # Returns an estimate of the number of Gitaly calls made for this
     # request
     def self.get_request_count
-      return 0 unless RequestStore.active?
+      return 0 unless Gitlab::SafeRequestStore.active?
 
       gitaly_migrate_count = get_call_count("gitaly_migrate_actual")
       gitaly_call_count = get_call_count("gitaly_call_actual")
@@ -336,12 +388,28 @@ module Gitlab
     end
 
     def self.reset_counts
-      return unless RequestStore.active?
+      return unless Gitlab::SafeRequestStore.active?
 
       %w[migrate call].each do |call_site|
-        RequestStore.store["gitaly_#{call_site}_actual"] = 0
-        RequestStore.store["gitaly_#{call_site}_permitted"] = 0
+        Gitlab::SafeRequestStore["gitaly_#{call_site}_actual"] = 0
+        Gitlab::SafeRequestStore["gitaly_#{call_site}_permitted"] = 0
       end
+    end
+
+    def self.add_call_details(details)
+      id = details.delete(:id)
+
+      return unless id && Gitlab::SafeRequestStore[:peek_enabled]
+
+      Gitlab::SafeRequestStore['gitaly_call_details'] ||= {}
+      Gitlab::SafeRequestStore['gitaly_call_details'][id] ||= {}
+      Gitlab::SafeRequestStore['gitaly_call_details'][id].merge!(details)
+    end
+
+    def self.list_call_details
+      return {} unless Gitlab::SafeRequestStore[:peek_enabled]
+
+      Gitlab::SafeRequestStore['gitaly_call_details'] || {}
     end
 
     def self.expected_server_version
@@ -349,13 +417,13 @@ module Gitlab
       path.read.chomp
     end
 
-    def self.timestamp(t)
-      Google::Protobuf::Timestamp.new(seconds: t.to_i)
+    def self.timestamp(time)
+      Google::Protobuf::Timestamp.new(seconds: time.to_i)
     end
 
     # The default timeout on all Gitaly calls
     def self.default_timeout
-      return 0 if Sidekiq.server?
+      return no_timeout if Sidekiq.server?
 
       timeout(:gitaly_timeout_default)
     end
@@ -368,6 +436,10 @@ module Gitlab
       timeout(:gitaly_timeout_medium)
     end
 
+    def self.no_timeout
+      0
+    end
+
     def self.timeout(timeout_name)
       Gitlab::CurrentSettings.current_application_settings[timeout_name]
     end
@@ -375,22 +447,22 @@ module Gitlab
 
     # Count a stack. Used for n+1 detection
     def self.count_stack
-      return unless RequestStore.active?
+      return unless Gitlab::SafeRequestStore.active?
 
-      stack_string = caller.drop(1).join("\n")
+      stack_string = Gitlab::Profiler.clean_backtrace(caller).drop(1).join("\n")
 
-      RequestStore.store[:stack_counter] ||= Hash.new
+      Gitlab::SafeRequestStore[:stack_counter] ||= Hash.new
 
-      count = RequestStore.store[:stack_counter][stack_string] || 0
-      RequestStore.store[:stack_counter][stack_string] = count + 1
+      count = Gitlab::SafeRequestStore[:stack_counter][stack_string] || 0
+      Gitlab::SafeRequestStore[:stack_counter][stack_string] = count + 1
     end
     private_class_method :count_stack
 
     # Returns a count for the stack which called Gitaly the most times. Used for n+1 detection
     def self.max_call_count
-      return 0 unless RequestStore.active?
+      return 0 unless Gitlab::SafeRequestStore.active?
 
-      stack_counter = RequestStore.store[:stack_counter]
+      stack_counter = Gitlab::SafeRequestStore[:stack_counter]
       return 0 unless stack_counter
 
       stack_counter.values.max
@@ -399,9 +471,9 @@ module Gitlab
 
     # Returns the stacks that calls Gitaly the most times. Used for n+1 detection
     def self.max_stacks
-      return nil unless RequestStore.active?
+      return nil unless Gitlab::SafeRequestStore.active?
 
-      stack_counter = RequestStore.store[:stack_counter]
+      stack_counter = Gitlab::SafeRequestStore[:stack_counter]
       return nil unless stack_counter
 
       max = max_call_count

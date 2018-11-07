@@ -1,9 +1,8 @@
 # Custom Git Hooks
 
->
-**Note:** Custom Git hooks must be configured on the filesystem of the GitLab
+> **Note:** Custom Git hooks must be configured on the filesystem of the GitLab
 server. Only GitLab server administrators will be able to complete these tasks.
-Please explore [webhooks] as an option if you do not
+Please explore [webhooks] and [CI] as an option if you do not
 have filesystem access. For a user configurable Git hook interface, see
 [Push Rules](https://docs.gitlab.com/ee/push_rules/push_rules.html),
 available in GitLab Enterprise Edition.
@@ -51,6 +50,9 @@ Hooks can be also placed in `hooks/<hook_name>.d` (global) or
 `custom_hooks/<hook_name>.d` (per project) directories supporting chained
 execution of the hooks.
 
+NOTE: **Note:** `<hook_name>.d` would need to be either `pre-receive.d`,
+`post-receive.d`, or `update.d` to work properly. Any other names will be ignored. 
+
 To look in a different directory for the global custom hooks (those in
 `hooks/<hook_name.d>`), set `custom_hooks_dir` in gitlab-shell config. For
 Omnibus installations, this can be set in `gitlab.rb`; and in source
@@ -80,6 +82,7 @@ STDERR takes precedence over STDOUT.
 
 ![Custom message from custom Git hook](img/custom_hooks_error_msg.png)
 
+[CI]: ../ci/README.md
 [hooks]: https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks#Server-Side-Hooks
 [webhooks]: ../user/project/integrations/webhooks.md
 [5073]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5073

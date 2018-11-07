@@ -86,7 +86,7 @@ module Gitlab
         # Example:
         #
         #     Gitlab::Metrics.measure(:find_by_username_duration) do
-        #       User.find_by_username(some_username)
+        #       UserFinder.new(some_username).find_by_username
         #     end
         #
         # name - The name of the field to store the execution time in.
@@ -162,7 +162,6 @@ module Gitlab
 
         # When enabled this should be set before being used as the usual pattern
         # "@foo ||= bar" is _not_ thread-safe.
-        # rubocop:disable Gitlab/ModuleWithInstanceVariables
         def pool
           if influx_metrics_enabled?
             if @pool.nil?
@@ -180,7 +179,6 @@ module Gitlab
             @pool
           end
         end
-        # rubocop:enable Gitlab/ModuleWithInstanceVariables
       end
     end
   end

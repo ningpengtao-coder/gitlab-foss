@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import flash from '~/flash';
 import { __ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
@@ -6,7 +7,8 @@ import ContributorsStatGraph from './stat_graph_contributors';
 document.addEventListener('DOMContentLoaded', () => {
   const url = document.querySelector('.js-graphs-show').dataset.projectGraphPath;
 
-  axios.get(url)
+  axios
+    .get(url)
     .then(({ data }) => {
       const graph = new ContributorsStatGraph();
       graph.init(data);

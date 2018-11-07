@@ -13,7 +13,7 @@ export default class SketchLoader {
     return this.getZipFile()
       .then(data => JSZip.loadAsync(data))
       .then(asyncResult => asyncResult.files['previews/preview.png'].async('uint8array'))
-      .then((content) => {
+      .then(content => {
         const url = window.URL || window.webkitURL;
         const blob = new Blob([new Uint8Array(content)], {
           type: 'image/png',
@@ -44,7 +44,7 @@ export default class SketchLoader {
     previewLink.href = previewUrl;
     previewLink.target = '_blank';
     previewImage.src = previewUrl;
-    previewImage.className = 'img-responsive';
+    previewImage.className = 'img-fluid';
 
     previewLink.appendChild(previewImage);
     this.container.appendChild(previewLink);

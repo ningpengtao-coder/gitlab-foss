@@ -1,6 +1,3 @@
-window.gl = window.gl || {};
-window.gl.issueBoards = window.gl.issueBoards || {};
-
 class ModalStore {
   constructor() {
     this.store = {
@@ -29,7 +26,7 @@ class ModalStore {
 
   toggleIssue(issueObj) {
     const issue = issueObj;
-    const selected = issue.selected;
+    const { selected } = issue;
 
     issue.selected = !selected;
 
@@ -43,7 +40,7 @@ class ModalStore {
   toggleAll() {
     const select = this.selectedCount() !== this.store.issues.length;
 
-    this.store.issues.forEach((issue) => {
+    this.store.issues.forEach(issue => {
       const issueUpdate = issue;
 
       if (issueUpdate.selected !== select) {
@@ -72,13 +69,14 @@ class ModalStore {
 
   removeSelectedIssue(issue, forcePurge = false) {
     if (this.store.activeTab === 'all' || forcePurge) {
-      this.store.selectedIssues = this.store.selectedIssues
-        .filter(fIssue => fIssue.id !== issue.id);
+      this.store.selectedIssues = this.store.selectedIssues.filter(
+        fIssue => fIssue.id !== issue.id,
+      );
     }
   }
 
   purgeUnselectedIssues() {
-    this.store.selectedIssues.forEach((issue) => {
+    this.store.selectedIssues.forEach(issue => {
       if (!issue.selected) {
         this.removeSelectedIssue(issue, true);
       }
@@ -90,9 +88,8 @@ class ModalStore {
   }
 
   findSelectedIssue(issue) {
-    return this.store.selectedIssues
-      .filter(filteredIssue => filteredIssue.id === issue.id)[0];
+    return this.store.selectedIssues.filter(filteredIssue => filteredIssue.id === issue.id)[0];
   }
 }
 
-gl.issueBoards.ModalStore = new ModalStore();
+export default new ModalStore();

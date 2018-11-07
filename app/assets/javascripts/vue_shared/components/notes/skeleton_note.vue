@@ -1,3 +1,14 @@
+<script>
+import { GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
+
+export default {
+  name: 'SkeletonNote',
+  components: {
+    GlSkeletonLoading,
+  },
+};
+</script>
+
 <template>
   <li class="timeline-entry note">
     <div class="timeline-entry-inner">
@@ -6,19 +17,9 @@
       <div class="timeline-content">
         <div class="note-header"></div>
         <div class="note-body">
-          <skeleton-loading-container />
+          <gl-skeleton-loading />
         </div>
       </div>
     </div>
   </li>
 </template>
-
-<script>
-  import skeletonLoadingContainer from '~/vue_shared/components/skeleton_loading_container.vue';
-
-  export default {
-    components: {
-      skeletonLoadingContainer,
-    },
-  };
-</script>

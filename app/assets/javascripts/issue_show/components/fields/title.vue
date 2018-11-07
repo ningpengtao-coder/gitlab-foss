@@ -1,15 +1,15 @@
 <script>
-  import updateMixin from '../../mixins/update';
+import updateMixin from '../../mixins/update';
 
-  export default {
-    mixins: [updateMixin],
-    props: {
-      formState: {
-        type: Object,
-        required: true,
-      },
+export default {
+  mixins: [updateMixin],
+  props: {
+    formState: {
+      type: Object,
+      required: true,
     },
-  };
+  },
+};
 </script>
 
 <template>
@@ -21,11 +21,11 @@
     </label>
     <input
       id="issuable-title"
-      class="form-control"
+      v-model="formState.title"
+      class="form-control qa-title-input"
       type="text"
       placeholder="Title"
       aria-label="Title"
-      v-model="formState.title"
       @keydown.meta.enter="updateIssuable"
       @keydown.ctrl.enter="updateIssuable" />
   </fieldset>

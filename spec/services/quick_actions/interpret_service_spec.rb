@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe QuickActions::InterpretService do
@@ -6,6 +8,7 @@ describe QuickActions::InterpretService do
   let(:developer2) { create(:user) }
   let(:issue) { create(:issue, project: project) }
   let(:milestone) { create(:milestone, project: project, title: '9.10') }
+  let(:commit) { create(:commit, project: project) }
   let(:inprogress) { create(:label, project: project, title: 'In Progress') }
   let(:bug) { create(:label, project: project, title: 'Bug') }
   let(:note) { build(:note, commit_id: merge_request.diff_head_sha) }
@@ -271,6 +274,28 @@ describe QuickActions::InterpretService do
       end
     end
 
+    shared_examples 'lock command' do
+      let(:issue) { create(:issue, project: project, discussion_locked: false) }
+      let(:merge_request) { create(:merge_request, source_project: project, discussion_locked: false) }
+
+      it 'returns discussion_locked: true if content contains /lock' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(discussion_locked: true)
+      end
+    end
+
+    shared_examples 'unlock command' do
+      let(:issue) { create(:issue, project: project, discussion_locked: true) }
+      let(:merge_request) { create(:merge_request, source_project: project, discussion_locked: true) }
+
+      it 'returns discussion_locked: true if content contains /unlock' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(discussion_locked: false)
+      end
+    end
+
     shared_examples 'empty command' do
       it 'populates {} if content contains an unsupported command' do
         _, updates = service.execute(content, issuable)
@@ -290,7 +315,7 @@ describe QuickActions::InterpretService do
     end
 
     shared_examples 'award command' do
-      it 'toggle award 100 emoji if content containts /award :100:' do
+      it 'toggle award 100 emoji if content contains /award :100:' do
         _, updates = service.execute(content, issuable)
 
         expect(updates).to eq(emoji_award: "100")
@@ -303,6 +328,31 @@ describe QuickActions::InterpretService do
         _, updates = service.execute(content, issuable)
 
         expect(updates).to eq(canonical_issue_id: issue_duplicate.id)
+      end
+    end
+
+    shared_examples 'copy_metadata command' do
+      it 'fetches issue or merge request and copies labels and milestone if content contains /copy_metadata reference' do
+        source_issuable # populate the issue
+        todo_label # populate this label
+        inreview_label # populate this label
+        _, updates = service.execute(content, issuable)
+
+        expect(updates[:add_label_ids]).to match_array([inreview_label.id, todo_label.id])
+
+        if source_issuable.milestone
+          expect(updates[:milestone_id]).to eq(source_issuable.milestone.id)
+        else
+          expect(updates).not_to have_key(:milestone_id)
+        end
+      end
+    end
+
+    shared_examples 'confidential command' do
+      it 'marks issue as confidential if content contains /confidential' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(confidential: true)
       end
     end
 
@@ -319,6 +369,22 @@ describe QuickActions::InterpretService do
         new_content, _ = service.execute(content, issuable)
 
         expect(new_content).to end_with(described_class::TABLEFLIP)
+      end
+    end
+
+    shared_examples 'tag command' do
+      it 'tags a commit' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(tag_name: tag_name, tag_message: tag_message)
+      end
+    end
+
+    shared_examples 'assign command' do
+      it 'assigns to a single user' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(assignee_ids: [developer.id])
       end
     end
 
@@ -416,67 +482,56 @@ describe QuickActions::InterpretService do
       let(:issuable) { issue }
     end
 
-    context 'assign command' do
-      let(:content) { "/assign @#{developer.username}" }
-
-      context 'Issue' do
-        it 'fetches assignee and populates assignee_ids if content contains /assign' do
-          _, updates = service.execute(content, issue)
-
-          expect(updates[:assignee_ids]).to match_array([developer.id])
-        end
+    context 'assign command with one user' do
+      it_behaves_like 'assign command' do
+        let(:content) { "/assign @#{developer.username}" }
+        let(:issuable) { issue }
       end
 
-      context 'Merge Request' do
-        it 'fetches assignee and populates assignee_ids if content contains /assign' do
-          _, updates = service.execute(content, merge_request)
-
-          expect(updates).to eq(assignee_ids: [developer.id])
-        end
+      it_behaves_like 'assign command' do
+        let(:content) { "/assign @#{developer.username}" }
+        let(:issuable) { merge_request }
       end
     end
 
+    # CE does not have multiple assignees
     context 'assign command with multiple assignees' do
-      let(:content) { "/assign @#{developer.username} @#{developer2.username}" }
-
       before do
         project.add_developer(developer2)
       end
 
-      context 'Issue' do
-        it 'fetches assignee and populates assignee_ids if content contains /assign' do
-          _, updates = service.execute(content, issue)
-
-          expect(updates[:assignee_ids]).to match_array([developer.id])
-        end
+      it_behaves_like 'assign command' do
+        let(:content) { "/assign @#{developer.username} @#{developer2.username}" }
+        let(:issuable) { issue }
       end
 
-      context 'Merge Request' do
-        it 'fetches assignee and populates assignee_ids if content contains /assign' do
-          _, updates = service.execute(content, merge_request)
-
-          expect(updates).to eq(assignee_ids: [developer.id])
-        end
+      it_behaves_like 'assign command' do
+        let(:content) { "/assign @#{developer.username} @#{developer2.username}" }
+        let(:issuable) { merge_request }
       end
     end
 
     context 'assign command with me alias' do
-      let(:content) { "/assign me" }
-
-      context 'Issue' do
-        it 'fetches assignee and populates assignee_ids if content contains /assign' do
-          _, updates = service.execute(content, issue)
-
-          expect(updates).to eq(assignee_ids: [developer.id])
-        end
+      it_behaves_like 'assign command' do
+        let(:content) { '/assign me' }
+        let(:issuable) { issue }
       end
 
-      context 'Merge Request' do
-        it 'fetches assignee and populates assignee_ids if content contains /assign' do
-          _, updates = service.execute(content, merge_request)
+      it_behaves_like 'assign command' do
+        let(:content) { '/assign me' }
+        let(:issuable) { merge_request }
+      end
+    end
 
-          expect(updates).to eq(assignee_ids: [developer.id])
-        end
+    context 'assign command with me alias and whitespace' do
+      it_behaves_like 'assign command' do
+        let(:content) { '/assign  me ' }
+        let(:issuable) { issue }
+      end
+
+      it_behaves_like 'assign command' do
+        let(:content) { '/assign  me ' }
+        let(:issuable) { merge_request }
       end
     end
 
@@ -600,16 +655,6 @@ describe QuickActions::InterpretService do
 
     it_behaves_like 'relabel command' do
       let(:content) { %(/relabel ~"#{inprogress.title}") }
-      let(:issuable) { merge_request }
-    end
-
-    it_behaves_like 'todo command' do
-      let(:content) { '/todo' }
-      let(:issuable) { issue }
-    end
-
-    it_behaves_like 'todo command' do
-      let(:content) { '/todo' }
       let(:issuable) { merge_request }
     end
 
@@ -757,6 +802,119 @@ describe QuickActions::InterpretService do
       let(:issuable) { issue }
     end
 
+    it_behaves_like 'confidential command' do
+      let(:content) { '/confidential' }
+      let(:issuable) { issue }
+    end
+
+    it_behaves_like 'lock command' do
+      let(:content) { '/lock' }
+      let(:issuable) { issue }
+    end
+
+    it_behaves_like 'lock command' do
+      let(:content) { '/lock' }
+      let(:issuable) { merge_request }
+    end
+
+    it_behaves_like 'unlock command' do
+      let(:content) { '/unlock' }
+      let(:issuable) { issue }
+    end
+
+    it_behaves_like 'unlock command' do
+      let(:content) { '/unlock' }
+      let(:issuable) { merge_request }
+    end
+
+    context '/todo' do
+      let(:content) { '/todo' }
+
+      context 'if issuable is an Issue' do
+        it_behaves_like 'todo command' do
+          let(:issuable) { issue }
+        end
+      end
+
+      context 'if issuable is a MergeRequest' do
+        it_behaves_like 'todo command' do
+          let(:issuable) { merge_request }
+        end
+      end
+
+      context 'if issuable is a Commit' do
+        it_behaves_like 'empty command' do
+          let(:issuable) { commit }
+        end
+      end
+    end
+
+    context '/copy_metadata command' do
+      let(:todo_label) { create(:label, project: project, title: 'To Do') }
+      let(:inreview_label) { create(:label, project: project, title: 'In Review') }
+
+      it_behaves_like 'empty command' do
+        let(:content) { '/copy_metadata' }
+        let(:issuable) { issue }
+      end
+
+      it_behaves_like 'copy_metadata command' do
+        let(:source_issuable) { create(:labeled_issue, project: project, labels: [inreview_label, todo_label]) }
+
+        let(:content) { "/copy_metadata #{source_issuable.to_reference}" }
+        let(:issuable) { build(:issue, project: project) }
+      end
+
+      it_behaves_like 'copy_metadata command' do
+        let(:source_issuable) { create(:labeled_issue, project: project, labels: [inreview_label, todo_label]) }
+
+        let(:content) { "/copy_metadata #{source_issuable.to_reference}" }
+        let(:issuable) { issue }
+      end
+
+      context 'when the parent issuable has a milestone' do
+        it_behaves_like 'copy_metadata command' do
+          let(:source_issuable) { create(:labeled_issue, project: project, labels: [todo_label, inreview_label], milestone: milestone) }
+
+          let(:content) { "/copy_metadata #{source_issuable.to_reference(project)}" }
+          let(:issuable) { issue }
+        end
+      end
+
+      context 'when more than one issuable is passed' do
+        it_behaves_like 'copy_metadata command' do
+          let(:source_issuable) { create(:labeled_issue, project: project, labels: [inreview_label, todo_label]) }
+          let(:other_label) { create(:label, project: project, title: 'Other') }
+          let(:other_source_issuable) { create(:labeled_issue, project: project, labels: [other_label]) }
+
+          let(:content) { "/copy_metadata #{source_issuable.to_reference} #{other_source_issuable.to_reference}" }
+          let(:issuable) { issue }
+        end
+      end
+
+      context 'cross project references' do
+        it_behaves_like 'empty command' do
+          let(:other_project) { create(:project, :public) }
+          let(:source_issuable) { create(:labeled_issue, project: other_project, labels: [todo_label, inreview_label]) }
+          let(:content) { "/copy_metadata #{source_issuable.to_reference(project)}" }
+          let(:issuable) { issue }
+        end
+
+        it_behaves_like 'empty command' do
+          let(:content) { "/copy_metadata imaginary#1234" }
+          let(:issuable) { issue }
+        end
+
+        it_behaves_like 'empty command' do
+          let(:other_project) { create(:project, :private) }
+          let(:source_issuable) { create(:issue, project: other_project) }
+
+          let(:content) { "/copy_metadata #{source_issuable.to_reference(project)}" }
+          let(:issuable) { issue }
+        end
+      end
+    end
+
     context '/duplicate command' do
       it_behaves_like 'duplicate command' do
         let(:issue_duplicate) { create(:issue, project: project) }
@@ -843,7 +1001,22 @@ describe QuickActions::InterpretService do
       end
 
       it_behaves_like 'empty command' do
+        let(:content) { '/confidential' }
+        let(:issuable) { issue }
+      end
+
+      it_behaves_like 'empty command' do
         let(:content) { '/duplicate #{issue.to_reference}' }
+        let(:issuable) { issue }
+      end
+
+      it_behaves_like 'empty command' do
+        let(:content) { '/lock' }
+        let(:issuable) { issue }
+      end
+
+      it_behaves_like 'empty command' do
+        let(:content) { '/unlock' }
         let(:issuable) { issue }
       end
     end
@@ -876,6 +1049,12 @@ describe QuickActions::InterpretService do
           let(:content) { '/award :lorem_ipsum:' }
           let(:issuable) { issue }
         end
+      end
+
+      context 'if issuable is a Commit' do
+        let(:content) { '/award :100:' }
+        let(:issuable) { commit }
+        it_behaves_like 'empty command'
       end
     end
 
@@ -1006,6 +1185,32 @@ describe QuickActions::InterpretService do
       context 'if issuable is not an Issue' do
         let(:issuable) { merge_request }
         it_behaves_like 'empty command'
+      end
+    end
+
+    context '/tag command' do
+      let(:issuable) { commit }
+
+      context 'ignores command with no argument' do
+        it_behaves_like 'empty command' do
+          let(:content) { '/tag' }
+        end
+      end
+
+      context 'tags a commit with a tag name' do
+        it_behaves_like 'tag command' do
+          let(:tag_name) { 'v1.2.3' }
+          let(:tag_message) { nil }
+          let(:content) { "/tag #{tag_name}" }
+        end
+      end
+
+      context 'tags a commit with a tag name and message' do
+        it_behaves_like 'tag command' do
+          let(:tag_name) { 'v1.2.3' }
+          let(:tag_message) { 'Stable release' }
+          let(:content) { "/tag #{tag_name} #{tag_message}" }
+        end
       end
     end
   end
@@ -1190,7 +1395,7 @@ describe QuickActions::InterpretService do
       it 'includes the formatted duration and proper verb' do
         _, explanations = service.explain(content, issue)
 
-        expect(explanations).to eq(['Substracts 2h spent time.'])
+        expect(explanations).to eq(['Subtracts 2h spent time.'])
       end
     end
 
@@ -1223,6 +1428,40 @@ describe QuickActions::InterpretService do
         _, explanations = service.explain(content, issue)
 
         expect(explanations).to eq(["Moves this issue to test/project."])
+      end
+    end
+
+    describe 'tag a commit' do
+      describe 'with a tag name' do
+        context 'without a message' do
+          let(:content) { '/tag v1.2.3' }
+
+          it 'includes the tag name only' do
+            _, explanations = service.explain(content, commit)
+
+            expect(explanations).to eq(["Tags this commit to v1.2.3."])
+          end
+        end
+
+        context 'with an empty message' do
+          let(:content) { '/tag v1.2.3 ' }
+
+          it 'includes the tag name only' do
+            _, explanations = service.explain(content, commit)
+
+            expect(explanations).to eq(["Tags this commit to v1.2.3."])
+          end
+        end
+      end
+
+      describe 'with a tag name and message' do
+        let(:content) { '/tag v1.2.3 Stable release' }
+
+        it 'includes the tag name and message' do
+          _, explanations = service.explain(content, commit)
+
+          expect(explanations).to eq(["Tags this commit to v1.2.3 with \"Stable release\"."])
+        end
       end
     end
   end

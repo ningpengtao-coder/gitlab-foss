@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Pipeline
@@ -11,7 +13,7 @@ module Gitlab
             end
 
             def evaluate(variables = {})
-              HashWithIndifferentAccess.new(variables).fetch(@name, nil)
+              variables.with_indifferent_access.fetch(@name, nil)
             end
 
             def self.build(string)

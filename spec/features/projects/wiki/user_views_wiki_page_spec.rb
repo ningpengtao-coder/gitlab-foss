@@ -2,22 +2,26 @@ require 'spec_helper'
 
 describe 'User views a wiki page' do
   shared_examples 'wiki page user view' do
+    include WikiHelpers
+
     let(:user) { create(:user) }
-    let(:project) { create(:project, namespace: user.namespace) }
+    let(:project) { create(:project, :wiki_repo, namespace: user.namespace) }
+    let(:path) { 'image.png' }
     let(:wiki_page) do
       create(:wiki_page,
         wiki: project.wiki,
-        attrs: { title: 'home', content: 'Look at this [image](image.jpg)\n\n ![alt text](image.jpg)' })
+        attrs: { title: 'home', content: "Look at this [image](#{path})\n\n ![alt text](#{path})" })
     end
 
     before do
-      project.add_master(user)
+      project.add_maintainer(user)
       sign_in(user)
     end
 
     context 'when wiki is empty' do
       before do
         visit(project_wikis_path(project))
+        click_link "Create your first page"
 
         click_on('New page')
 
@@ -81,32 +85,26 @@ describe 'User views a wiki page' do
         expect(find('.wiki-pages')).to have_content(wiki_page.title.capitalize)
       end
 
-      it 'shows a file stored in a page' do
-        gollum_file_double = double('Gollum::File',
-                                    mime_type: 'image/jpeg',
-                                    name: 'images/image.jpg',
-                                    path: 'images/image.jpg',
-                                    raw_data: '')
-        wiki_file = Gitlab::Git::WikiFile.new(gollum_file_double)
+      context 'shows a file stored in a page' do
+        let(:path) { upload_file_to_wiki(project, user, 'dk.png') }
 
-        allow(wiki_file).to receive(:mime_type).and_return('image/jpeg')
-        allow_any_instance_of(ProjectWiki).to receive(:find_file).with('image.jpg', nil).and_return(wiki_file)
+        it do
+          expect(page).to have_xpath("//img[@data-src='#{project.wiki.wiki_base_path}/#{path}']")
+          expect(page).to have_link('image', href: "#{project.wiki.wiki_base_path}/#{path}")
 
-        expect(page).to have_xpath('//img[@data-src="image.jpg"]')
-        expect(page).to have_link('image', href: "#{project.wiki.wiki_base_path}/image.jpg")
+          click_on('image')
 
-        click_on('image')
-
-        expect(current_path).to match('wikis/image.jpg')
-        expect(page).not_to have_xpath('/html') # Page should render the image which means there is no html involved
+          expect(current_path).to match("wikis/#{path}")
+          expect(page).not_to have_xpath('/html') # Page should render the image which means there is no html involved
+        end
       end
 
       it 'shows the creation page if file does not exist' do
-        expect(page).to have_link('image', href: "#{project.wiki.wiki_base_path}/image.jpg")
+        expect(page).to have_link('image', href: "#{project.wiki.wiki_base_path}/#{path}")
 
         click_on('image')
 
-        expect(current_path).to match('wikis/image.jpg')
+        expect(current_path).to match("wikis/#{path}")
         expect(page).to have_content('New Wiki Page')
         expect(page).to have_content('Create page')
       end
@@ -136,10 +134,31 @@ describe 'User views a wiki page' do
       end
     end
 
+    context 'when page has invalid content encoding' do
+      let(:content) { 'whatever'.force_encoding('ISO-8859-1') }
+
+      before do
+        allow(Gitlab::EncodingHelper).to receive(:encode!).and_return(content)
+
+        visit(project_wiki_path(project, wiki_page))
+      end
+
+      it 'does not show "Edit" button' do
+        expect(page).not_to have_selector('a.btn', text: 'Edit')
+      end
+
+      it 'shows error' do
+        page.within(:css, '.flash-notice') do
+          expect(page).to have_content('The content of this page is not encoded in UTF-8. Edits can only be made via the Git repository.')
+        end
+      end
+    end
+
     it 'opens a default wiki page', :js do
       visit(project_path(project))
 
       find('.shortcuts-wiki').click
+      click_link "Create your first page"
 
       expect(page).to have_content('Home · Create Page')
     end

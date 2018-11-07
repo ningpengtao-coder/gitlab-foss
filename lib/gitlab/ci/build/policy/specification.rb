@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Build
@@ -15,7 +17,7 @@ module Gitlab
             @spec = spec
           end
 
-          def satisfied_by?(pipeline)
+          def satisfied_by?(pipeline, seed = nil)
             raise NotImplementedError
           end
         end

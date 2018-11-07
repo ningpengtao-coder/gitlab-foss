@@ -1,7 +1,9 @@
 /* eslint-disable no-new */
+
+import $ from 'jquery';
 import Diff from '~/diff';
 import ZenMode from '~/zen_mode';
-import ShortcutsNavigation from '~/shortcuts_navigation';
+import ShortcutsNavigation from '~/behaviors/shortcuts/shortcuts_navigation';
 import MiniPipelineGraph from '~/mini_pipeline_graph_dropdown';
 import initNotes from '~/init_notes';
 import initChangesDropdown from '~/init_changes_dropdown';

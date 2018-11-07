@@ -1,84 +1,98 @@
 <script>
-  import tooltip from '../../directives/tooltip';
-  import toolbarButton from './toolbar_button.vue';
-  import icon from '../icon.vue';
+import $ from 'jquery';
+import { GlTooltipDirective } from '@gitlab-org/gitlab-ui';
+import ToolbarButton from './toolbar_button.vue';
+import Icon from '../icon.vue';
 
-  export default {
-    directives: {
-      tooltip,
+export default {
+  components: {
+    ToolbarButton,
+    Icon,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+  },
+  props: {
+    previewMarkdown: {
+      type: Boolean,
+      required: true,
     },
-    components: {
-      toolbarButton,
-      icon,
+  },
+  computed: {
+    mdTable() {
+      return [
+        '| header | header |',
+        '| ------ | ------ |',
+        '| cell | cell |',
+        '| cell | cell |',
+      ].join('\n');
     },
-    props: {
-      previewMarkdown: {
-        type: Boolean,
-        required: true,
-      },
+  },
+  mounted() {
+    $(document).on('markdown-preview:show.vue', this.previewMarkdownTab);
+    $(document).on('markdown-preview:hide.vue', this.writeMarkdownTab);
+  },
+  beforeDestroy() {
+    $(document).off('markdown-preview:show.vue', this.previewMarkdownTab);
+    $(document).off('markdown-preview:hide.vue', this.writeMarkdownTab);
+  },
+  methods: {
+    isValid(form) {
+      return (
+        !form ||
+        (form.find('.js-vue-markdown-field').length && $(this.$el).closest('form')[0] === form[0])
+      );
     },
-    mounted() {
-      $(document).on('markdown-preview:show.vue', this.previewMarkdownTab);
-      $(document).on('markdown-preview:hide.vue', this.writeMarkdownTab);
-    },
-    beforeDestroy() {
-      $(document).off('markdown-preview:show.vue', this.previewMarkdownTab);
-      $(document).off('markdown-preview:hide.vue', this.writeMarkdownTab);
-    },
-    methods: {
-      isMarkdownForm(form) {
-        return form && !form.find('.js-vue-markdown-field').length;
-      },
 
-      previewMarkdownTab(event, form) {
-        if (event.target.blur) event.target.blur();
-        if (this.isMarkdownForm(form)) return;
+    previewMarkdownTab(event, form) {
+      if (event.target.blur) event.target.blur();
+      if (!this.isValid(form)) return;
 
-        this.$emit('preview-markdown');
-      },
-
-      writeMarkdownTab(event, form) {
-        if (event.target.blur) event.target.blur();
-        if (this.isMarkdownForm(form)) return;
-
-        this.$emit('write-markdown');
-      },
+      this.$emit('preview-markdown');
     },
-  };
+
+    writeMarkdownTab(event, form) {
+      if (event.target.blur) event.target.blur();
+      if (!this.isValid(form)) return;
+
+      this.$emit('write-markdown');
+    },
+  },
+};
 </script>
 
 <template>
   <div class="md-header">
     <ul class="nav-links clearfix">
       <li
-        class="md-header-tab"
         :class="{ active: !previewMarkdown }"
+        class="md-header-tab"
       >
-        <a
+        <button
           class="js-write-link"
-          href="#md-write-holder"
           tabindex="-1"
-          @click.prevent="writeMarkdownTab($event)"
+          type="button"
+          @click="writeMarkdownTab($event)"
         >
           Write
-        </a>
+        </button>
       </li>
       <li
-        class="md-header-tab"
         :class="{ active: previewMarkdown }"
+        class="md-header-tab"
       >
-        <a
-          class="js-preview-link"
-          href="#md-preview-holder"
+        <button
+          class="js-preview-link js-md-preview-button"
           tabindex="-1"
-          @click.prevent="previewMarkdownTab($event)"
+          type="button"
+          @click="previewMarkdownTab($event)"
         >
           Preview
-        </a>
+        </button>
       </li>
       <li
-        class="md-header-toolbar"
         :class="{ active: !previewMarkdown }"
+        class="md-header-toolbar"
       >
         <toolbar-button
           tag="**"
@@ -91,8 +105,8 @@
           icon="italic"
         />
         <toolbar-button
-          tag="> "
           :prepend="true"
+          tag="> "
           button-title="Insert a quote"
           icon="quote"
         />
@@ -103,25 +117,37 @@
           icon="code"
         />
         <toolbar-button
-          tag="* "
+          tag="[{text}](url)"
+          tag-select="url"
+          button-title="Add a link"
+          icon="link"
+        />
+        <toolbar-button
           :prepend="true"
+          tag="* "
           button-title="Add a bullet list"
           icon="list-bulleted"
         />
         <toolbar-button
-          tag="1. "
           :prepend="true"
+          tag="1. "
           button-title="Add a numbered list"
           icon="list-numbered"
         />
         <toolbar-button
-          tag="* [ ] "
           :prepend="true"
+          tag="* [ ] "
           button-title="Add a task list"
           icon="task-done"
         />
+        <toolbar-button
+          :tag="mdTable"
+          :prepend="true"
+          :button-title="__('Add a table')"
+          icon="table"
+        />
         <button
-          v-tooltip
+          v-gl-tooltip
           aria-label="Go full screen"
           class="toolbar-btn toolbar-fullscreen-btn js-zen-enter"
           data-container="body"

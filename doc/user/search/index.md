@@ -40,6 +40,16 @@ The same process is valid for merge requests. Navigate to your project's **Merge
 and click **Search or filter results...**. Merge requests can be filtered by author, assignee,
 milestone, and label.
 
+### Filtering by **None** / **Any**
+
+Some filter fields like milestone and assignee, allow you to filter by **None** or **Any**.
+
+![filter by none any](img/issues_filter_none_any.png)
+
+Selecting **None** returns results that have an empty value for that field. E.g.: no milestone, no assignee.
+
+Selecting **Any** does the opposite. It returns results that have a non-empty value for that field.
+
 ### Searching for specific terms
 
 You can filter issues and merge requests by specific terms included in titles or descriptions.
@@ -96,7 +106,7 @@ On the field **Filter by name**, type the project or group name you want to find
 will filter them for you as you type.
 
 You can also look for the projects you starred (**Starred projects**), and **Explore** all
-public and internal projects available in GitLab.com, from which you can filter by visibitily,
+public and internal projects available in GitLab.com, from which you can filter by visibility,
 through **Trending**, best rated with **Most starts**, or **All** of them.
 
 You can also sort them by **Name**, **Last created**, **Oldest created**, **Last updated**,

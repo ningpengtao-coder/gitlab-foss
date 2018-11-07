@@ -1,6 +1,5 @@
 <script>
 import Store from '../../stores/sidebar_store';
-import eventHub from '../../event_hub';
 import Flash from '../../../flash';
 import { __ } from '../../../locale';
 import subscriptions from './subscriptions.vue';
@@ -20,18 +19,11 @@ export default {
       store: new Store(),
     };
   },
-  created() {
-    eventHub.$on('toggleSubscription', this.onToggleSubscription);
-  },
-  beforeDestroy() {
-    eventHub.$off('toggleSubscription', this.onToggleSubscription);
-  },
   methods: {
     onToggleSubscription() {
-      this.mediator.toggleSubscription()
-        .catch(() => {
-          Flash(__('Error occurred when toggling the notification subscription'));
-        });
+      this.mediator.toggleSubscription().catch(() => {
+        Flash(__('Error occurred when toggling the notification subscription'));
+      });
     },
   },
 };
@@ -42,6 +34,7 @@ export default {
     <subscriptions
       :loading="store.isFetching.subscriptions"
       :subscribed="store.subscribed"
+      @toggleSubscription="onToggleSubscription"
     />
   </div>
 </template>

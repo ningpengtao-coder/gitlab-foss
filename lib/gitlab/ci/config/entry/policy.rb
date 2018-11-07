@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     class Config
@@ -25,15 +27,33 @@ module Gitlab
             include Entry::Validatable
             include Entry::Attributable
 
-            attributes :refs, :kubernetes
+            ALLOWED_KEYS = %i[refs kubernetes variables changes].freeze
+            attributes :refs, :kubernetes, :variables, :changes
 
             validations do
               validates :config, presence: true
-              validates :config, allowed_keys: %i[refs kubernetes]
+              validates :config, allowed_keys: ALLOWED_KEYS
+              validate :variables_expressions_syntax
 
               with_options allow_nil: true do
                 validates :refs, array_of_strings_or_regexps: true
                 validates :kubernetes, allowed_values: %w[active]
+                validates :variables, array_of_strings: true
+                validates :changes, array_of_strings: true
+              end
+
+              def variables_expressions_syntax
+                return unless variables.is_a?(Array)
+
+                statements = variables.map do |statement|
+                  ::Gitlab::Ci::Pipeline::Expression::Statement.new(statement)
+                end
+
+                statements.each do |statement|
+                  unless statement.valid?
+                    errors.add(:variables, "Invalid expression syntax")
+                  end
+                end
               end
             end
           end

@@ -4,8 +4,14 @@ describe 'Merge request > User selects branches for new MR', :js do
   let(:project) { create(:project, :public, :repository) }
   let(:user) { project.creator }
 
+  def select_source_branch(branch_name)
+    find('.js-source-branch', match: :first).click
+    find('.js-source-branch-dropdown .dropdown-input-field').native.send_keys branch_name
+    find('.js-source-branch-dropdown .dropdown-content a', text: branch_name, match: :first).click
+  end
+
   before do
-    project.add_master(user)
+    project.add_maintainer(user)
     sign_in(user)
   end
 
@@ -19,7 +25,7 @@ describe 'Merge request > User selects branches for new MR', :js do
     expect(page).to have_content('Target branch')
 
     first('.js-source-branch').click
-    find('.dropdown-source-branch .dropdown-content a', match: :first).click
+    find('.js-source-branch-dropdown .dropdown-content a', match: :first).click
 
     expect(page).to have_content "b83d6e3"
   end
@@ -35,22 +41,15 @@ describe 'Merge request > User selects branches for new MR', :js do
     expect(page).to have_content('Target branch')
 
     first('.js-target-branch').click
-    find('.dropdown-target-branch .dropdown-content a', text: 'v1.1.0', match: :first).click
+    find('.js-target-branch-dropdown .dropdown-content a', text: 'v1.1.0', match: :first).click
 
     expect(page).to have_content "b83d6e3"
   end
 
   it 'generates a diff for an orphaned branch' do
-    visit project_merge_requests_path(project)
+    visit project_new_merge_request_path(project)
 
-    page.within '.content' do
-      click_link 'New merge request'
-    end
-    expect(page).to have_content('Source branch')
-    expect(page).to have_content('Target branch')
-
-    find('.js-source-branch', match: :first).click
-    find('.dropdown-source-branch .dropdown-content a', text: 'orphaned-branch', match: :first).click
+    select_source_branch('orphaned-branch')
 
     click_button "Compare branches"
     click_link "Changes"
@@ -71,19 +70,18 @@ describe 'Merge request > User selects branches for new MR', :js do
 
     first('.js-source-branch').click
 
-    input = find('.dropdown-source-branch .dropdown-input-field')
-    input.click
-    input.send_keys('orphaned-branch')
+    page.within '.js-source-branch-dropdown' do
+      input = find('.dropdown-input-field')
+      input.click
+      input.send_keys('orphaned-branch')
 
-    find('.dropdown-source-branch .dropdown-content li', match: :first)
-    source_items = all('.dropdown-source-branch .dropdown-content li')
-
-    expect(source_items.count).to eq(1)
+      expect(page).to have_css('.dropdown-content li', count: 1)
+    end
 
     first('.js-target-branch').click
 
-    find('.dropdown-target-branch .dropdown-content li', match: :first)
-    target_items = all('.dropdown-target-branch .dropdown-content li')
+    find('.js-target-branch-dropdown .dropdown-content li', match: :first)
+    target_items = all('.js-target-branch-dropdown .dropdown-content li')
 
     expect(target_items.count).to be > 1
   end
@@ -111,13 +109,13 @@ describe 'Merge request > User selects branches for new MR', :js do
   end
 
   it 'populates source branch button' do
-    visit project_new_merge_request_path(project, change_branches: true, merge_request: { target_branch: 'master', source_branch: 'fix' })
+    visit project_new_merge_request_path(project, change_branches: true, merge_request_source_branch: 'fix', merge_request: { target_branch: 'master' })
 
     expect(find('.js-source-branch')).to have_content('fix')
   end
 
   it 'allows to change the diff view' do
-    visit project_new_merge_request_path(project, merge_request: { target_branch: 'master', source_branch: 'fix' })
+    visit project_new_merge_request_path(project, merge_request_source_branch: 'fix', merge_request: { target_branch: 'master' })
 
     click_link 'Changes'
 
@@ -133,7 +131,7 @@ describe 'Merge request > User selects branches for new MR', :js do
   end
 
   it 'does not allow non-existing branches' do
-    visit project_new_merge_request_path(project, merge_request: { target_branch: 'non-exist-target', source_branch: 'non-exist-source' })
+    visit project_new_merge_request_path(project, merge_request_source_branch: 'non-exist-source', merge_request: { target_branch: 'non-exist-target' })
 
     expect(page).to have_content('The form contains the following errors')
     expect(page).to have_content('Source branch "non-exist-source" does not exist')
@@ -142,7 +140,7 @@ describe 'Merge request > User selects branches for new MR', :js do
 
   context 'when a branch contains commits that both delete and add the same image' do
     it 'renders the diff successfully' do
-      visit project_new_merge_request_path(project, merge_request: { target_branch: 'master', source_branch: 'deleted-image-test' })
+      visit project_new_merge_request_path(project, merge_request_source_branch: 'deleted-image-test', merge_request: { target_branch: 'master' })
 
       click_link "Changes"
 
@@ -167,14 +165,41 @@ describe 'Merge request > User selects branches for new MR', :js do
     it 'shows pipelines for a new merge request' do
       visit project_new_merge_request_path(
         project,
-        merge_request: { target_branch: 'master', source_branch: 'fix' })
+        merge_request_source_branch: 'fix',
+        merge_request: { target_branch: 'master' })
 
       page.within('.merge-request') do
         click_link 'Pipelines'
-        wait_for_requests
 
         expect(page).to have_content "##{pipeline.id}"
       end
+    end
+  end
+
+  context 'with special characters in branch names' do
+    it 'escapes quotes in branch names' do
+      special_branch_name = '"with-quotes"'
+      CreateBranchService.new(project, user)
+        .execute(special_branch_name, 'add-pdf-file')
+
+      visit project_new_merge_request_path(project)
+      select_source_branch(special_branch_name)
+
+      source_branch_input = find('[name="merge_request[source_branch]"]', visible: false)
+      expect(source_branch_input.value).to eq special_branch_name
+    end
+
+    it 'does not escape unicode in branch names' do
+      special_branch_name = 'ʕ•ᴥ•ʔ'
+      CreateBranchService.new(project, user)
+        .execute(special_branch_name, 'add-pdf-file')
+
+      visit project_new_merge_request_path(project)
+      select_source_branch(special_branch_name)
+
+      click_button "Compare branches"
+
+      expect(page).to have_button("Submit merge request")
     end
   end
 end

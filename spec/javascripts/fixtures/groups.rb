@@ -13,8 +13,18 @@ describe 'Groups (JavaScript fixtures)', type: :controller do
   end
 
   before do
-    group.add_master(admin)
+    group.add_maintainer(admin)
     sign_in(admin)
+  end
+
+  describe GroupsController, '(JavaScript fixtures)', type: :controller do
+    it 'groups/edit.html.raw' do |example|
+      get :edit,
+        id: group
+
+      expect(response).to be_success
+      store_frontend_fixture(response, example.description)
+    end
   end
 
   describe Groups::Settings::CiCdController, '(JavaScript fixtures)', type: :controller do

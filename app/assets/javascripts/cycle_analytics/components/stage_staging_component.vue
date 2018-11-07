@@ -1,33 +1,33 @@
 <script>
-  import userAvatarImage from '../../vue_shared/components/user_avatar/user_avatar_image.vue';
-  import iconBranch from '../svg/icon_branch.svg';
-  import limitWarning from './limit_warning_component.vue';
-  import totalTime from './total_time_component.vue';
-  import icon from '../../vue_shared/components/icon.vue';
+import userAvatarImage from '../../vue_shared/components/user_avatar/user_avatar_image.vue';
+import iconBranch from '../svg/icon_branch.svg';
+import limitWarning from './limit_warning_component.vue';
+import totalTime from './total_time_component.vue';
+import icon from '../../vue_shared/components/icon.vue';
 
-  export default {
-    components: {
-      userAvatarImage,
-      totalTime,
-      limitWarning,
-      icon,
+export default {
+  components: {
+    userAvatarImage,
+    totalTime,
+    limitWarning,
+    icon,
+  },
+  props: {
+    items: {
+      type: Array,
+      default: () => [],
     },
-    props: {
-      items: {
-        type: Array,
-        default: () => [],
-      },
-      stage: {
-        type: Object,
-        default: () => ({}),
-      },
+    stage: {
+      type: Object,
+      default: () => ({}),
     },
-    computed: {
-      iconBranch() {
-        return iconBranch;
-      },
+  },
+  computed: {
+    iconBranch() {
+      return iconBranch;
     },
-  };
+  },
+};
 </script>
 <template>
   <div>
@@ -38,8 +38,8 @@
     <ul class="stage-event-list">
       <li
         v-for="(build, i) in items"
-        class="stage-event-item item-build-component"
         :key="i"
+        class="stage-event-item item-build-component"
       >
         <div class="item-details">
           <!-- FIXME: Pass an alt attribute here for accessibility -->
@@ -52,8 +52,8 @@
               #{{ build.id }}
             </a>
             <icon
-              name="fork"
               :size="16"
+              name="fork"
             />
             <a
               :href="build.branch.url"

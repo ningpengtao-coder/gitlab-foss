@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import setupToggleButtons from '~/toggle_buttons';
 import getSetTimeoutPromise from './helpers/set_timeout_promise_helper';
 
@@ -23,11 +24,14 @@ describe('ToggleButtons', () => {
     it('should initialize as checked', () => {
       const wrapper = setupFixture(true);
 
-      expect(wrapper.querySelector('.js-project-feature-toggle').classList.contains('is-checked')).toEqual(true);
+      expect(
+        wrapper.querySelector('.js-project-feature-toggle').classList.contains('is-checked'),
+      ).toEqual(true);
+
       expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('true');
     });
 
-    it('should toggle to unchecked when clicked', (done) => {
+    it('should toggle to unchecked when clicked', done => {
       const wrapper = setupFixture(true);
       const toggleButton = wrapper.querySelector('.js-project-feature-toggle');
 
@@ -47,11 +51,14 @@ describe('ToggleButtons', () => {
     it('should initialize as unchecked', () => {
       const wrapper = setupFixture(false);
 
-      expect(wrapper.querySelector('.js-project-feature-toggle').classList.contains('is-checked')).toEqual(false);
+      expect(
+        wrapper.querySelector('.js-project-feature-toggle').classList.contains('is-checked'),
+      ).toEqual(false);
+
       expect(wrapper.querySelector('.js-project-feature-toggle-input').value).toEqual('false');
     });
 
-    it('should toggle to checked when clicked', (done) => {
+    it('should toggle to checked when clicked', done => {
       const wrapper = setupFixture(false);
       const toggleButton = wrapper.querySelector('.js-project-feature-toggle');
 
@@ -67,7 +74,7 @@ describe('ToggleButtons', () => {
     });
   });
 
-  it('should emit `trigger-change` event', (done) => {
+  it('should emit `trigger-change` event', done => {
     const changeSpy = jasmine.createSpy('changeEventHandler');
     const wrapper = setupFixture(false);
     const toggleButton = wrapper.querySelector('.js-project-feature-toggle');
@@ -86,7 +93,7 @@ describe('ToggleButtons', () => {
   });
 
   describe('clickCallback', () => {
-    it('should show loading indicator while waiting', (done) => {
+    it('should show loading indicator while waiting', done => {
       const isChecked = true;
       const clickCallback = (newValue, toggleButton) => {
         const input = toggleButton.querySelector('.js-project-feature-toggle-input');

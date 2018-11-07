@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { truncate } from '../../../lib/utils/text_utility';
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -30,7 +31,7 @@ export default class AbuseReports {
       $messageCellElement.text(originalMessage);
     } else {
       $messageCellElement.data('messageTruncated', 'true');
-      $messageCellElement.text(`${originalMessage.substr(0, (MAX_MESSAGE_LENGTH - 3))}...`);
+      $messageCellElement.text(`${originalMessage.substr(0, MAX_MESSAGE_LENGTH - 3)}...`);
     }
   }
 }

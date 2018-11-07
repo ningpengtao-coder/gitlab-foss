@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # `CommonMark` markdown engine for GitLab's Banzai markdown filter.
 # This module is used in Banzai::Filter::MarkdownFilter.
 # Used gem is `commonmarker` which is a ruby wrapper for libcmark (CommonMark parser)
@@ -18,7 +20,7 @@ module Banzai
         PARSE_OPTIONS = [
           :FOOTNOTES,                  # parse footnotes.
           :STRIKETHROUGH_DOUBLE_TILDE, # parse strikethroughs by double tildes (as redcarpet does).
-          :VALIDATE_UTF8	             # replace illegal sequences with the replacement character U+FFFD.
+          :VALIDATE_UTF8               # replace illegal sequences with the replacement character U+FFFD.
         ].freeze
 
         # The `:GITHUB_PRE_LANG` option is not used intentionally because

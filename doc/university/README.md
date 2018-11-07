@@ -11,15 +11,15 @@ and [Blog Articles](https://about.gitlab.com/blog/).
 
 Would you like to contribute to GitLab University? Then please take a look at our contribution [process](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/PROCESS.md) for more information.
 
-## Gitlab University Curriculum
+## GitLab University Curriculum
 
 The curriculum is composed of GitLab videos, screencasts, presentations, projects and external GitLab content hosted on other services and has been organized into the following sections.
 
-1. [GitLab Beginner](#beginner)
-1. [GitLab Intermediate](#intermediate)
-1. [GitLab Advanced](#advanced)
-1. [External Articles](#external)
-1. [Resources for GitLab Team Members](#team)
+1. [GitLab Beginner](#1-gitlab-beginner)
+1. [GitLab Intermediate](#2-gitlab-intermediate)
+1. [GitLab Advanced](#3-gitlab-advanced)
+1. [External Articles](#4-external-articles)
+1. [Resources for GitLab Team Members](#5-resources-for-gitlab-team-members)
 
 ---
 
@@ -28,7 +28,6 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 #### 1.1. Version Control and Git
 
 1. [Version Control Systems](https://docs.google.com/presentation/d/16sX7hUrCZyOFbpvnrAFrg6tVO5_yT98IgdAqOmXwBho/edit#slide=id.g72f2e4906_2_29)
-1. [Operating Systems and How Git Works](https://drive.google.com/a/gitlab.com/file/d/0B41DBToSSIG_OVYxVFJDOGI3Vzg/view?usp=sharing)
 1. [Code School: An Introduction to Git](https://www.codeschool.com/account/courses/try-git)
 
 #### 1.2. GitLab Basics
@@ -74,10 +73,10 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 #### 1.7 Community and Support
 
 1. [Getting Help](https://about.gitlab.com/getting-help/)
-  - Proposing Features and Reporting and Tracking bugs for GitLab
-  - The GitLab IRC channel, Gitter Chat Room, Community Forum and Mailing List
-  - Getting Technical Support
-  - Being part of our Great Community and Contributing to GitLab
+   - Proposing Features and Reporting and Tracking bugs for GitLab
+   - The GitLab IRC channel, Gitter Chat Room, Community Forum and Mailing List
+   - Getting Technical Support
+   - Being part of our Great Community and Contributing to GitLab
 1. [Getting Started with the GitLab Development Kit (GDK)](https://about.gitlab.com/2016/06/08/getting-started-with-gitlab-development-kit/)
 1. [Contributing Technical Articles to the GitLab Blog](https://about.gitlab.com/2016/01/26/call-for-writers/)
 1. [GitLab Training Workshops](https://docs.gitlab.com/ce/university/training/end-user/)
@@ -127,7 +126,7 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 1. [IBM: Continuous Delivery vs Continuous Deployment - Video](https://www.youtube.com/watch?v=igwFj8PPSnw)
 1. [Amazon: Transition to Continuous Delivery - Video](https://www.youtube.com/watch?v=esEFaY0FDKc)
 2. [TechBeacon: Doing continuous delivery? Focus first on reducing release cycle times](https://techbeacon.com/doing-continuous-delivery-focus-first-reducing-release-cycle-times)
-1. See **[Integrations](#integrations)** for integrations with other CI services.
+1. See **[Integrations](#39-integrations)** for integrations with other CI services.
 
 #### 2.4. Workflow
 
@@ -206,7 +205,7 @@ The curriculum is composed of GitLab videos, screencasts, presentations, project
 
 ### 4. External Articles
 
-1. [2011 WSJ article by Marc Andreessen - Software is Eating the World](http://www.wsj.com/articles/SB10001424053111903480904576512250915629460)
+1. [2011 WSJ article by Marc Andreessen - Software is Eating the World](https://www.wsj.com/articles/SB10001424053111903480904576512250915629460)
 1. [2014 Blog post by Chris Dixon - Software eats software development](http://cdixon.org/2014/04/13/software-eats-software-development/)
 1. [2015 Venture Beat article - Actually, Open Source is Eating the World](http://venturebeat.com/2015/12/06/its-actually-open-source-software-thats-eating-the-world/)
 
