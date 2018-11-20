@@ -1,7 +1,6 @@
 ---
 nav_section: admin
 nav_category: settings
-layout: default-copy
 ---
 
 # Environment Variables

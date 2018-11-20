@@ -3,7 +3,6 @@ description: 'Understand and explore the user permission levels in GitLab, and w
 nav_section: user
 nav_category: account
 nav_category_position: 1
-layout: default-copy
 ---
 
 # Permissions

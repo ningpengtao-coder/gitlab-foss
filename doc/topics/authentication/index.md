@@ -1,7 +1,6 @@
 ---
 nav_section: user
 nav_category: general
-layout: default-copy
 ---
 
 # Authentication

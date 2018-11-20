@@ -2,7 +2,6 @@
 nav_section: admin
 nav_category: settings
 nav_title: "Gitaly"
-layout: default-copy
 ---
 
 # Gitaly

@@ -3,7 +3,6 @@ nav_section: admin
 nav_category: instance
 nav_title: "Update"
 nav_category_position: -1
-layout: default-copy
 ---
 
 # Updating GitLab

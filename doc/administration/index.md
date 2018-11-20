@@ -3,7 +3,6 @@ description: 'Learn how to install, configure, update, and maintain your GitLab 
 nav_section: admin_main
 nav_category: ""
 nav_title: "Administrator"
-layout: default-copy
 ---
 
 # Administrator documentation **[CORE ONLY]**

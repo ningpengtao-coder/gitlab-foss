@@ -3,7 +3,6 @@ nav_section: admin
 nav_category: instance
 nav_title: "Monitor"
 nav_category_position: 0
-layout: default-copy
 ---
 
 # Monitoring GitLab

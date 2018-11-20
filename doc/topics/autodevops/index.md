@@ -1,7 +1,6 @@
 ---
 nav_section: user
 nav_category: ci
-layout: default-copy
 ---
 
 # Auto DevOps

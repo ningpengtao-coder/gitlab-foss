@@ -2,7 +2,6 @@
 nav_section: user
 nav_category: general
 nav_title: SSH
-layout: default-copy
 ---
 
 # GitLab and SSH keys

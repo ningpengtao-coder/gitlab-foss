@@ -5,7 +5,6 @@ nav_section: user
 nav_category: ci
 nav_category_position: -1
 nav_title: "GitLab CI/CD"
-layout: default-copy
 ---
 
 # GitLab Continuous Integration (GitLab CI/CD)

@@ -3,7 +3,6 @@ nav_section: user
 nav_category: essentials
 nav_category_position: -2
 nav_title: "Groups"
-layout: default-copy
 ---
 
 # Groups

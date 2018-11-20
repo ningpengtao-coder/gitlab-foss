@@ -3,7 +3,6 @@ nav_section: user
 nav_category: account
 nav_category_position: 2
 nav_title: Markdown
-layout: default-copy
 ---
 
 # GitLab Markdown

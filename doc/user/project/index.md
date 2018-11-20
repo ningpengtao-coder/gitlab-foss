@@ -2,7 +2,6 @@
 nav_section: user
 nav_category: essentials
 nav_title: Projects
-layout: default-copy
 nav_category_position: -3
 ---
 
