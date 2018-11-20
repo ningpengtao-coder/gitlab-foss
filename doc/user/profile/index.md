@@ -2,8 +2,6 @@
 nav_section: user
 nav_category: account
 nav_title: "Account and profile"
-nav_category_position: 0
-layout: default-copy
 ---
 
 # User account

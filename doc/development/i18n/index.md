@@ -2,7 +2,6 @@
 nav_section: development
 nav_category: ""
 nav_title: "Translate GitLab"
-layout: default-copy
 ---
 
 # Translate GitLab to your language

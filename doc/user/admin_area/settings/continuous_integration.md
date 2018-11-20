@@ -2,7 +2,6 @@
 nav_section: admin
 nav_category: settings
 nav_title: "CI/CD"
-layout: default-copy
 ---
 
 # Continuous Integration and Deployment Admin settings **[CORE ONLY]**

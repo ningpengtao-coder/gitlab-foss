@@ -3,7 +3,6 @@ comments: false
 nav_section: admin
 nav_category: settings
 nav_title: "Authentication"
-layout: default-copy
 ---
 
 # Authentication and Authorization

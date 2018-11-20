@@ -2,7 +2,6 @@
 nav_section: user
 nav_category: ci
 nav_title: "Configuration"
-layout: default-copy
 ---
 
 # Configuration of your jobs with .gitlab-ci.yml

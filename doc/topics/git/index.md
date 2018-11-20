@@ -2,7 +2,6 @@
 nav_section: user
 nav_category: general
 nav_title: Git
-layout: default-copy
 ---
 
 # Git documentation
