@@ -49,13 +49,18 @@ The available sections are:
 
 The `nav_category` frontmatter entry sets the category of the nav under one of its sections.
 
-Available categories for the `user` section:
+Available categories for the `user` section (resembles the UI):
 
 | Category slug | Output     |
 | ------------- | ---------- |
 | `essentials`  | Essentials |
 | `ci`          | CI/CD      |
 | `account`     | Account    |
+| `operations`  | Operations |
+| `registry`    | Registry   |
+| `packages`    | Packages   |
+| `wiki`        | Wiki       |
+| `settings`    | Settings   |
 | `general`     | General    |
 
 Example:
@@ -197,31 +202,54 @@ In case there's a category missing in the array, the build will fail.
 The layout of the nav is defined by the file `global-nav.html`. In this file,
 the sections are organized individually.
 
-For example:
+Each section has two compenents: the highest-level document, and all the rest.
+
+The highest-level document has a unique section slug defined:
+
+- User documentation: `user_main`
+- Administration documentation: `admin_main`
+- Development documentation: `development_main`
+
+The unique (highest-level) doc is followed by the loop through all the docs
+within a section of the nav. For example, for the user docs:
 
 ```erb
-<!-- Admin docs -->
-<span class="global-nav-block">Administrator</span>
-<%= nav_create_links_for(sections, 'admin', @item) %>
+<!-- User docs -->
+<span class="global-nav-block-top">
+  <%= nav_create_links_for(sections, 'user_main', @item) %>
+</span>
+<%= nav_create_links_for(sections, 'user', @item) %>
 ```
 
-This block defines the admin section name in the span tag (hard coded), and outputs
-the loop through all the docs within the `admin` section of the nav.
+The span tag outputs the highest-level user documentation (`user_main`),
+and the subsequent loop outputs all the docs under the `user` section.
 
-Let's say you want to add a new section to the nav:
+To create a new section:
 
-```erb
-<!-- New section -->
-<span class="global-nav-block">Section name</span>
-<%= nav_create_links_for(sections, 'section-slug', @item) %>
-```
+1. Select the highest-level document and add the following to its frontmatter:
 
-To include docs into this new section, add this to their frontmatter:
+    ```yml
+    nav_section: section_main
+    nav_category: ""
+    ```
 
-```yaml
-nav_section: section-slug
-nav_category: category-name
-```
+1. Define a new section slug, e.g., `section`
+1. Add to the `global-nav.html` layout:
+
+    ```erb
+    <!-- User docs -->
+    <span class="global-nav-block-top">
+      <%= nav_create_links_for(sections, 'section_main', @item) %>
+    </span>
+    <%= nav_create_links_for(sections, 'section', @item) %>
+    ```
+
+1. To include docs into this new section, add this to their frontmatter:
+
+    ```yaml
+    nav_section: section
+    nav_category: category-name
+    ```
 
 Note that the category is created by the frontmatter entry itself, although,
 if you want to define a specific order for the categories within a section, or if
@@ -274,8 +302,8 @@ category to the array in the helper file:
 ```ruby
 NAV_SECTION_CONFIG = {
   #...
-  'admin' => {
-    'category_order' => %w{essentials ci account general qa}
+  'user' => {
+    'category_order' => %w{essentials ci operations registry packages wiki settings account general qa}
   }
 }
 ```
