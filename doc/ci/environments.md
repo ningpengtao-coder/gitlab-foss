@@ -1,3 +1,11 @@
+---
+nav_section: user
+nav_category: operations
+nav_title: Environments
+nav_category_position: -2
+layout: default-copy
+---
+
 # Introduction to environments and deployments
 
 > Introduced in GitLab 8.9.

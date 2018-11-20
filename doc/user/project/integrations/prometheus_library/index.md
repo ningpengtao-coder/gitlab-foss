@@ -2,6 +2,7 @@
 nav_section: user
 nav_category: operations
 nav_title: Metrics
+nav_category_position: -3
 layout: default-copy
 ---
 

@@ -1,3 +1,11 @@
+---
+nav_section: user
+nav_category: operations
+nav_title: Kubernetes
+nav_category_position: -1
+layout: default-copy
+---
+
 # Connecting GitLab with a Kubernetes cluster
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/35954) in GitLab 10.1.
