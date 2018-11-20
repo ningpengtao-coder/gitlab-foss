@@ -1,10 +1,11 @@
 ---
 nav_section: user
 nav_category: essentials
+nav_category_position: -1
 layout: default-copy
 ---
 
-# Repositories
+# Repository
 
 A [repository](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
 is what you use to store your codebase in GitLab and change it with version control.

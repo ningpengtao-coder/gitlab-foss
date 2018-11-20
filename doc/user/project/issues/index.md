@@ -1,7 +1,6 @@
 ---
 nav_section: user
 nav_category: essentials
-nav_category_position: -1
 layout: default-copy
 ---
 

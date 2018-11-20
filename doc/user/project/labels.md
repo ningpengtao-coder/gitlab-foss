@@ -1,9 +1,3 @@
----
-nav_section: user
-nav_category: essentials
-layout: default-copy
----
-
 # Labels
 
 ## Overview

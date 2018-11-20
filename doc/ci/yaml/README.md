@@ -1,3 +1,10 @@
+---
+nav_section: user
+nav_category: ci
+nav_title: "Configuration"
+layout: default-copy
+---
+
 # Configuration of your jobs with .gitlab-ci.yml
 
 This document describes the usage of `.gitlab-ci.yml`, the file that is used by
