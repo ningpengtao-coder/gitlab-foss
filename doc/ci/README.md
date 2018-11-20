@@ -4,7 +4,7 @@ description: "Learn how to use GitLab CI/CD, the GitLab built-in Continuous Inte
 nav_section: user
 nav_category: ci
 nav_category_position: -1
-nav_title: "GitLab CI/CD"
+nav_title: "Overview"
 layout: default-copy
 ---
 
