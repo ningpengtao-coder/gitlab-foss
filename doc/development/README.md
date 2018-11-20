@@ -34,6 +34,7 @@ layout: default-copy
 ## Backend guides
 
 - [GitLab utilities](utilities.md)
+- [Logging](logging.md)
 - [API styleguide](api_styleguide.md) Use this styleguide if you are
   contributing to the API.
 - [GraphQL API styleguide](api_graphql_styleguide.md) Use this
@@ -55,6 +56,7 @@ layout: default-copy
 - [Prometheus metrics](prometheus_metrics.md)
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
+- [Switching to Rails 5](switching_to_rails5.md)
 
 ## Performance guides
 
