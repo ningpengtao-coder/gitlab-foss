@@ -186,9 +186,9 @@ For customizing the order of the categories within a section, look for the
 ```ruby
 NAV_SECTION_CONFIG = {
   # Sets the order of the categories in the "user" section.
-  # In this case, `essentials` comes first, then `ci`, then `account`, and then `general`.
+  # In this case, `essentials` comes first, then `ci`, then `operations`,then `account`, and then `general`.
   'user' => {
-    'category_order' => %w{essentials ci account general}
+    'category_order' => %w{essentials ci operations account general}
   }
 }
 ```
@@ -303,7 +303,7 @@ category to the array in the helper file:
 NAV_SECTION_CONFIG = {
   #...
   'user' => {
-    'category_order' => %w{essentials ci operations registry packages wiki settings account general qa}
+    'category_order' => %w{essentials ci operations account general qa}
   }
 }
 ```

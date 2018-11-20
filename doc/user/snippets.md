@@ -1,3 +1,9 @@
+---
+nav_section: user
+nav_category: essentials
+layout: default-copy
+---
+
 # Snippets
 
 With GitLab Snippets you can store and share bits of code and text with other users.

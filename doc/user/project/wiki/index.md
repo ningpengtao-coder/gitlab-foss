@@ -1,3 +1,9 @@
+---
+nav_section: user
+nav_category: essentials
+layout: default-copy
+---
+
 # Wiki
 
 A separate system for documentation called Wiki, is built right into each

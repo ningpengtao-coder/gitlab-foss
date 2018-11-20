@@ -1,3 +1,11 @@
+---
+nav_section: user
+nav_category: ci
+nav_title: "Container Registry"
+nav_category_position: 2
+layout: default-copy
+---
+
 # GitLab Container Registry
 
 > **Notes:**
