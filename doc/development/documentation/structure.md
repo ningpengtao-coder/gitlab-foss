@@ -151,6 +151,10 @@ Notes:
 - (2): Apply the correct format for the [GitLab version introducing the feature](https://docs.gitlab.com/ee/development/documentation/styleguide.html#gitlab-versions-and-tiers)
 ```
 
+## Global nav
+
+Please read through the [global navigation](architecture/global_nav.md) doc.
+
 ## Help and feedback section
 
 The "help and feedback" section (introduced by [!319](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/319)) displayed at the end of each document
