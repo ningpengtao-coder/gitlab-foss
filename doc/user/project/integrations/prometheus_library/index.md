@@ -1,3 +1,10 @@
+---
+nav_section: user
+nav_category: operations
+nav_title: Metrics
+layout: default-copy
+---
+
 # Prometheus Metrics library
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8935) in GitLab 9.0.
