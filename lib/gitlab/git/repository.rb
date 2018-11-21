@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tempfile'
 require 'forwardable'
 require "rubygems/package"
@@ -439,7 +441,7 @@ module Gitlab
         gitaly_ref_client.find_ref_name(sha, ref_path)
       end
 
-      # Get refs hash which key is is the commit id
+      # Get refs hash which key is the commit id
       # and value is a Gitlab::Git::Tag or Gitlab::Git::Branch
       # Note that both inherit from Gitlab::Git::Ref
       def refs_hash
