@@ -6,7 +6,7 @@ module QA
   module Resource
     class KubernetesCluster < Base
       attr_writer :project, :cluster,
-        :install_helm_tiller, :install_ingress, :install_prometheus, :install_runner
+        :install_helm_tiller, :install_ingress, :install_prometheus, :install_runner, :install_cert_manager
 
       attribute :ingress_ip do
         Page::Project::Operations::Kubernetes::Show.perform(&:ingress_ip)
@@ -45,10 +45,12 @@ module QA
             page.install!(:ingress) if @install_ingress
             page.install!(:prometheus) if @install_prometheus
             page.install!(:runner) if @install_runner
+            page.install!(:cert_manager) if @install_cert_manager
 
             page.await_installed(:ingress) if @install_ingress
             page.await_installed(:prometheus) if @install_prometheus
             page.await_installed(:runner) if @install_runner
+            page.await_installed(:cert_manager) if @install_cert_manager
           end
         end
       end

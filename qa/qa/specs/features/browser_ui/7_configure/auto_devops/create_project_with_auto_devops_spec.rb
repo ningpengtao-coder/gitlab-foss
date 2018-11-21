@@ -48,6 +48,7 @@ module QA
               cluster.install_ingress = true
               cluster.install_prometheus = true
               cluster.install_runner = true
+              cluster.install_cert_manager = true
             end
             kubernetes_cluster.populate(:ingress_ip)
 
