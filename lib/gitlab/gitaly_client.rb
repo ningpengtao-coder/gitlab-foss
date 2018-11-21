@@ -60,7 +60,7 @@ module Gitlab
         @stubs[storage][name] ||= begin
           klass = stub_class(name)
           addr = stub_address(storage)
-          klass.new(addr, :this_channel_is_insecure)
+          klass.new(addr, :this_channel_is_insecure, interceptors: [Gitlab::GRPCCorrelationInterceptor.instance])
         end
       end
     end

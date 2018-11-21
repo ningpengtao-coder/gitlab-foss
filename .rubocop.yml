@@ -112,6 +112,7 @@ Naming/FileName:
     - CSS
     - DNS
     - EOF
+    - GRPC
     - GUID
     - HTML
     - HTTP
