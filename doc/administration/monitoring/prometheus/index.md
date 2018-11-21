@@ -107,7 +107,7 @@ Sample Prometheus queries:
 Grafana allows you to import Prometheus performance metrics as a data source
 and render the metrics as graphs and dashboards which is helpful with visualisation.
 
-To add a prometheus follow the steps below.
+To add a Prometheus dashboard follow the steps below.
 
 1. Create a new data source in Grafana.
 1. Name your data source i.e GitLab.
