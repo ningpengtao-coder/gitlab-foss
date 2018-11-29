@@ -35,7 +35,7 @@ Parameters:
 | `sort`              | string   | no       | Return requests sorted in `asc` or `desc` order. Default is `desc`                                                     |
 | `milestone`         | string   | no       | Return merge requests for a specific milestone. `None` returns merge requests with no milestone. `Any` returns merge requests that have an assigned milestone. |
 | `view`              | string   | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                              |
-| `labels`            | string   | no       | Return merge requests matching a comma separated list of labels                                                        |
+| `labels`            | string   | no       | Return merge requests matching a comma separated list of labels. `None` lists all merge requests with no labels. `Any` lists all merge requests with at least one label. `No+Label` (Deprecated) lists all merge requests with no labels. Predefined names are case-insensitive. |
 | `created_after`     | datetime | no       | Return merge requests created on or after the given time                                                               |
 | `created_before`    | datetime | no       | Return merge requests created on or before the given time                                                              |
 | `updated_after`     | datetime | no       | Return merge requests updated on or after the given time                                                               |
@@ -57,7 +57,18 @@ Parameters:
     "project_id": 3,
     "title": "test1",
     "description": "fixed login page css paddings",
-    "state": "opened",
+    "state": "merged",
+    "merged_by": {
+      "id": 87854,
+      "name": "Douwe Maan",
+      "username": "DouweM",
+      "state": "active",
+      "avatar_url": "https://gitlab.example.com/uploads/-/system/user/avatar/87854/avatar.png",
+      "web_url": "https://gitlab.com/DouweM"
+    },
+    "merged_at": "2018-09-07T11:16:17.520Z",
+    "closed_by": null,
+    "closed_at": null,
     "created_at": "2017-04-29T08:46:00Z",
     "updated_at": "2017-04-29T08:46:00Z",
     "target_branch": "master",
@@ -159,7 +170,7 @@ Parameters:
 | `sort`              | string         | no       | Return requests sorted in `asc` or `desc` order. Default is `desc`                                                             |
 | `milestone`         | string         | no       | Return merge requests for a specific milestone. `None` returns merge requests with no milestone. `Any` returns merge requests that have an assigned milestone. |
 | `view`              | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                                      |
-| `labels`            | string         | no       | Return merge requests matching a comma separated list of labels                                                                |
+| `labels`            | string         | no       | Return merge requests matching a comma separated list of labels. `None` lists all merge requests with no labels. `Any` lists all merge requests with at least one label. `No+Label` (Deprecated) lists all merge requests with no labels. Predefined names are case-insensitive. |
 | `created_after`     | datetime       | no       | Return merge requests created on or after the given time                                                                       |
 | `created_before`    | datetime       | no       | Return merge requests created on or before the given time                                                                      |
 | `updated_after`     | datetime       | no       | Return merge requests updated on or after the given time                                                                       |
@@ -180,7 +191,18 @@ Parameters:
     "project_id": 3,
     "title": "test1",
     "description": "fixed login page css paddings",
-    "state": "opened",
+    "state": "merged",
+    "merged_by": {
+      "id": 87854,
+      "name": "Douwe Maan",
+      "username": "DouweM",
+      "state": "active",
+      "avatar_url": "https://gitlab.example.com/uploads/-/system/user/avatar/87854/avatar.png",
+      "web_url": "https://gitlab.com/DouweM"
+    },
+    "merged_at": "2018-09-07T11:16:17.520Z",
+    "closed_by": null,
+    "closed_at": null,
     "created_at": "2017-04-29T08:46:00Z",
     "updated_at": "2017-04-29T08:46:00Z",
     "target_branch": "master",
@@ -272,7 +294,7 @@ Parameters:
 | `sort`              | string         | no       | Return merge requests sorted in `asc` or `desc` order. Default is `desc`                                                       |
 | `milestone`         | string         | no       | Return merge requests for a specific milestone. `None` returns merge requests with no milestone. `Any` returns merge requests that have an assigned milestone. |
 | `view`              | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                                      |
-| `labels`            | string         | no       | Return merge requests matching a comma separated list of labels                                                                |
+| `labels`            | string         | no       | Return merge requests matching a comma separated list of labels. `None` lists all merge requests with no labels. `Any` lists all merge requests with at least one label. `No+Label` (Deprecated) lists all merge requests with no labels. Predefined names are case-insensitive. |
 | `created_after`     | datetime       | no       | Return merge requests created on or after the given time                                                                       |
 | `created_before`    | datetime       | no       | Return merge requests created on or before the given time                                                                      |
 | `updated_after`     | datetime       | no       | Return merge requests updated on or after the given time                                                                       |
@@ -293,7 +315,18 @@ Parameters:
     "project_id": 3,
     "title": "test1",
     "description": "fixed login page css paddings",
-    "state": "opened",
+    "state": "merged",
+    "merged_by": {
+      "id": 87854,
+      "name": "Douwe Maan",
+      "username": "DouweM",
+      "state": "active",
+      "avatar_url": "https://gitlab.example.com/uploads/-/system/user/avatar/87854/avatar.png",
+      "web_url": "https://gitlab.com/DouweM"
+    },
+    "merged_at": "2018-09-07T11:16:17.520Z",
+    "closed_by": null,
+    "closed_at": null,
     "created_at": "2017-04-29T08:46:00Z",
     "updated_at": "2017-04-29T08:46:00Z",
     "target_branch": "master",
@@ -383,7 +416,7 @@ Parameters:
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -695,7 +728,7 @@ POST /projects/:id/merge_requests
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -822,7 +855,7 @@ Must include at least one non-required attribute from above.
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -965,7 +998,7 @@ Parameters:
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -1080,7 +1113,7 @@ Parameters:
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -1279,7 +1312,7 @@ Example response:
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -1400,7 +1433,7 @@ Example response:
   "project_id": 3,
   "title": "test1",
   "description": "fixed login page css paddings",
-  "state": "opened",
+  "state": "merged",
   "created_at": "2017-04-29T08:46:00Z",
   "updated_at": "2017-04-29T08:46:00Z",
   "target_branch": "master",
@@ -1540,7 +1573,7 @@ Example response:
     "project_id": 3,
     "title": "Et voluptas laudantium minus nihil recusandae ut accusamus earum aut non.",
     "description": "Veniam sunt nihil modi earum cumque illum delectus. Nihil ad quis distinctio quia. Autem eligendi at quibusdam repellendus.",
-    "state": "opened",
+    "state": "merged",
     "created_at": "2016-06-17T07:48:04.330Z",
     "updated_at": "2016-07-01T11:14:15.537Z",
     "target_branch": "allow_regex_for_project_skip_ref",
