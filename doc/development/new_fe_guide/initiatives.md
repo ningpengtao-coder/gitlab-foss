@@ -1,15 +1,12 @@
 # Initiatives
 
-Long term (more than one release) goals of the Frontend team can be viewed on [Frontend Epics](TODO LINK)
-These are the long term initiatives of the frontend team.
+A list of long term goals of the Frontend team can be found on the [Frontend Epics List](https://gitlab.com/groups/gitlab-org/-/epics?label_name%5B%5D=frontend). These track larger efforts across multiple releases.
 
 ## Frontend projects
 
+Frontend is split into multiple repositories. Commonly-used ones are:
+
 [csslab](https://gitlab.com/gitlab-org/csslab)
-[design.gitlab.com](TODO - https://gitlab.com/gitlab-org/design.gitlab.com ??)
+[design.gitlab.com](https://gitlab.com/gitlab-org/design.gitlab.com)
 [gitlab-svgs](https://gitlab.com/gitlab-org/gitlab-svgs)
 [gitlab-ui](https://gitlab.com/gitlab-org/gitlab-ui)
-
-## CSS refactor
-
-For more details about this initiative, please visit issue [#42325](https://gitlab.com/gitlab-org/gitlab-ce/issues/42325)
