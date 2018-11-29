@@ -39,10 +39,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    svg {
-      vertical-align: middle;
-    }
   }
 
   .next-run-cell {
@@ -51,6 +47,10 @@
 
   a {
     color: $text-color;
+  }
+
+  svg {
+    vertical-align: middle;
   }
 }
 
@@ -69,7 +69,7 @@
 .cron-preset-radio-input {
   display: inline-block;
 
-  @media (max-width: $screen-md-max) {
+  @include media-breakpoint-down(md) {
     display: block;
     margin: 0 0 5px 5px;
   }

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Vue from 'vue';
 
 import Translate from '~/vue_shared/translate';
@@ -31,12 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   });
 
-  $(document).on('shown.bs.modal', (event) => {
+  $(document).on('shown.bs.modal', event => {
     if (event.relatedTarget.classList.contains('delete-user-button')) {
       const buttonProps = event.relatedTarget.dataset;
       deleteModal.deleteUserUrl = buttonProps.deleteUserUrl;
       deleteModal.blockUserUrl = buttonProps.blockUserUrl;
-      deleteModal.deleteContributions = event.relatedTarget.hasAttribute('data-delete-contributions');
+      deleteModal.deleteContributions = event.relatedTarget.hasAttribute(
+        'data-delete-contributions',
+      );
       deleteModal.username = buttonProps.username;
     }
   });

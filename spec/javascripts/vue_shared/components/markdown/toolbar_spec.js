@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import toolbar from '~/vue_shared/components/markdown/toolbar.vue';
-import mountComponent from '../../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('toolbar', () => {
   let vm;
@@ -25,9 +25,12 @@ describe('toolbar', () => {
 
   describe('user cannot attach file', () => {
     beforeEach(() => {
-      vm = mountComponent(Toolbar, Object.assign({}, props, {
-        canAttachFile: false,
-      }));
+      vm = mountComponent(
+        Toolbar,
+        Object.assign({}, props, {
+          canAttachFile: false,
+        }),
+      );
     });
 
     it('should not render uploading-container', () => {

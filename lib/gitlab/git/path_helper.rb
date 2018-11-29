@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Gitaly note: JV: no RPC's here.
 
 module Gitlab
@@ -6,7 +8,7 @@ module Gitlab
       class << self
         def normalize_path(filename)
           # Strip all leading slashes so that //foo -> foo
-          filename[%r{^/*}] = ''
+          filename = filename.sub(%r{\A/*}, '')
 
           # Expand relative paths (e.g. foo/../bar)
           filename = Pathname.new(filename)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GitlabUploader < CarrierWave::Uploader::Base
   class_attribute :options
 
@@ -37,22 +39,16 @@ class GitlabUploader < CarrierWave::Uploader::Base
     cache_storage.is_a?(CarrierWave::Storage::File)
   end
 
-  # Reduce disk IO
   def move_to_cache
     file_storage?
   end
 
-  # Reduce disk IO
   def move_to_store
     file_storage?
   end
 
   def exists?
     file.present?
-  end
-
-  def store_dir
-    File.join(base_dir, dynamic_segment)
   end
 
   def cache_dir
@@ -67,8 +63,40 @@ class GitlabUploader < CarrierWave::Uploader::Base
     super || file&.filename
   end
 
+  def relative_path
+    return path if pathname.relative?
+
+    pathname.relative_path_from(Pathname.new(root))
+  end
+
   def model_valid?
     !!model
+  end
+
+  def local_url
+    File.join('/', self.class.base_dir, dynamic_segment, filename)
+  end
+
+  def cached_size
+    size
+  end
+
+  def open
+    stream =
+      if file_storage?
+        File.open(path, "rb") if path
+      else
+        ::Gitlab::HttpIO.new(url, cached_size) if url
+      end
+
+    return unless stream
+    return stream unless block_given?
+
+    begin
+      yield(stream)
+    ensure
+      stream.close
+    end
   end
 
   private
@@ -76,6 +104,10 @@ class GitlabUploader < CarrierWave::Uploader::Base
   # Designed to be overridden by child uploaders that have a dynamic path
   # segment -- that is, a path that changes based on mutable attributes of its
   # associated model
+  #
+  # For example, `FileUploader` builds the storage path based on the associated
+  # project model's `path_with_namespace` value, which can change when the
+  # project or its containing namespace is moved or renamed.
   def dynamic_segment
     raise(NotImplementedError)
   end
@@ -88,5 +120,9 @@ class GitlabUploader < CarrierWave::Uploader::Base
     # because calling CarrierWave.clean_cache_files! will remove any files in
     # the cache directory.
     File.join(work_dir, cache_id, version_name.to_s, for_file)
+  end
+
+  def pathname
+    @pathname ||= Pathname.new(path)
   end
 end

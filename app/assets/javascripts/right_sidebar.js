@@ -1,9 +1,11 @@
-/* eslint-disable func-names, space-before-function-paren, no-var, prefer-rest-params, wrap-iife, no-unused-vars, consistent-return, one-var, one-var-declaration-per-line, quotes, prefer-template, object-shorthand, comma-dangle, no-else-return, no-param-reassign, max-len */
+/* eslint-disable func-names, no-var, no-unused-vars, consistent-return, one-var, prefer-template, no-else-return, no-param-reassign */
 
+import $ from 'jquery';
 import _ from 'underscore';
 import Cookies from 'js-cookie';
 import flash from './flash';
 import axios from './lib/utils/axios_utils';
+import { __ } from './locale';
 
 function Sidebar(currentUser) {
   this.toggleTodo = this.toggleTodo.bind(this);
@@ -19,7 +21,7 @@ Sidebar.initialize = function(currentUser) {
   }
 };
 
-Sidebar.prototype.removeListeners = function () {
+Sidebar.prototype.removeListeners = function() {
   this.sidebar.off('click', '.sidebar-collapsed-icon');
   this.sidebar.off('hidden.gl.dropdown');
   $('.dropdown').off('loading.gl.dropdown');
@@ -36,28 +38,41 @@ Sidebar.prototype.addEventListeners = function() {
   $('.dropdown').on('loaded.gl.dropdown', this.sidebarDropdownLoaded);
 
   $document.on('click', '.js-sidebar-toggle', this.sidebarToggleClicked);
-  return $(document).off('click', '.js-issuable-todo').on('click', '.js-issuable-todo', this.toggleTodo);
+  return $(document)
+    .off('click', '.js-issuable-todo')
+    .on('click', '.js-issuable-todo', this.toggleTodo);
 };
 
-Sidebar.prototype.sidebarToggleClicked = function (e, triggered) {
-  var $allGutterToggleIcons, $this, $thisIcon;
+Sidebar.prototype.sidebarToggleClicked = function(e, triggered) {
+  var $allGutterToggleIcons, $this, isExpanded, tooltipLabel;
   e.preventDefault();
   $this = $(this);
-  $thisIcon = $this.find('i');
+  isExpanded = $this.find('i').hasClass('fa-angle-double-right');
+  tooltipLabel = isExpanded ? __('Expand sidebar') : __('Collapse sidebar');
   $allGutterToggleIcons = $('.js-sidebar-toggle i');
-  if ($thisIcon.hasClass('fa-angle-double-right')) {
+
+  if (isExpanded) {
     $allGutterToggleIcons.removeClass('fa-angle-double-right').addClass('fa-angle-double-left');
-    $('aside.right-sidebar').removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
-    $('.layout-page').removeClass('right-sidebar-expanded').addClass('right-sidebar-collapsed');
+    $('aside.right-sidebar')
+      .removeClass('right-sidebar-expanded')
+      .addClass('right-sidebar-collapsed');
+    $('.layout-page')
+      .removeClass('right-sidebar-expanded')
+      .addClass('right-sidebar-collapsed');
   } else {
     $allGutterToggleIcons.removeClass('fa-angle-double-left').addClass('fa-angle-double-right');
-    $('aside.right-sidebar').removeClass('right-sidebar-collapsed').addClass('right-sidebar-expanded');
-    $('.layout-page').removeClass('right-sidebar-collapsed').addClass('right-sidebar-expanded');
-
-    if (gl.lazyLoader) gl.lazyLoader.loadCheck();
+    $('aside.right-sidebar')
+      .removeClass('right-sidebar-collapsed')
+      .addClass('right-sidebar-expanded');
+    $('.layout-page')
+      .removeClass('right-sidebar-collapsed')
+      .addClass('right-sidebar-expanded');
   }
+
+  $this.attr('data-original-title', tooltipLabel);
+
   if (!triggered) {
-    Cookies.set("collapsed_gutter", $('.right-sidebar').hasClass('right-sidebar-collapsed'));
+    Cookies.set('collapsed_gutter', $('.right-sidebar').hasClass('right-sidebar-collapsed'));
   }
 };
 
@@ -66,21 +81,27 @@ Sidebar.prototype.toggleTodo = function(e) {
   $this = $(e.currentTarget);
   ajaxType = $this.attr('data-delete-path') ? 'delete' : 'post';
   if ($this.attr('data-delete-path')) {
-    url = "" + ($this.attr('data-delete-path'));
+    url = '' + $this.attr('data-delete-path');
   } else {
-    url = "" + ($this.data('url'));
+    url = '' + $this.data('url');
   }
 
   $this.tooltip('hide');
 
-  $('.js-issuable-todo').disable().addClass('is-loading');
+  $('.js-issuable-todo')
+    .disable()
+    .addClass('is-loading');
 
   axios[ajaxType](url, {
     issuable_id: $this.data('issuableId'),
     issuable_type: $this.data('issuableType'),
-  }).then(({ data }) => {
-    this.todoUpdateDone(data);
-  }).catch(() => flash(`There was an error ${ajaxType === 'post' ? 'adding a' : 'deleting the'} todo.`));
+  })
+    .then(({ data }) => {
+      this.todoUpdateDone(data);
+    })
+    .catch(() =>
+      flash(`There was an error ${ajaxType === 'post' ? 'adding a' : 'deleting the'} todo.`),
+    );
 };
 
 Sidebar.prototype.todoUpdateDone = function(data) {
@@ -94,14 +115,15 @@ Sidebar.prototype.todoUpdateDone = function(data) {
     const $el = $(el);
     const $elText = $el.find('.js-issuable-todo-inner');
 
-    $el.removeClass('is-loading')
+    $el
+      .removeClass('is-loading')
       .enable()
       .attr('aria-label', $el.data(`${attrPrefix}Text`))
       .attr('data-delete-path', deletePath)
       .attr('title', $el.data(`${attrPrefix}Text`));
 
     if ($el.hasClass('has-tooltip')) {
-      $el.tooltip('fixTitle');
+      $el.tooltip('_fixTitle');
     }
 
     if ($el.data(`${attrPrefix}Icon`)) {
@@ -114,7 +136,9 @@ Sidebar.prototype.todoUpdateDone = function(data) {
 
 Sidebar.prototype.sidebarDropdownLoading = function(e) {
   var $loading, $sidebarCollapsedIcon, i, img;
-  $sidebarCollapsedIcon = $(this).closest('.block').find('.sidebar-collapsed-icon');
+  $sidebarCollapsedIcon = $(this)
+    .closest('.block')
+    .find('.sidebar-collapsed-icon');
   img = $sidebarCollapsedIcon.find('img');
   i = $sidebarCollapsedIcon.find('i');
   $loading = $('<i class="fa fa-spinner fa-spin"></i>');
@@ -129,7 +153,9 @@ Sidebar.prototype.sidebarDropdownLoading = function(e) {
 
 Sidebar.prototype.sidebarDropdownLoaded = function(e) {
   var $sidebarCollapsedIcon, i, img;
-  $sidebarCollapsedIcon = $(this).closest('.block').find('.sidebar-collapsed-icon');
+  $sidebarCollapsedIcon = $(this)
+    .closest('.block')
+    .find('.sidebar-collapsed-icon');
   img = $sidebarCollapsedIcon.find('img');
   $sidebarCollapsedIcon.find('i.fa-spin').remove();
   i = $sidebarCollapsedIcon.find('i');
@@ -215,7 +241,7 @@ Sidebar.prototype.isOpen = function() {
 };
 
 Sidebar.prototype.getBlock = function(name) {
-  return this.sidebar.find(".block." + name);
+  return this.sidebar.find('.block.' + name);
 };
 
 export default Sidebar;

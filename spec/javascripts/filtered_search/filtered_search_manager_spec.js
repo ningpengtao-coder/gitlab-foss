@@ -1,9 +1,7 @@
-import * as urlUtils from '~/lib/utils/url_utility';
-import * as recentSearchesStoreSrc from '~/filtered_search/stores/recent_searches_store';
 import RecentSearchesService from '~/filtered_search/services/recent_searches_service';
 import RecentSearchesServiceError from '~/filtered_search/services/recent_searches_service_error';
 import RecentSearchesRoot from '~/filtered_search/recent_searches_root';
-import FilteredSearchTokenKeys from '~/filtered_search/filtered_search_token_keys';
+import IssuableFilteredSearchTokenKeys from '~/filtered_search/issuable_filtered_search_token_keys';
 import '~/lib/utils/common_utils';
 import DropdownUtils from '~/filtered_search/dropdown_utils';
 import FilteredSearchVisualTokens from '~/filtered_search/filtered_search_visual_tokens';
@@ -11,7 +9,7 @@ import FilteredSearchDropdownManager from '~/filtered_search/filtered_search_dro
 import FilteredSearchManager from '~/filtered_search/filtered_search_manager';
 import FilteredSearchSpecHelper from '../helpers/filtered_search_spec_helper';
 
-describe('Filtered Search Manager', () => {
+describe('Filtered Search Manager', function() {
   let input;
   let manager;
   let tokensContainer;
@@ -74,20 +72,21 @@ describe('Filtered Search Manager', () => {
 
   describe('class constructor', () => {
     const isLocalStorageAvailable = 'isLocalStorageAvailable';
+    let RecentSearchesStoreSpy;
 
     beforeEach(() => {
       spyOn(RecentSearchesService, 'isAvailable').and.returnValue(isLocalStorageAvailable);
-      spyOn(recentSearchesStoreSrc, 'default');
       spyOn(RecentSearchesRoot.prototype, 'render');
+      RecentSearchesStoreSpy = spyOnDependency(FilteredSearchManager, 'RecentSearchesStore');
     });
 
     it('should instantiate RecentSearchesStore with isLocalStorageAvailable', () => {
       manager = new FilteredSearchManager({ page });
 
       expect(RecentSearchesService.isAvailable).toHaveBeenCalled();
-      expect(recentSearchesStoreSrc.default).toHaveBeenCalledWith({
+      expect(RecentSearchesStoreSpy).toHaveBeenCalledWith({
         isLocalStorageAvailable,
-        allowedKeys: FilteredSearchTokenKeys.getKeys(),
+        allowedKeys: IssuableFilteredSearchTokenKeys.getKeys(),
       });
     });
   });
@@ -98,7 +97,9 @@ describe('Filtered Search Manager', () => {
     });
 
     it('should not instantiate Flash if an RecentSearchesServiceError is caught', () => {
-      spyOn(RecentSearchesService.prototype, 'fetch').and.callFake(() => Promise.reject(new RecentSearchesServiceError()));
+      spyOn(RecentSearchesService.prototype, 'fetch').and.callFake(() =>
+        Promise.reject(new RecentSearchesServiceError()),
+      );
       spyOn(window, 'Flash');
 
       manager.setup();
@@ -135,6 +136,7 @@ describe('Filtered Search Manager', () => {
       };
 
       manager.searchState(e);
+
       expect(FilteredSearchManager.prototype.search).not.toHaveBeenCalled();
     });
 
@@ -150,6 +152,7 @@ describe('Filtered Search Manager', () => {
       };
 
       manager.searchState(e);
+
       expect(FilteredSearchManager.prototype.search).toHaveBeenCalledWith('opened');
     });
   });
@@ -161,10 +164,10 @@ describe('Filtered Search Manager', () => {
       initializeManager();
     });
 
-    it('should search with a single word', (done) => {
+    it('should search with a single word', done => {
       input.value = 'searchTerm';
 
-      spyOn(urlUtils, 'visitUrl').and.callFake((url) => {
+      spyOnDependency(FilteredSearchManager, 'visitUrl').and.callFake(url => {
         expect(url).toEqual(`${defaultParams}&search=searchTerm`);
         done();
       });
@@ -172,10 +175,10 @@ describe('Filtered Search Manager', () => {
       manager.search();
     });
 
-    it('should search with multiple words', (done) => {
+    it('should search with multiple words', done => {
       input.value = 'awesome search terms';
 
-      spyOn(urlUtils, 'visitUrl').and.callFake((url) => {
+      spyOnDependency(FilteredSearchManager, 'visitUrl').and.callFake(url => {
         expect(url).toEqual(`${defaultParams}&search=awesome+search+terms`);
         done();
       });
@@ -183,24 +186,26 @@ describe('Filtered Search Manager', () => {
       manager.search();
     });
 
-    it('should search with special characters', (done) => {
+    it('should search with special characters', done => {
       input.value = '~!@#$%^&*()_+{}:<>,.?/';
 
-      spyOn(urlUtils, 'visitUrl').and.callFake((url) => {
-        expect(url).toEqual(`${defaultParams}&search=~!%40%23%24%25%5E%26*()_%2B%7B%7D%3A%3C%3E%2C.%3F%2F`);
+      spyOnDependency(FilteredSearchManager, 'visitUrl').and.callFake(url => {
+        expect(url).toEqual(
+          `${defaultParams}&search=~!%40%23%24%25%5E%26*()_%2B%7B%7D%3A%3C%3E%2C.%3F%2F`,
+        );
         done();
       });
 
       manager.search();
     });
 
-    it('removes duplicated tokens', (done) => {
+    it('removes duplicated tokens', done => {
       tokensContainer.innerHTML = FilteredSearchSpecHelper.createTokensContainerHTML(`
         ${FilteredSearchSpecHelper.createFilterVisualTokenHTML('label', '~bug')}
         ${FilteredSearchSpecHelper.createFilterVisualTokenHTML('label', '~bug')}
       `);
 
-      spyOn(urlUtils, 'visitUrl').and.callFake((url) => {
+      spyOnDependency(FilteredSearchManager, 'visitUrl').and.callFake(url => {
         expect(url).toEqual(`${defaultParams}&label_name[]=bug`);
         done();
       });
@@ -305,6 +310,7 @@ describe('Filtered Search Manager', () => {
       );
 
       tokensContainer.querySelector('.js-visual-token .remove-token').click();
+
       expect(tokensContainer.querySelector('.js-visual-token')).toEqual(null);
     });
 
@@ -438,12 +444,18 @@ describe('Filtered Search Manager', () => {
 
     it('toggles on focus', () => {
       input.focus();
-      expect(document.querySelector('.filtered-search-box').classList.contains('focus')).toEqual(true);
+
+      expect(document.querySelector('.filtered-search-box').classList.contains('focus')).toEqual(
+        true,
+      );
     });
 
     it('toggles on blur', () => {
       input.blur();
-      expect(document.querySelector('.filtered-search-box').classList.contains('focus')).toEqual(false);
+
+      expect(document.querySelector('.filtered-search-box').classList.contains('focus')).toEqual(
+        false,
+      );
     });
   });
 
@@ -455,9 +467,12 @@ describe('Filtered Search Manager', () => {
     });
 
     it('correctly modifies params when custom modifier is passed', () => {
-      const modifedParams = manager.getAllParams.call({
-        modifyUrlParams: paramsArr => paramsArr.reverse(),
-      }, [].concat(this.paramsArr));
+      const modifedParams = manager.getAllParams.call(
+        {
+          modifyUrlParams: paramsArr => paramsArr.reverse(),
+        },
+        [].concat(this.paramsArr),
+      );
 
       expect(modifedParams[0]).toBe(this.paramsArr[1]);
     });

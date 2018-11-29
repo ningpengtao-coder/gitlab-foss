@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Vue from 'vue';
 import Translate from '../../../../vue_shared/translate';
 import GlFieldErrors from '../../../../gl_field_errors';
@@ -10,7 +11,9 @@ Vue.use(Translate);
 
 function initIntervalPatternInput() {
   const intervalPatternMount = document.getElementById('interval-pattern-input');
-  const initialCronInterval = intervalPatternMount ? intervalPatternMount.dataset.initialInterval : '';
+  const initialCronInterval = intervalPatternMount
+    ? intervalPatternMount.dataset.initialInterval
+    : '';
 
   return new Vue({
     el: intervalPatternMount,

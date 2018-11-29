@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Checks
     class CommitCheck
@@ -8,8 +10,8 @@ module Gitlab
       def initialize(project, user, newrev, oldrev)
         @project = project
         @user = user
-        @newrev = user
-        @oldrev = user
+        @newrev = newrev
+        @oldrev = oldrev
         @file_paths = []
       end
 
@@ -37,12 +39,13 @@ module Gitlab
 
       def validate_lfs_file_locks?
         strong_memoize(:validate_lfs_file_locks) do
-          project.lfs_enabled? && project.lfs_file_locks.any? && newrev && oldrev
+          project.lfs_enabled? && newrev && oldrev && project.any_lfs_file_locks?
         end
       end
 
       private
 
+      # rubocop: disable CodeReuse/ActiveRecord
       def lfs_file_locks_validation
         lambda do |paths|
           lfs_lock = project.lfs_file_locks.where(path: paths).where.not(user_id: user.id).first
@@ -52,6 +55,7 @@ module Gitlab
           end
         end
       end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       def path_validations
         validate_lfs_file_locks? ? [lfs_file_locks_validation] : []

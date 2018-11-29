@@ -21,6 +21,34 @@ describe IssuableCollections do
     controller
   end
 
+  describe '#set_set_order_from_cookie' do
+    describe 'when sort param given' do
+      let(:cookies) { {} }
+      let(:params) { { sort: 'downvotes_asc' } }
+
+      it 'sets the cookie with the right values and flags' do
+        allow(controller).to receive(:cookies).and_return(cookies)
+
+        controller.send(:set_sort_order_from_cookie)
+
+        expect(cookies['issue_sort']).to eq({ value: 'popularity', secure: false, httponly: false })
+      end
+    end
+
+    describe 'when cookie exists' do
+      let(:cookies) { { 'issue_sort' => 'id_asc' } }
+      let(:params) { {} }
+
+      it 'sets the cookie with the right values and flags' do
+        allow(controller).to receive(:cookies).and_return(cookies)
+
+        controller.send(:set_sort_order_from_cookie)
+
+        expect(cookies['issue_sort']).to eq({ value: 'created_asc', secure: false, httponly: false })
+      end
+    end
+  end
+
   describe '#page_count_for_relation' do
     let(:params) { { state: 'opened' } }
 
@@ -32,7 +60,7 @@ describe IssuableCollections do
     end
   end
 
-  describe '#filter_params' do
+  describe '#finder_options' do
     let(:params) do
       {
         assignee_id: '1',
@@ -56,25 +84,20 @@ describe IssuableCollections do
       }
     end
 
-    it 'filters params' do
+    it 'only allows whitelisted params' do
       allow(controller).to receive(:cookies).and_return({})
 
-      filtered_params = controller.send(:filter_params)
+      finder_options = controller.send(:finder_options)
 
-      expect(filtered_params).to eq({
+      expect(finder_options).to eq({
         'assignee_id' => '1',
         'assignee_username' => 'user1',
         'author_id' => '2',
         'author_username' => 'user2',
-        'authorized_only' => 'true',
-        'due_date' => '2017-01-01',
-        'group_id' => '3',
-        'iids' => '4',
         'label_name' => 'foo',
         'milestone_title' => 'bar',
         'my_reaction_emoji' => 'thumbsup',
-        'non_archived' => 'true',
-        'project_id' => '5',
+        'due_date' => '2017-01-01',
         'scope' => 'all',
         'search' => 'baz',
         'sort' => 'priority',

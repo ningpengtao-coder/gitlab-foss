@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 export default class FileTemplateSelector {
   constructor(mediator) {
     this.mediator = mediator;
@@ -30,6 +32,10 @@ export default class FileTemplateSelector {
     }
   }
 
+  isHidden() {
+    return this.$wrapper.hasClass('hidden');
+  }
+
   getToggleText() {
     return this.$dropdownToggleText.text();
   }
@@ -39,15 +45,11 @@ export default class FileTemplateSelector {
   }
 
   renderLoading() {
-    this.$loadingIcon
-      .addClass('fa-spinner fa-spin')
-      .removeClass('fa-chevron-down');
+    this.$loadingIcon.addClass('fa-spinner fa-spin').removeClass('fa-chevron-down');
   }
 
   renderLoaded() {
-    this.$loadingIcon
-      .addClass('fa-chevron-down')
-      .removeClass('fa-spinner fa-spin');
+    this.$loadingIcon.addClass('fa-chevron-down').removeClass('fa-spinner fa-spin');
   }
 
   reportSelection(options) {

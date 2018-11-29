@@ -35,15 +35,6 @@ describe GroupDescendantsFinder do
       expect(finder.execute).to contain_exactly(project)
     end
 
-    it 'does not include projects shared with the group' do
-      project = create(:project, namespace: group)
-      other_project = create(:project)
-      other_project.project_group_links.create(group: group,
-                                               group_access: ProjectGroupLink::MASTER)
-
-      expect(finder.execute).to contain_exactly(project)
-    end
-
     context 'when archived is `true`' do
       let(:params) { { archived: 'true' } }
 
@@ -83,6 +74,13 @@ describe GroupDescendantsFinder do
       end
     end
 
+    it 'sorts elements by latest created as default' do
+      project1 = create(:project, namespace: group, created_at: 1.hour.ago)
+      project2 = create(:project, namespace: group)
+
+      expect(subject.execute).to eq([project2, project1])
+    end
+
     context 'sorting by name' do
       let!(:project1) { create(:project, namespace: group, name: 'a', path: 'project-a') }
       let!(:project2) { create(:project, namespace: group, name: 'z', path: 'project-z') }
@@ -116,6 +114,15 @@ describe GroupDescendantsFinder do
           )
         end
       end
+    end
+
+    it 'does not include projects shared with the group' do
+      project = create(:project, namespace: group)
+      other_project = create(:project)
+      other_project.project_group_links.create(group: group,
+                                               group_access: ProjectGroupLink::MASTER)
+
+      expect(finder.execute).to contain_exactly(project)
     end
   end
 

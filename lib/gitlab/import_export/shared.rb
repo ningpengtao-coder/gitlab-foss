@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module ImportExport
     class Shared
@@ -22,7 +24,7 @@ module Gitlab
 
       def error(error)
         error_out(error.message, caller[0].dup)
-        @errors << error.message
+        add_error_message(error.message)
 
         # Debug:
         if error.backtrace
@@ -30,6 +32,14 @@ module Gitlab
         else
           Rails.logger.error("No backtrace found")
         end
+      end
+
+      def add_error_message(error_message)
+        @errors << error_message
+      end
+
+      def after_export_in_progress?
+        File.exist?(after_export_lock_file)
       end
 
       private
@@ -44,6 +54,10 @@ module Gitlab
 
       def error_out(message, caller)
         Rails.logger.error("Import/Export error raised on #{caller}: #{message}")
+      end
+
+      def after_export_lock_file
+        AfterExportStrategies::BaseAfterExportStrategy.lock_file_path(project)
       end
     end
   end

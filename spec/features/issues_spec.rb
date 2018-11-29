@@ -8,6 +8,17 @@ describe 'Issues' do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }
 
+  shared_examples_for 'empty state with filters' do
+    it 'user sees empty state with filters' do
+      create(:issue, author: user, project: project)
+
+      visit project_issues_path(project, milestone_title: "1.0")
+
+      expect(page).to have_content('Sorry, your filter produced no results')
+      expect(page).to have_content('To widen your search, change or remove filters above')
+    end
+  end
+
   describe 'while user is signed out' do
     describe 'empty state' do
       it 'user sees empty state' do
@@ -17,6 +28,8 @@ describe 'Issues' do
         expect(page).to have_content('The Issue Tracker is the place to add things that need to be improved or solved in a project.')
         expect(page).to have_content('You can register or sign in to create issues for this project.')
       end
+
+      it_behaves_like 'empty state with filters'
     end
   end
 
@@ -37,6 +50,8 @@ describe 'Issues' do
         expect(page).to have_content('Issues can be bugs, tasks or ideas to be discussed. Also, issues are searchable and filterable.')
         expect(page).to have_content('New issue')
       end
+
+      it_behaves_like 'empty state with filters'
     end
 
     describe 'Edit issue' do
@@ -340,6 +355,20 @@ describe 'Issues' do
             expect(page).to have_content('baz')
           end
         end
+
+        it 'filters by due next month and previous two weeks' do
+          foo.update(due_date: Date.today - 4.weeks)
+          bar.update(due_date: (Date.today + 2.months).beginning_of_month)
+          baz.update(due_date: Date.yesterday)
+
+          visit project_issues_path(project, due_date: Issue::DueNextMonthAndPreviousTwoWeeks.name)
+
+          page.within '.issues-holder' do
+            expect(page).not_to have_content('foo')
+            expect(page).not_to have_content('bar')
+            expect(page).to have_content('baz')
+          end
+        end
       end
 
       describe 'sorting by milestone' do
@@ -384,7 +413,7 @@ describe 'Issues' do
 
       before do
         stub_incoming_email_setting(enabled: true, address: "p+%{key}@gl.ab")
-        project1.add_master(user)
+        project1.add_maintainer(user)
         visit namespace_project_issues_path(user.namespace, project1)
       end
 
@@ -591,6 +620,20 @@ describe 'Issues' do
         end
       end
 
+      it 'clears local storage after creating a new issue', :js do
+        2.times do
+          visit new_project_issue_path(project)
+          wait_for_requests
+
+          expect(page).to have_field('Title', with: '')
+
+          fill_in 'issue_title', with: 'bug 345'
+          fill_in 'issue_description', with: 'bug description'
+
+          click_button 'Submit issue'
+        end
+      end
+
       context 'dropzone upload file', :js do
         before do
           visit new_project_issue_path(project)
@@ -637,6 +680,18 @@ describe 'Issues' do
 
         it 'fills in template' do
           expect(find('.js-issuable-selector .dropdown-toggle-text')).to have_content('bug')
+        end
+      end
+
+      context 'suggestions', :js do
+        it 'displays list of related issues' do
+          create(:issue, project: project, title: 'test issue')
+
+          visit new_project_issue_path(project)
+
+          fill_in 'issue_title', with: issue.title
+
+          expect(page).to have_selector('.suggestion-item', count: 1)
         end
       end
     end

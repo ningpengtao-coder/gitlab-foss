@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module ImportExport
     class AttributesFinder
@@ -30,6 +32,10 @@ module Gitlab
       def find_method(value)
         key = key_from_hash(value)
         @methods[key].nil? ? {} : { methods: @methods[key] }
+      end
+
+      def find_excluded_keys(klass_name)
+        @excluded_attributes[klass_name.to_sym]&.map(&:to_s) || []
       end
 
       private

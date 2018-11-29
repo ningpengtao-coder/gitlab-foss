@@ -5,7 +5,7 @@ describe Projects::BoardsController do
   let(:user)    { create(:user) }
 
   before do
-    project.add_master(user)
+    project.add_maintainer(user)
     sign_in(user)
   end
 
@@ -27,11 +27,65 @@ describe Projects::BoardsController do
         expect(response).to render_template :index
         expect(response.content_type).to eq 'text/html'
       end
+
+      it 'redirects to latest visited board' do
+        board = create(:board, project: project)
+        create(:board_project_recent_visit, project: board.project, board: board, user: user)
+
+        list_boards
+
+        expect(response).to redirect_to(namespace_project_board_path(id: board.id))
+      end
+
+      it 'renders template if visited board is not found' do
+        temporary_board = create(:board, project: project)
+        visited = create(:board_project_recent_visit, project: temporary_board.project, board: temporary_board, user: user)
+        temporary_board.delete
+
+        allow_any_instance_of(Boards::Visits::LatestService).to receive(:execute).and_return(visited)
+
+        list_boards
+
+        expect(response).to render_template :index
+        expect(response.content_type).to eq 'text/html'
+      end
+
+      context 'with unauthorized user' do
+        before do
+          allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
+          allow(Ability).to receive(:allowed?).with(user, :read_board, project).and_return(false)
+        end
+
+        it 'returns a not found 404 response' do
+          list_boards
+
+          expect(response).to have_gitlab_http_status(404)
+          expect(response.content_type).to eq 'text/html'
+        end
+      end
+
+      context 'when user is signed out' do
+        let(:project) { create(:project, :public) }
+
+        it 'renders template' do
+          sign_out(user)
+
+          board = create(:board, project: project)
+          create(:board_project_recent_visit, project: board.project, board: board, user: user)
+
+          list_boards
+
+          expect(response).to render_template :index
+          expect(response.content_type).to eq 'text/html'
+        end
+      end
     end
 
     context 'when format is JSON' do
       it 'returns a list of project boards' do
         create_list(:board, 2, project: project)
+
+        expect(Boards::Visits::LatestService).not_to receive(:new)
 
         list_boards format: :json
 
@@ -40,18 +94,19 @@ describe Projects::BoardsController do
         expect(response).to match_response_schema('boards')
         expect(parsed_response.length).to eq 2
       end
-    end
 
-    context 'with unauthorized user' do
-      before do
-        allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
-        allow(Ability).to receive(:allowed?).with(user, :read_board, project).and_return(false)
-      end
+      context 'with unauthorized user' do
+        before do
+          allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
+          allow(Ability).to receive(:allowed?).with(user, :read_board, project).and_return(false)
+        end
 
-      it 'returns a not found 404 response' do
-        list_boards
+        it 'returns a not found 404 response' do
+          list_boards format: :json
 
-        expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(404)
+          expect(response.content_type).to eq 'application/json'
+        end
       end
     end
 
@@ -83,31 +138,61 @@ describe Projects::BoardsController do
 
     context 'when format is HTML' do
       it 'renders template' do
-        read_board board: board
+        expect { read_board board: board }.to change(BoardProjectRecentVisit, :count).by(1)
 
         expect(response).to render_template :show
         expect(response.content_type).to eq 'text/html'
+      end
+
+      context 'with unauthorized user' do
+        before do
+          allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
+          allow(Ability).to receive(:allowed?).with(user, :read_board, project).and_return(false)
+        end
+
+        it 'returns a not found 404 response' do
+          read_board board: board
+
+          expect(response).to have_gitlab_http_status(404)
+          expect(response.content_type).to eq 'text/html'
+        end
+      end
+
+      context 'when user is signed out' do
+        let(:project) { create(:project, :public) }
+
+        it 'does not save visit' do
+          sign_out(user)
+
+          expect { read_board board: board }.to change(BoardProjectRecentVisit, :count).by(0)
+
+          expect(response).to render_template :show
+          expect(response.content_type).to eq 'text/html'
+        end
       end
     end
 
     context 'when format is JSON' do
       it 'returns project board' do
+        expect(Boards::Visits::CreateService).not_to receive(:new)
+
         read_board board: board, format: :json
 
         expect(response).to match_response_schema('board')
       end
-    end
 
-    context 'with unauthorized user' do
-      before do
-        allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
-        allow(Ability).to receive(:allowed?).with(user, :read_board, project).and_return(false)
-      end
+      context 'with unauthorized user' do
+        before do
+          allow(Ability).to receive(:allowed?).with(user, :read_project, project).and_return(true)
+          allow(Ability).to receive(:allowed?).with(user, :read_board, project).and_return(false)
+        end
 
-      it 'returns a not found 404 response' do
-        read_board board: board
+        it 'returns a not found 404 response' do
+          read_board board: board, format: :json
 
-        expect(response).to have_gitlab_http_status(404)
+          expect(response).to have_gitlab_http_status(404)
+          expect(response.content_type).to eq 'application/json'
+        end
       end
     end
 

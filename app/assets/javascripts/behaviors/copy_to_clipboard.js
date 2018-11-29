@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Clipboard from 'clipboard';
 
 function showTooltip(target, title) {
@@ -7,10 +8,10 @@ function showTooltip(target, title) {
   if (!$target.data('hideTooltip')) {
     $target
       .attr('title', title)
-      .tooltip('fixTitle')
+      .tooltip('_fixTitle')
       .tooltip('show')
       .attr('title', originalTitle)
-      .tooltip('fixTitle');
+      .tooltip('_fixTitle');
   }
 }
 
@@ -50,8 +51,8 @@ export default function initCopyToClipboard() {
    * the last minute to deconstruct this JSON hash and set the `text/plain` and `text/x-gfm` copy
    * data types to the intended values.
    */
-  $(document).on('copy', 'body > textarea[readonly]', (e) => {
-    const clipboardData = e.originalEvent.clipboardData;
+  $(document).on('copy', 'body > textarea[readonly]', e => {
+    const { clipboardData } = e.originalEvent;
     if (!clipboardData) return;
 
     const text = e.target.value;

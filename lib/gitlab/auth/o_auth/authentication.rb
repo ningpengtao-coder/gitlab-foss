@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # These calls help to authenticate to OAuth provider by providing username and password
 #
 
@@ -12,6 +14,7 @@ module Gitlab
           @user = user
         end
 
+        # Implementation must return user object if login successful
         def login(login, password)
           raise NotImplementedError
         end

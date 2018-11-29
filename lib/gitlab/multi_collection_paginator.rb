@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   class MultiCollectionPaginator
     attr_reader :first_collection, :second_collection, :per_page
@@ -5,7 +7,7 @@ module Gitlab
     def initialize(*collections, per_page: nil)
       raise ArgumentError.new('Only 2 collections are supported') if collections.size != 2
 
-      @per_page = per_page || Kaminari.config.default_per_page
+      @per_page = (per_page || Kaminari.config.default_per_page).to_i
       @first_collection, @second_collection = collections
     end
 
@@ -53,6 +55,7 @@ module Gitlab
       @first_collection_page_count = first_collection_page.total_pages
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def first_collection_last_page_size
       return @first_collection_last_page_size if defined?(@first_collection_last_page_size)
 
@@ -60,5 +63,6 @@ module Gitlab
                                            .except(:select)
                                            .size
     end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
 end

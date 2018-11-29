@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Merge request > User creates image diff notes', :js do
+describe 'Merge request > User creates image diff notes', :js do
   include NoteInteractionHelpers
 
   let(:project) { create(:project, :public, :repository) }
@@ -12,7 +12,7 @@ feature 'Merge request > User creates image diff notes', :js do
     # Stub helper to return any blob file as image from public app folder.
     # This is necessary to run this specs since we don't display repo images in capybara.
     allow_any_instance_of(DiffHelper).to receive(:diff_file_blob_raw_url).and_return('/apple-touch-icon.png')
-    allow_any_instance_of(DiffHelper).to receive(:diff_file_old_blob_raw_url).and_return('/favicon.ico')
+    allow_any_instance_of(DiffHelper).to receive(:diff_file_old_blob_raw_url).and_return('/favicon.png')
   end
 
   context 'create commit diff notes' do
@@ -116,7 +116,7 @@ feature 'Merge request > User creates image diff notes', :js do
 
         it 'shows indicator and avatar badges, and allows collapsing/expanding the discussion notes' do
           indicator = find('.js-image-badge', match: :first)
-          badge = find('.image-diff-avatar-link .badge', match: :first)
+          badge = find('.user-avatar-link .badge', match: :first)
 
           expect(indicator).to have_content('1')
           expect(badge).to have_content('1')
@@ -198,7 +198,6 @@ feature 'Merge request > User creates image diff notes', :js do
 
   def create_image_diff_note
     find('.js-add-image-diff-note-button', match: :first).click
-    page.all('.js-add-image-diff-note-button')[0].click
     find('.diff-content .note-textarea').native.send_keys('image diff test comment')
     click_button 'Comment'
     wait_for_requests

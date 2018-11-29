@@ -1,20 +1,11 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Metrics
     class WebTransaction < Transaction
       CONTROLLER_KEY = 'action_controller.instance'.freeze
       ENDPOINT_KEY = 'api.endpoint'.freeze
-
-      CONTENT_TYPES = {
-        'text/html' => :html,
-        'text/plain' => :txt,
-        'application/json' => :json,
-        'text/js' => :js,
-        'application/atom+xml' => :atom,
-        'image/png' => :png,
-        'image/jpeg' => :jpeg,
-        'image/gif' => :gif,
-        'image/svg+xml' => :svg
-      }.freeze
+      ALLOWED_SUFFIXES = Set.new(%w[json js atom rss xml zip])
 
       def initialize(env)
         super()
@@ -40,10 +31,18 @@ module Gitlab
         controller = @env[CONTROLLER_KEY]
 
         action = "#{controller.action_name}"
-        suffix = CONTENT_TYPES[controller.content_type]
 
-        if suffix && suffix != :html
-          action += ".#{suffix}"
+        # Devise exposes a method called "request_format" that does the below.
+        # However, this method is not available to all controllers (e.g. certain
+        # Doorkeeper controllers). As such we use the underlying code directly.
+        suffix = controller.request.format.try(:ref).to_s
+
+        # Sometimes the request format is set to silly data such as
+        # "application/xrds+xml" or actual URLs. To prevent such values from
+        # increasing the cardinality of our metrics, we limit the number of
+        # possible suffixes.
+        if suffix && ALLOWED_SUFFIXES.include?(suffix)
+          action = "#{action}.#{suffix}"
         end
 
         { controller: controller.class.name, action: action }

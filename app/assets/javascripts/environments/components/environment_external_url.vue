@@ -1,43 +1,41 @@
 <script>
-  import tooltip from '../../vue_shared/directives/tooltip';
-  import { s__ } from '../../locale';
+import { GlTooltipDirective } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { s__ } from '~/locale';
 
-  /**
-  * Renders the external url link in environments table.
-  */
-  export default {
-    directives: {
-      tooltip,
+/**
+ * Renders the external url link in environments table.
+ */
+export default {
+  components: {
+    Icon,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+  },
+  props: {
+    externalUrl: {
+      type: String,
+      required: true,
     },
-    props: {
-      externalUrl: {
-        type: String,
-        required: true,
-      },
+  },
+  computed: {
+    title() {
+      return s__('Environments|Open live environment');
     },
-
-    computed: {
-      title() {
-        return s__('Environments|Open');
-      },
-    },
-  };
+  },
+};
 </script>
 <template>
   <a
-    v-tooltip
-    class="btn external-url"
-    data-container="body"
-    target="_blank"
-    rel="noopener noreferrer nofollow"
+    v-gl-tooltip
     :title="title"
     :aria-label="title"
     :href="externalUrl"
+    class="btn external-url"
+    target="_blank"
+    rel="noopener noreferrer nofollow"
   >
-    <i
-      class="fa fa-external-link"
-      aria-hidden="true"
-    >
-    </i>
+    <icon name="external-link" />
   </a>
 </template>

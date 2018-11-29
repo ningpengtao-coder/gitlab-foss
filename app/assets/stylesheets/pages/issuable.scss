@@ -1,25 +1,20 @@
 // Limit MR description for side-by-side diff view
 .fixed-width-container {
-  max-width: $limited-layout-width - ($gl-padding * 2);
-  margin-left: auto;
-  margin-right: auto;
+  @include fixed-width-container;
 }
 
 .issuable-warning-icon {
   background-color: $orange-100;
   border-radius: $border-radius-default;
-  margin: 0 $btn-side-margin 0 0;
   width: $issuable-warning-size;
   height: $issuable-warning-size;
   text-align: center;
+  margin-right: $issuable-warning-icon-margin;
+  line-height: $gl-line-height-24;
 
   .icon {
     fill: $orange-600;
     vertical-align: text-bottom;
-  }
-
-  &:first-of-type {
-    margin-right: $issuable-warning-icon-margin;
   }
 }
 
@@ -27,7 +22,6 @@
   .detail-page-header,
   .page-content-header,
   .commit-box,
-  .info-well,
   .commit-ci-menu,
   .files-changed-inner,
   .limited-header-width,
@@ -46,12 +40,6 @@
 
   .merge-request-details {
     .emoji-list-container {
-      @extend .fixed-width-container;
-    }
-  }
-
-  .diffs {
-    .mr-version-controls {
       @extend .fixed-width-container;
     }
   }
@@ -137,12 +125,22 @@
   z-index: 200;
   overflow: hidden;
 
-  a:not(.btn-retry),
-  .btn-link {
+  a:not(.btn) {
     color: inherit;
+
+    &:hover {
+      color: $blue-800;
+
+      .avatar {
+        border-color: rgba($gray-normal, .2);
+      }
+
+    }
+
   }
 
   .btn-link {
+    color: inherit;
     outline: none;
   }
 
@@ -156,7 +154,7 @@
     border-bottom: 1px solid $border-gray-normal;
     // This prevents the mess when resizing the sidebar
     // of elements repositioning themselves..
-    width: $gutter_inner_width;
+    width: $gutter-inner-width;
     // --
 
     &.issuable-sidebar-header {
@@ -177,14 +175,31 @@
       padding-left: 10px;
 
       &:hover {
-        color: $gray-darkest;
+        color: $gl-text-color;
+      }
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
       }
     }
 
     &.assignee {
-      .author_link:hover {
-        .author {
-          text-decoration: underline;
+      .author-link {
+        display: block;
+        padding-left: 42px;
+        position: relative;
+
+        &:hover {
+          .author {
+            text-decoration: underline;
+          }
+        }
+
+        .avatar {
+          left: 0;
+          position: absolute;
+          top: 0;
         }
       }
     }
@@ -204,7 +219,7 @@
     }
 
     a.edit-link:not([href]):hover {
-      color: rgba($avatar-border, .2);
+      color: rgba($gray-normal, .2);
     }
 
     .lock-edit, // uses same style, different js behaviour
@@ -214,7 +229,7 @@
 
       &:hover {
         text-decoration: underline;
-        color: $md-link-color;
+        color: $blue-800;
       }
     }
   }
@@ -263,7 +278,7 @@
   }
 
   &.right-sidebar-expanded {
-    width: $gutter_width;
+    width: $gutter-width;
 
     .value {
       line-height: 1;
@@ -302,7 +317,7 @@
     }
 
     .btn-secondary-hover-link:hover {
-      color: $gl-link-color;
+      color: $blue-600;
     }
 
     .sidebar-collapsed-icon {
@@ -346,18 +361,26 @@
     /* Extra small devices (phones, less than 768px) */
     display: none;
     /* Small devices (tablets, 768px and up) */
-    @media (min-width: $screen-sm-min) {
+    @include media-breakpoint-up(sm) {
       display: block;
     }
 
-    width: $gutter_collapsed_width;
+    width: $gutter-collapsed-width;
     padding: 0;
 
     .block {
-      width: $gutter_collapsed_width - 2px;
+      width: $gutter-collapsed-width - 2px;
       padding: 15px 0 0;
       border-bottom: 0;
       overflow: hidden;
+
+      &:hover {
+        background-color: $sidebar-block-hover-color;
+      }
+
+      &.issuable-sidebar-header {
+        padding-top: 0;
+      }
     }
 
     .participants {
@@ -370,8 +393,17 @@
 
     .gutter-toggle {
       width: 100%;
+      height: $sidebar-toggle-height;
       margin-left: 0;
-      padding-left: 25px;
+      padding-left: 0;
+      border-bottom: 1px solid $border-gray-dark;
+    }
+
+    a.gutter-toggle {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
     }
 
     .sidebar-collapsed-icon {
@@ -379,10 +411,10 @@
       width: 100%;
       text-align: center;
       margin-bottom: 10px;
-      color: $issuable-sidebar-color;
+      color: $gl-text-color-secondary;
 
       svg {
-        fill: $issuable-sidebar-color;
+        fill: $gl-text-color-secondary;
       }
 
       &:hover:not(.disabled),
@@ -404,7 +436,8 @@
       }
 
       .todo-undone {
-        color: $gl-link-color;
+        color: $blue-600;
+        fill: $blue-600;
       }
 
       .author {
@@ -412,16 +445,16 @@
       }
 
       .avatar-counter:hover {
-        color: $issuable-sidebar-color;
-        border-color: $issuable-sidebar-color;
+        color: $gl-text-color-secondary;
+        border-color: $gl-text-color-secondary;
       }
 
       .btn-clipboard {
         border: 0;
-        color: $issuable-sidebar-color;
+        background: transparent;
+        color: $gl-text-color-secondary;
 
         &:hover {
-          background: transparent;
           color: $gl-text-color;
         }
       }
@@ -441,6 +474,15 @@
     .sidebar-collapsed-user {
       padding-bottom: 0;
       margin-bottom: 10px;
+
+      .author-link {
+        padding-left: 0;
+
+        .avatar {
+          position: static;
+          margin: 0;
+        }
+      }
     }
 
     .issuable-header-btn {
@@ -486,16 +528,6 @@
     }
   }
 
-  a:not(.btn-retry) {
-    &:hover {
-      color: $md-link-color;
-
-      .avatar {
-        border-color: rgba($avatar-border, .2);
-      }
-    }
-  }
-
   .dropdown-menu-toggle {
     width: 100%;
     padding-top: 6px;
@@ -503,15 +535,25 @@
 
   .dropdown-menu {
     width: 100%;
+
+    /*
+     * Overwrite hover style for dropdown items, so that they are not blue
+     * This should be removed during dev of https://gitlab.com/gitlab-org/gitlab-ce/issues/44040
+     */
+    li a {
+      &:hover,
+      &:active,
+      &:focus,
+      &.is-focused {
+        @include dropdown-item-hover;
+      }
+    }
+
   }
 }
 
 .with-performance-bar .right-sidebar {
   top: $header-height + $performance-bar-height;
-
-  .issuable-sidebar {
-    height: calc(100% - #{$performance-bar-height});
-  }
 }
 
 .sidebar-move-issue-confirmation-button {
@@ -542,7 +584,7 @@
   margin: 16px 0 0;
   font-size: 85%;
 
-  .author_link {
+  .author-link {
     color: $gray-darkest;
   }
 }
@@ -567,7 +609,7 @@
     padding-right: 0;
   }
 
-  .author_link {
+  .author-link {
     display: block;
   }
 
@@ -612,7 +654,7 @@
 }
 
 .issuable-form-padding-top {
-  @media (min-width: $screen-sm-min) {
+  @include media-breakpoint-up(sm) {
     padding-top: 7px;
   }
 }
@@ -626,7 +668,7 @@
   padding-left: 9px;
   padding-right: 9px;
 
-  @media (min-width: $screen-sm-min) {
+  @include media-breakpoint-up(sm) {
     display: inline-block;
     height: auto;
     align-self: center;
@@ -634,7 +676,7 @@
 }
 
 .issuable-gutter-toggle {
-  @media (max-width: $screen-sm-max) {
+  @include media-breakpoint-down(sm) {
     margin-left: $btn-side-margin;
   }
 }
@@ -643,8 +685,14 @@
   flex: 1;
   display: inline-block;
   font-size: 14px;
-  line-height: 24px;
   align-self: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .user-status-emoji {
+    margin-left: $gl-padding-4;
+    margin-right: 0;
+  }
 }
 
 .js-issuable-selector-wrap {
@@ -652,7 +700,7 @@
     width: 100%;
   }
 
-  @media (max-width: $screen-sm-max) {
+  @include media-breakpoint-down(sm) {
     margin-bottom: $gl-padding;
   }
 }
@@ -665,15 +713,19 @@
       display: flex;
     }
 
-    .issue-info-container {
+    .issuable-info-container {
       -webkit-flex: 1;
       flex: 1;
       display: flex;
       padding-right: $gl-padding;
 
-      .issue-main-info {
+      .issuable-main-info {
         flex: 1 auto;
         margin-right: 10px;
+
+        .issue-weight-icon {
+          vertical-align: sub;
+        }
       }
 
       .issuable-meta {
@@ -693,7 +745,7 @@
         }
       }
 
-      @media(max-width: $screen-xs-max) {
+      @include media-breakpoint-down(xs) {
         .issuable-meta {
           .controls li {
             margin-right: 0;
@@ -707,7 +759,7 @@
       margin-bottom: 10px;
       min-width: 15px;
 
-      .selected_issue {
+      .selected-issuable {
         vertical-align: text-top;
       }
     }
@@ -728,7 +780,7 @@
       }
     }
 
-    @media(max-width: $screen-md-max) {
+    @media(max-width: map-get($grid-breakpoints, lg)-1) {
       .task-status,
       .issuable-due-date,
       .project-ref-path {
@@ -739,7 +791,7 @@
 }
 
 .issuable-list li,
-.issue-info-container .controls {
+.issuable-info-container .controls {
   .avatar-counter {
     display: inline-block;
     vertical-align: middle;
@@ -765,7 +817,7 @@
     svg {
       width: 16px;
       height: 16px;
-      fill: $issuable-sidebar-color;
+      fill: $gl-text-color-secondary;
     }
 
     &:hover svg {
@@ -779,33 +831,11 @@
   }
 
   .compare-meter {
-    &.within_estimate {
-      .meter-fill {
-        background: $gl-primary;
-      }
-    }
-
     &.over_estimate {
-      .meter-fill {
-        background: $red-500;
-      }
-
       .time-remaining,
       .compare-value.spent {
         color: $red-500;
       }
-    }
-  }
-
-  .meter-container {
-    background: $border-gray-light;
-    border-radius: 3px;
-
-    .meter-fill {
-      max-width: 100%;
-      height: 5px;
-      border-radius: 3px;
-      background: $gl-primary;
     }
   }
 
@@ -906,5 +936,39 @@
         padding-top: 0;
       }
     }
+  }
+}
+
+.issuable-suggestions svg {
+  vertical-align: sub;
+}
+
+.suggestion-item a {
+  color: initial;
+}
+
+.suggestion-confidential {
+  color: $orange-600;
+}
+
+.suggestion-state-open {
+  color: $green-500;
+}
+
+.suggestion-state-closed {
+  color: $blue-500;
+}
+
+.suggestion-help-hover {
+  cursor: help;
+}
+
+.suggestion-footer {
+  font-size: 12px;
+  line-height: 15px;
+
+  .avatar {
+    margin-top: -3px;
+    border: 0;
   }
 }

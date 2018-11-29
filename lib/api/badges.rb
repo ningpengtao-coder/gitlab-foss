@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class Badges < Grape::API
     include PaginationParams
@@ -127,6 +129,7 @@ module API
           end
 
           destroy_conditionally!(badge)
+          body false
         end
       end
     end

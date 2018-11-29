@@ -27,6 +27,12 @@ FactoryBot.define do
 
     pipeline factory: :ci_pipeline
 
+    trait :degenerated do
+      commands nil
+      options nil
+      yaml_variables nil
+    end
+
     trait :started do
       started_at 'Di 29. Okt 09:51:28 CET 2013'
     end
@@ -62,11 +68,24 @@ FactoryBot.define do
     end
 
     trait :pending do
+      queued_at 'Di 29. Okt 09:50:59 CET 2013'
       status 'pending'
     end
 
     trait :created do
       status 'created'
+    end
+
+    trait :scheduled do
+      schedulable
+      status 'scheduled'
+      scheduled_at  { 1.minute.since }
+    end
+
+    trait :expired_scheduled do
+      schedulable
+      status 'scheduled'
+      scheduled_at { 1.minute.ago }
     end
 
     trait :manual do
@@ -79,6 +98,30 @@ FactoryBot.define do
       options environment: { name: 'staging',
                              action: 'stop',
                              url: 'http://staging.example.com/$CI_JOB_NAME' }
+    end
+
+    trait :deploy_to_production do
+      environment 'production'
+
+      options environment: { name: 'production',
+                             url: 'http://prd.example.com/$CI_JOB_NAME' }
+    end
+
+    trait :start_review_app do
+      environment 'review/$CI_COMMIT_REF_NAME'
+
+      options environment: { name: 'review/$CI_COMMIT_REF_NAME',
+                             url: 'http://staging.example.com/$CI_JOB_NAME',
+                             on_stop: 'stop_review_app' }
+    end
+
+    trait :stop_review_app do
+      name 'stop_review_app'
+      environment 'review/$CI_COMMIT_REF_NAME'
+
+      options environment: { name: 'review/$CI_COMMIT_REF_NAME',
+                             url: 'http://staging.example.com/$CI_JOB_NAME',
+                             action: 'stop' }
     end
 
     trait :allowed_to_fail do
@@ -95,6 +138,15 @@ FactoryBot.define do
 
     trait :retryable do
       success
+    end
+
+    trait :schedulable do
+      self.when 'delayed'
+      options start_in: '1 minute'
+    end
+
+    trait :actionable do
+      self.when 'manual'
     end
 
     trait :retried do
@@ -158,12 +210,12 @@ FactoryBot.define do
     end
 
     trait :erased do
-      erased_at Time.now
+      erased_at { Time.now }
       erased_by factory: :user
     end
 
     trait :queued do
-      queued_at Time.now
+      queued_at { Time.now }
       runner factory: :ci_runner
     end
 
@@ -186,8 +238,14 @@ FactoryBot.define do
       end
     end
 
+    trait :test_reports do
+      after(:build) do |build|
+        build.job_artifacts << create(:ci_job_artifact, :junit, job: build)
+      end
+    end
+
     trait :expired do
-      artifacts_expire_at 1.minute.ago
+      artifacts_expire_at { 1.minute.ago }
     end
 
     trait :with_commit do
@@ -206,7 +264,7 @@ FactoryBot.define do
       options do
         {
             image: { name: 'ruby:2.1', entrypoint: '/bin/sh' },
-            services: ['postgres', { name: 'docker:dind', entrypoint: '/bin/sh', command: 'sleep 30', alias: 'docker' }],
+            services: ['postgres', { name: 'docker:stable-dind', entrypoint: '/bin/sh', command: 'sleep 30', alias: 'docker' }],
             after_script: %w(ls date),
             artifacts: {
                 name: 'artifacts_file',
@@ -236,6 +294,22 @@ FactoryBot.define do
 
     trait :protected do
       protected true
+    end
+
+    trait :script_failure do
+      failed
+      failure_reason 1
+    end
+
+    trait :api_failure do
+      failed
+      failure_reason 2
+    end
+
+    trait :with_runner_session do
+      after(:build) do |build|
+        build.build_runner_session(url: 'ws://localhost')
+      end
     end
   end
 end

@@ -1,5 +1,6 @@
-/* eslint-disable no-useless-return, max-len */
+/* eslint-disable no-useless-return */
 
+import $ from 'jquery';
 import Api from '../api';
 import TemplateSelector from '../blob/template_selector';
 
@@ -30,12 +31,18 @@ export default class IssuableTemplateSelector extends TemplateSelector {
 
   requestFile(query) {
     this.startLoadingSpinner();
-    Api.issueTemplate(this.namespacePath, this.projectPath, query.name, this.issuableType, (err, currentTemplate) => {
-      this.currentTemplate = currentTemplate;
-      this.stopLoadingSpinner();
-      if (err) return; // Error handled by global AJAX error handler
-      this.setInputValueToTemplateContent();
-    });
+    Api.issueTemplate(
+      this.namespacePath,
+      this.projectPath,
+      query.name,
+      this.issuableType,
+      (err, currentTemplate) => {
+        this.currentTemplate = currentTemplate;
+        this.stopLoadingSpinner();
+        if (err) return; // Error handled by global AJAX error handler
+        this.setInputValueToTemplateContent();
+      },
+    );
     return;
   }
 

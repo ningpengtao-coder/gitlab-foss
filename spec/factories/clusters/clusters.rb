@@ -2,10 +2,25 @@ FactoryBot.define do
   factory :cluster, class: Clusters::Cluster do
     user
     name 'test-cluster'
+    cluster_type :project_type
+
+    trait :instance do
+      cluster_type { Clusters::Cluster.cluster_types[:instance_type] }
+    end
 
     trait :project do
-      after(:create) do |cluster, evaluator|
-        cluster.projects << create(:project)
+      cluster_type { Clusters::Cluster.cluster_types[:project_type] }
+
+      before(:create) do |cluster, evaluator|
+        cluster.projects << create(:project, :repository)
+      end
+    end
+
+    trait :group do
+      cluster_type { Clusters::Cluster.cluster_types[:group_type] }
+
+      before(:create) do |cluster, evalutor|
+        cluster.groups << create(:group)
       end
     end
 
@@ -31,6 +46,14 @@ FactoryBot.define do
 
     trait :disabled do
       enabled false
+    end
+
+    trait :production_environment do
+      sequence(:environment_scope) { |n| "production#{n}/*" }
+    end
+
+    trait :with_installed_helm do
+      application_helm factory: %i(clusters_applications_helm installed)
     end
   end
 end

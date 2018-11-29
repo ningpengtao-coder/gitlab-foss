@@ -62,5 +62,35 @@ describe Ci::PipelinePolicy, :models do
         end
       end
     end
+
+    context 'when maintainer is allowed to push to pipeline branch' do
+      let(:project) { create(:project, :public) }
+      let(:owner) { user }
+
+      it 'enables update_pipeline if user is maintainer' do
+        allow_any_instance_of(Project).to receive(:empty_repo?).and_return(false)
+        allow_any_instance_of(Project).to receive(:branch_allows_collaboration?).and_return(true)
+
+        expect(policy).to be_allowed :update_pipeline
+      end
+    end
+
+    describe 'destroy_pipeline' do
+      let(:project) { create(:project, :public) }
+
+      context 'when user has owner access' do
+        let(:user) { project.owner }
+
+        it 'is enabled' do
+          expect(policy).to be_allowed :destroy_pipeline
+        end
+      end
+
+      context 'when user is not owner' do
+        it 'is disabled' do
+          expect(policy).not_to be_allowed :destroy_pipeline
+        end
+      end
+    end
   end
 end

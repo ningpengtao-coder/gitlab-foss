@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # These calls help to authenticate to LDAP by providing username and password
 #
 # Since multiple LDAP servers are supported, it will loop through all of them
@@ -12,30 +14,26 @@ module Gitlab
           return unless Gitlab::Auth::LDAP::Config.enabled?
           return unless login.present? && password.present?
 
-          auth = nil
-          # loop through providers until valid bind
+          # return found user that was authenticated by first provider for given login credentials
           providers.find do |provider|
             auth = new(provider)
-            auth.login(login, password) # true will exit the loop
+            break auth.user if auth.login(login, password) # true will exit the loop
           end
-
-          # If (login, password) was invalid for all providers, the value of auth is now the last
-          # Gitlab::Auth::LDAP::Authentication instance we tried.
-          auth.user
         end
 
         def self.providers
           Gitlab::Auth::LDAP::Config.providers
         end
 
-        attr_accessor :ldap_user
-
         def login(login, password)
-          @ldap_user = adapter.bind_as(
+          result = adapter.bind_as(
             filter: user_filter(login),
             size: 1,
             password: password
           )
+          return unless result
+
+          @user = Gitlab::Auth::LDAP::User.find_by_uid_and_provider(result.dn, provider)
         end
 
         def adapter
@@ -55,12 +53,6 @@ module Gitlab
           end
 
           filter
-        end
-
-        def user
-          return unless ldap_user
-
-          Gitlab::Auth::LDAP::User.find_by_uid_and_provider(ldap_user.dn, provider)
         end
       end
     end

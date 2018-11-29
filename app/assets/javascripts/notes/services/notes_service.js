@@ -5,8 +5,9 @@ import * as constants from '../constants';
 Vue.use(VueResource);
 
 export default {
-  fetchNotes(endpoint) {
-    return Vue.http.get(endpoint);
+  fetchDiscussions(endpoint, filter) {
+    const config = filter !== undefined ? { params: { notes_filter: filter } } : null;
+    return Vue.http.get(endpoint, config);
   },
   deleteNote(endpoint) {
     return Vue.http.delete(endpoint);
@@ -27,10 +28,11 @@ export default {
     return Vue.http[method](endpoint);
   },
   poll(data = {}) {
-    const { endpoint, lastFetchedAt } = data;
+    const endpoint = data.notesData.notesPath;
+    const { lastFetchedAt } = data;
     const options = {
       headers: {
-        'X-Last-Fetched-At': lastFetchedAt,
+        'X-Last-Fetched-At': lastFetchedAt ? `${lastFetchedAt}` : undefined,
       },
     };
 

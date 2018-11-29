@@ -3,16 +3,18 @@ inherit_gem:
     - rubocop-default.yml
 
 inherit_from: .rubocop_todo.yml
-require: ./rubocop/rubocop
+require:
+  - ./rubocop/rubocop
+  - rubocop-rspec
 
 AllCops:
   TargetRailsVersion: 4.2
   Exclude:
     - 'vendor/**/*'
     - 'node_modules/**/*'
-    - 'db/**/*'
     - 'db/fixtures/**/*'
-    - 'ee/db/**/*'
+    - 'db/schema.rb'
+    - 'ee/db/geo/schema.rb'
     - 'tmp/**/*'
     - 'bin/**/*'
     - 'generator_templates/**/*'
@@ -31,7 +33,118 @@ Style/MutableConstant:
     - 'ee/db/post_migrate/**/*'
     - 'ee/db/geo/migrate/**/*'
 
-# Gitlab ###################################################################
+# TODO: Move this to gitlab-styles
+Style/SafeNavigation:
+  Enabled: false
+
+# Frozen String Literal
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  Exclude:
+    - 'config.ru'
+    - 'Dangerfile'
+    - 'Gemfile'
+    - 'Rakefile'
+    - 'app/views/**/*'
+    - 'config/**/*'
+    - 'danger/**/*'
+    - 'db/**/*'
+    - 'ee/**/*'
+    - 'lib/tasks/**/*'
+    - 'qa/**/*'
+    - 'rubocop/**/*'
+    - 'scripts/**/*'
+    - 'spec/**/*'
+
+RSpec/FilePath:
+  Exclude:
+    - 'qa/**/*'
+    - 'spec/javascripts/fixtures/*'
+    - 'ee/spec/javascripts/fixtures/*'
+    - 'spec/requests/api/v3/*'
+
+Naming/FileName:
+  ExpectMatchingDefinition: true
+  Exclude:
+    - 'db/**/*'
+    - 'ee/db/**/*'
+    - 'spec/**/*'
+    - 'features/**/*'
+    - 'ee/spec/**/*'
+    - 'qa/spec/**/*'
+    - 'qa/qa/specs/**/*'
+    - 'qa/bin/*'
+    - 'config/**/*'
+    - 'ee/config/**/*'
+    - 'lib/generators/**/*'
+    - 'locale/unfound_translations.rb'
+    - 'ee/locale/unfound_translations.rb'
+    - 'ee/lib/generators/**/*'
+    - 'qa/qa/scenario/test/integration/ldap_no_tls.rb'
+    - 'qa/qa/scenario/test/integration/ldap_tls.rb'
+
+  IgnoreExecutableScripts: true
+  AllowedAcronyms:
+    - EE
+    - JSON
+    - LDAP
+    - SAML
+    - IO
+    - HMAC
+    - QA
+    - ENV
+    - STL
+    - PDF
+    - SVG
+    - CTE
+    - DN
+    - RSA
+    - CI
+    - CD
+    - OAuth
+    # default ones:
+    - CLI
+    - DSL
+    - ACL
+    - API
+    - ASCII
+    - CPU
+    - CSS
+    - DNS
+    - EOF
+    - GUID
+    - HTML
+    - HTTP
+    - HTTPS
+    - ID
+    - IP
+    - JSON
+    - LHS
+    - QPS
+    - RAM
+    - RHS
+    - RPC
+    - SLA
+    - SMTP
+    - SQL
+    - SSH
+    - TCP
+    - TLS
+    - TTL
+    - UDP
+    - UI
+    - UID
+    - UUID
+    - URI
+    - URL
+    - UTF8
+    - VM
+    - XML
+    - XMPP
+    - XSRF
+    - XSS
+
+# GitLab ###################################################################
 
 Gitlab/ModuleWithInstanceVariables:
   Enable: true
@@ -45,6 +158,9 @@ Gitlab/ModuleWithInstanceVariables:
     # We ignore spec helpers because it usually doesn't matter
     - spec/support/**/*.rb
     - features/steps/**/*.rb
+
+Gitlab/HTTParty:
+  Enabled: true
 
 GitlabSecurity/PublicSend:
   Enabled: true

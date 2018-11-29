@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { convertPermissionToBoolean } from '../lib/utils/common_utils';
+import { parseBoolean } from '../lib/utils/common_utils';
 import { s__ } from '../locale';
 import setupToggleButtons from '../toggle_buttons';
 import CreateItemDropdown from '../create_item_dropdown';
@@ -16,10 +16,7 @@ function createEnvironmentItem(value) {
 }
 
 export default class VariableList {
-  constructor({
-    container,
-    formField,
-  }) {
+  constructor({ container, formField }) {
     this.$container = $(container);
     this.formField = formField;
     this.environmentDropdownMap = new WeakMap();
@@ -33,7 +30,7 @@ export default class VariableList {
         selector: '.js-ci-variable-input-key',
         default: '',
       },
-      value: {
+      secret_value: {
         selector: '.js-ci-variable-input-value',
         default: '',
       },
@@ -71,7 +68,7 @@ export default class VariableList {
       this.initRow(rowEl);
     });
 
-    this.$container.on('click', '.js-row-remove-button', (e) => {
+    this.$container.on('click', '.js-row-remove-button', e => {
       e.preventDefault();
       this.removeRow($(e.currentTarget).closest('.js-row'));
     });
@@ -81,7 +78,7 @@ export default class VariableList {
       .join(',');
 
     // Remove any empty rows except the last row
-    this.$container.on('blur', inputSelector, (e) => {
+    this.$container.on('blur', inputSelector, e => {
       const $row = $(e.currentTarget).closest('.js-row');
 
       if ($row.is(':not(:last-child)') && !this.checkIfRowTouched($row)) {
@@ -105,7 +102,7 @@ export default class VariableList {
     setupToggleButtons($row[0]);
 
     // Reset the resizable textarea
-    $row.find(this.inputMap.value.selector).css('height', '');
+    $row.find(this.inputMap.secret_value.selector).css('height', '');
 
     const $environmentSelect = $row.find('.js-variable-environment-toggle');
     if ($environmentSelect.length) {
@@ -136,9 +133,14 @@ export default class VariableList {
     $rowClone.removeAttr('data-is-persisted');
 
     // Reset the inputs to their defaults
-    Object.keys(this.inputMap).forEach((name) => {
+    Object.keys(this.inputMap).forEach(name => {
       const entry = this.inputMap[name];
       $rowClone.find(entry.selector).val(entry.default);
+    });
+
+    // Close any dropdowns
+    $rowClone.find('.dropdown-menu.show').each((index, $dropdown) => {
+      $dropdown.classList.remove('show');
     });
 
     this.initRow($rowClone);
@@ -148,7 +150,7 @@ export default class VariableList {
 
   removeRow(row) {
     const $row = $(row);
-    const isPersisted = convertPermissionToBoolean($row.attr('data-is-persisted'));
+    const isPersisted = parseBoolean($row.attr('data-is-persisted'));
 
     if (isPersisted) {
       $row.hide();
@@ -166,7 +168,7 @@ export default class VariableList {
   }
 
   checkIfRowTouched($row) {
-    return Object.keys(this.inputMap).some((name) => {
+    return Object.keys(this.inputMap).some(name => {
       const entry = this.inputMap[name];
       const $el = $row.find(entry.selector);
       return $el.length && $el.val() !== entry.default;
@@ -185,11 +187,14 @@ export default class VariableList {
   getAllData() {
     // Ignore the last empty row because we don't want to try persist
     // a blank variable and run into validation problems.
-    const validRows = this.$container.find('.js-row').toArray().slice(0, -1);
+    const validRows = this.$container
+      .find('.js-row')
+      .toArray()
+      .slice(0, -1);
 
-    return validRows.map((rowEl) => {
+    return validRows.map(rowEl => {
       const resultant = {};
-      Object.keys(this.inputMap).forEach((name) => {
+      Object.keys(this.inputMap).forEach(name => {
         const entry = this.inputMap[name];
         const $input = $(rowEl).find(entry.selector);
         if ($input.length) {
@@ -202,11 +207,16 @@ export default class VariableList {
   }
 
   getEnvironmentValues() {
-    const valueMap = this.$container.find(this.inputMap.environment_scope.selector).toArray()
-      .reduce((prevValueMap, envInput) => ({
-        ...prevValueMap,
-        [envInput.value]: envInput.value,
-      }), {});
+    const valueMap = this.$container
+      .find(this.inputMap.environment_scope.selector)
+      .toArray()
+      .reduce(
+        (prevValueMap, envInput) => ({
+          ...prevValueMap,
+          [envInput.value]: envInput.value,
+        }),
+        {},
+      );
 
     return Object.keys(valueMap).map(createEnvironmentItem);
   }

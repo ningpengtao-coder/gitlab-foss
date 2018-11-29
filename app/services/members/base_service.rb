@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Members
   class BaseService < ::BaseService
     # current_user - The user that performs the action
@@ -8,7 +10,7 @@ module Members
     end
 
     def after_execute(args)
-      # overriden in EE::Members modules
+      # overridden in EE::Members modules
     end
 
     private

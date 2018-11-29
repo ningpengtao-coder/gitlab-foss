@@ -1,125 +1,87 @@
-/* eslint-disable space-before-function-paren, no-var, one-var, one-var-declaration-per-line, new-parens, no-return-assign, new-cap, vars-on-top, max-len */
-
+import $ from 'jquery';
 import MockAdapter from 'axios-mock-adapter';
 import '~/commons/bootstrap';
 import axios from '~/lib/utils/axios_utils';
 import Sidebar from '~/right_sidebar';
 
-(function() {
-  var $aside, $icon, $labelsIcon, $page, $toggle, assertSidebarState;
+let $aside = null;
+let $toggle = null;
+let $icon = null;
+let $page = null;
+let $labelsIcon = null;
 
-  this.sidebar = null;
+const assertSidebarState = function(state) {
+  const shouldBeExpanded = state === 'expanded';
+  const shouldBeCollapsed = state === 'collapsed';
+  expect($aside.hasClass('right-sidebar-expanded')).toBe(shouldBeExpanded);
+  expect($page.hasClass('right-sidebar-expanded')).toBe(shouldBeExpanded);
+  expect($icon.hasClass('fa-angle-double-right')).toBe(shouldBeExpanded);
+  expect($aside.hasClass('right-sidebar-collapsed')).toBe(shouldBeCollapsed);
+  expect($page.hasClass('right-sidebar-collapsed')).toBe(shouldBeCollapsed);
+  expect($icon.hasClass('fa-angle-double-left')).toBe(shouldBeCollapsed);
+};
 
-  $aside = null;
+describe('RightSidebar', function() {
+  describe('fixture tests', () => {
+    const fixtureName = 'issues/open-issue.html.raw';
+    preloadFixtures(fixtureName);
+    loadJSONFixtures('todos/todos.json');
+    let mock;
 
-  $toggle = null;
+    beforeEach(function() {
+      loadFixtures(fixtureName);
+      mock = new MockAdapter(axios);
+      new Sidebar(); // eslint-disable-line no-new
+      $aside = $('.right-sidebar');
+      $page = $('.layout-page');
+      $icon = $aside.find('i');
+      $toggle = $aside.find('.js-sidebar-toggle');
+      $labelsIcon = $aside.find('.sidebar-collapsed-icon');
+    });
 
-  $icon = null;
+    afterEach(() => {
+      mock.restore();
+    });
 
-  $page = null;
+    it('should expand/collapse the sidebar when arrow is clicked', function() {
+      assertSidebarState('expanded');
+      $toggle.click();
+      assertSidebarState('collapsed');
+      $toggle.click();
+      assertSidebarState('expanded');
+    });
 
-  $labelsIcon = null;
+    it('should float over the page and when sidebar icons clicked', function() {
+      $labelsIcon.click();
+      assertSidebarState('expanded');
+    });
 
-  assertSidebarState = function(state) {
-    var shouldBeCollapsed, shouldBeExpanded;
-    shouldBeExpanded = state === 'expanded';
-    shouldBeCollapsed = state === 'collapsed';
-    expect($aside.hasClass('right-sidebar-expanded')).toBe(shouldBeExpanded);
-    expect($page.hasClass('right-sidebar-expanded')).toBe(shouldBeExpanded);
-    expect($icon.hasClass('fa-angle-double-right')).toBe(shouldBeExpanded);
-    expect($aside.hasClass('right-sidebar-collapsed')).toBe(shouldBeCollapsed);
-    expect($page.hasClass('right-sidebar-collapsed')).toBe(shouldBeCollapsed);
-    return expect($icon.hasClass('fa-angle-double-left')).toBe(shouldBeCollapsed);
-  };
+    it('should collapse when the icon arrow clicked while it is floating on page', function() {
+      $labelsIcon.click();
+      assertSidebarState('expanded');
+      $toggle.click();
+      assertSidebarState('collapsed');
+    });
 
-  describe('RightSidebar', function() {
-    describe('fixture tests', () => {
-      var fixtureName = 'issues/open-issue.html.raw';
-      preloadFixtures(fixtureName);
-      loadJSONFixtures('todos/todos.json');
-      let mock;
+    it('should broadcast todo:toggle event when add todo clicked', function(done) {
+      const todos = getJSONFixture('todos/todos.json');
+      mock.onPost(/(.*)\/todos$/).reply(200, todos);
 
-      beforeEach(function() {
-        loadFixtures(fixtureName);
-        mock = new MockAdapter(axios);
-        this.sidebar = new Sidebar();
-        $aside = $('.right-sidebar');
-        $page = $('.layout-page');
-        $icon = $aside.find('i');
-        $toggle = $aside.find('.js-sidebar-toggle');
-        return $labelsIcon = $aside.find('.sidebar-collapsed-icon');
-      });
+      const todoToggleSpy = spyOnEvent(document, 'todo:toggle');
 
-      afterEach(() => {
-        mock.restore();
-      });
+      $('.issuable-sidebar-header .js-issuable-todo').click();
 
-      it('should expand/collapse the sidebar when arrow is clicked', function() {
-        assertSidebarState('expanded');
-        $toggle.click();
-        assertSidebarState('collapsed');
-        $toggle.click();
-        assertSidebarState('expanded');
-      });
-      it('should float over the page and when sidebar icons clicked', function() {
-        $labelsIcon.click();
-        return assertSidebarState('expanded');
-      });
-      it('should collapse when the icon arrow clicked while it is floating on page', function() {
-        $labelsIcon.click();
-        assertSidebarState('expanded');
-        $toggle.click();
-        return assertSidebarState('collapsed');
-      });
+      setTimeout(() => {
+        expect(todoToggleSpy.calls.count()).toEqual(1);
 
-      it('should broadcast todo:toggle event when add todo clicked', function(done) {
-        var todos = getJSONFixture('todos/todos.json');
-        mock.onPost(/(.*)\/todos$/).reply(200, todos);
-
-        var todoToggleSpy = spyOnEvent(document, 'todo:toggle');
-
-        $('.issuable-sidebar-header .js-issuable-todo').click();
-
-        setTimeout(() => {
-          expect(todoToggleSpy.calls.count()).toEqual(1);
-
-          done();
-        });
-      });
-
-      it('should not hide collapsed icons', () => {
-        [].forEach.call(document.querySelectorAll('.sidebar-collapsed-icon'), (el) => {
-          expect(el.querySelector('.fa, svg').classList.contains('hidden')).toBeFalsy();
-        });
+        done();
       });
     });
 
-    describe('sidebarToggleClicked', () => {
-      const event = jasmine.createSpyObj('event', ['preventDefault']);
-
-      beforeEach(() => {
-        spyOn($.fn, 'hasClass').and.returnValue(false);
-      });
-
-      afterEach(() => {
-        gl.lazyLoader = undefined;
-      });
-
-      it('calls loadCheck if lazyLoader is set', () => {
-        gl.lazyLoader = jasmine.createSpyObj('lazyLoader', ['loadCheck']);
-
-        Sidebar.prototype.sidebarToggleClicked(event);
-
-        expect(gl.lazyLoader.loadCheck).toHaveBeenCalled();
-      });
-
-      it('does not throw if lazyLoader is not defined', () => {
-        gl.lazyLoader = undefined;
-
-        const toggle = Sidebar.prototype.sidebarToggleClicked.bind(null, event);
-
-        expect(toggle).not.toThrow();
+    it('should not hide collapsed icons', () => {
+      [].forEach.call(document.querySelectorAll('.sidebar-collapsed-icon'), el => {
+        expect(el.querySelector('.fa, svg').classList.contains('hidden')).toBeFalsy();
       });
     });
   });
-}).call(window);
+});

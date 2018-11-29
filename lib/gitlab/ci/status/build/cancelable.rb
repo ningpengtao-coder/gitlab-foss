@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Status
@@ -21,6 +23,10 @@ module Gitlab
 
           def action_title
             'Cancel'
+          end
+
+          def action_button_title
+            _('Cancel this job')
           end
 
           def self.matches?(build, user)
