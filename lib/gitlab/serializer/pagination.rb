@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Serializer
     class Pagination
@@ -16,8 +18,6 @@ module Gitlab
           raise InvalidResourceError
         end
       end
-
-      private
 
       # Methods needed by `API::Helpers::Pagination`
       #

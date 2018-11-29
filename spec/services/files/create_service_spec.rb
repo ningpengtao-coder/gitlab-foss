@@ -3,7 +3,7 @@ require "spec_helper"
 describe Files::CreateService do
   let(:project) { create(:project, :repository) }
   let(:repository) { project.repository }
-  let(:user) { create(:user) }
+  let(:user) { create(:user, :commit_email) }
   let(:file_content) { 'Test file content' }
   let(:branch_name) { project.default_branch }
   let(:start_branch) { branch_name }
@@ -20,10 +20,12 @@ describe Files::CreateService do
     }
   end
 
+  let(:commit) { repository.head_commit }
+
   subject { described_class.new(project, user, commit_params) }
 
   before do
-    project.add_master(user)
+    project.add_maintainer(user)
   end
 
   describe "#execute" do
@@ -43,7 +45,7 @@ describe Files::CreateService do
 
           blob = repository.blob_at('lfs', file_path)
 
-          expect(blob.data).not_to start_with('version https://git-lfs.github.com/spec/v1')
+          expect(blob.data).not_to start_with(Gitlab::Git::LfsPointerFile::VERSION_LINE)
           expect(blob.data).to eq(file_content)
         end
       end
@@ -58,7 +60,7 @@ describe Files::CreateService do
 
           blob = repository.blob_at('lfs', file_path)
 
-          expect(blob.data).to start_with('version https://git-lfs.github.com/spec/v1')
+          expect(blob.data).to start_with(Gitlab::Git::LfsPointerFile::VERSION_LINE)
         end
 
         it "creates an LfsObject with the file's content" do
@@ -73,6 +75,18 @@ describe Files::CreateService do
           end.to change { project.lfs_objects.count }.by(1)
         end
       end
+    end
+  end
+
+  context 'commit attribute' do
+    let(:file_path) { 'test-commit-attributes.txt' }
+
+    it 'uses the commit email' do
+      subject.execute
+
+      expect(user.commit_email).not_to eq(user.email)
+      expect(commit.author_email).to eq(user.commit_email)
+      expect(commit.committer_email).to eq(user.commit_email)
     end
   end
 end

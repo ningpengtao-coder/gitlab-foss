@@ -11,14 +11,21 @@
       = image_tag avatar_icon_for_user(user, 40), class: "avatar s40", alt: ''
       .user-info
         = link_to user.name, user_path(user), class: 'member'
+        = user_status(user)
         %span.cgray= user.to_reference
 
+        = render_if_exists 'shared/members/ee/sso_badge', member: member
+
         - if user == current_user
-          %span.label.label-success.prepend-left-5 It's you
+          %span.badge.badge-success.prepend-left-5= _("It's you")
 
         - if user.blocked?
-          %label.label.label-danger
-            %strong Blocked
+          %label.badge.badge-danger
+            %strong= _("Blocked")
+
+        - if user.two_factor_enabled?
+          %label.badge.badge-info
+            = _("2FA")
 
         - if source.instance_of?(Group) && source != @group
           &middot;
@@ -26,14 +33,13 @@
 
         .cgray
           - if member.request?
-            Requested
-            = time_ago_with_tooltip(member.requested_at)
+            = _("Requested %{time_ago}").html_safe % { time_ago: time_ago_with_tooltip(member.requested_at) }
           - else
-            Joined #{time_ago_with_tooltip(member.created_at)}
+            = _("Given access %{time_ago}").html_safe % { time_ago: time_ago_with_tooltip(member.created_at) }
           - if member.expires?
             ·
             %span{ class: "#{"text-warning" if member.expires_soon?} has-tooltip", title: member.expires_at.to_time.in_time_zone.to_s(:medium) }
-              Expires in #{distance_of_time_in_words_to_now(member.expires_at)}
+              = _("Expires in %{expires_at}").html_safe % { expires_at: distance_of_time_in_words_to_now(member.expires_at) }
 
     - else
       = image_tag avatar_icon_for_email(member.invite_email, 40), class: "avatar s40", alt: ''
@@ -53,11 +59,11 @@
         - if member.can_resend_invite?
           = link_to icon('paper-plane'), polymorphic_path([:resend_invite, member]),
                     method: :post,
-                    class: 'btn btn-default prepend-left-10 hidden-xs',
-                    title: 'Resend invite'
+                    class: 'btn btn-default prepend-left-10 d-none d-sm-block',
+                    title: _('Resend invite')
 
         - if user != current_user && member.can_update?
-          = form_for member, remote: true, html: { class: 'form-horizontal js-edit-member-form' } do |f|
+          = form_for member, remote: true, html: { class: 'js-edit-member-form form-group row append-right-5' } do |f|
             = f.hidden_field :access_level
             .member-form-control.dropdown.append-right-5
               %button.dropdown-menu-toggle.js-member-permissions-dropdown{ type: "button",
@@ -65,8 +71,8 @@
                 %span.dropdown-toggle-text
                   = member.human_access
                 = icon("chevron-down")
-              .dropdown-menu.dropdown-select.dropdown-menu-align-right.dropdown-menu-selectable
-                = dropdown_title("Change permissions")
+              .dropdown-menu.dropdown-select.dropdown-menu-right.dropdown-menu-selectable
+                = dropdown_title(_("Change permissions"))
                 .dropdown-content
                   %ul
                     - member.access_level_roles.each do |role, role_id|
@@ -77,7 +83,7 @@
             .prepend-left-5.clearable-input.member-form-control
               = f.text_field :expires_at,
                 class: 'form-control js-access-expiration-date js-member-update-control',
-                placeholder: 'Expiration date',
+                placeholder: _('Expiration date'),
                 id: "member_expires_at_#{member.id}",
                 data: { el_id: dom_id(member) }
               %i.clear-icon.js-clear-input
@@ -88,15 +94,15 @@
           = link_to polymorphic_path([:approve_access_request, member]),
                     method: :post,
                     class: 'btn btn-success prepend-left-10',
-                    title: 'Grant access' do
-            %span{ class: ('visible-xs-block' unless force_mobile_view) }
-              Grant access
+                    title: _('Grant access') do
+            %span{ class: ('d-block d-sm-none' unless force_mobile_view) }
+              = _('Grant access')
             - unless force_mobile_view
-              = icon('check inverse', class: 'hidden-xs')
+              = icon('check inverse', class: 'd-none d-sm-block')
 
         - if member.can_remove?
           - if current_user == user
-            = link_to icon('sign-out', text: 'Leave'), polymorphic_path([:leave, member.source, :members]),
+            = link_to icon('sign-out', text: _('Leave')), polymorphic_path([:leave, member.source, :members]),
                       method: :delete,
                       data: { confirm: leave_confirmation_message(member.source) },
                       class: 'btn btn-remove prepend-left-10'
@@ -106,9 +112,9 @@
                       data: { confirm: remove_member_message(member) },
                       class: 'btn btn-remove prepend-left-10',
                       title: remove_member_title(member) do
-              %span{ class: ('visible-xs-block' unless force_mobile_view) }
-                Delete
+              %span{ class: ('d-block d-sm-none' unless force_mobile_view) }
+                = _("Delete")
               - unless force_mobile_view
-                = icon('trash', class: 'hidden-xs')
+                = icon('trash', class: 'd-none d-sm-block')
       - else
         %span.member-access-text= member.human_access

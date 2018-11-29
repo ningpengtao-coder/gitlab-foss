@@ -4,18 +4,18 @@ module QA
       module Settings
         class DeployKeys < Page::Base
           view 'app/views/projects/deploy_keys/_form.html.haml' do
-            element :deploy_key_title, 'text_field :title'
-            element :deploy_key_key, 'text_area :key'
+            element :deploy_key_title, 'text_field :title' # rubocop:disable QA/ElementWithPattern
+            element :deploy_key_key, 'text_area :key' # rubocop:disable QA/ElementWithPattern
           end
 
           view 'app/assets/javascripts/deploy_keys/components/app.vue' do
-            element :deploy_keys_section, /class=".*deploy\-keys.*"/
-            element :project_deploy_keys, 'class="qa-project-deploy-keys"'
+            element :deploy_keys_section, /class=".*deploy\-keys.*"/ # rubocop:disable QA/ElementWithPattern
+            element :project_deploy_keys, 'class="qa-project-deploy-keys"' # rubocop:disable QA/ElementWithPattern
           end
 
           view 'app/assets/javascripts/deploy_keys/components/key.vue' do
-            element :key_title, /class=".*qa-key-title.*"/
-            element :key_fingerprint, /class=".*qa-key-fingerprint.*"/
+            element :key_title, /class=".*qa-key-title.*"/ # rubocop:disable QA/ElementWithPattern
+            element :key_fingerprint, /class=".*qa-key-fingerprint.*"/ # rubocop:disable QA/ElementWithPattern
           end
 
           def fill_key_title(title)
@@ -42,9 +42,25 @@ module QA
             end
           end
 
+          def key_titles
+            within_project_deploy_keys do
+              all_elements(:key_title)
+            end
+          end
+
+          def key_fingerprints
+            within_project_deploy_keys do
+              all_elements(:key_fingerprint)
+            end
+          end
+
           private
 
           def within_project_deploy_keys
+            wait(reload: false) do
+              has_css?(element_selector_css(:project_deploy_keys))
+            end
+
             within_element(:project_deploy_keys) do
               yield
             end

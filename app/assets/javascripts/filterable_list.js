@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 
@@ -64,12 +65,15 @@ export default class FilterableList {
 
     this.isBusy = true;
 
-    return axios.get(this.getFilterEndpoint(), {
-      params,
-    }).then((res) => {
-      this.onFilterSuccess(res, params);
-      this.onFilterComplete();
-    }).catch(() => this.onFilterComplete());
+    return axios
+      .get(this.getFilterEndpoint(), {
+        params,
+      })
+      .then(res => {
+        this.onFilterSuccess(res, params);
+        this.onFilterComplete();
+      })
+      .catch(() => this.onFilterComplete());
   }
 
   onFilterSuccess(response, queryData) {
@@ -80,9 +84,13 @@ export default class FilterableList {
     // Change url so if user reload a page - search results are saved
     const currentPath = this.getPagePath(queryData);
 
-    return window.history.replaceState({
-      page: currentPath,
-    }, document.title, currentPath);
+    return window.history.replaceState(
+      {
+        page: currentPath,
+      },
+      document.title,
+      currentPath,
+    );
   }
 
   onFilterComplete() {

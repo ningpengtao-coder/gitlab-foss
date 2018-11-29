@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import '~/behaviors/autosize';
 
 function load() {
@@ -11,6 +12,7 @@ describe('Autosize behavior', () => {
 
   it('does not overwrite the resize property', () => {
     load();
+
     expect($('textarea')).toHaveCss({
       resize: 'vertical',
     });

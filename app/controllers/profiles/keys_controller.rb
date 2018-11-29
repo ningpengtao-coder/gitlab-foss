@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Profiles::KeysController < Profiles::ApplicationController
   skip_before_action :authenticate_user!, only: [:get_keys]
 
@@ -23,10 +25,10 @@ class Profiles::KeysController < Profiles::ApplicationController
 
   def destroy
     @key = current_user.keys.find(params[:id])
-    @key.destroy
+    Keys::DestroyService.new(current_user).execute(@key)
 
     respond_to do |format|
-      format.html { redirect_to profile_keys_url, status: 302 }
+      format.html { redirect_to profile_keys_url, status: :found }
       format.js { head :ok }
     end
   end
@@ -36,9 +38,10 @@ class Profiles::KeysController < Profiles::ApplicationController
   def get_keys
     if params[:username].present?
       begin
-        user = User.find_by_username(params[:username])
+        user = UserFinder.new(params[:username]).find_by_username
         if user.present?
-          render text: user.all_ssh_keys.join("\n"), content_type: "text/plain"
+          headers['Content-Disposition'] = 'attachment'
+          render text: user.all_ssh_keys.join("\n"), content_type: 'text/plain'
         else
           return render_404
         end

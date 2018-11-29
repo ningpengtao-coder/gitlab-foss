@@ -5,7 +5,7 @@ describe Banzai::ReferenceParser::CommitParser do
 
   let(:project) { create(:project, :public) }
   let(:user) { create(:user) }
-  subject { described_class.new(project, user) }
+  subject { described_class.new(Banzai::RenderContext.new(project, user)) }
   let(:link) { empty_html_link }
 
   describe '#nodes_visible_to_user' do
@@ -119,5 +119,23 @@ describe Banzai::ReferenceParser::CommitParser do
 
       expect(subject.find_commits(project, %w{123})).to eq([])
     end
+  end
+
+  context 'when checking commits on another projects' do
+    let(:control_links) do
+      [commit_link]
+    end
+
+    let(:actual_links) do
+      control_links + [commit_link, commit_link]
+    end
+
+    def commit_link
+      project = create(:project, :repository, :public)
+
+      Nokogiri::HTML.fragment(%Q{<a data-commit="#{project.commit.id}" data-project="#{project.id}"></a>}).children[0]
+    end
+
+    it_behaves_like 'no project N+1 queries'
   end
 end

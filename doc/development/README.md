@@ -1,13 +1,14 @@
 ---
 comments: false
+description: 'Learn how to contribute to GitLab.'
 ---
 
 # GitLab development guides
 
 ## Get started!
 
-- Setup GitLab's development environment with [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/README.md)
-- [GitLab contributing guide](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/CONTRIBUTING.md)
+- Set up GitLab's development environment with [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/README.md)
+- [GitLab contributing guide](contributing/index.md)
 - [Architecture](architecture.md) of GitLab
 - [Rake tasks](rake_tasks.md) for development
 
@@ -18,39 +19,59 @@ comments: false
 - [Code review guidelines](code_review.md) for reviewing code and having code reviewed.
 - [Automatic CE->EE merge](automatic_ce_ee_merge.md)
 - [Guidelines for implementing Enterprise Edition features](ee_features.md)
+- [Security process for developers](https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md#security-releases-critical-non-critical-as-a-developer)
 
 ## UX and frontend guides
 
-- [UX guide](ux_guide/index.md) for building GitLab with existing CSS styles and elements
+- [GitLab Design System](https://design.gitlab.com/) for building GitLab with existing CSS styles and elements
 - [Frontend guidelines](fe_guide/index.md)
 - [Emoji guide](fe_guide/emojis.md)
 
 ## Backend guides
 
 - [GitLab utilities](utilities.md)
+- [Logging](logging.md)
 - [API styleguide](api_styleguide.md) Use this styleguide if you are
   contributing to the API.
+- [GraphQL API styleguide](api_graphql_styleguide.md) Use this
+  styleguide if you are contribution to the [GraphQL API](../api/graphql/index.md)
 - [Sidekiq guidelines](sidekiq_style_guide.md) for working with Sidekiq workers
 - [Working with Gitaly](gitaly.md)
 - [Manage feature flags](feature_flags.md)
 - [View sent emails or preview mailers](emails.md)
 - [Shell commands](shell_commands.md) in the GitLab codebase
 - [`Gemfile` guidelines](gemfile.md)
+- [Pry debugging](pry_debugging.md)
 - [Sidekiq debugging](sidekiq_debugging.md)
 - [Gotchas](gotchas.md) to avoid
 - [Avoid modules with instance variables](module_with_instance_variables.md) if possible
-- [Issue and merge requests state models](object_state_models.md)
 - [How to dump production data to staging](db_dump.md)
 - [Working with the GitHub importer](github_importer.md)
+- [Working with Merge Request diffs](diffs.md)
+- [Permissions](permissions.md)
+- [Prometheus metrics](prometheus_metrics.md)
+- [Guidelines for reusing abstractions](reusing_abstractions.md)
+- [DeclarativePolicy framework](policies.md)
+- [Switching to Rails 5](switching_to_rails5.md)
 
 ## Performance guides
 
-- [Instrumentation](instrumentation.md)
-- [Performance guidelines](performance.md)
+- [Instrumentation](instrumentation.md) for Ruby code running in production
+  environments
+- [Performance guidelines](performance.md) for writing code, benchmarks, and
+  certain patterns to avoid
 - [Merge request performance guidelines](merge_request_performance_guidelines.md)
   for ensuring merge requests do not negatively impact GitLab performance
+- [Profiling](profiling.md) a URL, measuring performance using Sherlock, or
+  tracking down N+1 queries using Bullet
 
-## Databases guides
+## Database guides
+
+### Tooling
+
+- [Understanding EXPLAIN plans](understanding_explain_plans.md)
+- [explain.depesz.com](https://explain.depesz.com/) for visualising the output
+  of `EXPLAIN`
 
 ### Migrations
 
@@ -76,6 +97,7 @@ comments: false
 - [Verifying database capabilities](verifying_database_capabilities.md)
 - [Database Debugging and Troubleshooting](database_debugging.md)
 - [Query Count Limits](query_count_limits.md)
+- [Database helper modules](database_helpers.md)
 
 ## Testing guides
 
@@ -84,8 +106,8 @@ comments: false
 
 ## Documentation guides
 
-- [Writing documentation](writing_documentation.md)
-- [Documentation styleguide](doc_styleguide.md)
+- [Writing documentation](documentation/index.md)
+- [Documentation styleguide](documentation/styleguide.md)
 - [Markdown](../user/markdown.md)
 
 ## Internationalization (i18n) guides

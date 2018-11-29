@@ -20,8 +20,11 @@ describe('Applications', () => {
         applications: {
           helm: { title: 'Helm Tiller' },
           ingress: { title: 'Ingress' },
+          cert_manager: { title: 'Cert-Manager' },
           runner: { title: 'GitLab Runner' },
           prometheus: { title: 'Prometheus' },
+          jupyter: { title: 'JupyterHub' },
+          knative: { title: 'Knative' },
         },
       });
     });
@@ -34,12 +37,24 @@ describe('Applications', () => {
       expect(vm.$el.querySelector('.js-cluster-application-row-ingress')).toBeDefined();
     });
 
+    it('renders a row for Cert-Manager', () => {
+      expect(vm.$el.querySelector('.js-cluster-application-row-cert_manager')).toBeDefined();
+    });
+
     it('renders a row for Prometheus', () => {
       expect(vm.$el.querySelector('.js-cluster-application-row-prometheus')).toBeDefined();
     });
 
     it('renders a row for GitLab Runner', () => {
       expect(vm.$el.querySelector('.js-cluster-application-row-runner')).toBeDefined();
+    });
+
+    it('renders a row for Jupyter', () => {
+      expect(vm.$el.querySelector('.js-cluster-application-row-jupyter')).not.toBe(null);
+    });
+
+    it('renders a row for Knative', () => {
+      expect(vm.$el.querySelector('.js-cluster-application-row-knative')).not.toBe(null);
     });
   });
 
@@ -55,14 +70,15 @@ describe('Applications', () => {
                 externalIp: '0.0.0.0',
               },
               helm: { title: 'Helm Tiller' },
+              cert_manager: { title: 'Cert-Manager' },
               runner: { title: 'GitLab Runner' },
               prometheus: { title: 'Prometheus' },
+              jupyter: { title: 'JupyterHub', hostname: '' },
+              knative: { title: 'Knative', hostname: '' },
             },
           });
 
-          expect(
-            vm.$el.querySelector('.js-ip-address').value,
-          ).toEqual('0.0.0.0');
+          expect(vm.$el.querySelector('.js-ip-address').value).toEqual('0.0.0.0');
 
           expect(
             vm.$el.querySelector('.js-clipboard-btn').getAttribute('data-clipboard-text'),
@@ -79,14 +95,15 @@ describe('Applications', () => {
                 status: 'installed',
               },
               helm: { title: 'Helm Tiller' },
+              cert_manager: { title: 'Cert-Manager' },
               runner: { title: 'GitLab Runner' },
               prometheus: { title: 'Prometheus' },
+              jupyter: { title: 'JupyterHub', hostname: '' },
+              knative: { title: 'Knative', hostname: '' },
             },
           });
 
-          expect(
-            vm.$el.querySelector('.js-ip-address').value,
-          ).toEqual('?');
+          expect(vm.$el.querySelector('.js-ip-address').value).toEqual('?');
 
           expect(vm.$el.querySelector('.js-no-ip-message')).not.toBe(null);
         });
@@ -99,13 +116,102 @@ describe('Applications', () => {
           applications: {
             helm: { title: 'Helm Tiller' },
             ingress: { title: 'Ingress' },
+            cert_manager: { title: 'Cert-Manager' },
             runner: { title: 'GitLab Runner' },
             prometheus: { title: 'Prometheus' },
+            jupyter: { title: 'JupyterHub', hostname: '' },
+            knative: { title: 'Knative', hostname: '' },
           },
         });
 
         expect(vm.$el.textContent).not.toContain('Ingress IP Address');
         expect(vm.$el.querySelector('.js-ip-address')).toBe(null);
+      });
+    });
+
+    describe('Jupyter application', () => {
+      describe('with ingress installed with ip & jupyter installable', () => {
+        it('renders hostname active input', () => {
+          vm = mountComponent(Applications, {
+            applications: {
+              helm: { title: 'Helm Tiller', status: 'installed' },
+              ingress: { title: 'Ingress', status: 'installed', externalIp: '1.1.1.1' },
+              cert_manager: { title: 'Cert-Manager' },
+              runner: { title: 'GitLab Runner' },
+              prometheus: { title: 'Prometheus' },
+              jupyter: { title: 'JupyterHub', hostname: '', status: 'installable' },
+              knative: { title: 'Knative', hostname: '', status: 'installable' },
+            },
+          });
+
+          expect(vm.$el.querySelector('.js-hostname').getAttribute('readonly')).toEqual(null);
+        });
+      });
+
+      describe('with ingress installed without external ip', () => {
+        it('does not render hostname input', () => {
+          vm = mountComponent(Applications, {
+            applications: {
+              helm: { title: 'Helm Tiller', status: 'installed' },
+              ingress: { title: 'Ingress', status: 'installed' },
+              cert_manager: { title: 'Cert-Manager' },
+              runner: { title: 'GitLab Runner' },
+              prometheus: { title: 'Prometheus' },
+              jupyter: { title: 'JupyterHub', hostname: '', status: 'installable' },
+              knative: { title: 'Knative', hostname: '', status: 'installable' },
+            },
+          });
+
+          expect(vm.$el.querySelector('.js-hostname')).toBe(null);
+        });
+      });
+
+      describe('with ingress & jupyter installed', () => {
+        it('renders readonly input', () => {
+          vm = mountComponent(Applications, {
+            applications: {
+              helm: { title: 'Helm Tiller', status: 'installed' },
+              ingress: { title: 'Ingress', status: 'installed', externalIp: '1.1.1.1' },
+              cert_manager: { title: 'Cert-Manager' },
+              runner: { title: 'GitLab Runner' },
+              prometheus: { title: 'Prometheus' },
+              jupyter: { title: 'JupyterHub', status: 'installed', hostname: '' },
+              knative: { title: 'Knative', status: 'installed', hostname: '' },
+            },
+          });
+
+          expect(vm.$el.querySelector('.js-hostname').getAttribute('readonly')).toEqual('readonly');
+        });
+      });
+
+      describe('without ingress installed', () => {
+        beforeEach(() => {
+          vm = mountComponent(Applications, {
+            applications: {
+              helm: { title: 'Helm Tiller' },
+              ingress: { title: 'Ingress' },
+              cert_manager: { title: 'Cert-Manager' },
+              runner: { title: 'GitLab Runner' },
+              prometheus: { title: 'Prometheus' },
+              jupyter: { title: 'JupyterHub', status: 'not_installable' },
+              knative: { title: 'Knative' },
+            },
+          });
+        });
+
+        it('does not render input', () => {
+          expect(vm.$el.querySelector('.js-hostname')).toBe(null);
+        });
+
+        it('renders disabled install button', () => {
+          expect(
+            vm.$el
+              .querySelector(
+                '.js-cluster-application-row-jupyter .js-cluster-application-install-button',
+              )
+              .getAttribute('disabled'),
+          ).toEqual('disabled');
+        });
       });
     });
   });

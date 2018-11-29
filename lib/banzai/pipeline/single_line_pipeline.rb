@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Banzai
   module Pipeline
     class SingleLinePipeline < GfmPipeline
@@ -10,13 +12,19 @@ module Banzai
           Filter::AutolinkFilter,
           Filter::ExternalLinkFilter,
 
+          *reference_filters
+        ]
+      end
+
+      def self.reference_filters
+        [
           Filter::UserReferenceFilter,
           Filter::IssueReferenceFilter,
           Filter::ExternalIssueReferenceFilter,
           Filter::MergeRequestReferenceFilter,
           Filter::SnippetReferenceFilter,
           Filter::CommitRangeReferenceFilter,
-          Filter::CommitReferenceFilter,
+          Filter::CommitReferenceFilter
         ]
       end
     end

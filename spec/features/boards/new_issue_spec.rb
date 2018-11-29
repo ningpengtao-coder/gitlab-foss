@@ -8,7 +8,7 @@ describe 'Issue Boards new issue', :js do
 
   context 'authorized user' do
     before do
-      project.add_master(user)
+      project.add_maintainer(user)
 
       sign_in(user)
 
@@ -63,6 +63,13 @@ describe 'Issue Boards new issue', :js do
       page.within(first('.board .issue-count-badge-count')) do
         expect(page).to have_content('1')
       end
+
+      page.within(first('.board-card')) do
+        issue = project.issues.find_by_title('bug')
+
+        expect(page).to have_content(issue.to_reference)
+        expect(page).to have_link(issue.title, href: issue_path(issue))
+      end
     end
 
     it 'shows sidebar when creating new issue' do
@@ -87,8 +94,14 @@ describe 'Issue Boards new issue', :js do
       wait_for_requests
     end
 
-    it 'does not display new issue button' do
-      expect(page).to have_selector('.issue-count-badge-add-button', count: 0)
+    it 'displays new issue button in open list' do
+      expect(first('.board')).to have_selector('.issue-count-badge-add-button', count: 1)
+    end
+
+    it 'does not display new issue button in label list' do
+      page.within('.board:nth-child(2)') do
+        expect(page).not_to have_selector('.issue-count-badge-add-button')
+      end
     end
   end
 end

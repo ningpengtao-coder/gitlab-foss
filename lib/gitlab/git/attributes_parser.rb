@@ -1,14 +1,12 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Git
     # Class for parsing Git attribute files and extracting the attributes for
     # file patterns.
     class AttributesParser
-      def initialize(attributes_data)
+      def initialize(attributes_data = "")
         @data = attributes_data || ""
-
-        if @data.is_a?(File)
-          @patterns = parse_file
-        end
       end
 
       # Returns all the Git attributes for the given path.
@@ -28,7 +26,7 @@ module Gitlab
 
       # Returns a Hash containing the file patterns and their attributes.
       def patterns
-        @patterns ||= parse_file
+        @patterns ||= parse_data
       end
 
       # Parses an attribute string.
@@ -91,8 +89,8 @@ module Gitlab
 
       private
 
-      # Parses the Git attributes file.
-      def parse_file
+      # Parses the Git attributes file contents.
+      def parse_data
         pairs = []
         comment = '#'
 

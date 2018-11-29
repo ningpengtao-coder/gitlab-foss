@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DeclarativePolicy
   class Runner
     class State
@@ -77,7 +79,7 @@ module DeclarativePolicy
       @state = State.new
 
       steps_by_score do |step, score|
-        return if !debug && @state.prevented?
+        break if !debug && @state.prevented?
 
         passed = nil
         case step.action
@@ -127,7 +129,7 @@ module DeclarativePolicy
     #
     # For each step, we yield the step object along with the computed score
     # for debugging purposes.
-    def steps_by_score(&b)
+    def steps_by_score
       flatten_steps!
 
       if @steps.size > 50

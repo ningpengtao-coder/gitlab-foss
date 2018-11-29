@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import LabelsSelect from '~/labels_select';
 
 const mockUrl = '/foo/bar/url';
@@ -18,10 +19,12 @@ describe('LabelsSelect', () => {
     let $labelEl;
 
     beforeEach(() => {
-      $labelEl = $(LabelsSelect.getLabelTemplate({
-        labels: mockLabels,
-        issueUpdateURL: mockUrl,
-      }));
+      $labelEl = $(
+        LabelsSelect.getLabelTemplate({
+          labels: mockLabels,
+          issueUpdateURL: mockUrl,
+        }),
+      );
     });
 
     it('generated label item template has correct label URL', () => {
@@ -37,7 +40,13 @@ describe('LabelsSelect', () => {
     });
 
     it('generated label item template has correct label styles', () => {
-      expect($labelEl.find('span.label').attr('style')).toBe(`background-color: ${label.color}; color: ${label.text_color};`);
+      expect($labelEl.find('span.label').attr('style')).toBe(
+        `background-color: ${label.color}; color: ${label.text_color};`,
+      );
+    });
+
+    it('generated label item has a badge class', () => {
+      expect($labelEl.find('span').hasClass('badge')).toEqual(true);
     });
   });
 });

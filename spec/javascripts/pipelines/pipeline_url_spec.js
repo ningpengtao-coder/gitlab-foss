@@ -35,7 +35,10 @@ describe('Pipeline Url Component', () => {
       },
     }).$mount();
 
-    expect(component.$el.querySelector('.js-pipeline-url-link').getAttribute('href')).toEqual('foo');
+    expect(component.$el.querySelector('.js-pipeline-url-link').getAttribute('href')).toEqual(
+      'foo',
+    );
+
     expect(component.$el.querySelector('.js-pipeline-url-link span').textContent).toEqual('#1');
   });
 
@@ -60,12 +63,16 @@ describe('Pipeline Url Component', () => {
     }).$mount();
 
     const image = component.$el.querySelector('.js-pipeline-url-user img');
+    const tooltip = component.$el.querySelector(
+      '.js-pipeline-url-user .js-user-avatar-image-toolip',
+    );
 
-    expect(
-      component.$el.querySelector('.js-pipeline-url-user').getAttribute('href'),
-    ).toEqual(mockData.pipeline.user.web_url);
-    expect(image.getAttribute('data-original-title')).toEqual(mockData.pipeline.user.name);
-    expect(image.getAttribute('src')).toEqual(mockData.pipeline.user.avatar_url);
+    expect(component.$el.querySelector('.js-pipeline-url-user').getAttribute('href')).toEqual(
+      mockData.pipeline.user.web_url,
+    );
+
+    expect(tooltip.textContent.trim()).toEqual(mockData.pipeline.user.name);
+    expect(image.getAttribute('src')).toEqual(`${mockData.pipeline.user.avatar_url}?width=20`);
   });
 
   it('should render "API" when no user is provided', () => {
@@ -100,7 +107,10 @@ describe('Pipeline Url Component', () => {
     }).$mount();
 
     expect(component.$el.querySelector('.js-pipeline-url-latest').textContent).toContain('latest');
-    expect(component.$el.querySelector('.js-pipeline-url-yaml').textContent).toContain('yaml invalid');
+    expect(component.$el.querySelector('.js-pipeline-url-yaml').textContent).toContain(
+      'yaml invalid',
+    );
+
     expect(component.$el.querySelector('.js-pipeline-url-stuck').textContent).toContain('stuck');
   });
 
@@ -121,9 +131,9 @@ describe('Pipeline Url Component', () => {
       },
     }).$mount();
 
-    expect(
-      component.$el.querySelector('.js-pipeline-url-autodevops').textContent.trim(),
-    ).toEqual('Auto DevOps');
+    expect(component.$el.querySelector('.js-pipeline-url-autodevops').textContent.trim()).toEqual(
+      'Auto DevOps',
+    );
   });
 
   it('should render error badge when pipeline has a failure reason set', () => {
@@ -142,6 +152,8 @@ describe('Pipeline Url Component', () => {
     }).$mount();
 
     expect(component.$el.querySelector('.js-pipeline-url-failure').textContent).toContain('error');
-    expect(component.$el.querySelector('.js-pipeline-url-failure').getAttribute('data-original-title')).toContain('some reason');
+    expect(
+      component.$el.querySelector('.js-pipeline-url-failure').getAttribute('data-original-title'),
+    ).toContain('some reason');
   });
 });

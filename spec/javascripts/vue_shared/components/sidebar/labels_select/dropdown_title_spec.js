@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 import dropdownTitleComponent from '~/vue_shared/components/sidebar/labels_select/dropdown_title.vue';
 
-import mountComponent from '../../../../helpers/vue_mount_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 const createComponent = (canEdit = true) => {
   const Component = Vue.extend(dropdownTitleComponent);
@@ -35,6 +35,7 @@ describe('DropdownTitleComponent', () => {
 
     it('renders `Edit` button element', () => {
       const editBtnEl = vm.$el.querySelector('button.edit-link.js-sidebar-dropdown-toggle');
+
       expect(editBtnEl).not.toBeNull();
       expect(editBtnEl.innerText.trim()).toBe('Edit');
     });

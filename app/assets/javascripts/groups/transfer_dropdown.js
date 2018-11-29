@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 export default class TransferDropdown {
   constructor() {
     this.groupDropdown = $('.js-groups-dropdown');
@@ -20,7 +22,7 @@ export default class TransferDropdown {
       search: { fields: ['text'] },
       data: extraOptions.concat(this.data),
       text: item => item.text,
-      clicked: (options) => {
+      clicked: options => {
         const { e } = options;
         e.preventDefault();
         this.assignSelected(options.selectedObj);

@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 export default function projectAvatar() {
   $('.js-choose-project-avatar-button').bind('click', function onClickAvatar() {
     const form = $(this).closest('form');
@@ -6,8 +8,9 @@ export default function projectAvatar() {
 
   $('.js-project-avatar-input').bind('change', function onClickAvatarInput() {
     const form = $(this).closest('form');
-    // eslint-disable-next-line no-useless-escape
-    const filename = $(this).val().replace(/^.*[\\\/]/, '');
+    const filename = $(this)
+      .val()
+      .replace(/^.*[\\\/]/, ''); // eslint-disable-line no-useless-escape
     return form.find('.js-avatar-filename').text(filename);
   });
 }

@@ -11,17 +11,21 @@ You can leave a comment in the following places:
 - commit diffs
 
 The comment area supports [Markdown] and [quick actions]. One can edit their
-own comment at any time, and anyone with [Master access level][permissions] or
+own comment at any time, and anyone with [Maintainer access level][permissions] or
 higher can also edit a comment made by someone else.
+
+You could also reply to the notification email in order to reply to a comment,
+provided that [Reply by email] is configured by your GitLab admin. This also
+supports [Markdown] and [quick actions] as if replied from the web.
 
 Apart from the standard comments, you also have the option to create a comment
 in the form of a resolvable or threaded discussion.
 
 ## Resolvable discussions
 
->**Notes:**
-- The main feature was [introduced][ce-5022] in GitLab 8.11.
-- Resolvable discussions can be added only to merge request diffs.
+> **Notes:**
+> - The main feature was [introduced][ce-5022] in GitLab 8.11.
+> - Resolvable discussions can be added only to merge request diffs.
 
 Discussion resolution helps keep track of progress during planning or code review.
 Resolving comments prevents you from forgetting to address feedback and lets you
@@ -249,7 +253,7 @@ to newer issues or merge requests.
 - The people participating in the discussion are trolling, abusive, or otherwise
 being unproductive.
 
-In these cases, a user with Master permissions or higher in the project can lock (and unlock)
+In these cases, a user with Maintainer permissions or higher in the project can lock (and unlock)
 an issue or a merge request, using the "Lock" section in the sidebar:
 
 | Unlock | Lock |
@@ -267,6 +271,28 @@ edit existing comments. Non-team members are restricted from adding or editing c
 | :-----------: | :----------: |
 | ![Comment form member](img/lock_form_member.png) | ![Comment form non-member](img/lock_form_non_member.png) |
 
+Additionally locked issues can not be reopened.
+
+## Filtering notes
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5. 
+
+For issues with many comments like activity notes and user comments, sometimes 
+finding useful information can be hard. There is a way to filter comments from single notes and discussions for merge requests and issues.  
+
+From a merge request's **Discussion** tab, or from an issue overview, find the filter's dropdown menu on the right side of the page, from which you can choose one of the following options:
+
+- **Show all activity**: displays all user comments and system notes
+(issue updates, mentions from other issues, changes to the description, etc).
+- **Show comments only**: only displays user comments in the list.
+- **Show history only**: only displays activity notes. 
+
+![Notes filters dropdown options](img/index_notes_filters.png)
+
+Once you select one of the filters in a given issue or MR, GitLab will save
+your preference, so that it will persist when you visit the same page again
+from any device you're logged into.
+
 [ce-5022]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5022
 [ce-7125]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7125
 [ce-7527]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7527
@@ -275,7 +301,7 @@ edit existing comments. Non-team members are restricted from adding or editing c
 [ce-14053]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/14053
 [ce-14061]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/14061
 [ce-14531]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/14531
-[ce-31847]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/31847
+[ce-31847]: https://gitlab.com/gitlab-org/gitlab-ce/issues/31847
 [resolve-discussion-button]: img/resolve_discussion_button.png
 [resolve-comment-button]: img/resolve_comment_button.png
 [discussion-view]: img/discussion_view.png
@@ -283,3 +309,4 @@ edit existing comments. Non-team members are restricted from adding or editing c
 [markdown]: ../markdown.md
 [quick actions]: ../project/quick_actions.md
 [permissions]: ../permissions.md
+[Reply by email]: ../../administration/reply_by_email.md

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import MockAdaptor from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import IssuableIndex from '~/issuable_index';
@@ -7,6 +8,7 @@ describe('Issuable', () => {
   describe('initBulkUpdate', () => {
     it('should not set bulkUpdateSidebar', () => {
       Issuable = new IssuableIndex('issue_');
+
       expect(Issuable.bulkUpdateSidebar).not.toBeDefined();
     });
 
@@ -16,6 +18,7 @@ describe('Issuable', () => {
       document.body.appendChild(element);
 
       Issuable = new IssuableIndex('issue_');
+
       expect(Issuable.bulkUpdateSidebar).toBeDefined();
     });
   });
@@ -46,7 +49,7 @@ describe('Issuable', () => {
       mock.restore();
     });
 
-    it('should send request to reset email token', (done) => {
+    it('should send request to reset email token', done => {
       spyOn(axios, 'put').and.callThrough();
       document.querySelector('.incoming-email-token-reset').click();
 
@@ -59,4 +62,3 @@ describe('Issuable', () => {
     });
   });
 });
-

@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module IssuableCollections
   extend ActiveSupport::Concern
+  include CookiesHelper
   include SortingHelper
   include Gitlab::IssuableMetadata
   include Gitlab::Utils::StrongMemoize
@@ -47,9 +50,11 @@ module IssuableCollections
     false
   end
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def issuables_collection
     finder.execute.preload(preload_for_collection)
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def redirect_out_of_range(total_pages)
     return false if total_pages.nil? || total_pages.zero?
@@ -57,7 +62,7 @@ module IssuableCollections
     out_of_range = @issuables.current_page > total_pages # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
     if out_of_range
-      redirect_to(url_for(params.merge(page: total_pages, only_path: true)))
+      redirect_to(url_for(safe_params.merge(page: total_pages, only_path: true)))
     end
 
     out_of_range
@@ -76,47 +81,51 @@ module IssuableCollections
   end
 
   def issuable_finder_for(finder_class)
-    finder_class.new(current_user, filter_params)
+    finder_class.new(current_user, finder_options)
   end
 
   # rubocop:disable Gitlab/ModuleWithInstanceVariables
-  def filter_params
-    set_sort_order_from_cookie
-    set_default_state
+  def finder_options
+    params[:state] = default_state if params[:state].blank?
 
-    # Skip irrelevant Rails routing params
-    @filter_params = params.dup.except(:controller, :action, :namespace_id)
-    @filter_params[:sort] ||= default_sort_order
+    options = {
+      scope: params[:scope],
+      state: params[:state],
+      sort: set_sort_order_from_cookie || default_sort_order
+    }
 
-    @sort = @filter_params[:sort]
+    # Used by view to highlight active option
+    @sort = options[:sort]
 
     if @project
-      @filter_params[:project_id] = @project.id
+      options[:project_id] = @project.id
     elsif @group
-      @filter_params[:group_id] = @group.id
-      @filter_params[:include_subgroups] = true
-    else
-      # TODO: this filter ignore issues/mr created in public or
-      # internal repos where you are not a member. Enable this filter
-      # or improve current implementation to filter only issues you
-      # created or assigned or mentioned
-      # @filter_params[:authorized_only] = true
+      options[:group_id] = @group.id
+      options[:include_subgroups] = true
+      options[:use_cte_for_search] = true
     end
 
-    @filter_params.permit(finder_type.valid_params)
+    params.permit(finder_type.valid_params).merge(options)
   end
   # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
-  def set_default_state
-    params[:state] = 'opened' if params[:state].blank?
+  def default_state
+    'opened'
   end
 
   def set_sort_order_from_cookie
-    key = 'issuable_sort'
+    sort_param = params[:sort] if params[:sort].present?
+    # fallback to legacy cookie value for backward compatibility
+    sort_param ||= cookies['issuable_sort']
+    sort_param ||= cookies[remember_sorting_key]
 
-    cookies[key] = params[:sort] if params[:sort].present?
-    cookies[key] = update_cookie_value(cookies[key])
-    params[:sort] = cookies[key]
+    sort_value = update_cookie_value(sort_param)
+    set_secure_cookie(remember_sorting_key, sort_value)
+    sort_value
+  end
+
+  def remember_sorting_key
+    @remember_sorting_key ||= "#{collection_type.downcase}_sort"
   end
 
   def default_sort_order
@@ -145,16 +154,14 @@ module IssuableCollections
   end
 
   def finder
-    strong_memoize(:finder) do
-      issuable_finder_for(finder_type)
-    end
+    @finder ||= issuable_finder_for(finder_type)
   end
 
   def collection_type
-    @collection_type ||= case finder
-                         when IssuesFinder
+    @collection_type ||= case finder_type.name
+                         when 'IssuesFinder'
                            'Issue'
-                         when MergeRequestsFinder
+                         when 'MergeRequestsFinder'
                            'MergeRequest'
                          end
   end
@@ -165,8 +172,8 @@ module IssuableCollections
                                   [:project, :author, :assignees, :labels, :milestone, project: :namespace]
                                 when 'MergeRequest'
                                   [
-                                    :source_project, :target_project, :author, :assignee, :labels, :milestone,
-                                    head_pipeline: :project, target_project: :namespace, latest_merge_request_diff: :merge_request_diff_commits
+                                    :target_project, :author, :assignee, :labels, :milestone,
+                                    source_project: :route, head_pipeline: :project, target_project: :namespace, latest_merge_request_diff: :merge_request_diff_commits
                                   ]
                                 end
   end

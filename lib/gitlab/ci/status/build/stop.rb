@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Status
@@ -17,6 +19,10 @@ module Gitlab
 
           def action_title
             'Stop'
+          end
+
+          def action_button_title
+            _('Stop this environment')
           end
 
           def action_path

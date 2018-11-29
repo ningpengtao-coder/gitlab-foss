@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostReceive
   include ApplicationWorker
 
@@ -27,15 +29,14 @@ class PostReceive
   def process_project_changes(post_received)
     changes = []
     refs = Set.new
+    @user = post_received.identify
+
+    unless @user
+      log("Triggered hook for non-existing user \"#{post_received.identifier}\"")
+      return false
+    end
 
     post_received.changes_refs do |oldrev, newrev, ref|
-      @user ||= post_received.identify(newrev)
-
-      unless @user
-        log("Triggered hook for non-existing user \"#{post_received.identifier}\"")
-        return false
-      end
-
       if Gitlab::Git.tag_ref?(ref)
         GitTagPushService.new(post_received.project, @user, oldrev: oldrev, newrev: newrev, ref: ref).execute
       elsif Gitlab::Git.branch_ref?(ref)
@@ -55,7 +56,7 @@ class PostReceive
   end
 
   def process_wiki_changes(post_received)
-    # Nothing defined here yet.
+    post_received.project.touch(:last_activity_at, :last_repository_updated_at)
   end
 
   def log(message)

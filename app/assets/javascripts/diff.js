@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
 import flash from '~/flash';
 import { __ } from '~/locale';
@@ -20,9 +21,12 @@ export default class Diff {
     });
 
     const tab = document.getElementById('diffs');
-    if (!tab || (tab && tab.dataset && tab.dataset.isLocked !== '')) FilesCommentButton.init($diffFile);
+    if (!tab || (tab && tab.dataset && tab.dataset.isLocked !== ''))
+      FilesCommentButton.init($diffFile);
 
-    const firstFile = $('.files').first().get(0);
+    const firstFile = $('.files')
+      .first()
+      .get(0);
     const canCreateNote = firstFile && firstFile.hasAttribute('data-can-create-note');
     $diffFile.each((index, file) => imageDiffHelper.initImageDiff(file, canCreateNote));
 
@@ -72,9 +76,10 @@ export default class Diff {
     const view = file.data('view');
 
     const params = { since, to, bottom, offset, unfold, view };
-    axios.get(link, { params })
-    .then(({ data }) => $target.parent().replaceWith(data))
-    .catch(() => flash(__('An error occurred while loading diff')));
+    axios
+      .get(link, { params })
+      .then(({ data }) => $target.parent().replaceWith(data))
+      .catch(() => flash(__('An error occurred while loading diff')));
   }
 
   openAnchoredDiff(cb) {

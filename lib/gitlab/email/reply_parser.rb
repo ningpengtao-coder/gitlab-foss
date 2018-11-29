@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 # Inspired in great part by Discourse's Email::Receiver
 module Gitlab
   module Email
     class ReplyParser
       attr_accessor :message
 
-      def initialize(message)
+      def initialize(message, trim_reply: true)
         @message = message
+        @trim_reply = trim_reply
       end
 
       def execute
@@ -13,7 +16,9 @@ module Gitlab
 
         encoding = body.encoding
 
-        body = EmailReplyTrimmer.trim(body)
+        if @trim_reply
+          body = EmailReplyTrimmer.trim(body)
+        end
 
         return '' unless body
 

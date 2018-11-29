@@ -2,13 +2,22 @@ import Vue from 'vue';
 import EmptyState from '~/monitoring/components/empty_state.vue';
 import { statePaths } from './mock_data';
 
-const createComponent = (propsData) => {
+function createComponent(props) {
   const Component = Vue.extend(EmptyState);
 
   return new Component({
-    propsData,
+    propsData: {
+      ...props,
+      settingsPath: statePaths.settingsPath,
+      clustersPath: statePaths.clustersPath,
+      documentationPath: statePaths.documentationPath,
+      emptyGettingStartedSvgPath: '/path/to/getting-started.svg',
+      emptyLoadingSvgPath: '/path/to/loading.svg',
+      emptyNoDataSvgPath: '/path/to/no-data.svg',
+      emptyUnableToConnectSvgPath: '/path/to/unable-to-connect.svg',
+    },
   }).$mount();
-};
+}
 
 function getTextFromNode(component, selector) {
   return component.$el.querySelector(selector).firstChild.nodeValue.trim();
@@ -19,11 +28,6 @@ describe('EmptyState', () => {
     it('currentState', () => {
       const component = createComponent({
         selectedState: 'gettingStarted',
-        settingsPath: statePaths.settingsPath,
-        documentationPath: statePaths.documentationPath,
-        emptyGettingStartedSvgPath: 'foo',
-        emptyLoadingSvgPath: 'foo',
-        emptyUnableToConnectSvgPath: 'foo',
       });
 
       expect(component.currentState).toBe(component.states.gettingStarted);
@@ -32,11 +36,6 @@ describe('EmptyState', () => {
     it('showButtonDescription returns a description with a link for the unableToConnect state', () => {
       const component = createComponent({
         selectedState: 'unableToConnect',
-        settingsPath: statePaths.settingsPath,
-        documentationPath: statePaths.documentationPath,
-        emptyGettingStartedSvgPath: 'foo',
-        emptyLoadingSvgPath: 'foo',
-        emptyUnableToConnectSvgPath: 'foo',
       });
 
       expect(component.showButtonDescription).toEqual(true);
@@ -45,11 +44,6 @@ describe('EmptyState', () => {
     it('showButtonDescription returns the description without a link for any other state', () => {
       const component = createComponent({
         selectedState: 'loading',
-        settingsPath: statePaths.settingsPath,
-        documentationPath: statePaths.documentationPath,
-        emptyGettingStartedSvgPath: 'foo',
-        emptyLoadingSvgPath: 'foo',
-        emptyUnableToConnectSvgPath: 'foo',
       });
 
       expect(component.showButtonDescription).toEqual(false);
@@ -59,49 +53,49 @@ describe('EmptyState', () => {
   it('should show the gettingStarted state', () => {
     const component = createComponent({
       selectedState: 'gettingStarted',
-      settingsPath: statePaths.settingsPath,
-      clustersPath: statePaths.clustersPath,
-      documentationPath: statePaths.documentationPath,
-      emptyGettingStartedSvgPath: 'foo',
-      emptyLoadingSvgPath: 'foo',
-      emptyUnableToConnectSvgPath: 'foo',
     });
 
     expect(component.$el.querySelector('svg')).toBeDefined();
-    expect(getTextFromNode(component, '.state-title')).toEqual(component.states.gettingStarted.title);
-    expect(getTextFromNode(component, '.state-description')).toEqual(component.states.gettingStarted.description);
-    expect(getTextFromNode(component, '.btn-success')).toEqual(component.states.gettingStarted.buttonText);
+    expect(getTextFromNode(component, '.state-title')).toEqual(
+      component.states.gettingStarted.title,
+    );
+
+    expect(getTextFromNode(component, '.state-description')).toEqual(
+      component.states.gettingStarted.description,
+    );
+
+    expect(getTextFromNode(component, '.btn-success')).toEqual(
+      component.states.gettingStarted.buttonText,
+    );
   });
 
   it('should show the loading state', () => {
     const component = createComponent({
       selectedState: 'loading',
-      settingsPath: statePaths.settingsPath,
-      documentationPath: statePaths.documentationPath,
-      emptyGettingStartedSvgPath: 'foo',
-      emptyLoadingSvgPath: 'foo',
-      emptyUnableToConnectSvgPath: 'foo',
     });
 
     expect(component.$el.querySelector('svg')).toBeDefined();
     expect(getTextFromNode(component, '.state-title')).toEqual(component.states.loading.title);
-    expect(getTextFromNode(component, '.state-description')).toEqual(component.states.loading.description);
+    expect(getTextFromNode(component, '.state-description')).toEqual(
+      component.states.loading.description,
+    );
+
     expect(getTextFromNode(component, '.btn-success')).toEqual(component.states.loading.buttonText);
   });
 
   it('should show the unableToConnect state', () => {
     const component = createComponent({
       selectedState: 'unableToConnect',
-      settingsPath: statePaths.settingsPath,
-      documentationPath: statePaths.documentationPath,
-      emptyGettingStartedSvgPath: 'foo',
-      emptyLoadingSvgPath: 'foo',
-      emptyUnableToConnectSvgPath: 'foo',
     });
 
     expect(component.$el.querySelector('svg')).toBeDefined();
-    expect(getTextFromNode(component, '.state-title')).toEqual(component.states.unableToConnect.title);
+    expect(getTextFromNode(component, '.state-title')).toEqual(
+      component.states.unableToConnect.title,
+    );
+
     expect(component.$el.querySelector('.state-description a')).toBeDefined();
-    expect(getTextFromNode(component, '.btn-success')).toEqual(component.states.unableToConnect.buttonText);
+    expect(getTextFromNode(component, '.btn-success')).toEqual(
+      component.states.unableToConnect.buttonText,
+    );
   });
 });

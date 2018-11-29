@@ -9,7 +9,7 @@ comments: false
 - Useful for marking deployments and releases
 - Annotated tags are an unchangeable part of Git history
 - Soft/lightweight tags can be set and removed at will
-- Many projects combine an anotated release tag with a stable branch
+- Many projects combine an annotated release tag with a stable branch
 - Consider setting deployment/release tags automatically
 
 ----------
@@ -22,7 +22,7 @@ comments: false
 
 **Additional resources**
 
-[http://git-scm.com/book/en/Git-Basics-Tagging](http://git-scm.com/book/en/Git-Basics-Tagging)
+<https://git-scm.com/book/en/Git-Basics-Tagging>
 
 ----------
 

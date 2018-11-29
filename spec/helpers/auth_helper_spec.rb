@@ -18,6 +18,40 @@ describe AuthHelper do
     end
   end
 
+  describe "providers_for_base_controller" do
+    it 'returns all enabled providers from devise' do
+      allow(helper).to receive(:auth_providers) { [:twitter, :github] }
+      expect(helper.providers_for_base_controller).to include(*[:twitter, :github])
+    end
+
+    it 'excludes ldap providers' do
+      allow(helper).to receive(:auth_providers) { [:twitter, :ldapmain] }
+      expect(helper.providers_for_base_controller).not_to include(:ldapmain)
+    end
+  end
+
+  describe "form_based_providers" do
+    it 'includes LDAP providers' do
+      allow(helper).to receive(:auth_providers) { [:twitter, :ldapmain] }
+      expect(helper.form_based_providers).to eq %i(ldapmain)
+    end
+
+    it 'includes crowd provider' do
+      allow(helper).to receive(:auth_providers) { [:twitter, :crowd] }
+      expect(helper.form_based_providers).to eq %i(crowd)
+    end
+  end
+
+  describe 'form_based_auth_provider_has_active_class?' do
+    it 'selects main LDAP server' do
+      allow(helper).to receive(:auth_providers) { [:twitter, :ldapprimary, :ldapsecondary, :kerberos] }
+      expect(helper.form_based_auth_provider_has_active_class?(:twitter)).to be(false)
+      expect(helper.form_based_auth_provider_has_active_class?(:ldapprimary)).to be(true)
+      expect(helper.form_based_auth_provider_has_active_class?(:ldapsecondary)).to be(false)
+      expect(helper.form_based_auth_provider_has_active_class?(:kerberos)).to be(false)
+    end
+  end
+
   describe 'enabled_button_based_providers' do
     before do
       allow(helper).to receive(:auth_providers) { [:twitter, :github] }

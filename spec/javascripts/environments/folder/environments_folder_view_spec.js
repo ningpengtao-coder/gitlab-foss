@@ -1,13 +1,15 @@
-import _ from 'underscore';
 import Vue from 'vue';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import environmentsFolderViewComponent from '~/environments/folder/environments_folder_view.vue';
-import { headersInterceptor } from 'spec/helpers/vue_resource_helper';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { environmentsList } from '../mock_data';
 
 describe('Environments Folder View', () => {
   let Component;
   let component;
+  let mock;
+
   const mockData = {
     endpoint: 'environments.json',
     folderName: 'review',
@@ -17,22 +19,27 @@ describe('Environments Folder View', () => {
   };
 
   beforeEach(() => {
+    mock = new MockAdapter(axios);
+
     Component = Vue.extend(environmentsFolderViewComponent);
   });
 
   afterEach(() => {
+    mock.restore();
+
     component.$destroy();
   });
 
-  describe('successfull request', () => {
-    const environmentsResponseInterceptor = (request, next) => {
-      next(request.respondWith(JSON.stringify({
-        environments: environmentsList,
-        stopped_count: 1,
-        available_count: 0,
-      }), {
-        status: 200,
-        headers: {
+  describe('successful request', () => {
+    beforeEach(() => {
+      mock.onGet(mockData.endpoint).reply(
+        200,
+        {
+          environments: environmentsList,
+          stopped_count: 1,
+          available_count: 0,
+        },
+        {
           'X-nExt-pAge': '2',
           'x-page': '1',
           'X-Per-Page': '2',
@@ -40,38 +47,26 @@ describe('Environments Folder View', () => {
           'X-TOTAL': '20',
           'X-Total-Pages': '10',
         },
-      }));
-    };
-
-    beforeEach(() => {
-      Vue.http.interceptors.push(environmentsResponseInterceptor);
-      Vue.http.interceptors.push(headersInterceptor);
+      );
 
       component = mountComponent(Component, mockData);
     });
 
-    afterEach(() => {
-      Vue.http.interceptors = _.without(
-        Vue.http.interceptors, environmentsResponseInterceptor,
-      );
-      Vue.http.interceptors = _.without(Vue.http.interceptors, headersInterceptor);
-    });
-
-    it('should render a table with environments', (done) => {
+    it('should render a table with environments', done => {
       setTimeout(() => {
         expect(component.$el.querySelectorAll('table')).not.toBeNull();
-        expect(
-          component.$el.querySelector('.environment-name').textContent.trim(),
-        ).toEqual(environmentsList[0].name);
+        expect(component.$el.querySelector('.environment-name').textContent.trim()).toEqual(
+          environmentsList[0].name,
+        );
         done();
       }, 0);
     });
 
-    it('should render available tab with count', (done) => {
+    it('should render available tab with count', done => {
       setTimeout(() => {
-        expect(
-          component.$el.querySelector('.js-environments-tab-available').textContent,
-        ).toContain('Available');
+        expect(component.$el.querySelector('.js-environments-tab-available').textContent).toContain(
+          'Available',
+        );
 
         expect(
           component.$el.querySelector('.js-environments-tab-available .badge').textContent,
@@ -80,11 +75,11 @@ describe('Environments Folder View', () => {
       }, 0);
     });
 
-    it('should render stopped tab with count', (done) => {
+    it('should render stopped tab with count', done => {
       setTimeout(() => {
-        expect(
-          component.$el.querySelector('.js-environments-tab-stopped').textContent,
-        ).toContain('Stopped');
+        expect(component.$el.querySelector('.js-environments-tab-stopped').textContent).toContain(
+          'Stopped',
+        );
 
         expect(
           component.$el.querySelector('.js-environments-tab-stopped .badge').textContent,
@@ -93,36 +88,37 @@ describe('Environments Folder View', () => {
       }, 0);
     });
 
-    it('should render parent folder name', (done) => {
+    it('should render parent folder name', done => {
       setTimeout(() => {
-        expect(
-          component.$el.querySelector('.js-folder-name').textContent.trim(),
-        ).toContain('Environments / review');
+        expect(component.$el.querySelector('.js-folder-name').textContent.trim()).toContain(
+          'Environments / review',
+        );
         done();
       }, 0);
     });
 
     describe('pagination', () => {
-      it('should render pagination', (done) => {
+      it('should render pagination', done => {
         setTimeout(() => {
-          expect(
-            component.$el.querySelectorAll('.gl-pagination'),
-          ).not.toBeNull();
+          expect(component.$el.querySelectorAll('.gl-pagination')).not.toBeNull();
           done();
         }, 0);
       });
 
-      it('should make an API request when changing page', (done) => {
+      it('should make an API request when changing page', done => {
         spyOn(component, 'updateContent');
         setTimeout(() => {
           component.$el.querySelector('.gl-pagination .js-last-button a').click();
 
-          expect(component.updateContent).toHaveBeenCalledWith({ scope: component.scope, page: '10' });
+          expect(component.updateContent).toHaveBeenCalledWith({
+            scope: component.scope,
+            page: '10',
+          });
           done();
         }, 0);
       });
 
-      it('should make an API request when using tabs', (done) => {
+      it('should make an API request when using tabs', done => {
         setTimeout(() => {
           spyOn(component, 'updateContent');
           component.$el.querySelector('.js-environments-tab-stopped').click();
@@ -135,38 +131,26 @@ describe('Environments Folder View', () => {
   });
 
   describe('unsuccessfull request', () => {
-    const environmentsErrorResponseInterceptor = (request, next) => {
-      next(request.respondWith(JSON.stringify([]), {
-        status: 500,
-      }));
-    };
-
     beforeEach(() => {
-      Vue.http.interceptors.push(environmentsErrorResponseInterceptor);
-    });
+      mock.onGet(mockData.endpoint).reply(500, {
+        environments: [],
+      });
 
-    afterEach(() => {
-      Vue.http.interceptors = _.without(
-        Vue.http.interceptors, environmentsErrorResponseInterceptor,
-      );
-    });
-
-    it('should not render a table', (done) => {
       component = mountComponent(Component, mockData);
+    });
 
+    it('should not render a table', done => {
       setTimeout(() => {
-        expect(
-          component.$el.querySelector('table'),
-        ).toBe(null);
+        expect(component.$el.querySelector('table')).toBe(null);
         done();
       }, 0);
     });
 
-    it('should render available tab with count 0', (done) => {
+    it('should render available tab with count 0', done => {
       setTimeout(() => {
-        expect(
-          component.$el.querySelector('.js-environments-tab-available').textContent,
-        ).toContain('Available');
+        expect(component.$el.querySelector('.js-environments-tab-available').textContent).toContain(
+          'Available',
+        );
 
         expect(
           component.$el.querySelector('.js-environments-tab-available .badge').textContent,
@@ -175,11 +159,11 @@ describe('Environments Folder View', () => {
       }, 0);
     });
 
-    it('should render stopped tab with count 0', (done) => {
+    it('should render stopped tab with count 0', done => {
       setTimeout(() => {
-        expect(
-          component.$el.querySelector('.js-environments-tab-stopped').textContent,
-        ).toContain('Stopped');
+        expect(component.$el.querySelector('.js-environments-tab-stopped').textContent).toContain(
+          'Stopped',
+        );
 
         expect(
           component.$el.querySelector('.js-environments-tab-stopped .badge').textContent,
@@ -190,30 +174,19 @@ describe('Environments Folder View', () => {
   });
 
   describe('methods', () => {
-    const environmentsEmptyResponseInterceptor = (request, next) => {
-      next(request.respondWith(JSON.stringify([]), {
-        status: 200,
-      }));
-    };
-
     beforeEach(() => {
-      Vue.http.interceptors.push(environmentsEmptyResponseInterceptor);
-      Vue.http.interceptors.push(headersInterceptor);
+      mock.onGet(mockData.endpoint).reply(200, {
+        environments: [],
+      });
 
       component = mountComponent(Component, mockData);
-      spyOn(history, 'pushState').and.stub();
-    });
-
-    afterEach(() => {
-      Vue.http.interceptors = _.without(
-        Vue.http.interceptors, environmentsEmptyResponseInterceptor,
-      );
-      Vue.http.interceptors = _.without(Vue.http.interceptors, headersInterceptor);
+      spyOn(window.history, 'pushState').and.stub();
     });
 
     describe('updateContent', () => {
-      it('should set given parameters', (done) => {
-        component.updateContent({ scope: 'stopped', page: '4' })
+      it('should set given parameters', done => {
+        component
+          .updateContent({ scope: 'stopped', page: '4' })
           .then(() => {
             expect(component.page).toEqual('4');
             expect(component.scope).toEqual('stopped');

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IssueTrackerService < Service
   validate :one_issue_tracker, if: :activated?, on: :manual_change
 
@@ -7,12 +9,12 @@ class IssueTrackerService < Service
   # Override this method on services that uses different patterns
   # This pattern does not support cross-project references
   # The other code assumes that this pattern is a superset of all
-  # overriden patterns. See ReferenceRegexes::EXTERNAL_PATTERN
+  # overridden patterns. See ReferenceRegexes.external_pattern
   def self.reference_pattern(only_long: false)
     if only_long
-      /(\b[A-Z][A-Z0-9_]+-)(?<issue>\d+)/
+      /(\b[A-Z][A-Z0-9_]*-)(?<issue>\d+)/
     else
-      /(\b[A-Z][A-Z0-9_]+-|#{Issue.reference_prefix})(?<issue>\d+)/
+      /(\b[A-Z][A-Z0-9_]*-|#{Issue.reference_prefix})(?<issue>\d+)/
     end
   end
 
@@ -77,16 +79,16 @@ class IssueTrackerService < Service
     result = false
 
     begin
-      response = HTTParty.head(self.project_url, verify: true)
+      response = Gitlab::HTTP.head(self.project_url, verify: true)
 
       if response
         message = "#{self.type} received response #{response.code} when attempting to connect to #{self.project_url}"
         result = true
       end
-    rescue HTTParty::Error, Timeout::Error, SocketError, Errno::ECONNRESET, Errno::ECONNREFUSED, OpenSSL::SSL::SSLError => error
+    rescue Gitlab::HTTP::Error, Timeout::Error, SocketError, Errno::ECONNRESET, Errno::ECONNREFUSED, OpenSSL::SSL::SSLError => error
       message = "#{self.type} had an error when trying to connect to #{self.project_url}: #{error.message}"
     end
-    Rails.logger.info(message)
+    log_info(message)
     result
   end
 

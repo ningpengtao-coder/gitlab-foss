@@ -3,7 +3,9 @@ unless Rails.env.production?
   require 'haml_lint/inline_javascript'
 
   # Workaround for warnings from parser/current
-  # TODO: Remove this after we update parser gem
+  # Keep it even if it no longer emits any warnings,
+  # because we'll still see warnings in console/server anyway,
+  # and we don't need to break static-analysis for this.
   task :haml_lint do
     require 'parser'
     def Parser.warn(*args)
