@@ -12,7 +12,7 @@ module GraphqlHelpers
 
   # Run a loader's named resolver
   def resolve(resolver_class, obj: nil, args: {}, ctx: {})
-    resolver_class.new(object: obj, context: ctx).resolve(args)
+    resolver_class.new(object: obj, context: ctx).resolve(**args)
   end
 
   # Runs a block inside a BatchLoader::Executor wrapper
@@ -111,7 +111,8 @@ module GraphqlHelpers
 
   def attributes_to_graphql(attributes)
     attributes.map do |name, value|
-      "#{GraphqlHelpers.fieldnamerize(name.to_s)}: \"#{value}\""
+      attribute = "#{GraphqlHelpers.fieldnamerize(name.to_s)}: "
+      attribute << (value.is_a?(Integer) || value.is_a?(Symbol) ? value.to_s : "\"#{value}\"")
     end.join(", ")
   end
 

@@ -9,3 +9,6 @@ module Types
     mount_mutation Mutations::MergeRequests::SetWip
   end
 end
+
+require_dependency Rails.root.join('ee', 'app', 'graphql', 'types', 'ee', 'mutation_type')
+Types::MutationType.prepend(EE::Types::MutationType)

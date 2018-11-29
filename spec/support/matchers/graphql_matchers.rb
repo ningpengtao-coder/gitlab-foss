@@ -58,6 +58,12 @@ RSpec::Matchers.define :have_graphql_type do |expected|
   end
 end
 
+RSpec::Matchers.define :have_graphql_connection_type do |expected|
+  match do |field|
+    expect(field.type).to eq(expected.connection_type)
+  end
+end
+
 RSpec::Matchers.define :have_graphql_resolver do |expected|
   match do |field|
     case expected

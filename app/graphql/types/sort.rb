@@ -6,5 +6,7 @@ module Types
     value "updated_asc", "Updated at ascending order"
     value "created_desc", "Created at descending order"
     value "created_asc", "Created at ascending order"
+    value "id_asc", "ID ascending order"
+    value "id_desc", "ID descending order"
   end
 end
