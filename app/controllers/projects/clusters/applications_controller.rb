@@ -1,25 +1,17 @@
-class Projects::Clusters::ApplicationsController < Projects::ApplicationController
-  before_action :cluster
-  before_action :application_class, only: [:create]
-  before_action :authorize_read_cluster!
-  before_action :authorize_create_cluster!, only: [:create]
+# frozen_string_literal: true
 
-  def create
-    Clusters::Applications::ScheduleInstallationService.new(project, current_user,
-                                                            application_class: @application_class,
-                                                            cluster: @cluster).execute
-    head :no_content
-  rescue StandardError
-    head :bad_request
-  end
+class Projects::Clusters::ApplicationsController < Clusters::ApplicationsController
+  include ProjectUnauthorized
+
+  prepend_before_action :project
 
   private
 
-  def cluster
-    @cluster ||= project.clusters.find(params[:id]) || render_404
+  def clusterable
+    @clusterable ||= ClusterablePresenter.fabricate(project, current_user: current_user)
   end
 
-  def application_class
-    @application_class ||= Clusters::Cluster::APPLICATIONS[params[:application]] || render_404
+  def project
+    @project ||= find_routable!(Project, File.join(params[:namespace_id], params[:project_id]), not_found_or_authorized_proc: project_unauthorized_proc)
   end
 end

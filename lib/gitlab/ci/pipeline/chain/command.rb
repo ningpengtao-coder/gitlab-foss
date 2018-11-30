@@ -1,3 +1,6 @@
+# rubocop:disable Naming/FileName
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Pipeline
@@ -7,7 +10,7 @@ module Gitlab
           :origin_ref, :checkout_sha, :after_sha, :before_sha,
           :trigger_request, :schedule,
           :ignore_skip_ci, :save_incompleted,
-          :seeds_block
+          :seeds_block, :variables_attributes
         ) do
           include Gitlab::Utils::StrongMemoize
 

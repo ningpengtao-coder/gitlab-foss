@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Banzai
   # Extract possible GFM references from an arbitrary String for further processing.
   class ReferenceExtractor
@@ -10,8 +12,8 @@ module Banzai
     end
 
     def references(type, project, current_user = nil)
-      processor = Banzai::ReferenceParser[type]
-        .new(project, current_user)
+      context = RenderContext.new(project, current_user)
+      processor = Banzai::ReferenceParser[type].new(context)
 
       processor.process(html_documents)
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'prometheus/client'
 
 module Gitlab
@@ -22,6 +24,14 @@ module Gitlab
         def prometheus_metrics_enabled?
           strong_memoize(:prometheus_metrics_enabled) do
             prometheus_metrics_enabled_unmemoized
+          end
+        end
+
+        def reset_registry!
+          clear_memoization(:registry)
+
+          REGISTRY_MUTEX.synchronize do
+            ::Prometheus::Client.reset!
           end
         end
 

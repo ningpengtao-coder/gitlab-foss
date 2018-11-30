@@ -1,4 +1,4 @@
-require "flowdock-git-hook"
+# frozen_string_literal: true
 
 class FlowdockService < Service
   prop_accessor :token
@@ -34,7 +34,7 @@ class FlowdockService < Service
       data[:before],
       data[:after],
       token: token,
-      repo: project.repository.path_to_repo,
+      repo: project.repository,
       repo_url: "#{Gitlab.config.gitlab.url}/#{project.full_path}",
       commit_url: "#{Gitlab.config.gitlab.url}/#{project.full_path}/commit/%s",
       diff_url: "#{Gitlab.config.gitlab.url}/#{project.full_path}/compare/%s...%s"

@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import wipComponent from '~/vue_merge_request_widget/components/states/mr_widget_wip';
+import WorkInProgress from '~/vue_merge_request_widget/components/states/work_in_progress.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 
 const createComponent = () => {
-  const Component = Vue.extend(wipComponent);
+  const Component = Vue.extend(WorkInProgress);
   const mr = {
     title: 'The best MR ever',
     removeWIPPath: '/path/to/remove/wip',
@@ -17,10 +17,10 @@ const createComponent = () => {
   });
 };
 
-describe('MRWidgetWIP', () => {
+describe('Wip', () => {
   describe('props', () => {
     it('should have props', () => {
-      const { mr, service } = wipComponent.props;
+      const { mr, service } = WorkInProgress.props;
 
       expect(mr.type instanceof Object).toBeTruthy();
       expect(mr.required).toBeTruthy();
@@ -33,6 +33,7 @@ describe('MRWidgetWIP', () => {
   describe('data', () => {
     it('should have default data', () => {
       const vm = createComponent();
+
       expect(vm.isMakingRequest).toBeFalsy();
     });
   });
@@ -43,22 +44,27 @@ describe('MRWidgetWIP', () => {
     };
 
     describe('removeWIP', () => {
-      it('should make a request to service and handle response', (done) => {
+      it('should make a request to service and handle response', done => {
         const vm = createComponent();
 
         spyOn(window, 'Flash').and.returnValue(true);
         spyOn(eventHub, '$emit');
-        spyOn(vm.service, 'removeWIP').and.returnValue(new Promise((resolve) => {
-          resolve({
-            data: mrObj,
-          });
-        }));
+        spyOn(vm.service, 'removeWIP').and.returnValue(
+          new Promise(resolve => {
+            resolve({
+              data: mrObj,
+            });
+          }),
+        );
 
         vm.removeWIP();
         setTimeout(() => {
           expect(vm.isMakingRequest).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('UpdateWidgetData', mrObj);
-          expect(window.Flash).toHaveBeenCalledWith('The merge request can now be merged.', 'notice');
+          expect(window.Flash).toHaveBeenCalledWith(
+            'The merge request can now be merged.',
+            'notice',
+          );
           done();
         }, 333);
       });
@@ -79,10 +85,12 @@ describe('MRWidgetWIP', () => {
       expect(el.innerText).toContain('This is a Work in Progress');
       expect(el.querySelector('button').getAttribute('disabled')).toBeTruthy();
       expect(el.querySelector('button').innerText).toContain('Merge');
-      expect(el.querySelector('.js-remove-wip').innerText).toContain('Resolve WIP status');
+      expect(el.querySelector('.js-remove-wip').innerText.replace(/\s\s+/g, ' ')).toContain(
+        'Resolve WIP status',
+      );
     });
 
-    it('should not show removeWIP button is user cannot update MR', (done) => {
+    it('should not show removeWIP button is user cannot update MR', done => {
       vm.mr.removeWIPPath = '';
 
       Vue.nextTick(() => {

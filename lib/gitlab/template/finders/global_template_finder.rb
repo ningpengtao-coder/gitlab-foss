@@ -1,4 +1,6 @@
-# Searches and reads file present on Gitlab installation directory
+# frozen_string_literal: true
+
+# Searches and reads file present on GitLab installation directory
 module Gitlab
   module Template
     module Finders
@@ -21,7 +23,7 @@ module Gitlab
         end
 
         def list_files_for(dir)
-          dir << '/' unless dir.end_with?('/')
+          dir = "#{dir}/" unless dir.end_with?('/')
           Dir.glob(File.join(dir, "*#{@extension}")).select { |f| f =~ self.class.filter_regex(@extension) }
         end
 

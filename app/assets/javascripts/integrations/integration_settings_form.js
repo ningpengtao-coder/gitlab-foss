@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import axios from '../lib/utils/axios_utils';
 import flash from '../flash';
 
@@ -90,23 +91,29 @@ export default class IntegrationSettingsForm {
     }
   }
 
-  /* eslint-disable promise/catch-or-return, no-new */
   /**
    * Test Integration config
    */
   testSettings(formData) {
     this.toggleSubmitBtnState(true);
 
-    return axios.put(this.testEndPoint, formData)
+    return axios
+      .put(this.testEndPoint, formData)
       .then(({ data }) => {
         if (data.error) {
-          flash(`${data.message} ${data.service_response}`, 'alert', document, {
-            title: 'Save anyway',
-            clickHandler: (e) => {
-              e.preventDefault();
-              this.$form.submit();
-            },
-          });
+          let flashActions;
+
+          if (data.test_failed) {
+            flashActions = {
+              title: 'Save anyway',
+              clickHandler: e => {
+                e.preventDefault();
+                this.$form.submit();
+              },
+            };
+          }
+
+          flash(`${data.message} ${data.service_response}`, 'alert', document, flashActions);
         } else {
           this.$form.submit();
         }

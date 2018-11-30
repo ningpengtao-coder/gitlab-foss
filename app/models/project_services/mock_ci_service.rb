@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 # For an example companion mocking service, see https://gitlab.com/gitlab-org/gitlab-mock-ci-service
 class MockCiService < CiService
   ALLOWED_STATES = %w[failed canceled running pending success success_with_warnings skipped not_found].freeze
 
   prop_accessor :mock_service_url
-  validates :mock_service_url, presence: true, url: true, if: :activated?
+  validates :mock_service_url, presence: true, public_url: true, if: :activated?
 
   def title
     'MockCI'
@@ -32,10 +34,9 @@ class MockCiService < CiService
   #   http://jenkins.example.com:8888/job/test1/scm/bySHA1/12d65c
   #
   def build_page(sha, ref)
-    url = [mock_service_url,
-           "#{project.namespace.path}/#{project.path}/status/#{sha}"]
-
-    URI.join(*url).to_s
+    Gitlab::Utils.append_path(
+      mock_service_url,
+      "#{project.namespace.path}/#{project.path}/status/#{sha}")
   end
 
   # Return string with build status or :error symbol
@@ -52,17 +53,16 @@ class MockCiService < CiService
   #
   #
   def commit_status(sha, ref)
-    response = HTTParty.get(commit_status_path(sha), verify: false)
+    response = Gitlab::HTTP.get(commit_status_path(sha), verify: false)
     read_commit_status(response)
   rescue Errno::ECONNREFUSED
     :error
   end
 
   def commit_status_path(sha)
-    url = [mock_service_url,
-           "#{project.namespace.path}/#{project.path}/status/#{sha}.json"]
-
-    URI.join(*url).to_s
+    Gitlab::Utils.append_path(
+      mock_service_url,
+      "#{project.namespace.path}/#{project.path}/status/#{sha}.json")
   end
 
   def read_commit_status(response)

@@ -1,9 +1,9 @@
-require 'json'
+# frozen_string_literal: true
 
 module RspecFlaky
   class Config
     def self.generate_report?
-      ENV['FLAKY_RSPEC_GENERATE_REPORT'] == 'true'
+      !!(ENV['FLAKY_RSPEC_GENERATE_REPORT'] =~ /1|true/)
     end
 
     def self.suite_flaky_examples_report_path

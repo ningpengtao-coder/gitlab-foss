@@ -8,7 +8,7 @@ require Rails.root.join('db', 'post_migrate', '20170313133418_rename_more_reserv
 # around this we use the DELETE cleaning strategy.
 describe RenameMoreReservedProjectNames, :delete do
   let(:migration) { described_class.new }
-  let!(:project) { create(:project) }
+  let!(:project) { create(:project) } # rubocop:disable RSpec/FactoriesInMigrationSpecs
 
   before do
     project.path = 'artifacts'
@@ -31,7 +31,16 @@ describe RenameMoreReservedProjectNames, :delete do
 
       context 'when exception is raised during rename' do
         before do
-          allow(project).to receive(:rename_repo).and_raise(StandardError)
+          service = instance_double('service')
+
+          allow(service)
+            .to receive(:execute)
+            .and_raise(Projects::AfterRenameService::RenameFailedError)
+
+          allow(Projects::AfterRenameService)
+            .to receive(:new)
+            .with(project)
+            .and_return(service)
         end
 
         it 'captures exception from project rename' do

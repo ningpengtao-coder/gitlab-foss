@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Git::AttributesParser, seed_helper: true do
+describe Gitlab::Git::AttributesParser, :seed_helper do
   let(:attributes_path) { File.join(SEED_STORAGE_PATH, 'with-git-attributes.git', 'info', 'attributes') }
   let(:data) { File.read(attributes_path) }
 
@@ -66,18 +66,6 @@ describe Gitlab::Git::AttributesParser, seed_helper: true do
       end
     end
 
-    context 'when attributes data is a file handle' do
-      subject do
-        File.open(attributes_path, 'r') do |file_handle|
-          described_class.new(file_handle)
-        end
-      end
-
-      it 'returns the attributes as a Hash' do
-        expect(subject.attributes('test.txt')).to eq({ 'text' => true })
-      end
-    end
-
     context 'when attributes data is nil' do
       let(:data) { nil }
 
@@ -106,7 +94,7 @@ describe Gitlab::Git::AttributesParser, seed_helper: true do
     # It's a bit hard to test for something _not_ being processed. As such we'll
     # just test the number of entries.
     it 'ignores any comments and empty lines' do
-      expect(subject.patterns.length).to eq(10)
+      expect(subject.patterns.length).to eq(12)
     end
   end
 
@@ -138,7 +126,7 @@ describe Gitlab::Git::AttributesParser, seed_helper: true do
 
   describe '#each_line' do
     it 'iterates over every line in the attributes file' do
-      args = [String] * 14 # the number of lines in the file
+      args = [String] * 16 # the number of lines in the file
 
       expect { |b| subject.each_line(&b) }.to yield_successive_args(*args)
     end

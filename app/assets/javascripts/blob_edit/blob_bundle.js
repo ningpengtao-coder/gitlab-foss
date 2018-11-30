@@ -1,5 +1,6 @@
-/* eslint-disable func-names, space-before-function-paren, prefer-arrow-callback, no-var, quotes, vars-on-top, no-unused-vars, no-new, max-len */
-/* global EditBlob */
+/* eslint-disable no-new */
+
+import $ from 'jquery';
 import NewCommitForm from '../new_commit_form';
 import EditBlob from './edit_blob';
 import BlobFileDropzone from '../blob/blob_file_dropzone';
@@ -12,11 +13,20 @@ export default () => {
   if (editBlobForm.length) {
     const urlRoot = editBlobForm.data('relativeUrlRoot');
     const assetsPath = editBlobForm.data('assetsPrefix');
-    const blobLanguage = editBlobForm.data('blobLanguage');
+    const filePath = editBlobForm.data('blobFilename');
     const currentAction = $('.js-file-title').data('currentAction');
+    const projectId = editBlobForm.data('project-id');
+    const commitButton = $('.js-commit-button');
 
-    new EditBlob(`${urlRoot}${assetsPath}`, blobLanguage, currentAction);
+    commitButton.on('click', () => {
+      window.onbeforeunload = null;
+    });
+
+    new EditBlob(`${urlRoot}${assetsPath}`, filePath, currentAction, projectId);
     new NewCommitForm(editBlobForm);
+
+    // returning here blocks page navigation
+    window.onbeforeunload = () => '';
   }
 
   if (uploadBlobForm.length) {

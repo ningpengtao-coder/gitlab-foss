@@ -1,4 +1,6 @@
-/* eslint-disable class-methods-use-this */
+import Api from '~/api';
+
+import $ from 'jquery';
 import Flash from '../flash';
 import FileTemplateTypeSelector from './template_selectors/type_selector';
 import BlobCiYamlSelector from './template_selectors/ci_yaml_selector';
@@ -7,9 +9,10 @@ import GitignoreSelector from './template_selectors/gitignore_selector';
 import LicenseSelector from './template_selectors/license_selector';
 
 export default class FileTemplateMediator {
-  constructor({ editor, currentAction }) {
+  constructor({ editor, currentAction, projectId }) {
     this.editor = editor;
     this.currentAction = currentAction;
+    this.projectId = projectId;
 
     this.initTemplateSelectors();
     this.initTemplateTypeSelector();
@@ -31,15 +34,14 @@ export default class FileTemplateMediator {
   initTemplateTypeSelector() {
     this.typeSelector = new FileTemplateTypeSelector({
       mediator: this,
-      dropdownData: this.templateSelectors
-        .map((templateSelector) => {
-          const cfg = templateSelector.config;
+      dropdownData: this.templateSelectors.map(templateSelector => {
+        const cfg = templateSelector.config;
 
-          return {
-            name: cfg.name,
-            key: cfg.key,
-          };
-        }),
+        return {
+          name: cfg.name,
+          key: cfg.key,
+        };
+      }),
     });
   }
 
@@ -87,12 +89,12 @@ export default class FileTemplateMediator {
   }
 
   listenForPreviewMode() {
-    this.$navLinks.on('click', 'a', (e) => {
+    this.$navLinks.on('click', 'a', e => {
       const urlPieces = e.target.href.split('#');
       const hash = urlPieces[1];
       if (hash === 'preview') {
         this.hideTemplateSelectorMenu();
-      } else if (hash === 'editor') {
+      } else if (hash === 'editor' && !this.typeSelector.isHidden()) {
         this.showTemplateSelectorMenu();
       }
     });
@@ -103,7 +105,7 @@ export default class FileTemplateMediator {
       e.preventDefault();
     }
 
-    this.templateSelectors.forEach((selector) => {
+    this.templateSelectors.forEach(selector => {
       if (selector.config.key === item.key) {
         selector.show();
       } else {
@@ -122,10 +124,10 @@ export default class FileTemplateMediator {
 
   selectTemplateFile(selector, query, data) {
     selector.renderLoading();
-    // in case undo menu is already already there
+    // in case undo menu is already there
     this.destroyUndoMenu();
-    this.fetchFileTemplate(selector.config.endpoint, query, data)
-      .then((file) => {
+    this.fetchFileTemplate(selector.config.type, query, data)
+      .then(file => {
         this.showUndoMenu();
         this.setEditorContent(file);
         this.setFilename(selector.config.name);
@@ -136,7 +138,7 @@ export default class FileTemplateMediator {
 
   displayMatchedTemplateSelector() {
     const currentInput = this.getFilename();
-    this.templateSelectors.forEach((selector) => {
+    this.templateSelectors.forEach(selector => {
       const match = selector.config.pattern.test(currentInput);
 
       if (match) {
@@ -147,15 +149,11 @@ export default class FileTemplateMediator {
     });
   }
 
-  fetchFileTemplate(apiCall, query, data) {
-    return new Promise((resolve) => {
+  fetchFileTemplate(type, query, data = {}) {
+    return new Promise(resolve => {
       const resolveFile = file => resolve(file);
 
-      if (!data) {
-        apiCall(query, resolveFile);
-      } else {
-        apiCall(query, data, resolveFile);
-      }
+      Api.projectTemplate(this.projectId, type, query, data, resolveFile);
     });
   }
 

@@ -35,10 +35,10 @@
     .label-container
       - if generic_commit_status.tags.any?
         - generic_commit_status.tags.each do |tag|
-          %span.label.label-primary
+          %span.badge.badge-primary
             = tag
       - if retried
-        %span.label.label-warning retried
+        %span.badge.badge-warning retried
 
   - if pipeline_link
     %td
@@ -48,7 +48,7 @@
       - if generic_commit_status.pipeline.user
         = user_avatar(user: generic_commit_status.pipeline.user, size: 20)
       - else
-        %span.api API
+        %span.monospace API
 
   - if admin
     %td

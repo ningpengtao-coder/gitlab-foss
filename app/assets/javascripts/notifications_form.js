@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { __ } from './locale';
 import axios from './lib/utils/axios_utils';
 import flash from './flash';
@@ -14,14 +15,15 @@ export default class NotificationsForm {
 
   toggleCheckbox(e) {
     const $checkbox = $(e.currentTarget);
-    const $parent = $checkbox.closest('.checkbox');
+    const $parent = $checkbox.closest('.form-check');
 
     this.saveEvent($checkbox, $parent);
   }
 
   // eslint-disable-next-line class-methods-use-this
   showCheckboxLoadingSpinner($parent) {
-    $parent.addClass('is-loading')
+    $parent
+      .addClass('is-loading')
       .find('.custom-notification-event-loading')
       .removeClass('fa-check')
       .addClass('fa-spin fa-spinner')
@@ -37,9 +39,12 @@ export default class NotificationsForm {
       .then(({ data }) => {
         $checkbox.enable();
         if (data.saved) {
-          $parent.find('.custom-notification-event-loading').toggleClass('fa-spin fa-spinner fa-check is-done');
+          $parent
+            .find('.custom-notification-event-loading')
+            .toggleClass('fa-spin fa-spinner fa-check is-done');
           setTimeout(() => {
-            $parent.removeClass('is-loading')
+            $parent
+              .removeClass('is-loading')
               .find('.custom-notification-event-loading')
               .toggleClass('fa-spin fa-spinner fa-check is-done');
           }, 2000);

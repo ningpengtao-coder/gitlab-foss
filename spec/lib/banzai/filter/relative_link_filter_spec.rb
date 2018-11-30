@@ -83,6 +83,11 @@ describe Banzai::Filter::RelativeLinkFilter do
     expect { filter(act) }.not_to raise_error
   end
 
+  it 'does not raise an exception with a space in the path' do
+    act = link("/uploads/d18213acd3732630991986120e167e3d/Landscape_8.jpg  \nBut here's some more unexpected text :smile:)")
+    expect { filter(act) }.not_to raise_error
+  end
+
   it 'ignores ref if commit is passed' do
     doc = filter(link('non/existent.file'), commit: project.commit('empty-branch') )
     expect(doc.at_css('a')['href'])
@@ -214,6 +219,23 @@ describe Banzai::Filter::RelativeLinkFilter do
       it 'correctly escapes the ref' do
         doc = filter(link('.gitkeep'))
         expect(doc.at_css('a')['href']).to eq "/#{project_path}/blob/#{Addressable::URI.escape(ref)}/foo/bar/.gitkeep"
+      end
+    end
+
+    context 'when ref name contains special chars' do
+      let(:ref) {'mark#\'@],+;-._/#@!$&()+down'}
+
+      it 'correctly escapes the ref' do
+        # Addressable won't escape the '#', so we do this manually
+        ref_escaped = 'mark%23\'@%5D,+;-._/%23@!$&()+down'
+
+        # Stub this method so the branch doesn't actually need to be in the repo
+        allow_any_instance_of(described_class).to receive(:uri_type).and_return(:raw)
+
+        doc = filter(link('files/images/logo-black.png'))
+
+        expect(doc.at_css('a')['href'])
+          .to eq "/#{project_path}/raw/#{ref_escaped}/files/images/logo-black.png"
       end
     end
 

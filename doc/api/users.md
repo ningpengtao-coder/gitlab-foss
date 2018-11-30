@@ -33,6 +33,20 @@ GET /users
 ]
 ```
 
+You can also search for users by email or username with: `/users?search=John`
+
+In addition, you can lookup users by username:
+
+```
+GET /users?username=:username
+```
+
+For example:
+
+```
+GET /users?username=jack_smith
+```
+
 In addition, you can filter users based on states eg. `blocked`, `active`
 This works only to filter users who are `blocked` or `active`.
 It does not support `active=false` or `blocked=false`.
@@ -45,6 +59,9 @@ GET /users?active=true
 GET /users?blocked=true
 ```
 
+NOTE: **Note:**
+Username search is case insensitive.
+
 ### For admins
 
 ```
@@ -53,8 +70,9 @@ GET /users
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `order_by` | string | no | Return projects ordered by `id`, `name`, `username`, `created_at`, or `updated_at` fields. Default is `id` |
-| `sort` | string | no | Return projects sorted in `asc` or `desc` order. Default is `desc` |
+| `order_by` | string | no | Return users ordered by `id`, `name`, `username`, `created_at`, or `updated_at` fields. Default is `id` |
+| `sort` | string | no | Return users sorted in `asc` or `desc` order. Default is `desc` |
+| `two_factor` | string | no | Filter users by Two-factor authentication. Filter values are `enabled` or `disabled`. By default it returns all users |
 
 ```json
 [
@@ -90,7 +108,8 @@ GET /users
     "can_create_group": true,
     "can_create_project": true,
     "two_factor_enabled": true,
-    "external": false
+    "external": false,
+    "private_profile": false
   },
   {
     "id": 2,
@@ -120,26 +139,13 @@ GET /users
     "can_create_group": true,
     "can_create_project": true,
     "two_factor_enabled": true,
-    "external": false
+    "external": false,
+    "private_profile": false
   }
 ]
 ```
 
-You can search for users by email or username with: `/users?search=John`
-
-In addition, you can lookup users by username:
-
-```
-GET /users?username=:username
-```
-
-For example:
-
-```
-GET /users?username=jack_smith
-```
-
-You can also lookup users by external UID and provider:
+You can lookup users by external UID and provider:
 
 ```
 GET /users?extern_uid=:extern_uid&provider=:provider
@@ -196,6 +202,7 @@ Parameters:
   "created_at": "2012-05-23T08:00:58Z",
   "bio": null,
   "location": null,
+  "public_email": "john@example.com",
   "skype": "",
   "linkedin": "",
   "twitter": "",
@@ -227,6 +234,7 @@ Parameters:
   "is_admin": false,
   "bio": null,
   "location": null,
+  "public_email": "john@example.com",
   "skype": "",
   "linkedin": "",
   "twitter": "",
@@ -247,7 +255,8 @@ Parameters:
   "can_create_group": true,
   "can_create_project": true,
   "two_factor_enabled": true,
-  "external": false
+  "external": false,
+  "private_profile": false
 }
 ```
 
@@ -259,7 +268,7 @@ GET /users/:id?with_custom_attributes=true
 
 ## User creation
 
-Creates a new user. Note only administrators can create new users. Either `password` or `reset_password` should be specified (`reset_password` takes priority).
+Creates a new user. Note only administrators can create new users. Either `password` or `reset_password` should be specified (`reset_password` takes priority). If `reset_password` is `false`, then `password` is required.
 
 ```
 POST /users
@@ -282,11 +291,13 @@ Parameters:
 - `provider` (optional)          - External provider name
 - `bio` (optional)               - User's biography
 - `location` (optional)          - User's location
+- `public_email` (optional)      - The public email of the user
 - `admin` (optional)             - User is admin - true or false (default)
 - `can_create_group` (optional)  - User can create groups - true or false
 - `skip_confirmation` (optional) - Skip confirmation - true or false (default)
 - `external` (optional)          - Flags the user as external - true or false(default)
 - `avatar` (optional)            - Image file for user's avatar
+- `private_profile` (optional)   - User's profile is private - true or false
 
 ## User modification
 
@@ -298,25 +309,27 @@ PUT /users/:id
 
 Parameters:
 
-- `email`                       - Email
-- `username`                    - Username
-- `name`                        - Name
-- `password`                    - Password
-- `skype`                       - Skype ID
-- `linkedin`                    - LinkedIn
-- `twitter`                     - Twitter account
-- `website_url`                 - Website URL
-- `organization`                - Organization name
-- `projects_limit`              - Limit projects each user can create
-- `extern_uid`                  - External UID
-- `provider`                    - External provider name
-- `bio`                         - User's biography
-- `location` (optional)         - User's location
-- `admin` (optional)            - User is admin - true or false (default)
-- `can_create_group` (optional) - User can create groups - true or false
+- `email`                          - Email
+- `username`                       - Username
+- `name`                           - Name
+- `password`                       - Password
+- `skype`                          - Skype ID
+- `linkedin`                       - LinkedIn
+- `twitter`                        - Twitter account
+- `website_url`                    - Website URL
+- `organization`                   - Organization name
+- `projects_limit`                 - Limit projects each user can create
+- `extern_uid`                     - External UID
+- `provider`                       - External provider name
+- `bio`                            - User's biography
+- `location` (optional)            - User's location
+- `public_email` (optional)        - The public email of the user
+- `admin` (optional)               - User is admin - true or false (default)
+- `can_create_group` (optional)    - User can create groups - true or false
 - `skip_reconfirmation` (optional) - Skip reconfirmation - true or false (default)
-- `external` (optional)         - Flags the user as external - true or false(default)
-- `avatar` (optional)           - Image file for user's avatar
+- `external` (optional)            - Flags the user as external - true or false(default)
+- `avatar` (optional)              - Image file for user's avatar
+- `private_profile` (optional)     - User's profile is private - true or false
 
 On password update, user will be forced to change it upon next login.
 Note, at the moment this method does only return a `404` error,
@@ -361,6 +374,7 @@ GET /user
   "created_at": "2012-05-23T08:00:58Z",
   "bio": null,
   "location": null,
+  "public_email": "john@example.com",
   "skype": "",
   "linkedin": "",
   "twitter": "",
@@ -381,7 +395,8 @@ GET /user
   "can_create_group": true,
   "can_create_project": true,
   "two_factor_enabled": true,
-  "external": false
+  "external": false,
+  "private_profile": false
 }
 ```
 
@@ -408,6 +423,7 @@ GET /user
   "is_admin": false,
   "bio": null,
   "location": null,
+  "public_email": "john@example.com",
   "skype": "",
   "linkedin": "",
   "twitter": "",
@@ -428,7 +444,85 @@ GET /user
   "can_create_group": true,
   "can_create_project": true,
   "two_factor_enabled": true,
-  "external": false
+  "external": false,
+  "private_profile": false
+}
+```
+
+## User status
+
+Get the status of the currently signed in user.
+
+```
+GET /user/status
+```
+
+```bash
+curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/user/status"
+```
+
+Example response:
+
+```json
+{
+  "emoji":"coffee",
+  "message":"I crave coffee :coffee:",
+  "message_html": "I crave coffee <gl-emoji title=\"hot beverage\" data-name=\"coffee\" data-unicode-version=\"4.0\">☕</gl-emoji>"
+}
+```
+
+## Get the status of a user
+
+Get the status of a user.
+
+```
+GET /users/:id_or_username/status
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id_or_username` | string | yes    | The id or username of the user to get a status of |
+
+```bash
+curl "https://gitlab.example.com/users/janedoe/status"
+```
+
+Example response:
+
+```json
+{
+  "emoji":"coffee",
+  "message":"I crave coffee :coffee:",
+  "message_html": "I crave coffee <gl-emoji title=\"hot beverage\" data-name=\"coffee\" data-unicode-version=\"4.0\">☕</gl-emoji>"
+}
+```
+
+## Set user status
+
+Set the status of the current user.
+
+```
+PUT /user/status
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `emoji`   | string | no     | The name of the emoji to use as status, if omitted `speech_balloon` is used. Emoji name can be one of the specified names in the [Gemojione index][gemojione-index]. |
+| `message` | string | no     | The message to set as a status. It can also contain emoji codes. |
+
+When both parameters `emoji` and `message` are empty, the status will be cleared.
+
+```bash
+curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" --data "emoji=coffee" --data "message=I crave coffee" https://gitlab.example.com/api/v4/user/status
+```
+
+Example responses
+
+```json
+{
+  "emoji":"coffee",
+  "message":"I crave coffee",
+  "message_html": "I crave coffee"
 }
 ```
 
@@ -467,7 +561,7 @@ Parameters:
 
 ## List SSH keys for user
 
-Get a list of a specified user's SSH keys. Available only for admin
+Get a list of a specified user's SSH keys.
 
 ```
 GET /users/:id/keys
@@ -887,6 +981,7 @@ Parameters:
 
 - `id` (required)    - id of specified user
 - `email` (required) - email address
+- `skip_confirmation` (optional) - Skip confirmation and assume e-mail is verified - true or false (default)
 
 ## Delete email for current user
 
@@ -977,7 +1072,6 @@ Example response:
 [
    {
       "active" : true,
-      "token" : "EsMo-vhKfXGwX9RKrwiy",
       "scopes" : [
          "api"
       ],
@@ -994,7 +1088,6 @@ Example response:
          "read_user"
       ],
       "revoked" : true,
-      "token" : "ZcZRpLeEuQRprkRjYydY",
       "name" : "mytoken2",
       "created_at" : "2017-03-17T17:19:28.697Z",
       "id" : 3,
@@ -1030,7 +1123,6 @@ Example response:
 ```json
 {
    "active" : true,
-   "token" : "EsMo-vhKfXGwX9RKrwiy",
    "scopes" : [
       "api"
    ],
@@ -1046,6 +1138,8 @@ Example response:
 ## Create an impersonation token
 
 > Requires admin permissions.
+
+> Token values are returned once. Make sure you save it - you won't be able to access it again.
 
 It creates a new impersonation token. Note that only administrators can do this.
 You are only able to create impersonation tokens to impersonate the user and perform
@@ -1159,3 +1253,5 @@ Example response:
 ```
 
 Please note that `last_activity_at` is deprecated, please use `last_activity_on`.
+
+[gemojione-index]: https://github.com/jonathanwiesel/gemojione/blob/master/config/index.json

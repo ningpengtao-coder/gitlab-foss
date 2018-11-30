@@ -1,14 +1,17 @@
-/* eslint-disable no-param-reassign, class-methods-use-this */
+/* eslint-disable class-methods-use-this */
 
+import $ from 'jquery';
 import Cookies from 'js-cookie';
 import Pager from './pager';
 import { localTimeAgo } from './lib/utils/datetime_utility';
 
 export default class Activities {
-  constructor() {
-    Pager.init(20, true, false, data => data, this.updateTooltips);
+  constructor(container = '') {
+    this.container = container;
 
-    $('.event-filter-link').on('click', (e) => {
+    Pager.init(20, true, false, data => data, this.updateTooltips, this.container);
+
+    $('.event-filter-link').on('click', e => {
       e.preventDefault();
       this.toggleFilter(e.currentTarget);
       this.reloadActivities();
@@ -21,7 +24,7 @@ export default class Activities {
 
   reloadActivities() {
     $('.content_list').html('');
-    Pager.init(20, true, false, data => data, this.updateTooltips);
+    Pager.init(20, true, false, data => data, this.updateTooltips, this.container);
   }
 
   toggleFilter(sender) {

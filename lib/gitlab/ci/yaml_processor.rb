@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     class YamlProcessor
@@ -7,8 +9,8 @@ module Gitlab
 
       attr_reader :cache, :stages, :jobs
 
-      def initialize(config)
-        @ci_config = Gitlab::Ci::Config.new(config)
+      def initialize(config, opts = {})
+        @ci_config = Gitlab::Ci::Config.new(config, opts)
         @config = @ci_config.to_hash
 
         unless @ci_config.valid?
@@ -16,7 +18,7 @@ module Gitlab
         end
 
         initial_parsing
-      rescue Gitlab::Ci::Config::Loader::FormatError => e
+      rescue Gitlab::Ci::Config::ConfigError => e
         raise ValidationError, e.message
       end
 
@@ -27,7 +29,7 @@ module Gitlab
       end
 
       def build_attributes(name)
-        job = @jobs[name.to_sym] || {}
+        job = @jobs.fetch(name.to_sym, {})
 
         { stage_idx: @stages.index(job[:stage]),
           stage: job[:stage],
@@ -49,41 +51,38 @@ module Gitlab
             script: job[:script],
             after_script: job[:after_script],
             environment: job[:environment],
-            retry: job[:retry]
+            retry: job[:retry],
+            parallel: job[:parallel],
+            instance: job[:instance],
+            start_in: job[:start_in]
           }.compact }
       end
 
-      def pipeline_stage_builds(stage, pipeline)
-        selected_jobs = @jobs.select do |_, job|
-          next unless job[:stage] == stage
-
-          only_specs = Gitlab::Ci::Build::Policy
-            .fabricate(job.fetch(:only, {}))
-          except_specs = Gitlab::Ci::Build::Policy
-            .fabricate(job.fetch(:except, {}))
-
-          only_specs.all? { |spec| spec.satisfied_by?(pipeline) } &&
-            except_specs.none? { |spec| spec.satisfied_by?(pipeline) }
-        end
-
-        selected_jobs.map { |_, job| build_attributes(job[:name]) }
+      def stage_builds_attributes(stage)
+        @jobs.values
+          .select { |job| job[:stage] == stage }
+          .map { |job| build_attributes(job[:name]) }
       end
 
-      def stage_seeds(pipeline)
-        seeds = @stages.uniq.map do |stage|
-          builds = pipeline_stage_builds(stage, pipeline)
+      def stages_attributes
+        @stages.uniq.map do |stage|
+          seeds = stage_builds_attributes(stage).map do |attributes|
+            job = @jobs.fetch(attributes[:name].to_sym)
 
-          Gitlab::Ci::Stage::Seed.new(pipeline, stage, builds) if builds.any?
+            attributes
+              .merge(only: job.fetch(:only, {}))
+              .merge(except: job.fetch(:except, {}))
+          end
+
+          { name: stage, index: @stages.index(stage), builds: seeds }
         end
-
-        seeds.compact
       end
 
-      def self.validation_message(content)
+      def self.validation_message(content, opts = {})
         return 'Please provide content of .gitlab-ci.yml' if content.blank?
 
         begin
-          Gitlab::Ci::YamlProcessor.new(content)
+          Gitlab::Ci::YamlProcessor.new(content, opts)
           nil
         rescue ValidationError => e
           e.message
@@ -107,7 +106,7 @@ module Gitlab
         ##
         # Jobs
         #
-        @jobs = @ci_config.jobs
+        @jobs = Ci::Config::Normalizer.new(@ci_config.jobs).normalize_jobs
 
         @jobs.each do |name, job|
           # logical validation for job

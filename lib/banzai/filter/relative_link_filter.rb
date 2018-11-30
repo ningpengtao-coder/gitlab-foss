@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 module Banzai
@@ -58,7 +60,11 @@ module Banzai
           path_parts.unshift(relative_url_root, project.full_path)
         end
 
-        path = Addressable::URI.escape(File.join(*path_parts))
+        begin
+          path = Addressable::URI.escape(File.join(*path_parts))
+        rescue Addressable::URI::InvalidURIError
+          return
+        end
 
         html_attr.value =
           if context[:only_path]
@@ -84,7 +90,7 @@ module Banzai
           relative_url_root,
           project.full_path,
           uri_type(file_path),
-          Addressable::URI.escape(ref),
+          Addressable::URI.escape(ref).gsub('#', '%23'),
           Addressable::URI.escape(file_path)
         ].compact.join('/').squeeze('/').chomp('/')
 

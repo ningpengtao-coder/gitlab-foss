@@ -22,7 +22,7 @@ describe Groups::TransferService, :postgresql do
       end
     end
 
-    context "when there's an exception on Gitlab shell directories" do
+    context "when there's an exception on GitLab shell directories" do
       let(:new_parent_group) { create(:group, :public) }
 
       before do
@@ -177,7 +177,7 @@ describe Groups::TransferService, :postgresql do
 
         it 'should add an error on group' do
           transfer_service.execute(new_parent_group)
-          expect(transfer_service.error).to eq('Transfer failed: Validation failed: Path has already been taken')
+          expect(transfer_service.error).to eq('Transfer failed: Validation failed: Group URL has already been taken')
         end
       end
 
@@ -222,8 +222,8 @@ describe Groups::TransferService, :postgresql do
           expect(new_parent_group.children.first).to eq(group)
         end
 
-        it 'should create a permanent redirect for the group' do
-          expect(group.redirect_routes.permanent.count).to eq(1)
+        it 'should create a redirect for the group' do
+          expect(group.redirect_routes.count).to eq(1)
         end
       end
 
@@ -243,10 +243,10 @@ describe Groups::TransferService, :postgresql do
           end
         end
 
-        it 'should create permanent redirects for the subgroups' do
-          expect(group.redirect_routes.permanent.count).to eq(1)
-          expect(subgroup1.redirect_routes.permanent.count).to eq(1)
-          expect(subgroup2.redirect_routes.permanent.count).to eq(1)
+        it 'should create redirects for the subgroups' do
+          expect(group.redirect_routes.count).to eq(1)
+          expect(subgroup1.redirect_routes.count).to eq(1)
+          expect(subgroup2.redirect_routes.count).to eq(1)
         end
 
         context 'when the new parent has a higher visibility than the children' do
@@ -287,9 +287,9 @@ describe Groups::TransferService, :postgresql do
         end
 
         it 'should create permanent redirects for the projects' do
-          expect(group.redirect_routes.permanent.count).to eq(1)
-          expect(project1.redirect_routes.permanent.count).to eq(1)
-          expect(project2.redirect_routes.permanent.count).to eq(1)
+          expect(group.redirect_routes.count).to eq(1)
+          expect(project1.redirect_routes.count).to eq(1)
+          expect(project2.redirect_routes.count).to eq(1)
         end
 
         context 'when the new parent has a higher visibility than the projects' do
@@ -338,16 +338,16 @@ describe Groups::TransferService, :postgresql do
           end
         end
 
-        it 'should create permanent redirect for the subgroups and projects' do
-          expect(group.redirect_routes.permanent.count).to eq(1)
-          expect(subgroup1.redirect_routes.permanent.count).to eq(1)
-          expect(subgroup2.redirect_routes.permanent.count).to eq(1)
-          expect(project1.redirect_routes.permanent.count).to eq(1)
-          expect(project2.redirect_routes.permanent.count).to eq(1)
+        it 'should create redirect for the subgroups and projects' do
+          expect(group.redirect_routes.count).to eq(1)
+          expect(subgroup1.redirect_routes.count).to eq(1)
+          expect(subgroup2.redirect_routes.count).to eq(1)
+          expect(project1.redirect_routes.count).to eq(1)
+          expect(project2.redirect_routes.count).to eq(1)
         end
       end
 
-      context 'when transfering a group with nested groups and projects' do
+      context 'when transferring a group with nested groups and projects' do
         let!(:group) { create(:group, :public) }
         let!(:project1) { create(:project, :repository, :private, namespace: group) }
         let!(:subgroup1) { create(:group, :private, parent: group) }
@@ -380,12 +380,12 @@ describe Groups::TransferService, :postgresql do
           end
         end
 
-        it 'should create permanent redirect for the subgroups and projects' do
-          expect(group.redirect_routes.permanent.count).to eq(1)
-          expect(project1.redirect_routes.permanent.count).to eq(1)
-          expect(subgroup1.redirect_routes.permanent.count).to eq(1)
-          expect(nested_subgroup.redirect_routes.permanent.count).to eq(1)
-          expect(nested_project.redirect_routes.permanent.count).to eq(1)
+        it 'should create redirect for the subgroups and projects' do
+          expect(group.redirect_routes.count).to eq(1)
+          expect(project1.redirect_routes.count).to eq(1)
+          expect(subgroup1.redirect_routes.count).to eq(1)
+          expect(nested_subgroup.redirect_routes.count).to eq(1)
+          expect(nested_project.redirect_routes.count).to eq(1)
         end
       end
 

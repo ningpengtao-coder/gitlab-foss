@@ -47,11 +47,42 @@ describe Projects::NotesController do
       get :index, request_params
     end
 
+    context 'when user notes_filter is present' do
+      let(:notes_json) { parsed_response[:notes] }
+      let!(:comment) { create(:note, noteable: issue, project: project) }
+      let!(:system_note) { create(:note, noteable: issue, project: project, system: true) }
+
+      it 'filters system notes by comments' do
+        user.set_notes_filter(UserPreference::NOTES_FILTERS[:only_comments], issue)
+
+        get :index, request_params
+
+        expect(notes_json.count).to eq(1)
+        expect(notes_json.first[:id].to_i).to eq(comment.id)
+      end
+
+      it 'returns all notes' do
+        user.set_notes_filter(UserPreference::NOTES_FILTERS[:all_notes], issue)
+
+        get :index, request_params
+
+        expect(notes_json.map { |note| note[:id].to_i }).to contain_exactly(comment.id, system_note.id)
+      end
+
+      it 'does not merge label event notes' do
+        user.set_notes_filter(UserPreference::NOTES_FILTERS[:only_comments], issue)
+
+        expect(ResourceEvents::MergeIntoNotesService).not_to receive(:new)
+
+        get :index, request_params
+      end
+    end
+
     context 'for a discussion note' do
       let(:project) { create(:project, :repository) }
       let!(:note) { create(:discussion_note_on_merge_request, project: project) }
 
-      let(:params) { request_params.merge(target_type: 'merge_request', target_id: note.noteable_id) }
+      let(:params) { request_params.merge(target_type: 'merge_request', target_id: note.noteable_id, html: true) }
 
       it 'responds with the expected attributes' do
         get :index, params
@@ -67,7 +98,7 @@ describe Projects::NotesController do
       let(:project) { create(:project, :repository) }
       let!(:note) { create(:diff_note_on_merge_request, project: project) }
 
-      let(:params) { request_params.merge(target_type: 'merge_request', target_id: note.noteable_id) }
+      let(:params) { request_params.merge(target_type: 'merge_request', target_id: note.noteable_id, html: true) }
 
       it 'responds with the expected attributes' do
         get :index, params
@@ -86,7 +117,7 @@ describe Projects::NotesController do
       context 'when displayed on a merge request' do
         let(:merge_request) { create(:merge_request, source_project: project) }
 
-        let(:params) { request_params.merge(target_type: 'merge_request', target_id: merge_request.id) }
+        let(:params) { request_params.merge(target_type: 'merge_request', target_id: merge_request.id, html: true) }
 
         it 'responds with the expected attributes' do
           get :index, params
@@ -99,7 +130,7 @@ describe Projects::NotesController do
       end
 
       context 'when displayed on the commit' do
-        let(:params) { request_params.merge(target_type: 'commit', target_id: note.commit_id) }
+        let(:params) { request_params.merge(target_type: 'commit', target_id: note.commit_id, html: true) }
 
         it 'responds with the expected attributes' do
           get :index, params
@@ -128,7 +159,7 @@ describe Projects::NotesController do
     context 'for a regular note' do
       let!(:note) { create(:note_on_merge_request, project: project) }
 
-      let(:params) { request_params.merge(target_type: 'merge_request', target_id: note.noteable_id) }
+      let(:params) { request_params.merge(target_type: 'merge_request', target_id: note.noteable_id, html: true) }
 
       it 'responds with the expected attributes' do
         get :index, params
@@ -154,7 +185,7 @@ describe Projects::NotesController do
         get :index, request_params
 
         expect(parsed_response[:notes].count).to eq(1)
-        expect(note_json[:id]).to eq(note.id)
+        expect(note_json[:id]).to eq(note.id.to_s)
       end
 
       it 'does not result in N+1 queries' do
@@ -205,6 +236,14 @@ describe Projects::NotesController do
       post :create, request_params.merge(format: :json)
 
       expect(response).to have_gitlab_http_status(200)
+    end
+
+    it 'returns discussion JSON when the return_discussion param is set' do
+      post :create, request_params.merge(format: :json, return_discussion: 'true')
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response).to have_key 'discussion'
+      expect(json_response['discussion']['notes'][0]['note']).to eq(request_params[:note][:note])
     end
 
     context 'when merge_request_diff_head_sha present' do
@@ -293,7 +332,7 @@ describe Projects::NotesController do
 
       context 'when a noteable is not found' do
         it 'returns 404 status' do
-          request_params[:note][:noteable_id] = 9999
+          request_params[:target_id] = 9999
           post :create, request_params.merge(format: :json)
 
           expect(response).to have_gitlab_http_status(404)
@@ -475,7 +514,7 @@ describe Projects::NotesController do
           end
 
           it "returns the name of the resolving user" do
-            post :resolve, request_params
+            post :resolve, request_params.merge(html: true)
 
             expect(JSON.parse(response.body)["resolved_by"]).to eq(user.name)
           end

@@ -9,6 +9,32 @@
       "title": { "type": "string" },
       "description": { "type": ["string", "null"] },
       "state": { "type": "string" },
+      "merged_by": {
+        "type": ["object", "null"],
+        "properties": {
+          "name": { "type": "string" },
+          "username": { "type": "string" },
+          "id": { "type": "integer" },
+          "state": { "type": "string" },
+          "avatar_url": { "type": "uri" },
+          "web_url": { "type": "uri" }
+        },
+        "additionalProperties": false
+      },
+      "merged_at": { "type": ["date", "null"] },
+      "closed_by": {
+        "type": ["object", "null"],
+        "properties": {
+          "name": { "type": "string" },
+          "username": { "type": "string" },
+          "id": { "type": "integer" },
+          "state": { "type": "string" },
+          "avatar_url": { "type": "uri" },
+          "web_url": { "type": "uri" }
+        },
+        "additionalProperties": false
+      },
+      "closed_at": { "type": ["date", "null"] },
       "created_at": { "type": "date" },
       "updated_at": { "type": "date" },
       "target_branch": { "type": "string" },
@@ -75,12 +101,14 @@
       "force_remove_source_branch": { "type": ["boolean", "null"] },
       "discussion_locked": { "type": ["boolean", "null"] },
       "web_url": { "type": "uri" },
+      "squash": { "type": "boolean" },
       "time_stats": {
         "time_estimate": { "type": "integer" },
         "total_time_spent": { "type": "integer" },
         "human_time_estimate": { "type": ["string", "null"] },
         "human_total_time_spent": { "type": ["string", "null"] }
       },
+      "allow_collaboration": { "type": ["boolean", "null"] },
       "allow_maintainer_to_push": { "type": ["boolean", "null"] }
     },
     "required": [
@@ -91,7 +119,7 @@
       "labels", "work_in_progress", "milestone", "merge_when_pipeline_succeeds",
       "merge_status", "sha", "merge_commit_sha", "user_notes_count",
       "should_remove_source_branch", "force_remove_source_branch",
-      "web_url"
+      "web_url", "squash"
     ],
     "additionalProperties": false
   }

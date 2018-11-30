@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Gitlab::Utils do
-  delegate :to_boolean, :boolean_to_yes_no, :slugify, :random_string, :which, :ensure_array_from_string, to: :described_class
+  delegate :to_boolean, :boolean_to_yes_no, :slugify, :random_string, :which, :ensure_array_from_string,
+   :bytes_to_megabytes, :append_path, to: :described_class
 
   describe '.slugify' do
     {
@@ -95,6 +96,35 @@ describe Gitlab::Utils do
       str = 'seven, eight, 9, 10'
 
       expect(ensure_array_from_string(str)).to eq(%w[seven eight 9 10])
+    end
+  end
+
+  describe '.bytes_to_megabytes' do
+    it 'converts bytes to megabytes' do
+      bytes = 1.megabyte
+
+      expect(bytes_to_megabytes(bytes)).to eq(1)
+    end
+  end
+
+  describe '.append_path' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:host, :path, :result) do
+      'http://test/'  | '/foo/bar'  |  'http://test/foo/bar'
+      'http://test/'  | '//foo/bar' |  'http://test/foo/bar'
+      'http://test//' | '/foo/bar'  |  'http://test/foo/bar'
+      'http://test'   | 'foo/bar'   |  'http://test/foo/bar'
+      'http://test//' | ''          |  'http://test/'
+      'http://test//' | nil         |  'http://test/'
+      ''              | '/foo/bar'  |  '/foo/bar'
+      nil             | '/foo/bar'  |  '/foo/bar'
+    end
+
+    with_them do
+      it 'makes sure there is only one slash as path separator' do
+        expect(append_path(host, path)).to eq(result)
+      end
     end
   end
 end

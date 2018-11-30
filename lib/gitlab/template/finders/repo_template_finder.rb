@@ -1,4 +1,6 @@
-# Searches and reads files present on each Gitlab project repository
+# frozen_string_literal: true
+
+# Searches and reads files present on each GitLab project repository
 module Gitlab
   module Template
     module Finders
@@ -27,18 +29,18 @@ module Gitlab
           directory = select_directory(file_name)
           raise FileNotFoundError if directory.nil?
 
-          category_directory(directory) + file_name
+          File.join(category_directory(directory), file_name)
         end
 
         def list_files_for(dir)
           return [] unless @commit
 
-          dir << '/' unless dir.end_with?('/')
+          dir = "#{dir}/" unless dir.end_with?('/')
 
           entries = @repository.tree(:head, dir).entries
 
-          names = entries.map(&:name)
-          names.select { |f| f =~ self.class.filter_regex(@extension) }
+          paths = entries.map(&:path)
+          paths.select { |f| f =~ self.class.filter_regex(@extension) }
         end
 
         private
@@ -47,10 +49,10 @@ module Gitlab
           return [] unless @commit
 
           # Insert root as directory
-          directories = ["", @categories.keys]
+          directories = ["", *@categories.keys]
 
           directories.find do |category|
-            path = category_directory(category) + file_name
+            path = File.join(category_directory(category), file_name)
             @repository.blob_at(@commit.id, path)
           end
         end

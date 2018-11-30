@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import imageDiffHelper from './helpers/index';
 import ImageBadge from './image_badge';
 import { isImageLoaded } from '../lib/utils/image_utility';
@@ -59,8 +60,10 @@ export default class ImageDiff {
   }
 
   renderBadge(discussionEl, index) {
-    const imageBadge = imageDiffHelper
-      .generateBadgeFromDiscussionDOM(this.imageFrameEl, discussionEl);
+    const imageBadge = imageDiffHelper.generateBadgeFromDiscussionDOM(
+      this.imageFrameEl,
+      discussionEl,
+    );
 
     this.imageBadges.push(imageBadge);
 
