@@ -35,5 +35,5 @@ markdown(<<~MARKDOWN)
 
   Also consider auto-formatting [on-save].
 
-  [on-save]: https://docs.gitlab.com/ee/development/new_fe_guide/style/prettier.html
+  [on-save]: https://docs.gitlab.com/ee/development/fe_guide/style/prettier.html
 MARKDOWN
