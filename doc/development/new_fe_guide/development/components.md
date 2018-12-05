@@ -1,5 +1,9 @@
 # Components
 
+## Component Library
+
+Our base Vue components are in the [gitlab-ui](https://gitlab.com/gitlab-org/gitlab-ui) repository. Docs and examples for them are available on [gitlab-ui storybook](https://gitlab-org.gitlab.io/gitlab-ui/).
+
 ## Icons
 
 Icons should be added to the [gitlab-svgs project][gitlab-svgs-project]. Once new icons are added, please have the maintainer update the gitlab-svgs dependency on NPM and on gitlab-ce. The gitlab-ee repo will be updated from the automatic CE->EE merge.
@@ -32,7 +36,7 @@ Import `spriteIcon` from [common_utils.js][common-utils]. Calling `spriteIcon(ic
 
 ## Illustrations
 
-Illustrations are also stored in the `gitlab-svgs` project. For consistent sizing and padding they can be wrapped by an element with the `svg-content` class.
+Illustrations are stored in the [gitlab-svgs project][gitlab-svgs-project]. For consistent sizing and padding they should be wrapped by an `.svg-content` element.
 
 ### In HAML
 
@@ -47,52 +51,22 @@ Illustrations can be referenced using the `image_tag` helper.
 
 ### In Vue
 
-SVGs can be added to templates using `v-html`. We don't need change detection for the SVG, so we add it in the `created` hook rather than using `data`.
+We can import SVG content directly, then add it to templates using `v-html`. The SVG content doesn't need Vue's change detection, so we access it using [`$options`][vue-options].
 
 ```
 <script>
-import svg from 'images/illustrations/todos_empty.svg';
+import todosEmptySvg from 'images/illustrations/todos_empty.svg';
 
 export default {
-  created() {
-    this.todosEmptySvg = svg;
-  },
+  todosEmptySvg,
 };
 </script>
 
 <template>
   <div class="svg-content">
-    <div v-html="todosEmptySvg"></div>
+    <div v-html="$options.todosEmptySvg"></div>
   </div>
 </template>
-```
-
-## Dropdowns
-
-> Note: There are multiple dropdown implementations in GitLab: Select2, DropLab, glDropdown and Bootstrap dropdowns. We will eventually align to one method for dropdowns. In the meantime, please use whichever one is more convenient.
-
-If you are using Bootstrap dropdowns, use the following template to ensure that your dropdown styles match our GitLab design.
-
-```
-# haml without using ruby helpers
-.dropdown.my-dropdown
-  %button{ type: 'button', data: { toggle: 'dropdown' }, 'aria-haspopup': true, 'aria-expanded': false }
-    %span.dropdown-toggle-text
-      Toggle Dropdown
-    = icon('chevron-down')
-
-  %ul.dropdown-menu
-    %li
-      %a
-        item!
-
-# haml using ruby helpers
-.dropdown.my-dropdown
-  = dropdown_toggle('Toogle!', { toggle: 'dropdown' })
-  = dropdown_content
-    %li
-      %a
-        item!
 ```
 
 ## Graphs
@@ -115,12 +89,9 @@ Within GitLab, D3 has been used for the following notable features
 * [Prometheus graphs](https://docs.gitlab.com/ee/user/project/integrations/prometheus.html)
 * Contribution calendars
 
-## Component Library
-
-For other Vue components, see the [gitlab-ui docs](https://gitlab.com/gitlab-org/gitlab-ui).
-
 
 [gitlab-svgs-project]: https://gitlab.com/gitlab-org/gitlab-svgs
 [svg-previewer]: http://gitlab-org.gitlab.io/gitlab-svgs/
 [icon-vue]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/app/assets/javascripts/vue_shared/components/icon.vue
 [common-utils]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/app/assets/javascripts/lib/utils/common_utils.js
+[vue-options]: https://vuejs.org/v2/api/#vm-options
