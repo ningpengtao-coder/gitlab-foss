@@ -1,10 +1,10 @@
 # Network requests
 
-We use [Axios][axios] to handle all of our network requests. Some of our legacy codebase still use Vue-Resource but we are in the process of transitioning that to Axios.
+We use [axios][axios] to handle all of our network requests. Some of our legacy codebase still use Vue-Resource but we are in the process of transitioning that to axios.
 
 ## Creating requests
 
-Since all of our network requests require a CSRF token, we automatically bundle that into a utility file called `axios_utils`. To ensure the token is set, this module should be used instead of using axios directly.
+Since all of our network requests require a CSRF token, we automatically bundle that into a utility file called `axios_utils`. To ensure the token is set, this module should be used instead of importing axios directly.
 
 ```
 import axios from './lib/utils/axios_utils';
@@ -58,7 +58,7 @@ afterEach(() => {
 });
 ```
 
-We do not use Axios interceptors because they are not suitable for mocking.
+We do not use axios interceptors because they are not suitable for mocking.
 
 ## Testing Polling Requests
 
