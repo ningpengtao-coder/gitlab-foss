@@ -13,7 +13,7 @@ In addition to the style guidelines set by Vue, we also have a few specific rule
 - [1.2](#no-singleton) **Do not use singleton for service or store**.
 
 <a name="init"></a><a name="1.3"></a>
-- [1.3](#init) **Initialize root Vue components** Use a function in the bundle file to instantiate Vue components
+- [1.3](#init) **Initialize root Vue components**. Use a function in the bundle file to instantiate Vue components
 
 ```
 // bad
@@ -49,19 +49,6 @@ document.addEventListener('DOMContentLoaded', () => new Vue({
 <style>
   // ...
 </style>
-```
-
-## Attributes
-
-<a name="dom-prop"></a><a name="2.1"></a>
-- [2.1](#dom-prop) **Avoid DOM component prop names**
-
-```
-// bad
-<component title="prop" />
-
-// good
-<component my-prop="prop" />
 ```
 
 [plugin-recommended]: https://github.com/vuejs/eslint-plugin-vue#gear-configs
