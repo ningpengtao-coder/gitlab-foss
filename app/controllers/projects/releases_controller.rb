@@ -4,9 +4,14 @@ class Projects::ReleasesController < Projects::ApplicationController
   # Authorize
   before_action :require_non_empty_project
   before_action :authorize_download_code!
-  before_action :authorize_push_code!
-  before_action :tag
-  before_action :release
+  before_action :authorize_push_code!, except: [:index]
+  before_action :tag, except: [:index]
+  before_action :release, except: [:index]
+
+  def index
+    @releases = project.releases
+    @releases = Kaminari.paginate_array(@releases).page(params[:page])
+  end
 
   def edit
   end

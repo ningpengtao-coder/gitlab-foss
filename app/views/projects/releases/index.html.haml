@@ -1,0 +1,18 @@
+- @no_container = true
+- page_title s_('ReleasesPage|Releases')
+= content_for :meta_tags do
+  = auto_discovery_link_tag(:atom, project_tags_url(@project, rss_url_options), title: "#{@project.name} tags")
+
+.flex-list{ class: container_class }
+  .tags
+    - if @releases.any?
+      %ul.flex-list.content-list
+        = render partial: 'release', collection: @releases
+
+      = paginate @releases, theme: 'gitlab'
+
+    - else
+      .nothing-here-block
+        = s_('ReleasesPage|Repository has no releases yet.')
+        %br
+        %small explain  how to use it
