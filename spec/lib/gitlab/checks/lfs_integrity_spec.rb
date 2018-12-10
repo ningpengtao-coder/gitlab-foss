@@ -3,17 +3,20 @@ require 'spec_helper'
 describe Gitlab::Checks::LfsIntegrity do
   include ProjectForksHelper
 
+  let!(:time_left) { 50 }
   let(:project) { create(:project, :repository) }
   let(:repository) { project.repository }
   let(:newrev) do
-    operations = BareRepoOperations.new(repository.path)
+    operations = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+      BareRepoOperations.new(repository.path)
+    end
 
     # Create a commit not pointed at by any ref to emulate being in the
     # pre-receive hook so that `--not --all` returns some objects
     operations.commit_tree('8856a329dd38ca86dfb9ce5aa58a16d88cc119bd', "New LFS objects")
   end
 
-  subject { described_class.new(project, newrev) }
+  subject { described_class.new(project, newrev, time_left) }
 
   describe '#objects_missing?' do
     let(:blob_object) { repository.blob_at_branch('lfs', 'files/lfs/lfs_object.iso') }
@@ -65,7 +68,7 @@ describe Gitlab::Checks::LfsIntegrity do
         expect(subject.objects_missing?).to be_truthy
       end
 
-      it 'is false parent project already conatins LFS objects for the fork' do
+      it 'is false parent project already contains LFS objects for the fork' do
         lfs_object = create(:lfs_object, oid: blob_object.lfs_oid)
         create(:lfs_objects_project, project: parent_project, lfs_object: lfs_object)
 

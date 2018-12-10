@@ -1,26 +1,32 @@
+# frozen_string_literal: true
+
 class NotePolicy < BasePolicy
   delegate { @subject.project }
-  delegate { @subject.noteable if @subject.noteable.lockable? }
+  delegate { @subject.noteable if DeclarativePolicy.has_policy?(@subject.noteable) }
 
   condition(:is_author) { @user && @subject.author == @user }
-  condition(:for_merge_request, scope: :subject) { @subject.for_merge_request? }
   condition(:is_noteable_author) { @user && @subject.noteable.author_id == @user.id }
 
   condition(:editable, scope: :subject) { @subject.editable? }
 
-  rule { ~editable | anonymous }.prevent :edit_note
+  condition(:can_read_noteable) { can?(:"read_#{@subject.to_ability_name}") }
 
-  rule { is_author | admin }.enable :edit_note
-  rule { can?(:master_access) }.enable :edit_note
+  rule { ~editable }.prevent :admin_note
+
+  # If user can't read the issue/MR/etc then they should not be allowed to do anything to their own notes
+  rule { ~can_read_noteable }.policy do
+    prevent :read_note
+    prevent :admin_note
+    prevent :resolve_note
+  end
 
   rule { is_author }.policy do
     enable :read_note
-    enable :update_note
     enable :admin_note
     enable :resolve_note
   end
 
-  rule { for_merge_request & is_noteable_author }.policy do
+  rule { is_noteable_author }.policy do
     enable :resolve_note
   end
 end

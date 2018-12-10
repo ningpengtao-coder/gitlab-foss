@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Projects::TransferService do
+  include GitHelpers
+
   let(:gitlab_shell) { Gitlab::Shell.new }
   let(:user) { create(:user) }
   let(:group) { create(:group) }
@@ -31,8 +33,8 @@ describe Projects::TransferService do
       transfer_project(project, user, group)
     end
 
-    it 'expires full_path cache' do
-      expect(project).to receive(:expires_full_path_cache)
+    it 'invalidates the user\'s personal_project_count cache' do
+      expect(user).to receive(:invalidate_personal_projects_count)
 
       transfer_project(project, user, group)
     end
@@ -58,7 +60,33 @@ describe Projects::TransferService do
     it 'updates project full path in .git/config' do
       transfer_project(project, user, group)
 
-      expect(project.repository.rugged.config['gitlab.fullpath']).to eq "#{group.full_path}/#{project.path}"
+      expect(rugged_config['gitlab.fullpath']).to eq "#{group.full_path}/#{project.path}"
+    end
+
+    context 'new group has a kubernetes cluster' do
+      let(:group_cluster) { create(:cluster, :group, :provided_by_gcp) }
+      let(:group) { group_cluster.group }
+
+      let(:token) { 'aaaa' }
+      let(:service_account_creator) { double(Clusters::Gcp::Kubernetes::CreateOrUpdateServiceAccountService, execute: true) }
+      let(:secrets_fetcher) { double(Clusters::Gcp::Kubernetes::FetchKubernetesTokenService, execute: token) }
+
+      subject { transfer_project(project, user, group) }
+
+      before do
+        expect(Clusters::Gcp::Kubernetes::CreateOrUpdateServiceAccountService).to receive(:namespace_creator).and_return(service_account_creator)
+        expect(Clusters::Gcp::Kubernetes::FetchKubernetesTokenService).to receive(:new).and_return(secrets_fetcher)
+      end
+
+      it 'creates kubernetes namespace for the project' do
+        subject
+
+        expect(project.kubernetes_namespaces.count).to eq(1)
+
+        kubernetes_namespace = group_cluster.kubernetes_namespaces.first
+        expect(kubernetes_namespace).to be_present
+        expect(kubernetes_namespace.project).to eq(project)
+      end
     end
   end
 
@@ -78,7 +106,9 @@ describe Projects::TransferService do
     end
 
     def project_path(project)
-      File.join(project.repository_storage_path, "#{project.disk_path}.git")
+      Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+        project.repository.path_to_repo
+      end
     end
 
     def current_path
@@ -88,14 +118,14 @@ describe Projects::TransferService do
     it 'rolls back repo location' do
       attempt_project_transfer
 
-      expect(Dir.exist?(original_path)).to be_truthy
+      expect(gitlab_shell.exists?(project.repository_storage, "#{project.disk_path}.git")).to be(true)
       expect(original_path).to eq current_path
     end
 
     it 'rolls back project full path in .git/config' do
       attempt_project_transfer
 
-      expect(project.repository.rugged.config['gitlab.fullpath']).to eq project.full_path
+      expect(rugged_config['gitlab.fullpath']).to eq project.full_path
     end
 
     it "doesn't send move notifications" do
@@ -121,7 +151,7 @@ describe Projects::TransferService do
     it { expect(project.errors.messages[:new_namespace].first).to eq 'Please select a new namespace for your project.' }
   end
 
-  context 'disallow transfering of project with tags' do
+  context 'disallow transferring of project with tags' do
     let(:container_repository) { create(:container_repository) }
 
     before do
@@ -146,12 +176,12 @@ describe Projects::TransferService do
 
   context 'namespace which contains orphan repository with same projects path name' do
     let(:repository_storage) { 'default' }
-    let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage]['path'] }
+    let(:repository_storage_path) { Gitlab.config.repositories.storages[repository_storage].legacy_disk_path }
 
     before do
       group.add_owner(user)
 
-      unless gitlab_shell.add_repository(repository_storage, "#{group.full_path}/#{project.path}")
+      unless gitlab_shell.create_repository(repository_storage, "#{group.full_path}/#{project.path}")
         raise 'failed to add repository'
       end
 
@@ -159,12 +189,41 @@ describe Projects::TransferService do
     end
 
     after do
-      gitlab_shell.remove_repository(repository_storage_path, "#{group.full_path}/#{project.path}")
+      gitlab_shell.remove_repository(repository_storage, "#{group.full_path}/#{project.path}")
     end
 
     it { expect(@result).to eq false }
     it { expect(project.namespace).to eq(user.namespace) }
     it { expect(project.errors[:new_namespace]).to include('Cannot move project') }
+  end
+
+  context 'target namespace containing the same project name' do
+    before do
+      group.add_owner(user)
+      project.update(name: 'new_name')
+
+      create(:project, name: 'new_name', group: group, path: 'other')
+
+      @result = transfer_project(project, user, group)
+    end
+
+    it { expect(@result).to eq false }
+    it { expect(project.namespace).to eq(user.namespace) }
+    it { expect(project.errors[:new_namespace]).to include('Project with same name or path in target namespace already exists') }
+  end
+
+  context 'target namespace containing the same project path' do
+    before do
+      group.add_owner(user)
+
+      create(:project, name: 'other-name', path: project.path, group: group)
+
+      @result = transfer_project(project, user, group)
+    end
+
+    it { expect(@result).to eq false }
+    it { expect(project.namespace).to eq(user.namespace) }
+    it { expect(project.errors[:new_namespace]).to include('Project with same name or path in target namespace already exists') }
   end
 
   def transfer_project(project, user, new_namespace)
@@ -239,7 +298,7 @@ describe Projects::TransferService do
     let(:group_member) { create(:user) }
 
     before do
-      group.add_user(owner, GroupMember::MASTER)
+      group.add_user(owner, GroupMember::MAINTAINER)
       group.add_user(group_member, GroupMember::DEVELOPER)
     end
 
@@ -257,5 +316,9 @@ describe Projects::TransferService do
 
       transfer_project(project, owner, group)
     end
+  end
+
+  def rugged_config
+    rugged_repo(project.repository).config
   end
 end

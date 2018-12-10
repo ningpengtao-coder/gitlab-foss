@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 class PipelineEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :id
   expose :user, using: UserEntity
   expose :active?, as: :active
-  expose :coverage
+
+  # Coverage isn't always necessary (e.g. when displaying project pipelines in
+  # the UI). Instead of creating an entirely different entity we just allow the
+  # disabling of this specific field whenever necessary.
+  expose :coverage, unless: proc { options[:disable_coverage] }
   expose :source
 
   expose :created_at, :updated_at
@@ -17,6 +23,7 @@ class PipelineEntity < Grape::Entity
     expose :latest?, as: :latest
     expose :stuck?, as: :stuck
     expose :auto_devops_source?, as: :auto_devops
+    expose :merge_request?, as: :merge_request
     expose :has_yaml_errors?, as: :yaml_errors
     expose :can_retry?, as: :retryable
     expose :can_cancel?, as: :cancelable
@@ -24,7 +31,7 @@ class PipelineEntity < Grape::Entity
   end
 
   expose :details do
-    expose :detailed_status, as: :status, with: StatusEntity
+    expose :detailed_status, as: :status, with: DetailedStatusEntity
     expose :duration
     expose :finished_at
   end
@@ -42,6 +49,7 @@ class PipelineEntity < Grape::Entity
 
     expose :tag?, as: :tag
     expose :branch?, as: :branch
+    expose :merge_request?, as: :merge_request
   end
 
   expose :commit, using: CommitEntity

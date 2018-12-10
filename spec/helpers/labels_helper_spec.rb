@@ -139,4 +139,101 @@ describe LabelsHelper do
       expect(text_color_for_bg('#000')).to eq '#FFFFFF'
     end
   end
+
+  describe 'create_label_title' do
+    set(:group) { create(:group) }
+
+    context 'with a group as subject' do
+      it 'returns "Create group label"' do
+        expect(create_label_title(group)).to eq 'Create group label'
+      end
+    end
+
+    context 'with a project as subject' do
+      set(:project) { create(:project, namespace: group) }
+
+      it 'returns "Create project label"' do
+        expect(create_label_title(project)).to eq 'Create project label'
+      end
+    end
+
+    context 'with no subject' do
+      it 'returns "Create new label"' do
+        expect(create_label_title(nil)).to eq 'Create new label'
+      end
+    end
+  end
+
+  describe 'manage_labels_title' do
+    set(:group) { create(:group) }
+
+    context 'with a group as subject' do
+      it 'returns "Manage group labels"' do
+        expect(manage_labels_title(group)).to eq 'Manage group labels'
+      end
+    end
+
+    context 'with a project as subject' do
+      set(:project) { create(:project, namespace: group) }
+
+      it 'returns "Manage project labels"' do
+        expect(manage_labels_title(project)).to eq 'Manage project labels'
+      end
+    end
+
+    context 'with no subject' do
+      it 'returns "Manage labels"' do
+        expect(manage_labels_title(nil)).to eq 'Manage labels'
+      end
+    end
+  end
+
+  describe 'view_labels_title' do
+    set(:group) { create(:group) }
+
+    context 'with a group as subject' do
+      it 'returns "View group labels"' do
+        expect(view_labels_title(group)).to eq 'View group labels'
+      end
+    end
+
+    context 'with a project as subject' do
+      set(:project) { create(:project, namespace: group) }
+
+      it 'returns "View project labels"' do
+        expect(view_labels_title(project)).to eq 'View project labels'
+      end
+    end
+
+    context 'with no subject' do
+      it 'returns "View labels"' do
+        expect(view_labels_title(nil)).to eq 'View labels'
+      end
+    end
+  end
+
+  describe 'labels_filter_path' do
+    let(:group) { create(:group) }
+    let(:project) { create(:project) }
+
+    it 'links to the dashboard labels page' do
+      expect(labels_filter_path).to eq(dashboard_labels_path)
+    end
+
+    it 'links to the group labels page' do
+      assign(:group, group)
+
+      expect(helper.labels_filter_path).to eq(group_labels_path(group))
+    end
+
+    it 'links to the project labels page' do
+      assign(:project, project)
+
+      expect(helper.labels_filter_path).to eq(project_labels_path(project))
+    end
+
+    it 'supports json format' do
+      expect(labels_filter_path(format: :json)).to eq(dashboard_labels_path(format: :json))
+    end
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Pipeline
@@ -6,15 +8,7 @@ module Gitlab
           include Chain::Helpers
 
           def perform!
-            ::Ci::Pipeline.transaction do
-              pipeline.save!
-
-              @command.seeds_block&.call(pipeline)
-
-              ::Ci::CreatePipelineStagesService
-                .new(project, current_user)
-                .execute(pipeline)
-            end
+            pipeline.save!
           rescue ActiveRecord::RecordInvalid => e
             error("Failed to persist the pipeline: #{e}")
           end

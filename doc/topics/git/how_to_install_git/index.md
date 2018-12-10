@@ -4,6 +4,7 @@ author_gitlab: SeanPackham
 level: beginner
 article_type: user guide
 date: 2017-05-15
+description: 'This article describes how to install Git on macOS, Ubuntu Linux and Windows.'
 ---
 
 # Installing Git
@@ -21,7 +22,7 @@ an extensive selection of dependency managed libraries and applications.
 
 If you are sure you don't need access to any additional development libraries
 or don't have approximately 15gb of available disk space for Xcode and Homebrew
-use one of the the aforementioned methods.
+use one of the aforementioned methods.
 
 ### Installing Xcode
 

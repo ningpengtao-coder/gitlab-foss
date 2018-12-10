@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Worker to destroy projects that do not have a namespace
 #
 # It destroys everything it can without having the info about the namespace it
@@ -30,7 +32,5 @@ class NamespacelessProjectDestroyWorker
     merge_requests = project.forked_from_project.merge_requests.opened.from_project(project)
 
     merge_requests.update_all(state: 'closed')
-
-    project.forked_project_link.destroy
   end
 end

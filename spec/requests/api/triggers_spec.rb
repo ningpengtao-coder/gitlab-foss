@@ -6,7 +6,7 @@ describe API::Triggers do
   let!(:trigger_token) { 'secure_token' }
   let!(:trigger_token_2) { 'secure_token_2' }
   let!(:project) { create(:project, :repository, creator: user) }
-  let!(:master) { create(:project_member, :master, user: user, project: project) }
+  let!(:maintainer) { create(:project_member, :maintainer, user: user, project: project) }
   let!(:developer) { create(:project_member, :developer, user: user2, project: project) }
   let!(:trigger) { create(:ci_trigger, project: project, token: trigger_token, owner: user) }
   let!(:trigger2) { create(:ci_trigger, project: project, token: trigger_token_2, owner: user2) }
@@ -39,7 +39,7 @@ describe API::Triggers do
     end
 
     context 'Have a commit' do
-      let(:pipeline) { project.pipelines.last }
+      let(:pipeline) { project.ci_pipelines.last }
 
       it 'creates pipeline' do
         post api("/projects/#{project.id}/trigger/pipeline"), options.merge(ref: 'master')

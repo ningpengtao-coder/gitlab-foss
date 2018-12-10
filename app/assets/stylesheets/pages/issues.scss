@@ -1,5 +1,3 @@
-@import "./issues/issue_count_badge";
-
 .issues-list {
   .issue {
     padding: 10px 0 10px $gl-padding;
@@ -14,7 +12,7 @@
     }
 
     .issuable-meta {
-      .author_link {
+      .author-link {
         display: inline-block;
       }
 
@@ -143,7 +141,7 @@ ul.related-merge-requests > li {
   }
 }
 
-@media (max-width: $screen-xs-max) {
+@include media-breakpoint-down(xs) {
   .detail-page-header {
     .issuable-meta {
       line-height: 18px;
@@ -159,7 +157,7 @@ ul.related-merge-requests > li {
 
 .issuable-email-modal-btn {
   padding: 0;
-  color: $gl-link-color;
+  color: $blue-600;
   background-color: transparent;
   border: 0;
   outline: 0;
@@ -187,12 +185,22 @@ ul.related-merge-requests > li {
 }
 
 .new-branch-col {
-  padding-top: 10px;
+  font-size: 0;
+
+  .discussion-filter-container {
+    &:not(:only-child) {
+      margin-right: $gl-padding-8;
+    }
+
+    @include media-breakpoint-down(md) {
+      margin-top: $gl-padding-8;
+    }
+  }
 }
 
 .create-mr-dropdown-wrap {
   .ref::selection {
-    color: $placeholder-text-color;
+    color: $gl-text-color-tertiary;
   }
 
   .dropdown {
@@ -205,8 +213,12 @@ ul.related-merge-requests > li {
     }
   }
 
-  .btn-group:not(.hide) {
+  .btn-group:not(.hidden) {
     display: flex;
+
+    @include media-breakpoint-down(md) {
+      margin-top: $gl-padding-8;
+    }
   }
 
   .js-create-merge-request {
@@ -247,20 +259,35 @@ ul.related-merge-requests > li {
   display: block;
 }
 
-@media (min-width: $screen-sm-min) {
+.issue-sort-dropdown {
+  .btn-group {
+    width: 100%;
+  }
+
+  .reverse-sort-btn {
+    color: $gl-text-color-secondary;
+  }
+}
+
+@include media-breakpoint-up(sm) {
   .emoji-block .row {
     display: flex;
 
     .new-branch-col {
       padding-top: 0;
-      text-align: right;
       align-self: center;
     }
 
     .create-mr-dropdown-wrap {
-      .btn-group:not(.hide) {
-        display: inline-block;
+      .btn-group:not(.hidden) {
+        display: inline-flex;
       }
     }
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .new-branch-col {
+    text-align: right;
   }
 }

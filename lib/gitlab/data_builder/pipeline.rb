@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module DataBuilder
     module Pipeline
@@ -22,10 +24,12 @@ module Gitlab
           sha: pipeline.sha,
           before_sha: pipeline.before_sha,
           status: pipeline.status,
+          detailed_status: pipeline.detailed_status(nil).label,
           stages: pipeline.stages_names,
           created_at: pipeline.created_at,
           finished_at: pipeline.finished_at,
-          duration: pipeline.duration
+          duration: pipeline.duration,
+          variables: pipeline.variables.map(&:hook_attrs)
         }
       end
 
@@ -54,7 +58,7 @@ module Gitlab
           id: runner.id,
           description: runner.description,
           active: runner.active?,
-          is_shared: runner.is_shared?
+          is_shared: runner.instance_type?
         }
       end
     end

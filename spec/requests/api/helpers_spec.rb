@@ -6,6 +6,7 @@ describe API::Helpers do
   include API::APIGuard::HelperMethods
   include described_class
   include SentryHelper
+  include TermsHelper
 
   let(:user) { create(:user) }
   let(:admin) { create(:admin) }
@@ -163,6 +164,23 @@ describe API::Helpers do
         expect { current_user }.to raise_error /403/
       end
 
+      context 'when terms are enforced' do
+        before do
+          enforce_terms
+          env[Gitlab::Auth::UserAuthFinders::PRIVATE_TOKEN_HEADER] = personal_access_token.token
+        end
+
+        it 'returns a 403 when a user has not accepted the terms' do
+          expect { current_user }.to raise_error /must accept the Terms of Service/
+        end
+
+        it 'sets the current user when the user accepted the terms' do
+          accept_terms(user)
+
+          expect(current_user).to eq(user)
+        end
+      end
+
       it "sets current_user" do
         env[Gitlab::Auth::UserAuthFinders::PRIVATE_TOKEN_HEADER] = personal_access_token.token
         expect(current_user).to eq(user)
@@ -183,10 +201,23 @@ describe API::Helpers do
       end
 
       it 'does not allow expired tokens' do
-        personal_access_token.update_attributes!(expires_at: 1.day.ago)
+        personal_access_token.update!(expires_at: 1.day.ago)
         env[Gitlab::Auth::UserAuthFinders::PRIVATE_TOKEN_HEADER] = personal_access_token.token
 
         expect { current_user }.to raise_error Gitlab::Auth::ExpiredError
+      end
+
+      context 'when impersonation is disabled' do
+        let(:personal_access_token) { create(:personal_access_token, :impersonation, user: user) }
+
+        before do
+          stub_config_setting(impersonation_enabled: false)
+          env[Gitlab::Auth::UserAuthFinders::PRIVATE_TOKEN_HEADER] = personal_access_token.token
+        end
+
+        it 'does not allow impersonation tokens' do
+          expect { current_user }.to raise_error Gitlab::Auth::ImpersonationDisabled
+        end
       end
     end
   end
@@ -350,6 +381,14 @@ describe API::Helpers do
                 it_behaves_like 'successful sudo'
               end
 
+              context 'when providing username (case insensitive)' do
+                before do
+                  env[API::Helpers::SUDO_HEADER] = user.username.upcase
+                end
+
+                it_behaves_like 'successful sudo'
+              end
+
               context 'when providing user ID' do
                 before do
                   env[API::Helpers::SUDO_HEADER] = user.id.to_s
@@ -363,6 +402,14 @@ describe API::Helpers do
               context 'when providing username' do
                 before do
                   set_param(API::Helpers::SUDO_PARAM, user.username)
+                end
+
+                it_behaves_like 'successful sudo'
+              end
+
+              context 'when providing username (case insensitive)' do
+                before do
+                  set_param(API::Helpers::SUDO_PARAM, user.username.upcase)
                 end
 
                 it_behaves_like 'successful sudo'

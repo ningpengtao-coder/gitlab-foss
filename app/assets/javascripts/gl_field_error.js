@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 /**
  * This class overrides the browser's validation error bubbles, displaying custom
  * error messages for invalid fields instead. To begin validating any form, add the
@@ -60,7 +62,7 @@ export default class GlFieldError {
     this.inputDomElement = this.inputElement.get(0);
     this.form = formErrors;
     this.errorMessage = this.inputElement.attr('title') || 'This field is required.';
-    this.fieldErrorElement = $(`<p class='${errorMessageClass} hide'>${this.errorMessage}</p>`);
+    this.fieldErrorElement = $(`<p class='${errorMessageClass} hidden'>${this.errorMessage}</p>`);
 
     this.state = {
       valid: false,
@@ -114,7 +116,8 @@ export default class GlFieldError {
     this.form.focusOnFirstInvalid.apply(this.form);
 
     // For UX, wait til after first invalid submission to check each keyup
-    this.inputElement.off('keyup.fieldValidator')
+    this.inputElement
+      .off('keyup.fieldValidator')
       .on('keyup.fieldValidator', this.updateValidity.bind(this));
   }
 
@@ -144,8 +147,8 @@ export default class GlFieldError {
 
   renderInvalid() {
     this.inputElement.addClass(inputErrorClass);
-    this.scopedSiblings.hide();
-    return this.fieldErrorElement.show();
+    this.scopedSiblings.addClass('hidden');
+    return this.fieldErrorElement.removeClass('hidden');
   }
 
   renderClear() {
@@ -155,7 +158,7 @@ export default class GlFieldError {
       this.accessCurrentValue(trimmedInput);
     }
     this.inputElement.removeClass(inputErrorClass);
-    this.scopedSiblings.hide();
-    this.fieldErrorElement.hide();
+    this.scopedSiblings.addClass('hidden');
+    this.fieldErrorElement.addClass('hidden');
   }
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Load a specific server configuration
 module Gitlab
   module Auth
@@ -11,6 +13,8 @@ module Gitlab
 
         attr_accessor :provider, :options
 
+        InvalidProvider = Class.new(StandardError)
+
         def self.enabled?
           Gitlab.config.ldap.enabled
         end
@@ -22,6 +26,10 @@ module Gitlab
         def self.available_servers
           return [] unless enabled?
 
+          _available_servers
+        end
+
+        def self._available_servers
           Array.wrap(servers.first)
         end
 
@@ -34,7 +42,7 @@ module Gitlab
         end
 
         def self.invalid_provider(provider)
-          raise "Unknown provider (#{provider}). Available providers: #{providers}"
+          raise InvalidProvider.new("Unknown provider (#{provider}). Available providers: #{providers}")
         end
 
         def initialize(provider)
@@ -84,11 +92,15 @@ module Gitlab
         end
 
         def base
-          options['base']
+          @base ||= Person.normalize_dn(options['base'])
         end
 
         def uid
           options['uid']
+        end
+
+        def label
+          options['label']
         end
 
         def sync_ssh_keys?
@@ -130,6 +142,10 @@ module Gitlab
 
         def timeout
           options['timeout'].to_i
+        end
+
+        def external_groups
+          options['external_groups'] || []
         end
 
         def has_auth?

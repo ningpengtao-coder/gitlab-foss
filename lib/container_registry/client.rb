@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'faraday'
 require 'faraday_middleware'
 
@@ -52,6 +54,8 @@ module ContainerRegistry
         conn.request(:authorization, :bearer, options[:token].to_s)
       end
 
+      yield(conn) if block_given?
+
       conn.adapter :net_http
     end
 
@@ -80,8 +84,7 @@ module ContainerRegistry
 
     def faraday
       @faraday ||= Faraday.new(@base_uri) do |conn|
-        initialize_connection(conn, @options)
-        accept_manifest(conn)
+        initialize_connection(conn, @options, &method(:accept_manifest))
       end
     end
 

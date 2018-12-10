@@ -2,13 +2,13 @@
 # Loops through old importer projects that kept a token/password in the import URL
 # and encrypts the credentials into a separate field in project#import_data
 # #down method not supported
-class RemoveWrongImportUrlFromProjects < ActiveRecord::Migration
+class RemoveWrongImportUrlFromProjects < ActiveRecord::Migration[4.2]
 
   class ProjectImportDataFake
     extend AttrEncrypted
     attr_accessor :credentials
     attr_encrypted :credentials,
-                   key: Gitlab::Application.secrets.db_key_base,
+                   key: Settings.attr_encrypted_db_key_base,
                    marshal: true,
                    encode: true,
                    :mode => :per_attribute_iv_and_salt,

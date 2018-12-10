@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateHeadPipelineForMergeRequestWorker
   include ApplicationWorker
   include PipelineQueue
@@ -6,7 +8,9 @@ class UpdateHeadPipelineForMergeRequestWorker
 
   def perform(merge_request_id)
     merge_request = MergeRequest.find(merge_request_id)
-    pipeline = Ci::Pipeline.where(project: merge_request.source_project, ref: merge_request.source_branch).last
+
+    sha = merge_request.diff_head_sha
+    pipeline = merge_request.all_pipelines(shas: sha).first
 
     return unless pipeline && pipeline.latest?
 

@@ -9,26 +9,30 @@ comments: false
 ## Undo Commits
 
 * Undo last commit putting everything back into the staging area.
-```
-git reset --soft HEAD^
-```
+
+    ```
+    git reset --soft HEAD^
+    ```
 
 * Add files and change message with:
-```
-git commit --amend -m "New Message"
-```
+
+    ```
+    git commit --amend -m "New Message"
+    ```
 
 ----------
 
 * Undo last and remove changes
-```
-git reset --hard HEAD^
-```
+
+    ```
+    git reset --hard HEAD^
+    ```
 
 * Same as last one but for two commits back
-```
-git reset --hard HEAD^^
-```
+
+    ```
+    git reset --hard HEAD^^
+    ```
 
 ** Don't reset after pushing **
 
@@ -37,15 +41,15 @@ git reset --hard HEAD^^
 ## Reset Workflow
 
 1. Edit file again 'edit_this_file.rb'
-2. Check status
-3. Add and commit with wrong message
-4. Check log
-5. Amend commit
-6. Check log
-7. Soft reset
-8. Check log
-9. Pull for updates
-10. Push changes
+1. Check status
+1. Add and commit with wrong message
+1. Check log
+1. Amend commit
+1. Check log
+1. Soft reset
+1. Check log
+1. Pull for updates
+1. Push changes
 
 
 ----------

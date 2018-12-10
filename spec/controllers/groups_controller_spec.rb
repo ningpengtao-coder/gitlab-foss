@@ -7,7 +7,7 @@ describe GroupsController do
   let(:project) { create(:project, namespace: group) }
   let!(:group_member) { create(:group_member, group: group, user: user) }
   let!(:owner) { group.add_owner(create(:user)).user }
-  let!(:master) { group.add_master(create(:user)).user }
+  let!(:maintainer) { group.add_maintainer(create(:user)).user }
   let!(:developer) { group.add_developer(create(:user)).user }
   let!(:guest) { group.add_guest(create(:user)).user }
 
@@ -38,14 +38,6 @@ describe GroupsController do
       project
     end
 
-    context 'as html' do
-      it 'assigns whether or not a group has children' do
-        get :show, id: group.to_param
-
-        expect(assigns(:has_children)).to be_truthy
-      end
-    end
-
     context 'as atom' do
       it 'assigns events for all the projects in the group' do
         create(:event, project: project)
@@ -57,12 +49,22 @@ describe GroupsController do
     end
   end
 
+  describe 'GET edit' do
+    it 'sets the badge API endpoint' do
+      sign_in(owner)
+
+      get :edit, id: group.to_param
+
+      expect(assigns(:badge_api_endpoint)).not_to be_nil
+    end
+  end
+
   describe 'GET #new' do
     context 'when creating subgroups', :nested_groups do
       [true, false].each do |can_create_group_status|
         context "and can_create_group is #{can_create_group_status}" do
           before do
-            User.where(id: [admin, owner, master, developer, guest]).update_all(can_create_group: can_create_group_status)
+            User.where(id: [admin, owner, maintainer, developer, guest]).update_all(can_create_group: can_create_group_status)
           end
 
           [:admin, :owner].each do |member_type|
@@ -73,7 +75,7 @@ describe GroupsController do
             end
           end
 
-          [:guest, :developer, :master].each do |member_type|
+          [:guest, :developer, :maintainer].each do |member_type|
             context "and logged in as #{member_type.capitalize}" do
               it_behaves_like 'member without ability to create subgroups' do
                 let(:member) { send(member_type) }
@@ -200,8 +202,8 @@ describe GroupsController do
   end
 
   describe 'GET #issues' do
-    let(:issue_1) { create(:issue, project: project) }
-    let(:issue_2) { create(:issue, project: project) }
+    let(:issue_1) { create(:issue, project: project, title: 'foo') }
+    let(:issue_2) { create(:issue, project: project, title: 'bar') }
 
     before do
       create_list(:award_emoji, 3, awardable: issue_2)
@@ -220,6 +222,31 @@ describe GroupsController do
       it 'sorts least popular issues' do
         get :issues, id: group.to_param, sort: 'downvotes_desc'
         expect(assigns(:issues)).to eq [issue_2, issue_1]
+      end
+    end
+
+    context 'searching' do
+      # Remove as part of https://gitlab.com/gitlab-org/gitlab-ce/issues/52271
+      before do
+        stub_feature_flags(use_cte_for_group_issues_search: false)
+      end
+
+      it 'works with popularity sort' do
+        get :issues, id: group.to_param, search: 'foo', sort: 'popularity'
+
+        expect(assigns(:issues)).to eq([issue_1])
+      end
+
+      it 'works with priority sort' do
+        get :issues, id: group.to_param, search: 'foo', sort: 'priority'
+
+        expect(assigns(:issues)).to eq([issue_1])
+      end
+
+      it 'works with label priority sort' do
+        get :issues, id: group.to_param, search: 'foo', sort: 'label_priority'
+
+        expect(assigns(:issues)).to eq([issue_1])
       end
     end
   end
@@ -502,7 +529,7 @@ describe GroupsController do
       sign_in(user)
     end
 
-    context 'when transfering to a subgroup goes right' do
+    context 'when transferring to a subgroup goes right' do
       let(:new_parent_group) { create(:group, :public) }
       let!(:group_member) { create(:group_member, :owner, group: group, user: user) }
       let!(:new_parent_group_member) { create(:group_member, :owner, group: new_parent_group, user: user) }
@@ -576,6 +603,26 @@ describe GroupsController do
 
       it 'should be denied' do
         expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  context 'token authentication' do
+    it_behaves_like 'authenticates sessionless user', :show, :atom, public: true do
+      before do
+        default_params.merge!(id: group)
+      end
+    end
+
+    it_behaves_like 'authenticates sessionless user', :issues, :atom, public: true do
+      before do
+        default_params.merge!(id: group, author_id: user.id)
+      end
+    end
+
+    it_behaves_like 'authenticates sessionless user', :issues_calendar, :ics, public: true do
+      before do
+        default_params.merge!(id: group)
       end
     end
   end

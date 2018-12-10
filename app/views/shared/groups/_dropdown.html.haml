@@ -9,11 +9,11 @@
     - default_sort_by = sort_value_recently_created
 
 .dropdown.inline.js-group-filter-dropdown-wrap.append-right-10
-  %button.dropdown-toggle{ type: 'button', 'data-toggle' => 'dropdown' }
+  %button.dropdown-menu-toggle{ type: 'button', 'data-toggle' => 'dropdown' }
     %span.dropdown-label
       = options_hash[default_sort_by]
     = icon('chevron-down')
-  %ul.dropdown-menu.dropdown-menu-align-right.dropdown-menu-selectable
+  %ul.dropdown-menu.dropdown-menu-right.dropdown-menu-selectable
     %li.dropdown-header
       = _("Sort by")
     - options_hash.each do |value, title|

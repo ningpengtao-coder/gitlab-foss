@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
 class CommitStatus < ActiveRecord::Base
   include HasStatus
   include Importable
   include AfterCommitQueue
+  include Presentable
+  include EnumWithNil
 
   self.table_name = 'ci_builds'
 
@@ -38,14 +42,9 @@ class CommitStatus < ActiveRecord::Base
   scope :retried_ordered, -> { retried.ordered.includes(project: :namespace) }
   scope :after_stage, -> (index) { where('stage_idx > ?', index) }
 
-  enum failure_reason: {
-    unknown_failure: nil,
-    script_failure: 1,
-    api_failure: 2,
-    stuck_or_timeout_failure: 3,
-    runner_system_failure: 4,
-    missing_dependency_failure: 5
-  }
+  # We use `CommitStatusEnums.failure_reasons` here so that EE can more easily
+  # extend this `Hash` with new values.
+  enum_with_nil failure_reason: ::CommitStatusEnums.failure_reasons
 
   ##
   # We still create some CommitStatuses outside of CreatePipelineService.
@@ -53,9 +52,11 @@ class CommitStatus < ActiveRecord::Base
   # These are pages deployments and external statuses.
   #
   before_create unless: :importing? do
+    # rubocop: disable CodeReuse/ServiceClass
     Ci::EnsureStageService.new(project, user).execute(self) do |stage|
       self.run_after_commit { StageUpdateWorker.perform_async(stage.id) }
     end
+    # rubocop: enable CodeReuse/ServiceClass
   end
 
   state_machine :status do
@@ -64,7 +65,7 @@ class CommitStatus < ActiveRecord::Base
     end
 
     event :enqueue do
-      transition [:created, :skipped, :manual] => :pending
+      transition [:created, :skipped, :manual, :scheduled] => :pending
     end
 
     event :run do
@@ -76,7 +77,7 @@ class CommitStatus < ActiveRecord::Base
     end
 
     event :drop do
-      transition [:created, :pending, :running] => :failed
+      transition [:created, :pending, :running, :scheduled] => :failed
     end
 
     event :success do
@@ -84,10 +85,10 @@ class CommitStatus < ActiveRecord::Base
     end
 
     event :cancel do
-      transition [:created, :pending, :running, :manual] => :canceled
+      transition [:created, :pending, :running, :manual, :scheduled] => :canceled
     end
 
-    before_transition created: [:pending, :running] do |commit_status|
+    before_transition [:created, :skipped, :manual, :scheduled] => :pending do |commit_status|
       commit_status.queued_at = Time.now
     end
 
@@ -101,7 +102,7 @@ class CommitStatus < ActiveRecord::Base
 
     before_transition any => :failed do |commit_status, transition|
       failure_reason = transition.args.first
-      commit_status.failure_reason = failure_reason
+      commit_status.failure_reason = CommitStatus.failure_reasons[failure_reason]
     end
 
     after_transition do |commit_status, transition|
@@ -125,10 +126,12 @@ class CommitStatus < ActiveRecord::Base
     after_transition any => :failed do |commit_status|
       next unless commit_status.project
 
+      # rubocop: disable CodeReuse/ServiceClass
       commit_status.run_after_commit do
         MergeRequests::AddTodoWhenBuildFailsService
           .new(project, nil).execute(self)
       end
+      # rubocop: enable CodeReuse/ServiceClass
     end
   end
 
@@ -141,7 +144,7 @@ class CommitStatus < ActiveRecord::Base
   end
 
   def group_name
-    name.to_s.gsub(%r{\d+[\.\s:/\\]+\d+\s*}, '').strip
+    name.to_s.gsub(%r{\d+[\s:/\\]+\d+\s*}, '').strip
   end
 
   def failed_but_allowed?
@@ -156,13 +159,15 @@ class CommitStatus < ActiveRecord::Base
     false
   end
 
-  # To be overriden when inherrited from
   def retryable?
     false
   end
 
-  # To be overriden when inherrited from
   def cancelable?
+    false
+  end
+
+  def archived?
     false
   end
 

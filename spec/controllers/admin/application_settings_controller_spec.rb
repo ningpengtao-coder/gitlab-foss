@@ -72,12 +72,36 @@ describe Admin::ApplicationSettingsController do
       expect(ApplicationSetting.current.restricted_visibility_levels).to eq([10, 20])
     end
 
-    it 'falls back to defaults when settings are omitted' do
-      put :update, application_setting: {}
+    it 'updates the restricted_visibility_levels when empty array is passed' do
+      put :update, application_setting: { restricted_visibility_levels: [""] }
 
       expect(response).to redirect_to(admin_application_settings_path)
-      expect(ApplicationSetting.current.default_project_visibility).to eq(Gitlab::VisibilityLevel::PRIVATE)
       expect(ApplicationSetting.current.restricted_visibility_levels).to be_empty
+    end
+
+    it 'updates the receive_max_input_size setting' do
+      put :update, application_setting: { receive_max_input_size: "1024" }
+
+      expect(response).to redirect_to(admin_application_settings_path)
+      expect(ApplicationSetting.current.receive_max_input_size).to eq(1024)
+    end
+  end
+
+  describe 'PUT #reset_registration_token' do
+    before do
+      sign_in(admin)
+    end
+
+    subject { put :reset_registration_token }
+
+    it 'resets runner registration token' do
+      expect { subject }.to change { ApplicationSetting.current.runners_registration_token }
+    end
+
+    it 'redirects the user to admin runners page' do
+      subject
+
+      expect(response).to redirect_to(admin_runners_path)
     end
   end
 end

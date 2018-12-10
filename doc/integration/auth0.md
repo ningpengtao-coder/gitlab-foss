@@ -3,7 +3,7 @@
 To enable the Auth0 OmniAuth provider, you must create an Auth0 account, and an
 application.
 
-1. Sign in to the [Auth0 Console](https://manage.auth0.com). If you need to
+1. Sign in to the [Auth0 Console](https://auth0.com/auth/login). If you need to
 create an account, you can do so at the same link.
 
 1. Select "New App/API".
@@ -56,7 +56,8 @@ for initial settings.
           "name" => "auth0",
           "args" => { client_id: 'YOUR_AUTH0_CLIENT_ID',
                       client_secret: 'YOUR_AUTH0_CLIENT_SECRET',
-                      namespace: 'YOUR_AUTH0_DOMAIN'
+                      domain: 'YOUR_AUTH0_DOMAIN',
+                      scope: 'openid profile email'
                     }
         }
       ]
@@ -69,8 +70,8 @@ for initial settings.
           args: {
             client_id: 'YOUR_AUTH0_CLIENT_ID',
             client_secret: 'YOUR_AUTH0_CLIENT_SECRET',
-            namespace: 'YOUR_AUTH0_DOMAIN'
-            }
+            domain: 'YOUR_AUTH0_DOMAIN',
+            scope: 'openid profile email' }
         }
     ```
 

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import _ from 'underscore';
 import '../commons/bootstrap';
 
@@ -17,7 +18,8 @@ import '../commons/bootstrap';
 $.fn.requiresInput = function requiresInput() {
   const $form = $(this);
   const $button = $('button[type=submit], input[type=submit]', $form);
-  const fieldSelector = 'input[required=required], select[required=required], textarea[required=required]';
+  const fieldSelector =
+    'input[required=required], select[required=required], textarea[required=required]';
 
   function requireInput() {
     // Collect the input values of *all* required fields
@@ -41,17 +43,18 @@ $.fn.requiresInput = function requiresInput() {
 function hideOrShowHelpBlock(form) {
   const selected = $('.js-select-namespace option:selected');
   if (selected.length && selected.data('optionsParent') === 'groups') {
-    form.find('.help-block').hide();
+    form.find('.form-text.text-muted').hide();
   } else if (selected.length) {
-    form.find('.help-block').show();
+    form.find('.form-text.text-muted').show();
   }
 }
 
 $(() => {
-  const $form = $('form.js-requires-input');
-  if ($form) {
+  $('form.js-requires-input').each((i, el) => {
+    const $form = $(el);
+
     $form.requiresInput();
     hideOrShowHelpBlock($form);
     $('.select2.js-select-namespace').change(() => hideOrShowHelpBlock($form));
-  }
+  });
 });

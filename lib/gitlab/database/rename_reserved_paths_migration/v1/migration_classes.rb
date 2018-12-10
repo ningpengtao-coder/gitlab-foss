@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Database
     module RenameReservedPathsMigration
@@ -37,6 +39,7 @@ module Gitlab
           class Namespace < ActiveRecord::Base
             include MigrationClasses::Routable
             self.table_name = 'namespaces'
+            self.inheritance_column = :_type_disabled
             belongs_to :parent,
                        class_name: "#{MigrationClasses.name}::Namespace"
             has_one :route, as: :source
@@ -74,7 +77,7 @@ module Gitlab
             }.freeze
 
             def repository_storage_path
-              Gitlab.config.repositories.storages[repository_storage]['path']
+              Gitlab.config.repositories.storages[repository_storage].legacy_disk_path
             end
 
             # Overridden to have the correct `source_type` for the `route` relation

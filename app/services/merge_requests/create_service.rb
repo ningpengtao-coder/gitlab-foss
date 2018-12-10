@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MergeRequests
   class CreateService < MergeRequests::BaseService
     def execute
@@ -23,6 +25,7 @@ module MergeRequests
     def after_create(issuable)
       todo_service.new_merge_request(issuable, current_user)
       issuable.cache_merge_request_closes_issues!(current_user)
+      create_merge_request_pipeline(issuable, current_user)
       update_merge_requests_head_pipeline(issuable)
 
       super
@@ -53,9 +56,7 @@ module MergeRequests
       sha = merge_request.source_branch_sha
       return unless sha
 
-      pipelines = merge_request.source_project.pipelines.where(ref: merge_request.source_branch, sha: sha)
-
-      pipelines.order(id: :desc).first
+      merge_request.all_pipelines(shas: sha).first
     end
 
     def set_projects!
@@ -71,8 +72,8 @@ module MergeRequests
       params.delete(:source_project_id)
       params.delete(:target_project_id)
 
-      unless can?(current_user, :read_project, @source_project) &&
-          can?(current_user, :read_project, @project)
+      unless can?(current_user, :create_merge_request_from, @source_project) &&
+          can?(current_user, :create_merge_request_in, @project)
 
         raise Gitlab::Access::AccessDeniedError
       end

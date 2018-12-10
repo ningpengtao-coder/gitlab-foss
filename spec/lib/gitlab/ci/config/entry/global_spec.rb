@@ -160,7 +160,8 @@ describe Gitlab::Ci::Config::Entry::Global do
                        cache: { key: 'k', untracked: true, paths: ['public/'], policy: 'pull-push' },
                        variables: { 'VAR' => 'value' },
                        ignore: false,
-                       after_script: ['make clean'] },
+                       after_script: ['make clean'],
+                       only: { refs: %w[branches tags] } },
               spinach: { name: :spinach,
                          before_script: [],
                          script: %w[spinach],
@@ -171,7 +172,8 @@ describe Gitlab::Ci::Config::Entry::Global do
                          cache: { key: 'k', untracked: true, paths: ['public/'], policy: 'pull-push' },
                          variables: {},
                          ignore: false,
-                         after_script: ['make clean'] }
+                         after_script: ['make clean'],
+                         only: { refs: %w[branches tags] } }
             )
           end
         end
@@ -219,7 +221,7 @@ describe Gitlab::Ci::Config::Entry::Global do
 
     ##
     # When nodes are specified but not defined, we assume that
-    # configuration is valid, and we asume that entry is simply undefined,
+    # configuration is valid, and we assume that entry is simply undefined,
     # despite the fact, that key is present. See issue #18775 for more
     # details.
     #

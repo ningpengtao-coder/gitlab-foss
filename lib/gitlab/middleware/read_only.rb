@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Middleware
     class ReadOnly
@@ -13,7 +15,7 @@ module Gitlab
       end
 
       def call(env)
-        ReadOnly::Controller.new(@app, env).call
+        ::Gitlab::Middleware::ReadOnly::Controller.new(@app, env).call
       end
     end
   end

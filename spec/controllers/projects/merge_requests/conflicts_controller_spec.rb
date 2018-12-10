@@ -5,7 +5,7 @@ describe Projects::MergeRequests::ConflictsController do
   let(:user)    { project.owner }
   let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
   let(:merge_request_with_conflicts) do
-    create(:merge_request, source_branch: 'conflict-resolvable', target_branch: 'conflict-start', source_project: project) do |mr|
+    create(:merge_request, source_branch: 'conflict-resolvable', target_branch: 'conflict-start', source_project: project, merge_status: :unchecked) do |mr|
       mr.mark_as_unmergeable
     end
   end
@@ -150,7 +150,6 @@ describe Projects::MergeRequests::ConflictsController do
                                          'new_path' => path,
                                          'blob_icon' => 'file-text-o',
                                          'blob_path' => a_string_ending_with(path),
-                                         'blob_ace_mode' => 'ruby',
                                          'content' => content)
       end
     end

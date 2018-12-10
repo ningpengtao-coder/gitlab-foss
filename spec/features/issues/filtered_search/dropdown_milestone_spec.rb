@@ -29,7 +29,7 @@ describe 'Dropdown milestone', :js do
   end
 
   before do
-    project.add_master(user)
+    project.add_maintainer(user)
     sign_in(user)
     create(:issue, project: project)
 
@@ -189,10 +189,18 @@ describe 'Dropdown milestone', :js do
     end
 
     it 'selects `no milestone`' do
-      click_static_milestone('No Milestone')
+      click_static_milestone('None')
 
       expect(page).to have_css(js_dropdown_milestone, visible: false)
       expect_tokens([milestone_token('none', false)])
+      expect_filtered_search_input_empty
+    end
+
+    it 'selects `any milestone`' do
+      click_static_milestone('Any')
+
+      expect(page).to have_css(js_dropdown_milestone, visible: false)
+      expect_tokens([milestone_token('any', false)])
       expect_filtered_search_input_empty
     end
 

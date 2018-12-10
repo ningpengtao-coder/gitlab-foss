@@ -1,15 +1,20 @@
+# frozen_string_literal: true
+
 module Ci
   class CreatePipelineService < BaseService
     attr_reader :pipeline
+
+    CreateError = Class.new(StandardError)
 
     SEQUENCE = [Gitlab::Ci::Pipeline::Chain::Build,
                 Gitlab::Ci::Pipeline::Chain::Validate::Abilities,
                 Gitlab::Ci::Pipeline::Chain::Validate::Repository,
                 Gitlab::Ci::Pipeline::Chain::Validate::Config,
                 Gitlab::Ci::Pipeline::Chain::Skip,
+                Gitlab::Ci::Pipeline::Chain::Populate,
                 Gitlab::Ci::Pipeline::Chain::Create].freeze
 
-    def execute(source, ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, schedule: nil, &block)
+    def execute(source, ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, schedule: nil, merge_request: nil, &block)
       @pipeline = Ci::Pipeline.new
 
       command = Gitlab::Ci::Pipeline::Chain::Command.new(
@@ -20,9 +25,11 @@ module Ci
         before_sha: params[:before],
         trigger_request: trigger_request,
         schedule: schedule,
+        merge_request: merge_request,
         ignore_skip_ci: ignore_skip_ci,
         save_incompleted: save_on_errors,
         seeds_block: block,
+        variables_attributes: params[:variables_attributes],
         project: project,
         current_user: current_user)
 
@@ -43,6 +50,14 @@ module Ci
       pipeline
     end
 
+    def execute!(*args, &block)
+      execute(*args, &block).tap do |pipeline|
+        unless pipeline.persisted?
+          raise CreateError, pipeline.errors.full_messages.join(',')
+        end
+      end
+    end
+
     private
 
     def commit
@@ -61,13 +76,15 @@ module Ci
       end
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def auto_cancelable_pipelines
-      project.pipelines
+      project.ci_pipelines
         .where(ref: pipeline.ref)
         .where.not(id: pipeline.id)
-        .where.not(sha: project.repository.sha_from_ref(pipeline.ref))
+        .where.not(sha: project.commit(pipeline.ref).try(:id))
         .created_or_pending
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def pipeline_created_counter
       @pipeline_created_counter ||= Gitlab::Metrics
@@ -80,8 +97,10 @@ module Ci
       end
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def related_merge_requests
       pipeline.project.source_of_merge_requests.opened.where(source_branch: pipeline.ref)
     end
+    # rubocop: enable CodeReuse/ActiveRecord
   end
 end

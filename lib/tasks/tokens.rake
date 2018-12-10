@@ -1,4 +1,7 @@
 require_relative '../../app/models/concerns/token_authenticatable.rb'
+require_relative '../../app/models/concerns/token_authenticatable_strategies/base.rb'
+require_relative '../../app/models/concerns/token_authenticatable_strategies/insecure.rb'
+require_relative '../../app/models/concerns/token_authenticatable_strategies/digest.rb'
 
 namespace :tokens do
   desc "Reset all GitLab incoming email tokens"
@@ -6,9 +9,9 @@ namespace :tokens do
     reset_all_users_token(:reset_incoming_email_token!)
   end
 
-  desc "Reset all GitLab RSS tokens"
-  task reset_all_rss: :environment do
-    reset_all_users_token(:reset_rss_token!)
+  desc "Reset all GitLab feed tokens"
+  task reset_all_feed: :environment do
+    reset_all_users_token(:reset_feed_token!)
   end
 
   def reset_all_users_token(reset_token_method)
@@ -26,13 +29,6 @@ class TmpUser < ActiveRecord::Base
 
   self.table_name = 'users'
 
-  def reset_incoming_email_token!
-    write_new_token(:incoming_email_token)
-    save!(validate: false)
-  end
-
-  def reset_rss_token!
-    write_new_token(:rss_token)
-    save!(validate: false)
-  end
+  add_authentication_token_field :incoming_email_token, token_generator: -> { SecureRandom.hex.to_i(16).to_s(36) }
+  add_authentication_token_field :feed_token
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Pipeline::Chain::Validate::Config do
-  set(:project) { create(:project) }
+  set(:project) { create(:project, :repository) }
   set(:user) { create(:user) }
 
   let(:command) do
@@ -76,28 +76,6 @@ describe Gitlab::Ci::Pipeline::Chain::Validate::Config do
     end
   end
 
-  context 'when pipeline has no stages / jobs' do
-    let(:config) do
-      { rspec: {
-          script: 'ls',
-          only: ['something']
-      } }
-    end
-
-    let(:pipeline) do
-      build(:ci_pipeline, project: project, config: config)
-    end
-
-    it 'appends an error about missing stages' do
-      expect(pipeline.errors.to_a)
-        .to include 'No stages / jobs for this pipeline.'
-    end
-
-    it 'breaks the chain' do
-      expect(step.break?).to be true
-    end
-  end
-
   context 'when pipeline contains configuration validation errors' do
     let(:config) { { rspec: {} } }
 
@@ -126,6 +104,36 @@ describe Gitlab::Ci::Pipeline::Chain::Validate::Config do
 
     it 'does not break the chain' do
       expect(step.break?).to be false
+    end
+  end
+
+  context 'when pipeline source is merge request' do
+    before do
+      stub_ci_pipeline_yaml_file(YAML.dump(config))
+    end
+
+    let(:pipeline) { build_stubbed(:ci_pipeline, project: project) }
+
+    let(:merge_request_pipeline) do
+      build(:ci_pipeline, source: :merge_request, project: project)
+    end
+
+    let(:chain) { described_class.new(merge_request_pipeline, command).tap(&:perform!) }
+
+    context "when config contains 'merge_requests' keyword" do
+      let(:config) { { rspec: { script: 'echo', only: ['merge_requests'] } } }
+
+      it 'does not break the chain' do
+        expect(chain).not_to be_break
+      end
+    end
+
+    context "when config contains 'merge_request' keyword" do
+      let(:config) { { rspec: { script: 'echo', only: ['merge_request'] } } }
+
+      it 'does not break the chain' do
+        expect(chain).not_to be_break
+      end
     end
   end
 end

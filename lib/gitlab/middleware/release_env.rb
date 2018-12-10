@@ -1,3 +1,6 @@
+# rubocop:disable Naming/FileName
+# frozen_string_literal: true
+
 module Gitlab
   module Middleware
     # Some of middleware would hold env for no good reason even after the

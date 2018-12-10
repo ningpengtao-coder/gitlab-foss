@@ -2,9 +2,9 @@ import Vue from 'vue';
 
 import dropdownValueCollapsedComponent from '~/vue_shared/components/sidebar/labels_select/dropdown_value_collapsed.vue';
 
-import { mockLabels } from './mock_data';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
-import mountComponent from '../../../../helpers/vue_mount_component_helper';
+import { mockLabels } from './mock_data';
 
 const createComponent = (labels = mockLabels) => {
   const Component = Vue.extend(dropdownValueCollapsedComponent);
@@ -29,12 +29,14 @@ describe('DropdownValueCollapsedComponent', () => {
     describe('labelsList', () => {
       it('returns empty text when `labels` prop is empty array', () => {
         const vmEmptyLabels = createComponent([]);
+
         expect(vmEmptyLabels.labelsList).toBe('');
         vmEmptyLabels.$destroy();
       });
 
       it('returns labels names separated by coma when `labels` prop has more than one item', () => {
         const vmMoreLabels = createComponent(mockLabels.concat(mockLabels));
+
         expect(vmMoreLabels.labelsList).toBe('Foo Label, Foo Label');
         vmMoreLabels.$destroy();
       });
@@ -46,12 +48,26 @@ describe('DropdownValueCollapsedComponent', () => {
         }
 
         const vmMoreLabels = createComponent(mockMoreLabels);
-        expect(vmMoreLabels.labelsList).toBe('Foo Label, Foo Label, Foo Label, Foo Label, Foo Label, and 2 more');
+
+        expect(vmMoreLabels.labelsList).toBe(
+          'Foo Label, Foo Label, Foo Label, Foo Label, Foo Label, and 2 more',
+        );
         vmMoreLabels.$destroy();
       });
 
       it('returns first label name when `labels` prop has only one item present', () => {
         expect(vm.labelsList).toBe('Foo Label');
+      });
+    });
+  });
+
+  describe('methods', () => {
+    describe('handleClick', () => {
+      it('emits onValueClick event on component', () => {
+        spyOn(vm, '$emit');
+        vm.handleClick();
+
+        expect(vm.$emit).toHaveBeenCalledWith('onValueClick');
       });
     });
   });

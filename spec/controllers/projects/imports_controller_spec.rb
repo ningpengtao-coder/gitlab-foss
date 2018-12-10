@@ -2,16 +2,15 @@ require 'spec_helper'
 
 describe Projects::ImportsController do
   let(:user) { create(:user) }
+  let(:project) { create(:project) }
+
+  before do
+    sign_in(user)
+    project.add_maintainer(user)
+  end
 
   describe 'GET #show' do
     context 'when repository does not exists' do
-      let(:project) { create(:project) }
-
-      before do
-        sign_in(user)
-        project.add_master(user)
-      end
-
       it 'renders template' do
         get :show, namespace_id: project.namespace.to_param, project_id: project
 
@@ -27,15 +26,11 @@ describe Projects::ImportsController do
 
     context 'when repository exists' do
       let(:project) { create(:project_empty_repo, import_url: 'https://github.com/vim/vim.git') }
-
-      before do
-        sign_in(user)
-        project.add_master(user)
-      end
+      let(:import_state) { project.import_state }
 
       context 'when import is in progress' do
         before do
-          project.update_attribute(:import_status, :started)
+          import_state.update(status: :started)
         end
 
         it 'renders template' do
@@ -53,7 +48,7 @@ describe Projects::ImportsController do
 
       context 'when import failed' do
         before do
-          project.update_attribute(:import_status, :failed)
+          import_state.update(status: :failed)
         end
 
         it 'redirects to new_namespace_project_import_path' do
@@ -65,7 +60,7 @@ describe Projects::ImportsController do
 
       context 'when import finished' do
         before do
-          project.update_attribute(:import_status, :finished)
+          import_state.update(status: :finished)
         end
 
         context 'when project is a fork' do
@@ -114,7 +109,7 @@ describe Projects::ImportsController do
 
       context 'when import never happened' do
         before do
-          project.update_attribute(:import_status, :none)
+          import_state.update(status: :none)
         end
 
         it 'redirects to namespace_project_path' do

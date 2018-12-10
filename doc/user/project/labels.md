@@ -9,8 +9,7 @@ Labels allow you to categorize issues or merge requests using descriptive titles
 In GitLab, you can create project and group labels:
 
 - **Project labels** can be assigned to issues or merge requests in that project only. 
-- **Group labels** can be assigned to any issue or merge request of any project in that group. 
-- In the [future](https://gitlab.com/gitlab-org/gitlab-ce/issues/40915), you will be able to assign group labels to issues and merge reqeusts of projects in [subgroups](../group/subgroups/index.md).
+- **Group labels** can be assigned to any issue or merge request of any project in that group or any subgroups of the group.
 
 ## Creating labels
 
@@ -20,6 +19,7 @@ A permission level of `Developer` or higher is required to create labels.
 ### New project label
 
 To create a **project label**, navigate to **Issues > Labels** in the project.
+This page only shows project labels in this project and group labels of this project's parent group.
 
 Click the **New label** button. Enter the title, an optional description, and the background color. Click **Create label** to create the label.
 
@@ -34,6 +34,7 @@ GitLab will add the following default labels to the project:
 ### New group label
 
 To create a **group label**, follow similar steps from above to project labels. Navigate to **Issues > Labels** in the group and create it from there.
+This page only shows group labels in this group.
 
 Group labels appear in every label list page of the group's child projects.
 
@@ -70,13 +71,23 @@ Every issue and merge request can be assigned any number of labels. The labels a
 |:---:|:---:|
 | ![Labels sidebar](img/labels_sidebar.png) | ![Labels sidebar assign](img/labels_sidebar_assign.png) |
 
+## Searching for project labels
+
+You can search for project labels by navigating from the left sidebar to your
+project's **Issues > Labels** and entering your query to the search bar on the
+top-right:
+
+![Labels project list search](img/labels_project_list_search.png)
+
+GitLab will consider the label title and description for the search.
+
 ## Filtering issues and merge requests by label
 
 ### Filtering in list pages
 
-From the project issue list page and the project merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group labels and project labels.
+From the project issue list page and the project merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group (including subgroup ancestors) labels and project labels.
 
-From the group issue list page and the group merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group labels and project labels.
+From the group issue list page and the group merge request list page, you can [filter](../search/index.md#issues-and-merge-requests) by both group labels (including subgroup ancestors and subgroup descendants) and project labels.
 
 ![Labels group issues](img/labels_group_issues.png)
 
@@ -86,7 +97,7 @@ From the group issue list page and the group merge request list page, you can [f
 
 ## Subscribing to labels
 
-From the project label list page and the group label list page, you can subscribe to [notifications](../../workflow/notifications.md) of a given label, to alert you that that label has been assigned to an issue or merge request.
+From the project label list page and the group label list page, you can subscribe to [notifications](../../workflow/notifications.md) of a given label, to alert you that the label has been assigned to an issue or merge request.
 
 ![Labels subscriptions](img/labels_subscriptions.png)
 

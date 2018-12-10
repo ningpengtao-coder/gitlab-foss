@@ -1,18 +1,42 @@
 module QA::Page
   module Project::Job
     class Show < QA::Page::Base
-      view 'app/views/projects/jobs/show.html.haml' do
-        element :build_output, '.js-build-output'
+      COMPLETED_STATUSES = %w[passed failed canceled blocked skipped manual].freeze # excludes created, pending, running
+      PASSED_STATUS = 'passed'.freeze
+
+      view 'app/assets/javascripts/jobs/components/job_app.vue' do
+        element :loading_animation
       end
 
+      view 'app/assets/javascripts/jobs/components/job_log.vue' do
+        element :build_trace
+      end
+
+      view 'app/assets/javascripts/vue_shared/components/ci_badge_link.vue' do
+        element :status_badge
+      end
+
+      def completed?
+        COMPLETED_STATUSES.include?(status_badge)
+      end
+
+      def passed?
+        status_badge == PASSED_STATUS
+      end
+
+      def trace_loading?
+        has_element?(:loading_animation)
+      end
+
+      # Reminder: You may wish to wait for a particular job status before checking output
       def output
-        css = '.js-build-output'
+        find_element(:build_trace).text
+      end
 
-        wait(reload: false) do
-          has_css?(css)
-        end
+      private
 
-        find(css).text
+      def status_badge
+        find_element(:status_badge).text
       end
     end
   end

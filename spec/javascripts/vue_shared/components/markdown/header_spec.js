@@ -1,10 +1,11 @@
 import Vue from 'vue';
+import $ from 'jquery';
 import headerComponent from '~/vue_shared/components/markdown/header.vue';
 
 describe('Markdown field header component', () => {
   let vm;
 
-  beforeEach((done) => {
+  beforeEach(done => {
     const Component = Vue.extend(headerComponent);
 
     vm = new Component({
@@ -16,25 +17,35 @@ describe('Markdown field header component', () => {
     Vue.nextTick(done);
   });
 
-  it('renders markdown buttons', () => {
-    expect(
-      vm.$el.querySelectorAll('.js-md').length,
-    ).toBe(7);
+  it('renders markdown header buttons', () => {
+    const buttons = [
+      'Add bold text',
+      'Add italic text',
+      'Insert a quote',
+      'Insert code',
+      'Add a link',
+      'Add a bullet list',
+      'Add a numbered list',
+      'Add a task list',
+      'Add a table',
+      'Go full screen',
+    ];
+    const elements = vm.$el.querySelectorAll('.toolbar-btn');
+
+    elements.forEach((buttonEl, index) => {
+      expect(buttonEl.getAttribute('data-original-title')).toBe(buttons[index]);
+    });
   });
 
   it('renders `write` link as active when previewMarkdown is false', () => {
-    expect(
-      vm.$el.querySelector('li:nth-child(1)').classList.contains('active'),
-    ).toBeTruthy();
+    expect(vm.$el.querySelector('li:nth-child(1)').classList.contains('active')).toBeTruthy();
   });
 
-  it('renders `preview` link as active when previewMarkdown is true', (done) => {
+  it('renders `preview` link as active when previewMarkdown is true', done => {
     vm.previewMarkdown = true;
 
     Vue.nextTick(() => {
-      expect(
-        vm.$el.querySelector('li:nth-child(2)').classList.contains('active'),
-      ).toBeTruthy();
+      expect(vm.$el.querySelector('li:nth-child(2)').classList.contains('active')).toBeTruthy();
 
       done();
     });
@@ -52,18 +63,34 @@ describe('Markdown field header component', () => {
     expect(vm.$emit).toHaveBeenCalledWith('write-markdown');
   });
 
-  it('blurs preview link after click', (done) => {
-    const link = vm.$el.querySelector('li:nth-child(2) a');
+  it('does not emit toggle markdown event when triggered from another form', () => {
+    spyOn(vm, '$emit');
+
+    $(document).triggerHandler('markdown-preview:show', [
+      $(
+        '<form><div class="js-vue-markdown-field"><textarea class="markdown-area"></textarea></div></form>',
+      ),
+    ]);
+
+    expect(vm.$emit).not.toHaveBeenCalled();
+  });
+
+  it('blurs preview link after click', done => {
+    const link = vm.$el.querySelector('li:nth-child(2) button');
     spyOn(HTMLElement.prototype, 'blur');
 
     link.click();
 
     setTimeout(() => {
-      expect(
-        link.blur,
-      ).toHaveBeenCalled();
+      expect(link.blur).toHaveBeenCalled();
 
       done();
     });
+  });
+
+  it('renders markdown table template', () => {
+    expect(vm.mdTable).toEqual(
+      '| header | header |\n| ------ | ------ |\n| cell | cell |\n| cell | cell |',
+    );
   });
 });

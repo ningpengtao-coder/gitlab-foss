@@ -7,12 +7,16 @@ if defined?(Unicorn)
     # Unicorn self-process killer
     require 'unicorn/worker_killer'
 
-    min = (ENV['GITLAB_UNICORN_MEMORY_MIN'] || 300 * 1 << 20).to_i
-    max = (ENV['GITLAB_UNICORN_MEMORY_MAX'] || 350 * 1 << 20).to_i
+    min = (ENV['GITLAB_UNICORN_MEMORY_MIN'] || 400 * 1 << 20).to_i
+    max = (ENV['GITLAB_UNICORN_MEMORY_MAX'] || 650 * 1 << 20).to_i
 
     # Max memory size (RSS) per worker
     use Unicorn::WorkerKiller::Oom, min, max
   end
+
+  # Monkey patch for fixing Rack 2.0.6 bug:
+  # https://gitlab.com/gitlab-org/gitlab-ee/issues/8539
+  Unicorn::StreamInput.send(:public, :eof?) # rubocop:disable GitlabSecurity/PublicSend
 end
 
 require ::File.expand_path('../config/environment',  __FILE__)

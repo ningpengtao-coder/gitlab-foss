@@ -5,6 +5,10 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
   set(:user) { create(:user) }
   let(:pipeline) { Ci::Pipeline.new }
 
+  let(:variables_attributes) do
+    [{ key: 'first', secret_value: 'world' },
+     { key: 'second', secret_value: 'second_world' }]
+  end
   let(:command) do
     Gitlab::Ci::Pipeline::Chain::Command.new(
       source: :push,
@@ -14,8 +18,10 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
       before_sha: nil,
       trigger_request: nil,
       schedule: nil,
+      merge_request: nil,
       project: project,
-      current_user: user)
+      current_user: user,
+      variables_attributes: variables_attributes)
   end
 
   let(:step) { described_class.new(pipeline, command) }
@@ -39,6 +45,8 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
     expect(pipeline.tag).to be false
     expect(pipeline.user).to eq user
     expect(pipeline.project).to eq project
+    expect(pipeline.variables.map { |var| var.slice(:key, :secret_value) })
+      .to eq variables_attributes.map(&:with_indifferent_access)
   end
 
   it 'sets a valid config source' do
@@ -69,6 +77,7 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
         before_sha: nil,
         trigger_request: nil,
         schedule: nil,
+        merge_request: nil,
         project: project,
         current_user: user)
     end
@@ -81,6 +90,33 @@ describe Gitlab::Ci::Pipeline::Chain::Build do
 
     it 'correctly indicated that this is a tagged pipeline' do
       expect(pipeline).to be_tag
+    end
+  end
+
+  context 'when pipeline is running for a merge request' do
+    let(:command) do
+      Gitlab::Ci::Pipeline::Chain::Command.new(
+        source: :merge_request,
+        origin_ref: 'feature',
+        checkout_sha: project.commit.id,
+        after_sha: nil,
+        before_sha: nil,
+        trigger_request: nil,
+        schedule: nil,
+        merge_request: merge_request,
+        project: project,
+        current_user: user)
+    end
+
+    let(:merge_request) { build(:merge_request, target_project: project) }
+
+    before do
+      step.perform!
+    end
+
+    it 'correctly indicated that this is a merge request pipeline' do
+      expect(pipeline).to be_merge_request
+      expect(pipeline.merge_request).to eq(merge_request)
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   # Retrieving of parent or child groups based on a base ActiveRecord relation.
   #
@@ -19,9 +21,11 @@ module Gitlab
 
     # Returns the set of descendants of a given relation, but excluding the given
     # relation
+    # rubocop: disable CodeReuse/ActiveRecord
     def descendants
       base_and_descendants.where.not(id: descendants_base.select(:id))
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     # Returns the set of ancestors of a given relation, but excluding the given
     # relation
@@ -29,9 +33,11 @@ module Gitlab
     # Passing an `upto` will stop the recursion once the specified parent_id is
     # reached. So all ancestors *lower* than the specified ancestor will be
     # included.
-    def ancestors(upto: nil)
-      base_and_ancestors(upto: upto).where.not(id: ancestors_base.select(:id))
+    # rubocop: disable CodeReuse/ActiveRecord
+    def ancestors(upto: nil, hierarchy_order: nil)
+      base_and_ancestors(upto: upto, hierarchy_order: hierarchy_order).where.not(id: ancestors_base.select(:id))
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     # Returns a relation that includes the ancestors_base set of groups
     # and all their ancestors (recursively).
@@ -39,11 +45,22 @@ module Gitlab
     # Passing an `upto` will stop the recursion once the specified parent_id is
     # reached. So all ancestors *lower* than the specified acestor will be
     # included.
-    def base_and_ancestors(upto: nil)
+    #
+    # Passing a `hierarchy_order` with either `:asc` or `:desc` will cause the
+    # recursive query order from most nested group to root or from the root
+    # ancestor to most nested group respectively. This uses a `depth` column
+    # where `1` is defined as the depth for the base and increment as we go up
+    # each parent.
+    # rubocop: disable CodeReuse/ActiveRecord
+    def base_and_ancestors(upto: nil, hierarchy_order: nil)
       return ancestors_base unless Group.supports_nested_groups?
 
-      read_only(base_and_ancestors_cte(upto).apply_to(model.all))
+      recursive_query = base_and_ancestors_cte(upto, hierarchy_order).apply_to(model.all)
+      recursive_query = recursive_query.order(depth: hierarchy_order) if hierarchy_order
+
+      read_only(recursive_query)
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     # Returns a relation that includes the descendants_base set of groups
     # and all their descendants (recursively).
@@ -75,6 +92,7 @@ module Gitlab
     # Rails thinking it's selecting data the usual way.
     #
     # If nested groups are not supported, ancestors_base is returned.
+    # rubocop: disable CodeReuse/ActiveRecord
     def all_groups
       return ancestors_base unless Group.supports_nested_groups?
 
@@ -84,36 +102,46 @@ module Gitlab
       ancestors_table = ancestors.alias_to(groups_table)
       descendants_table = descendants.alias_to(groups_table)
 
-      union = SQL::Union.new([model.unscoped.from(ancestors_table),
-                              model.unscoped.from(descendants_table)])
-
       relation = model
         .unscoped
         .with
         .recursive(ancestors.to_arel, descendants.to_arel)
-        .from("(#{union.to_sql}) #{model.table_name}")
+        .from_union([
+          model.unscoped.from(ancestors_table),
+          model.unscoped.from(descendants_table)
+        ])
 
       read_only(relation)
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     private
 
-    def base_and_ancestors_cte(stop_id = nil)
+    # rubocop: disable CodeReuse/ActiveRecord
+    def base_and_ancestors_cte(stop_id = nil, hierarchy_order = nil)
       cte = SQL::RecursiveCTE.new(:base_and_ancestors)
+      depth_column = :depth
 
-      cte << ancestors_base.except(:order)
+      base_query = ancestors_base.except(:order)
+      base_query = base_query.select("1 as #{depth_column}", groups_table[Arel.star]) if hierarchy_order
+
+      cte << base_query
 
       # Recursively get all the ancestors of the base set.
       parent_query = model
         .from([groups_table, cte.table])
         .where(groups_table[:id].eq(cte.table[:parent_id]))
         .except(:order)
+
+      parent_query = parent_query.select(cte.table[depth_column] + 1, groups_table[Arel.star]) if hierarchy_order
       parent_query = parent_query.where(cte.table[:parent_id].not_eq(stop_id)) if stop_id
 
       cte << parent_query
       cte
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def base_and_descendants_cte
       cte = SQL::RecursiveCTE.new(:base_and_descendants)
 
@@ -127,6 +155,7 @@ module Gitlab
 
       cte
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def groups_table
       model.arel_table

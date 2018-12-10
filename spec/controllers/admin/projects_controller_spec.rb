@@ -31,5 +31,26 @@ describe Admin::ProjectsController do
       expect(response.body).not_to match(pending_delete_project.name)
       expect(response.body).to match(project.name)
     end
+
+    it 'does not have N+1 queries', :use_clean_rails_memory_store_caching, :request_store do
+      get :index
+
+      control_count = ActiveRecord::QueryRecorder.new { get :index }.count
+
+      create(:project)
+
+      expect { get :index }.not_to exceed_query_limit(control_count)
+    end
+  end
+
+  describe 'GET /projects/:id' do
+    render_views
+
+    it 'renders show page' do
+      get :show, namespace_id: project.namespace.path, id: project.path
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response.body).to match(project.name)
+    end
   end
 end

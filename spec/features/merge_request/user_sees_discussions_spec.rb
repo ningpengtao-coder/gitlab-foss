@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-describe 'Merge request > User sees discussions' do
+describe 'Merge request > User sees discussions', :js do
   let(:project) { create(:project, :public, :repository) }
   let(:user) { project.creator }
   let(:merge_request) { create(:merge_request, source_project: project) }
 
   before do
-    project.add_master(user)
+    project.add_maintainer(user)
     sign_in(user)
   end
 
@@ -72,16 +72,21 @@ describe 'Merge request > User sees discussions' do
       visit project_merge_request_path(project, merge_request)
     end
 
-    context 'a regular commit comment' do
-      let(:note) { create(:note_on_commit, project: project) }
-
-      it_behaves_like 'a functional discussion'
-    end
+    # TODO: https://gitlab.com/gitlab-org/gitlab-ce/issues/48034
+    # context 'a regular commit comment' do
+    #   let(:note) { create(:note_on_commit, project: project) }
+    #
+    #   it_behaves_like 'a functional discussion'
+    # end
 
     context 'a commit diff comment' do
       let(:note) { create(:diff_note_on_commit, project: project) }
 
       it_behaves_like 'a functional discussion'
+
+      it 'displays correct header' do
+        expect(page).to have_content "started a discussion on commit #{note.commit_id[0...7]}"
+      end
     end
   end
 end

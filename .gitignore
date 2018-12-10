@@ -11,6 +11,7 @@
 eslint-report.html
 /.gitlab_shell_secret
 .idea
+/.vscode/*
 /.rbenv-version
 .rbx/
 /.ruby-gemset
@@ -22,10 +23,13 @@ eslint-report.html
 /.yarn-cache
 /.byebug_history
 /Vagrantfile
+/app/assets/images/icons.json
+/app/assets/images/icons.svg
+/app/assets/images/illustrations/
 /app/assets/javascripts/locale/**/app.js
 /backups/*
 /config/aws.yml
-/config/database.yml
+/config/database*.yml
 /config/gitlab.yml
 /config/gitlab_ci.yml
 /config/initializers/rack_attack.rb
@@ -36,6 +40,7 @@ eslint-report.html
 /config/redis.queues.yml
 /config/redis.shared_state.yml
 /config/unicorn.rb
+/config/puma.rb
 /config/secrets.yml
 /config/sidekiq.yml
 /config/registry.key
@@ -46,6 +51,7 @@ eslint-report.html
 /db/data.yml
 /doc/code/*
 /dump.rdb
+/jsconfig.json
 /log/*.log*
 /node_modules/
 /nohup.out
@@ -59,11 +65,18 @@ eslint-report.html
 /tags
 /tmp/*
 /vendor/bundle/*
+/vendor/gitaly-ruby
 /builds*
 /shared/*
 /.gitlab_workhorse_secret
 /webpack-report/
+/knapsack/
+/rspec_flaky/
 /locale/**/LC_MESSAGES
 /locale/**/*.time_stamp
 /.rspec
 /plugins/*
+/.gitlab_pages_secret
+package-lock.json
+/junit_*.xml
+/coverage-frontend/

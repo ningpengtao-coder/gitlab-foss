@@ -1,6 +1,4 @@
-/* global BoardService */
-/* eslint-disable comma-dangle, no-unused-vars, quote-props */
-import _ from 'underscore';
+import BoardService from '~/boards/services/board_service';
 
 export const listObj = {
   id: 300,
@@ -11,8 +9,8 @@ export const listObj = {
     id: 5000,
     title: 'Testing',
     color: 'red',
-    description: 'testing;'
-  }
+    description: 'testing;',
+  },
 };
 
 export const listObjDuplicate = {
@@ -24,35 +22,37 @@ export const listObjDuplicate = {
     id: listObj.label.id,
     title: 'Testing',
     color: 'red',
-    description: 'testing;'
-  }
+    description: 'testing;',
+  },
 };
 
 export const BoardsMockData = {
-  'GET': {
-    '/test/-/boards/1/lists/300/issues?id=300&page=1&=': {
-      issues: [{
-        title: 'Testing',
-        id: 1,
-        iid: 1,
-        confidential: false,
-        labels: [],
-        assignees: [],
-      }],
-    }
+  GET: {
+    '/test/-/boards/1/lists/300/issues?id=300&page=1': {
+      issues: [
+        {
+          title: 'Testing',
+          id: 1,
+          iid: 1,
+          confidential: false,
+          labels: [],
+          assignees: [],
+        },
+      ],
+    },
   },
-  'POST': {
-    '/test/-/boards/1/lists': listObj
+  POST: {
+    '/test/-/boards/1/lists': listObj,
   },
-  'PUT': {
-    '/test/issue-boards/board/1/lists{/id}': {}
+  PUT: {
+    '/test/issue-boards/board/1/lists{/id}': {},
   },
-  'DELETE': {
-    '/test/issue-boards/board/1/lists{/id}': {}
-  }
+  DELETE: {
+    '/test/issue-boards/board/1/lists{/id}': {},
+  },
 };
 
-export const boardsMockInterceptor = (config) => {
+export const boardsMockInterceptor = config => {
   const body = BoardsMockData[config.method.toUpperCase()][config.url];
   return [200, body];
 };

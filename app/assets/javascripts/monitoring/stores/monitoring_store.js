@@ -1,13 +1,35 @@
 import _ from 'underscore';
 
 function sortMetrics(metrics) {
-  return _.chain(metrics).sortBy('weight').sortBy('title').value();
+  return _.chain(metrics)
+    .sortBy('title')
+    .sortBy('weight')
+    .value();
+}
+
+function checkQueryEmptyData(query) {
+  return {
+    ...query,
+    result: query.result.filter(timeSeries => {
+      const newTimeSeries = timeSeries;
+      const hasValue = series =>
+        !Number.isNaN(series.value) && (series.value !== null || series.value !== undefined);
+      const hasNonNullValue = timeSeries.values.find(hasValue);
+
+      newTimeSeries.values = hasNonNullValue ? newTimeSeries.values : [];
+
+      return newTimeSeries.values.length > 0;
+    }),
+  };
+}
+
+function removeTimeSeriesNoData(queries) {
+  return queries.reduce((series, query) => series.concat(checkQueryEmptyData(query)), []);
 }
 
 function normalizeMetrics(metrics) {
-  return metrics.map(metric => ({
-    ...metric,
-    queries: metric.queries.map(query => ({
+  return metrics.map(metric => {
+    const queries = metric.queries.map(query => ({
       ...query,
       result: query.result.map(result => ({
         ...result,
@@ -16,14 +38,20 @@ function normalizeMetrics(metrics) {
           value: Number(value),
         })),
       })),
-    })),
-  }));
+    }));
+
+    return {
+      ...metric,
+      queries: removeTimeSeriesNoData(queries),
+    };
+  });
 }
 
 export default class MonitoringStore {
   constructor() {
     this.groups = [];
     this.deploymentData = [];
+    this.environmentsData = [];
   }
 
   storeMetrics(groups = []) {
@@ -35,6 +63,12 @@ export default class MonitoringStore {
 
   storeDeploymentData(deploymentData = []) {
     this.deploymentData = deploymentData;
+  }
+
+  storeEnvironmentsData(environmentsData = []) {
+    this.environmentsData = environmentsData.filter(
+      environment => !!environment.latest.last_deployment,
+    );
   }
 
   getMetricsCount() {

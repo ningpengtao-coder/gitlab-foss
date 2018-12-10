@@ -1,14 +1,19 @@
+import { PROJECT_BADGE } from '~/badges/constants';
 import initSettingsPanels from '~/settings_panels';
 import setupProjectEdit from '~/project_edit';
-import ProjectNew from '../shared/project_new';
-import projectAvatar from '../shared/project_avatar';
+import initConfirmDangerModal from '~/confirm_danger_modal';
+import mountBadgeSettings from '~/pages/shared/mount_badge_settings';
+import fileUpload from '~/lib/utils/file_upload';
+import initProjectLoadingSpinner from '../shared/save_project_loader';
 import initProjectPermissionsSettings from '../shared/permissions';
 
 document.addEventListener('DOMContentLoaded', () => {
-  new ProjectNew(); // eslint-disable-line no-new
+  initProjectLoadingSpinner();
   setupProjectEdit();
   // Initialize expandable settings panels
   initSettingsPanels();
-  projectAvatar();
+  fileUpload('.js-choose-project-avatar-button', '.js-project-avatar-input');
   initProjectPermissionsSettings();
+  initConfirmDangerModal();
+  mountBadgeSettings(PROJECT_BADGE);
 });

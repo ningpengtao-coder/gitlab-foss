@@ -1,94 +1,101 @@
 <script>
-  import { mapActions } from 'vuex';
-  import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
+import { mapActions } from 'vuex';
+import timeAgoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
 
-  export default {
-    components: {
-      timeAgoTooltip,
+export default {
+  components: {
+    timeAgoTooltip,
+  },
+  props: {
+    author: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
-    props: {
-      author: {
-        type: Object,
-        required: true,
-      },
-      createdAt: {
-        type: String,
-        required: true,
-      },
-      actionText: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      actionTextHtml: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      noteId: {
-        type: Number,
-        required: true,
-      },
-      includeToggle: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
-      expanded: {
-        type: Boolean,
-        required: false,
-        default: true,
-      },
+    createdAt: {
+      type: String,
+      required: false,
+      default: null,
     },
-    computed: {
-      toggleChevronClass() {
-        return this.expanded ? 'fa-chevron-up' : 'fa-chevron-down';
-      },
-      noteTimestampLink() {
-        return `#note_${this.noteId}`;
-      },
+    actionText: {
+      type: String,
+      required: false,
+      default: '',
     },
-    methods: {
-      ...mapActions([
-        'setTargetNoteHash',
-      ]),
-      handleToggle() {
-        this.$emit('toggleHandler');
-      },
-      updateTargetNoteHash() {
-        this.setTargetNoteHash(this.noteTimestampLink);
-      },
+    noteId: {
+      type: [String, Number],
+      required: false,
+      default: null,
     },
-  };
+    includeToggle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    expanded: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  computed: {
+    toggleChevronClass() {
+      return this.expanded ? 'fa-chevron-up' : 'fa-chevron-down';
+    },
+    noteTimestampLink() {
+      return `#note_${this.noteId}`;
+    },
+    hasAuthor() {
+      return this.author && Object.keys(this.author).length;
+    },
+  },
+  methods: {
+    ...mapActions(['setTargetNoteHash']),
+    handleToggle() {
+      this.$emit('toggleHandler');
+    },
+    updateTargetNoteHash() {
+      this.setTargetNoteHash(this.noteTimestampLink);
+    },
+  },
+};
 </script>
 
 <template>
   <div class="note-header-info">
-    <a :href="author.path">
+    <div v-if="includeToggle" class="discussion-actions">
+      <button
+        class="note-action-button discussion-toggle-button js-vue-toggle-button"
+        type="button"
+        @click="handleToggle"
+      >
+        <i :class="toggleChevronClass" class="fa" aria-hidden="true"> </i>
+        {{ __('Toggle discussion') }}
+      </button>
+    </div>
+    <a v-if="hasAuthor" v-once :href="author.path">
       <span class="note-header-author-name">{{ author.name }}</span>
-      <span class="note-headline-light">
-        @{{ author.username }}
-      </span>
+      <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
+      <span class="note-headline-light"> @{{ author.username }} </span>
     </a>
+    <span v-else> {{ __('A deleted user') }} </span>
     <span class="note-headline-light">
       <span class="note-headline-meta">
-        <template v-if="actionText">
-          {{ actionText }}
+        <span class="system-note-message"> <slot></slot> </span>
+        <template v-if="createdAt">
+          <span class="system-note-separator">
+            <template v-if="actionText">
+              {{ actionText }}
+            </template>
+          </span>
+          <a
+            :href="noteTimestampLink"
+            class="note-timestamp system-note-separator"
+            @click="updateTargetNoteHash"
+          >
+            <time-ago-tooltip :time="createdAt" tooltip-placement="bottom" />
+          </a>
         </template>
-        <span
-          v-if="actionTextHtml"
-          v-html="actionTextHtml"
-          class="system-note-message">
-        </span>
-        <a
-          :href="noteTimestampLink"
-          @click="updateTargetNoteHash"
-          class="note-timestamp">
-          <time-ago-tooltip
-            :time="createdAt"
-            tooltip-placement="bottom"
-          />
-        </a>
         <i
           class="fa fa-spinner fa-spin editing-spinner"
           aria-label="Comment is being updated"
@@ -97,20 +104,5 @@
         </i>
       </span>
     </span>
-    <div
-      v-if="includeToggle"
-      class="discussion-actions">
-      <button
-        @click="handleToggle"
-        class="note-action-button discussion-toggle-button js-vue-toggle-button"
-        type="button">
-        <i
-          :class="toggleChevronClass"
-          class="fa"
-          aria-hidden="true">
-        </i>
-        Toggle discussion
-      </button>
-    </div>
   </div>
 </template>

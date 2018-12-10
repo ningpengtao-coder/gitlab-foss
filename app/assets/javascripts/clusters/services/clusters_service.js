@@ -6,8 +6,11 @@ export default class ClusterService {
     this.appInstallEndpointMap = {
       helm: this.options.installHelmEndpoint,
       ingress: this.options.installIngressEndpoint,
+      cert_manager: this.options.installCertManagerEndpoint,
       runner: this.options.installRunnerEndpoint,
       prometheus: this.options.installPrometheusEndpoint,
+      jupyter: this.options.installJupyterEndpoint,
+      knative: this.options.installKnativeEndpoint,
     };
   }
 
@@ -15,8 +18,8 @@ export default class ClusterService {
     return axios.get(this.options.endpoint);
   }
 
-  installApplication(appId) {
-    return axios.post(this.appInstallEndpointMap[appId]);
+  installApplication(appId, params) {
+    return axios.post(this.appInstallEndpointMap[appId], params);
   }
 
   static updateCluster(endpoint, data) {

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class TeamcityService < CiService
   include ReactiveService
 
   prop_accessor :teamcity_url, :build_type, :username, :password
 
-  validates :teamcity_url, presence: true, url: true, if: :activated?
+  validates :teamcity_url, presence: true, public_url: true, if: :activated?
   validates :build_type, presence: true, if: :activated?
   validates :username,
     presence: true,
@@ -83,7 +85,7 @@ class TeamcityService < CiService
 
     branch = Gitlab::Git.ref_name(data[:ref])
 
-    HTTParty.post(
+    Gitlab::HTTP.post(
       build_url('httpAuth/app/rest/buildQueue'),
       body: "<build branchName=\"#{branch}\">"\
             "<buildType id=\"#{build_type}\"/>"\
@@ -130,14 +132,14 @@ class TeamcityService < CiService
   end
 
   def build_url(path)
-    URI.join("#{teamcity_url}/", path).to_s
+    Gitlab::Utils.append_path(teamcity_url, path)
   end
 
   def get_path(path)
-    HTTParty.get(build_url(path), verify: false,
-                                  basic_auth: {
-                                    username: username,
-                                    password: password
-                                  })
+    Gitlab::HTTP.get(build_url(path), verify: false,
+                                      basic_auth: {
+                                        username: username,
+                                        password: password
+                                      })
   end
 end

@@ -81,7 +81,10 @@ shared_examples 'discussion comments' do |resource_name|
 
       # on issues page, the menu closes when clicking anywhere, on other pages it will
       # remain open if clicking divider or menu padding, but should not change button action
-      if resource_name == 'issue'
+      #
+      # if dropdown menu is not toggled (and also not present),
+      # it's "issue-type" dropdown
+      if first(menu_selector).nil?
         expect(find(dropdown_selector)).to have_content 'Comment'
 
         find(toggle_selector).click
@@ -107,8 +110,10 @@ shared_examples 'discussion comments' do |resource_name|
       end
 
       it 'updates the submit button text and closes the dropdown' do
+        button = find(submit_selector)
+
         # on issues page, the submit input is a <button>, on other pages it is <input>
-        if resource_name == 'issue'
+        if button.tag_name == 'button'
           expect(find(submit_selector)).to have_content 'Start discussion'
         else
           expect(find(submit_selector).value).to eq 'Start discussion'
@@ -132,7 +137,17 @@ shared_examples 'discussion comments' do |resource_name|
       describe 'creating a discussion' do
         before do
           find(submit_selector).click
+          wait_for_requests
+
           find(comments_selector, match: :first)
+        end
+
+        def submit_reply(text)
+          find("#{comments_selector} .js-vue-discussion-reply").click
+          find("#{comments_selector} .note-textarea").send_keys(text)
+
+          click_button "Comment"
+          wait_for_requests
         end
 
         it 'clicking "Start discussion" will post a discussion' do
@@ -142,18 +157,39 @@ shared_examples 'discussion comments' do |resource_name|
           expect(new_comment).to have_selector '.discussion'
         end
 
+        if resource_name =~ /(issue|merge request)/
+          it 'can be replied to' do
+            submit_reply('some text')
+
+            expect(page).to have_css('.discussion-notes .note', count: 2)
+            expect(page).to have_content 'Collapse replies'
+          end
+
+          it 'can be collapsed' do
+            submit_reply('another text')
+
+            find('.js-collapse-replies').click
+            expect(page).to have_css('.discussion-notes .note', count: 1)
+            expect(page).to have_content '1 reply'
+          end
+        end
+
         if resource_name == 'merge request'
-          let(:note_id) { find("#{comments_selector} .note", match: :first)['data-note-id'] }
+          let(:note_id) { find("#{comments_selector} .note:first-child", match: :first)['data-note-id'] }
+          let(:reply_id) { find("#{comments_selector} .note:last-child", match: :first)['data-note-id'] }
 
           it 'shows resolved discussion when toggled' do
+            submit_reply('a')
+
             click_button "Resolve discussion"
+            wait_for_requests
 
             expect(page).to have_selector(".note-row-#{note_id}", visible: true)
 
             refresh
-            click_button "Toggle discussion"
+            click_button "1 reply"
 
-            expect(page).to have_selector(".note-row-#{note_id}", visible: true)
+            expect(page).to have_selector(".note-row-#{reply_id}", visible: true)
           end
         end
       end
@@ -197,11 +233,13 @@ shared_examples 'discussion comments' do |resource_name|
           end
 
           it 'updates the submit button text and closes the dropdown' do
+            button = find(submit_selector)
+
             # on issues page, the submit input is a <button>, on other pages it is <input>
-            if resource_name == 'issue'
-              expect(find(submit_selector)).to have_content 'Comment'
+            if button.tag_name == 'button'
+              expect(button).to have_content 'Comment'
             else
-              expect(find(submit_selector).value).to eq 'Comment'
+              expect(button.value).to eq 'Comment'
             end
 
             expect(page).not_to have_selector menu_selector

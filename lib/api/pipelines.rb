@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class Pipelines < Grape::API
     include PaginationParams
@@ -7,7 +9,7 @@ module API
     params do
       requires :id, type: String, desc: 'The project ID'
     end
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get all Pipelines of the project' do
         detail 'This feature was introduced in GitLab 8.11.'
         success Entities::PipelineBasic
@@ -19,6 +21,7 @@ module API
         optional :status,   type: String, values: HasStatus::AVAILABLE_STATUSES,
                             desc: 'The status of pipelines'
         optional :ref,      type: String, desc: 'The ref of pipelines'
+        optional :sha,      type: String, desc: 'The sha of pipelines'
         optional :yaml_errors, type: Boolean, desc: 'Returns pipelines with invalid configurations'
         optional :name,     type: String, desc: 'The name of the user who triggered pipelines'
         optional :username, type: String, desc: 'The username of the user who triggered pipelines'
@@ -30,7 +33,7 @@ module API
       get ':id/pipelines' do
         authorize! :read_pipeline, user_project
 
-        pipelines = PipelinesFinder.new(user_project, params).execute
+        pipelines = PipelinesFinder.new(user_project, current_user, params).execute
         present paginate(pipelines), with: Entities::PipelineBasic
       end
 
@@ -40,15 +43,21 @@ module API
       end
       params do
         requires :ref, type: String,  desc: 'Reference'
+        optional :variables, Array, desc: 'Array of variables available in the pipeline'
       end
+      # rubocop: disable CodeReuse/ActiveRecord
       post ':id/pipeline' do
         Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42124')
 
         authorize! :create_pipeline, user_project
 
+        pipeline_params = declared_params(include_missing: false)
+          .merge(variables_attributes: params[:variables])
+          .except(:variables)
+
         new_pipeline = Ci::CreatePipelineService.new(user_project,
                                                      current_user,
-                                                     declared_params(include_missing: false))
+                                                     pipeline_params)
                            .execute(:api, ignore_skip_ci: true, save_on_errors: false)
 
         if new_pipeline.persisted?
@@ -57,6 +66,7 @@ module API
           render_validation_error!(new_pipeline)
         end
       end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       desc 'Gets a specific pipeline for the project' do
         detail 'This feature was introduced in GitLab 8.11'
@@ -69,6 +79,21 @@ module API
         authorize! :read_pipeline, user_project
 
         present pipeline, with: Entities::Pipeline
+      end
+
+      desc 'Deletes a pipeline' do
+        detail 'This feature was introduced in GitLab 11.6'
+        http_codes [[204, 'Pipeline was deleted'], [403, 'Forbidden']]
+      end
+      params do
+        requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
+      end
+      delete ':id/pipelines/:pipeline_id' do
+        authorize! :destroy_pipeline, pipeline
+
+        destroy_conditionally!(pipeline) do
+          ::Ci::DestroyPipelineService.new(user_project, current_user).execute(pipeline)
+        end
       end
 
       desc 'Retry builds in the pipeline' do
@@ -105,7 +130,7 @@ module API
 
     helpers do
       def pipeline
-        @pipeline ||= user_project.pipelines.find(params[:pipeline_id])
+        @pipeline ||= user_project.ci_pipelines.find(params[:pipeline_id])
       end
     end
   end

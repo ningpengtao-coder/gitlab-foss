@@ -2,7 +2,7 @@ import Vue from 'vue';
 import GraphFlag from '~/monitoring/components/graph/flag.vue';
 import { deploymentData } from '../mock_data';
 
-const createComponent = (propsData) => {
+const createComponent = propsData => {
   const Component = Vue.extend(GraphFlag);
 
   return new Component({
@@ -22,15 +22,20 @@ const defaultValuesComponent = {
   graphHeightOffset: 120,
   showFlagContent: true,
   realPixelRatio: 1,
-  timeSeries: [{
-    values: [{
-      time: new Date('2017-06-04T18:17:33.501Z'),
-      value: '1.49609375',
-    }],
-  }],
+  timeSeries: [
+    {
+      values: [
+        {
+          time: new Date('2017-06-04T18:17:33.501Z'),
+          value: '1.49609375',
+        },
+      ],
+    },
+  ],
   unitOfDisplay: 'ms',
   currentDataIndex: 0,
   legendTitle: 'Average',
+  currentCoordinates: {},
 };
 
 const deploymentFlagData = {
@@ -46,8 +51,7 @@ describe('GraphFlag', () => {
   it('has a line at the currentXCoordinate', () => {
     component = createComponent(defaultValuesComponent);
 
-    expect(component.$el.style.left)
-      .toEqual(`${70 + component.currentXCoordinate}px`);
+    expect(component.$el.style.left).toEqual(`${70 + component.currentXCoordinate}px`);
   });
 
   describe('Deployment flag', () => {
@@ -57,9 +61,7 @@ describe('GraphFlag', () => {
         deploymentFlagData,
       });
 
-      expect(
-        deploymentFlagComponent.$el.querySelector('.popover-title'),
-      ).toContainText('Deployed');
+      expect(deploymentFlagComponent.$el.querySelector('.popover-title')).toContainText('Deployed');
     });
 
     it('contains the ref when a tag is available', () => {
@@ -73,13 +75,13 @@ describe('GraphFlag', () => {
         },
       });
 
-      expect(
-        deploymentFlagComponent.$el.querySelector('.deploy-meta-content'),
-      ).toContainText('f5bcd1d9');
+      expect(deploymentFlagComponent.$el.querySelector('.deploy-meta-content')).toContainText(
+        'f5bcd1d9',
+      );
 
-      expect(
-        deploymentFlagComponent.$el.querySelector('.deploy-meta-content'),
-      ).toContainText('1.0');
+      expect(deploymentFlagComponent.$el.querySelector('.deploy-meta-content')).toContainText(
+        '1.0',
+      );
     });
 
     it('does not contain the ref when a tag is unavailable', () => {
@@ -93,13 +95,13 @@ describe('GraphFlag', () => {
         },
       });
 
-      expect(
-        deploymentFlagComponent.$el.querySelector('.deploy-meta-content'),
-      ).toContainText('f5bcd1d9');
+      expect(deploymentFlagComponent.$el.querySelector('.deploy-meta-content')).toContainText(
+        'f5bcd1d9',
+      );
 
-      expect(
-        deploymentFlagComponent.$el.querySelector('.deploy-meta-content'),
-      ).not.toContainText('1.0');
+      expect(deploymentFlagComponent.$el.querySelector('.deploy-meta-content')).not.toContainText(
+        '1.0',
+      );
     });
   });
 
@@ -113,7 +115,7 @@ describe('GraphFlag', () => {
     });
 
     it('formatDate', () => {
-      expect(component.formatDate).toEqual('Sun, Jun 4');
+      expect(component.formatDate).toEqual('04 Jun 2017, ');
     });
 
     it('cursorStyle', () => {

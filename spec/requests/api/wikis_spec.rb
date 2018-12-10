@@ -7,7 +7,7 @@ require 'spec_helper'
 # Every state is tested for 3 user roles:
 # - guest
 # - developer
-# - master
+# - maintainer
 # because they are 3 edge cases of using wiki pages.
 
 describe API::Wikis do
@@ -139,11 +139,42 @@ describe API::Wikis do
     end
   end
 
+  shared_examples_for 'uploads wiki attachment' do
+    it 'pushes attachment to the wiki repository' do
+      allow(SecureRandom).to receive(:hex).and_return('fixed_hex')
+
+      post(api(url, user), payload)
+
+      expect(response).to have_gitlab_http_status(201)
+      expect(json_response).to eq result_hash.deep_stringify_keys
+    end
+
+    it 'responds with validation error on empty file' do
+      payload.delete(:file)
+
+      post(api(url, user), payload)
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(json_response.size).to eq(1)
+      expect(json_response['error']).to eq('file is missing')
+    end
+
+    it 'responds with validation error on invalid temp file' do
+      payload[:file] = { tempfile: '/etc/hosts' }
+
+      post(api(url, user), payload)
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(json_response.size).to eq(1)
+      expect(json_response['error']).to eq('file is invalid')
+    end
+  end
+
   describe 'GET /projects/:id/wikis' do
     let(:url) { "/projects/#{project.id}/wikis" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled) }
+      let(:project) { create(:project, :wiki_repo, :wiki_disabled) }
 
       context 'when user is guest' do
         before do
@@ -163,9 +194,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           get api(url, user)
         end
@@ -175,7 +206,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private) }
+      let(:project) { create(:project, :wiki_repo, :wiki_private) }
 
       context 'when user is guest' do
         before do
@@ -193,9 +224,9 @@ describe API::Wikis do
         include_examples 'returns list of wiki pages'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
         end
 
         include_examples 'returns list of wiki pages'
@@ -203,7 +234,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -221,9 +252,9 @@ describe API::Wikis do
         include_examples 'returns list of wiki pages'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
         end
 
         include_examples 'returns list of wiki pages'
@@ -236,7 +267,7 @@ describe API::Wikis do
     let(:url) { "/projects/#{project.id}/wikis/#{page.slug}" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled) }
+      let(:project) { create(:project, :wiki_repo, :wiki_disabled) }
 
       context 'when user is guest' do
         before do
@@ -256,9 +287,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           get api(url, user)
         end
@@ -268,7 +299,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private) }
+      let(:project) { create(:project, :wiki_repo, :wiki_private) }
 
       context 'when user is guest' do
         before do
@@ -293,9 +324,9 @@ describe API::Wikis do
         end
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           get api(url, user)
         end
@@ -311,7 +342,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -337,9 +368,9 @@ describe API::Wikis do
         end
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           get api(url, user)
         end
@@ -360,7 +391,7 @@ describe API::Wikis do
     let(:url) { "/projects/#{project.id}/wikis" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled) }
+      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -379,9 +410,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
           post(api(url, user), payload)
         end
 
@@ -390,7 +421,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private) }
+      let(:project) { create(:project, :wiki_private, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -408,9 +439,9 @@ describe API::Wikis do
         include_examples 'creates wiki page'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
         end
 
         include_examples 'creates wiki page'
@@ -418,7 +449,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -436,9 +467,9 @@ describe API::Wikis do
         include_examples 'creates wiki page'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
         end
 
         include_examples 'creates wiki page'
@@ -452,7 +483,7 @@ describe API::Wikis do
     let(:url) { "/projects/#{project.id}/wikis/#{page.slug}" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled) }
+      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -472,9 +503,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           put(api(url, user), payload)
         end
@@ -484,7 +515,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private) }
+      let(:project) { create(:project, :wiki_private, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -510,9 +541,9 @@ describe API::Wikis do
         end
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           put(api(url, user), payload)
         end
@@ -528,7 +559,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -554,9 +585,9 @@ describe API::Wikis do
         end
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           put(api(url, user), payload)
         end
@@ -572,7 +603,7 @@ describe API::Wikis do
     end
 
     context 'when wiki belongs to a group project' do
-      let(:project) { create(:project, namespace: group) }
+      let(:project) { create(:project, :wiki_repo, namespace: group) }
 
       before do
         put(api(url, user), payload)
@@ -587,7 +618,7 @@ describe API::Wikis do
     let(:url) { "/projects/#{project.id}/wikis/#{page.slug}" }
 
     context 'when wiki is disabled' do
-      let(:project) { create(:project, :wiki_disabled) }
+      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -607,9 +638,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           delete(api(url, user))
         end
@@ -619,7 +650,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available only for team members' do
-      let(:project) { create(:project, :wiki_private) }
+      let(:project) { create(:project, :wiki_private, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -639,9 +670,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           delete(api(url, user))
         end
@@ -651,7 +682,7 @@ describe API::Wikis do
     end
 
     context 'when wiki is available for everyone with access' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, :wiki_repo) }
 
       context 'when user is guest' do
         before do
@@ -671,9 +702,9 @@ describe API::Wikis do
         include_examples '403 Forbidden'
       end
 
-      context 'when user is master' do
+      context 'when user is maintainer' do
         before do
-          project.add_master(user)
+          project.add_maintainer(user)
 
           delete(api(url, user))
         end
@@ -689,13 +720,116 @@ describe API::Wikis do
     end
 
     context 'when wiki belongs to a group project' do
-      let(:project) { create(:project, namespace: group) }
+      let(:project) { create(:project, :wiki_repo, namespace: group) }
 
       before do
         delete(api(url, user))
       end
 
       include_examples '204 No Content'
+    end
+  end
+
+  describe 'POST /projects/:id/wikis/attachments' do
+    let(:payload) { { file: fixture_file_upload('spec/fixtures/dk.png') } }
+    let(:url) { "/projects/#{project.id}/wikis/attachments" }
+    let(:file_path) { "#{Wikis::CreateAttachmentService::ATTACHMENT_PATH}/fixed_hex/dk.png" }
+    let(:result_hash) do
+      {
+        file_name: 'dk.png',
+        file_path: file_path,
+        branch: 'master',
+        link: {
+          url: file_path,
+          markdown: "![dk](#{file_path})"
+        }
+      }
+    end
+
+    context 'when wiki is disabled' do
+      let(:project) { create(:project, :wiki_disabled, :wiki_repo) }
+
+      context 'when user is guest' do
+        before do
+          post(api(url), payload)
+        end
+
+        include_examples '404 Project Not Found'
+      end
+
+      context 'when user is developer' do
+        before do
+          project.add_developer(user)
+          post(api(url, user), payload)
+        end
+
+        include_examples '403 Forbidden'
+      end
+
+      context 'when user is maintainer' do
+        before do
+          project.add_maintainer(user)
+          post(api(url, user), payload)
+        end
+
+        include_examples '403 Forbidden'
+      end
+    end
+
+    context 'when wiki is available only for team members' do
+      let(:project) { create(:project, :wiki_private, :wiki_repo) }
+
+      context 'when user is guest' do
+        before do
+          post(api(url), payload)
+        end
+
+        include_examples '404 Project Not Found'
+      end
+
+      context 'when user is developer' do
+        before do
+          project.add_developer(user)
+        end
+
+        include_examples 'uploads wiki attachment'
+      end
+
+      context 'when user is maintainer' do
+        before do
+          project.add_maintainer(user)
+        end
+
+        include_examples 'uploads wiki attachment'
+      end
+    end
+
+    context 'when wiki is available for everyone with access' do
+      let(:project) { create(:project, :wiki_repo) }
+
+      context 'when user is guest' do
+        before do
+          post(api(url), payload)
+        end
+
+        include_examples '404 Project Not Found'
+      end
+
+      context 'when user is developer' do
+        before do
+          project.add_developer(user)
+        end
+
+        include_examples 'uploads wiki attachment'
+      end
+
+      context 'when user is maintainer' do
+        before do
+          project.add_maintainer(user)
+        end
+
+        include_examples 'uploads wiki attachment'
+      end
     end
   end
 end

@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_state do
-  let(:project) { create(:project, import_jid: '123') }
+  let(:project) { create(:project) }
+  let(:import_state) { create(:import_state, project: project, jid: '123') }
   let(:worker) { described_class.new }
 
   describe '#perform' do
@@ -16,8 +17,8 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
     context 'when there are remaining jobs' do
       before do
         allow(worker)
-          .to receive(:find_project)
-          .and_return(project)
+          .to receive(:find_import_state)
+          .and_return(import_state)
       end
 
       it 'reschedules itself' do
@@ -37,8 +38,8 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
     context 'when there are no remaining jobs' do
       before do
         allow(worker)
-          .to receive(:find_project)
-          .and_return(project)
+          .to receive(:find_import_state)
+          .and_return(import_state)
 
         allow(worker)
           .to receive(:wait_for_jobs)
@@ -47,8 +48,8 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
       end
 
       it 'schedules the next stage' do
-        expect(project)
-          .to receive(:refresh_import_jid_expiration)
+        expect(import_state)
+          .to receive(:refresh_jid_expiration)
 
         expect(Gitlab::GithubImport::Stage::FinishImportWorker)
           .to receive(:perform_async)
@@ -95,21 +96,18 @@ describe Gitlab::GithubImport::AdvanceStageWorker, :clean_gitlab_redis_shared_st
     end
   end
 
-  describe '#find_project' do
-    it 'returns a Project' do
-      project.update_column(:import_status, 'started')
+  describe '#find_import_state' do
+    it 'returns a ProjectImportState' do
+      import_state.update_column(:status, 'started')
 
-      found = worker.find_project(project.id)
+      found = worker.find_import_state(project.id)
 
-      expect(found).to be_an_instance_of(Project)
-
-      # This test is there to make sure we only select the columns we care
-      # about.
-      expect(found.attributes).to eq({ 'id' => nil, 'import_jid' => '123' })
+      expect(found).to be_an_instance_of(ProjectImportState)
+      expect(found.attributes.keys).to match_array(%w(id jid))
     end
 
     it 'returns nil if the project import is not running' do
-      expect(worker.find_project(project.id)).to be_nil
+      expect(worker.find_import_state(project.id)).to be_nil
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Ci
     module Build
@@ -14,7 +16,7 @@ module Gitlab
             self.new(:script).tap do |step|
               step.script = job.options[:before_script].to_a + job.options[:script].to_a
               step.script = job.commands.split("\n") if step.script.empty?
-              step.timeout = job.timeout
+              step.timeout = job.metadata_timeout
               step.when = WHEN_ON_SUCCESS
             end
           end
@@ -25,7 +27,7 @@ module Gitlab
 
             self.new(:after_script).tap do |step|
               step.script = after_script
-              step.timeout = job.timeout
+              step.timeout = job.metadata_timeout
               step.when = WHEN_ALWAYS
               step.allow_failure = true
             end

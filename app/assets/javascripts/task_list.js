@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import 'deckar01-task_list';
 import axios from './lib/utils/axios_utils';
 import Flash from './flash';
@@ -25,7 +26,11 @@ export default class TaskList {
     // Prevent duplicate event bindings
     this.disable();
     $(`${this.selector} .js-task-list-container`).taskList('enable');
-    $(document).on('tasklist:changed', `${this.selector} .js-task-list-container`, this.update.bind(this));
+    $(document).on(
+      'tasklist:changed',
+      `${this.selector} .js-task-list-container`,
+      this.update.bind(this),
+    );
   }
 
   disable() {
@@ -40,7 +45,8 @@ export default class TaskList {
       [this.fieldName]: $target.val(),
     };
 
-    return axios.patch($target.data('updateUrl') || $('form.js-issuable-update').attr('action'), patchData)
+    return axios
+      .patch($target.data('updateUrl') || $('form.js-issuable-update').attr('action'), patchData)
       .then(({ data }) => this.onSuccess(data))
       .catch(err => this.onError(err));
   }

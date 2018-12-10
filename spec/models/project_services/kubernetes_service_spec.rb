@@ -65,7 +65,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
 
       before do
         kubernetes_service.update_attribute(:active, false)
-        kubernetes_service.properties[:namespace] = "foo"
+        kubernetes_service.properties['namespace'] = "foo"
       end
 
       it 'should not update attributes' do
@@ -82,7 +82,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
       let(:kubernetes_service) { create(:kubernetes_service) }
 
       it 'should update attributes' do
-        kubernetes_service.properties[:namespace] = 'foo'
+        kubernetes_service.properties['namespace'] = 'foo'
         expect(kubernetes_service.save).to be_truthy
       end
     end
@@ -92,7 +92,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
 
       before do
         kubernetes_service.active = false
-        kubernetes_service.properties[:namespace] = 'foo'
+        kubernetes_service.properties['namespace'] = 'foo'
         kubernetes_service.save
       end
 
@@ -105,7 +105,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
       end
 
       it 'should update attributes' do
-        expect(kubernetes_service.properties[:namespace]).to eq("foo")
+        expect(kubernetes_service.properties['namespace']).to eq("foo")
       end
     end
 
@@ -113,12 +113,12 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
       let(:kubernetes_service) { create(:kubernetes_service, template: true, active: false) }
 
       before do
-        kubernetes_service.properties[:namespace] = 'foo'
+        kubernetes_service.properties['namespace'] = 'foo'
       end
 
       it 'should update attributes' do
         expect(kubernetes_service.save).to be_truthy
-        expect(kubernetes_service.properties[:namespace]).to eq('foo')
+        expect(kubernetes_service.properties['namespace']).to eq('foo')
       end
     end
   end
@@ -253,7 +253,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
     end
   end
 
-  describe '#predefined_variables' do
+  describe '#predefined_variable' do
     let(:kubeconfig) do
       config_file = expand_fixture_path('config/kubeconfig.yml')
       config = YAML.load(File.read(config_file))
@@ -274,7 +274,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
 
     shared_examples 'setting variables' do
       it 'sets the variables' do
-        expect(subject.predefined_variables).to include(
+        expect(subject.predefined_variables(project: project)).to include(
           { key: 'KUBE_URL', value: 'https://kube.domain.com', public: true },
           { key: 'KUBE_TOKEN', value: 'token', public: false },
           { key: 'KUBE_NAMESPACE', value: namespace, public: true },
@@ -301,7 +301,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
       it_behaves_like 'setting variables'
 
       it 'sets the KUBE_NAMESPACE' do
-        kube_namespace = subject.predefined_variables.find { |h| h[:key] == 'KUBE_NAMESPACE' }
+        kube_namespace = subject.predefined_variables(project: project).find { |h| h[:key] == 'KUBE_NAMESPACE' }
 
         expect(kube_namespace).not_to be_nil
         expect(kube_namespace[:value]).to match(/\A#{Gitlab::PathRegex::PATH_REGEX_STR}-\d+\z/)
@@ -370,7 +370,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
         stub_kubeclient_pods(status: 500)
       end
 
-      it { expect { subject }.to raise_error(KubeException) }
+      it { expect { subject }.to raise_error(Kubeclient::HttpError) }
     end
 
     context 'when kubernetes responds with 404s' do

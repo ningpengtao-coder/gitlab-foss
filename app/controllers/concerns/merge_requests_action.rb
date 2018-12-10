@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MergeRequestsAction
   extend ActiveSupport::Concern
   include IssuableCollections
@@ -17,7 +19,7 @@ module MergeRequestsAction
       (MergeRequestsFinder if action_name == 'merge_requests')
   end
 
-  def filter_params
+  def finder_options
     super.merge(non_archived: true)
   end
 end

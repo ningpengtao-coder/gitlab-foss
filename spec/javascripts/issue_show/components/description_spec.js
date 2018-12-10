@@ -1,6 +1,6 @@
+import $ from 'jquery';
 import Vue from 'vue';
-import descriptionComponent from '~/issue_show/components/description.vue';
-import * as taskList from '~/task_list';
+import Description from '~/issue_show/components/description.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('Description component', () => {
@@ -16,7 +16,7 @@ describe('Description component', () => {
   };
 
   beforeEach(() => {
-    DescriptionComponent = Vue.extend(descriptionComponent);
+    DescriptionComponent = Vue.extend(Description);
 
     if (!document.querySelector('.issuable-meta')) {
       const metaData = document.createElement('div');
@@ -33,7 +33,7 @@ describe('Description component', () => {
     vm.$destroy();
   });
 
-  it('animates description changes', (done) => {
+  it('animates description changes', done => {
     vm.descriptionHtml = 'changed';
 
     Vue.nextTick(() => {
@@ -51,10 +51,12 @@ describe('Description component', () => {
     });
   });
 
-  it('opens recaptcha dialog if update rejected as spam', (done) => {
+  it('opens recaptcha dialog if update rejected as spam', done => {
     let modal;
-    const recaptchaChild = vm.$children
-      .find(child => child.$options._componentTag === 'recaptcha-modal'); // eslint-disable-line no-underscore-dangle
+    const recaptchaChild = vm.$children.find(
+      // eslint-disable-next-line no-underscore-dangle
+      child => child.$options._componentTag === 'recaptcha-modal',
+    );
 
     recaptchaChild.scriptSrc = '//scriptsrc';
 
@@ -81,37 +83,42 @@ describe('Description component', () => {
   });
 
   describe('TaskList', () => {
+    let TaskList;
+
     beforeEach(() => {
-      vm = mountComponent(DescriptionComponent, Object.assign({}, props, {
-        issuableType: 'issuableType',
-      }));
-      spyOn(taskList, 'default');
+      vm = mountComponent(
+        DescriptionComponent,
+        Object.assign({}, props, {
+          issuableType: 'issuableType',
+        }),
+      );
+      TaskList = spyOnDependency(Description, 'TaskList');
     });
 
-    it('re-inits the TaskList when description changed', (done) => {
+    it('re-inits the TaskList when description changed', done => {
       vm.descriptionHtml = 'changed';
 
       setTimeout(() => {
-        expect(taskList.default).toHaveBeenCalled();
+        expect(TaskList).toHaveBeenCalled();
         done();
       });
     });
 
-    it('does not re-init the TaskList when canUpdate is false', (done) => {
+    it('does not re-init the TaskList when canUpdate is false', done => {
       vm.canUpdate = false;
       vm.descriptionHtml = 'changed';
 
       setTimeout(() => {
-        expect(taskList.default).not.toHaveBeenCalled();
+        expect(TaskList).not.toHaveBeenCalled();
         done();
       });
     });
 
-    it('calls with issuableType dataType', (done) => {
+    it('calls with issuableType dataType', done => {
       vm.descriptionHtml = 'changed';
 
       setTimeout(() => {
-        expect(taskList.default).toHaveBeenCalledWith({
+        expect(TaskList).toHaveBeenCalledWith({
           dataType: 'issuableType',
           fieldName: 'description',
           selector: '.detail-page-description',
@@ -123,44 +130,42 @@ describe('Description component', () => {
   });
 
   describe('taskStatus', () => {
-    it('adds full taskStatus', (done) => {
+    it('adds full taskStatus', done => {
       vm.taskStatus = '1 of 1';
 
       setTimeout(() => {
-        expect(
-          document.querySelector('.issuable-meta #task_status').textContent.trim(),
-        ).toBe('1 of 1');
+        expect(document.querySelector('.issuable-meta #task_status').textContent.trim()).toBe(
+          '1 of 1',
+        );
 
         done();
       });
     });
 
-    it('adds short taskStatus', (done) => {
+    it('adds short taskStatus', done => {
       vm.taskStatus = '1 of 1';
 
       setTimeout(() => {
-        expect(
-          document.querySelector('.issuable-meta #task_status_short').textContent.trim(),
-        ).toBe('1/1 task');
+        expect(document.querySelector('.issuable-meta #task_status_short').textContent.trim()).toBe(
+          '1/1 task',
+        );
 
         done();
       });
     });
 
-    it('clears task status text when no tasks are present', (done) => {
+    it('clears task status text when no tasks are present', done => {
       vm.taskStatus = '0 of 0';
 
       setTimeout(() => {
-        expect(
-          document.querySelector('.issuable-meta #task_status').textContent.trim(),
-        ).toBe('');
+        expect(document.querySelector('.issuable-meta #task_status').textContent.trim()).toBe('');
 
         done();
       });
     });
   });
 
-  it('applies syntax highlighting and math when description changed', (done) => {
+  it('applies syntax highlighting and math when description changed', done => {
     spyOn(vm, 'renderGFM').and.callThrough();
     spyOn($.prototype, 'renderGFM').and.callThrough();
     vm.descriptionHtml = 'changed';

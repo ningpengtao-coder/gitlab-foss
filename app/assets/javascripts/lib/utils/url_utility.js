@@ -17,27 +17,29 @@ export function getParameterValues(sParam) {
 // @param {Object} params - url keys and value to merge
 // @param {String} url
 export function mergeUrlParams(params, url) {
-  let newUrl = Object.keys(params).reduce((acc, paramName) => {
-    const paramValue = encodeURIComponent(params[paramName]);
-    const pattern = new RegExp(`\\b(${paramName}=).*?(&|$)`);
+  const re = /^([^?#]*)(\?[^#]*)?(.*)/;
+  const merged = {};
+  const urlparts = url.match(re);
 
-    if (paramValue === null) {
-      return acc.replace(pattern, '');
-    } else if (url.search(pattern) !== -1) {
-      return acc.replace(pattern, `$1${paramValue}$2`);
-    }
-
-    return `${acc}${acc.indexOf('?') > 0 ? '&' : '?'}${paramName}=${paramValue}`;
-  }, decodeURIComponent(url));
-
-  // Remove a trailing ampersand
-  const lastChar = newUrl[newUrl.length - 1];
-
-  if (lastChar === '&') {
-    newUrl = newUrl.slice(0, -1);
+  if (urlparts[2]) {
+    urlparts[2]
+      .substr(1)
+      .split('&')
+      .forEach(part => {
+        if (part.length) {
+          const kv = part.split('=');
+          merged[decodeURIComponent(kv[0])] = decodeURIComponent(kv.slice(1).join('='));
+        }
+      });
   }
 
-  return newUrl;
+  Object.assign(merged, params);
+
+  const query = Object.keys(merged)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(merged[key])}`)
+    .join('&');
+
+  return `${urlparts[1]}?${query}${urlparts[3]}`;
 }
 
 export function removeParamQueryString(url, param) {
@@ -47,11 +49,11 @@ export function removeParamQueryString(url, param) {
   return urlVariables.filter(variable => variable.indexOf(param) === -1).join('&');
 }
 
-export function removeParams(params) {
+export function removeParams(params, source = window.location.href) {
   const url = document.createElement('a');
-  url.href = window.location.href;
+  url.href = source;
 
-  params.forEach((param) => {
+  params.forEach(param => {
     url.search = removeParamQueryString(url.search, param);
   });
 
@@ -82,4 +84,12 @@ export function refreshCurrentPage() {
 
 export function redirectTo(url) {
   return window.location.assign(url);
+}
+
+export function webIDEUrl(route = undefined) {
+  let returnUrl = `${gon.relative_url_root || ''}/-/ide/`;
+  if (route) {
+    returnUrl += `project${route.replace(new RegExp(`^${gon.relative_url_root || ''}`), '')}`;
+  }
+  return returnUrl;
 }

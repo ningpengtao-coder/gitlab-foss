@@ -1,172 +1,148 @@
-import _ from 'underscore';
 import Vue from 'vue';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import pipelinesTable from '~/commit/pipelines/pipelines_table.vue';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
-describe('Pipelines table in Commits and Merge requests', () => {
+describe('Pipelines table in Commits and Merge requests', function() {
   const jsonFixtureName = 'pipelines/pipelines.json';
   let pipeline;
   let PipelinesTable;
+  let mock;
+  let vm;
 
   preloadFixtures(jsonFixtureName);
 
   beforeEach(() => {
-    const pipelines = getJSONFixture(jsonFixtureName).pipelines;
+    mock = new MockAdapter(axios);
+
+    const { pipelines } = getJSONFixture(jsonFixtureName);
 
     PipelinesTable = Vue.extend(pipelinesTable);
     pipeline = pipelines.find(p => p.user !== null && p.commit !== null);
   });
 
+  afterEach(() => {
+    vm.$destroy();
+    mock.restore();
+  });
+
   describe('successful request', () => {
     describe('without pipelines', () => {
-      const pipelinesEmptyResponse = (request, next) => {
-        next(request.respondWith(JSON.stringify([]), {
-          status: 200,
-        }));
-      };
+      beforeEach(function() {
+        mock.onGet('endpoint.json').reply(200, []);
 
-      beforeEach(function () {
-        Vue.http.interceptors.push(pipelinesEmptyResponse);
-
-        this.component = new PipelinesTable({
-          propsData: {
-            endpoint: 'endpoint',
-            helpPagePath: 'foo',
-            emptyStateSvgPath: 'foo',
-            errorStateSvgPath: 'foo',
-            autoDevopsHelpPath: 'foo',
-          },
-        }).$mount();
+        vm = mountComponent(PipelinesTable, {
+          endpoint: 'endpoint.json',
+          helpPagePath: 'foo',
+          emptyStateSvgPath: 'foo',
+          errorStateSvgPath: 'foo',
+          autoDevopsHelpPath: 'foo',
+        });
       });
 
-      afterEach(function () {
-        Vue.http.interceptors = _.without(
-          Vue.http.interceptors, pipelinesEmptyResponse,
-        );
-        this.component.$destroy();
-      });
-
-      it('should render the empty state', function (done) {
+      it('should render the empty state', function(done) {
         setTimeout(() => {
-          expect(this.component.$el.querySelector('.empty-state')).toBeDefined();
-          expect(this.component.$el.querySelector('.realtime-loading')).toBe(null);
-          expect(this.component.$el.querySelector('.js-pipelines-error-state')).toBe(null);
-          done();
-        }, 1);
-      });
-    });
-
-    describe('with pipelines', () => {
-      const pipelinesResponse = (request, next) => {
-        next(request.respondWith(JSON.stringify([pipeline]), {
-          status: 200,
-        }));
-      };
-
-      beforeEach(() => {
-        Vue.http.interceptors.push(pipelinesResponse);
-
-        this.component = new PipelinesTable({
-          propsData: {
-            endpoint: 'endpoint',
-            helpPagePath: 'foo',
-            emptyStateSvgPath: 'foo',
-            errorStateSvgPath: 'foo',
-            autoDevopsHelpPath: 'foo',
-          },
-        }).$mount();
-      });
-
-      afterEach(() => {
-        Vue.http.interceptors = _.without(
-          Vue.http.interceptors, pipelinesResponse,
-        );
-        this.component.$destroy();
-      });
-
-      it('should render a table with the received pipelines', (done) => {
-        setTimeout(() => {
-          expect(this.component.$el.querySelectorAll('.ci-table .commit').length).toEqual(1);
-          expect(this.component.$el.querySelector('.realtime-loading')).toBe(null);
-          expect(this.component.$el.querySelector('.empty-state')).toBe(null);
-          expect(this.component.$el.querySelector('.js-pipelines-error-state')).toBe(null);
+          expect(vm.$el.querySelector('.empty-state')).toBeDefined();
+          expect(vm.$el.querySelector('.realtime-loading')).toBe(null);
+          expect(vm.$el.querySelector('.js-pipelines-error-state')).toBe(null);
           done();
         }, 0);
       });
     });
 
-    describe('pipeline badge counts', () => {
-      const pipelinesResponse = (request, next) => {
-        next(request.respondWith(JSON.stringify([pipeline]), {
-          status: 200,
-        }));
-      };
-
+    describe('with pipelines', () => {
       beforeEach(() => {
-        Vue.http.interceptors.push(pipelinesResponse);
+        mock.onGet('endpoint.json').reply(200, [pipeline]);
+        vm = mountComponent(PipelinesTable, {
+          endpoint: 'endpoint.json',
+          helpPagePath: 'foo',
+          emptyStateSvgPath: 'foo',
+          errorStateSvgPath: 'foo',
+          autoDevopsHelpPath: 'foo',
+        });
       });
 
-      afterEach(() => {
-        Vue.http.interceptors = _.without(Vue.http.interceptors, pipelinesResponse);
-        this.component.$destroy();
+      it('should render a table with the received pipelines', done => {
+        setTimeout(() => {
+          expect(vm.$el.querySelectorAll('.ci-table .commit').length).toEqual(1);
+          expect(vm.$el.querySelector('.realtime-loading')).toBe(null);
+          expect(vm.$el.querySelector('.empty-state')).toBe(null);
+          expect(vm.$el.querySelector('.js-pipelines-error-state')).toBe(null);
+          done();
+        }, 0);
       });
 
-      it('should receive update-pipelines-count event', (done) => {
+      describe('with pagination', () => {
+        it('should make an API request when using pagination', done => {
+          setTimeout(() => {
+            spyOn(vm, 'updateContent');
+
+            vm.store.state.pageInfo = {
+              page: 1,
+              total: 10,
+              perPage: 2,
+              nextPage: 2,
+              totalPages: 5,
+            };
+
+            vm.$nextTick(() => {
+              vm.$el.querySelector('.js-next-button a').click();
+
+              expect(vm.updateContent).toHaveBeenCalledWith({ page: '2' });
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('pipeline badge counts', () => {
+      beforeEach(() => {
+        mock.onGet('endpoint.json').reply(200, [pipeline]);
+      });
+
+      it('should receive update-pipelines-count event', done => {
         const element = document.createElement('div');
         document.body.appendChild(element);
 
-        element.addEventListener('update-pipelines-count', (event) => {
+        element.addEventListener('update-pipelines-count', event => {
           expect(event.detail.pipelines).toEqual([pipeline]);
           done();
         });
 
-        this.component = new PipelinesTable({
-          propsData: {
-            endpoint: 'endpoint',
-            helpPagePath: 'foo',
-            emptyStateSvgPath: 'foo',
-            errorStateSvgPath: 'foo',
-            autoDevopsHelpPath: 'foo',
-          },
-        }).$mount();
-        element.appendChild(this.component.$el);
+        vm = mountComponent(PipelinesTable, {
+          endpoint: 'endpoint.json',
+          helpPagePath: 'foo',
+          emptyStateSvgPath: 'foo',
+          errorStateSvgPath: 'foo',
+          autoDevopsHelpPath: 'foo',
+        });
+
+        element.appendChild(vm.$el);
       });
     });
   });
 
   describe('unsuccessfull request', () => {
-    const pipelinesErrorResponse = (request, next) => {
-      next(request.respondWith(JSON.stringify([]), {
-        status: 500,
-      }));
-    };
+    beforeEach(() => {
+      mock.onGet('endpoint.json').reply(500, []);
 
-    beforeEach(function () {
-      Vue.http.interceptors.push(pipelinesErrorResponse);
-
-      this.component = new PipelinesTable({
-        propsData: {
-          endpoint: 'endpoint',
-          helpPagePath: 'foo',
-          emptyStateSvgPath: 'foo',
-          errorStateSvgPath: 'foo',
-          autoDevopsHelpPath: 'foo',
-        },
-      }).$mount();
+      vm = mountComponent(PipelinesTable, {
+        endpoint: 'endpoint.json',
+        helpPagePath: 'foo',
+        emptyStateSvgPath: 'foo',
+        errorStateSvgPath: 'foo',
+        autoDevopsHelpPath: 'foo',
+      });
     });
 
-    afterEach(function () {
-      Vue.http.interceptors = _.without(
-        Vue.http.interceptors, pipelinesErrorResponse,
-      );
-      this.component.$destroy();
-    });
-
-    it('should render error state', function (done) {
+    it('should render error state', function(done) {
       setTimeout(() => {
-        expect(this.component.$el.querySelector('.js-pipelines-error-state')).toBeDefined();
-        expect(this.component.$el.querySelector('.realtime-loading')).toBe(null);
-        expect(this.component.$el.querySelector('.js-empty-state')).toBe(null);
-        expect(this.component.$el.querySelector('.ci-table')).toBe(null);
+        expect(vm.$el.querySelector('.js-pipelines-error-state')).toBeDefined();
+        expect(vm.$el.querySelector('.realtime-loading')).toBe(null);
+        expect(vm.$el.querySelector('.js-empty-state')).toBe(null);
+        expect(vm.$el.querySelector('.ci-table')).toBe(null);
         done();
       }, 0);
     });

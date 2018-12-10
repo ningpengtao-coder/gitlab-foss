@@ -1,4 +1,5 @@
-import ShortcutsNetwork from '../../../../shortcuts_network';
+import $ from 'jquery';
+import ShortcutsNetwork from '~/behaviors/shortcuts/shortcuts_network';
 import Network from '../network';
 
 document.addEventListener('DOMContentLoaded', () => {

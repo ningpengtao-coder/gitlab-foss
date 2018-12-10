@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SortingHelper
   def sort_options_hash
     {
@@ -22,7 +24,8 @@ module SortingHelper
       sort_value_recently_updated => sort_title_recently_updated,
       sort_value_popularity       => sort_title_popularity,
       sort_value_priority         => sort_title_priority,
-      sort_value_upvotes          => sort_title_upvotes
+      sort_value_upvotes          => sort_title_upvotes,
+      sort_value_contacted_date   => sort_title_contacted_date
     }
   end
 
@@ -32,7 +35,8 @@ module SortingHelper
       sort_value_name             => sort_title_name,
       sort_value_oldest_activity  => sort_title_oldest_activity,
       sort_value_oldest_created   => sort_title_oldest_created,
-      sort_value_recently_created => sort_title_recently_created
+      sort_value_recently_created => sort_title_recently_created,
+      sort_value_most_stars       => sort_title_most_stars
     }
 
     if current_controller?('admin/projects')
@@ -44,13 +48,19 @@ module SortingHelper
 
   def groups_sort_options_hash
     {
-      sort_value_name => sort_title_name,
-      sort_value_name_desc => sort_title_name_desc,
+      sort_value_name             => sort_title_name,
+      sort_value_name_desc        => sort_title_name_desc,
       sort_value_recently_created => sort_title_recently_created,
-      sort_value_oldest_created => sort_title_oldest_created,
+      sort_value_oldest_created   => sort_title_oldest_created,
       sort_value_recently_updated => sort_title_recently_updated,
-      sort_value_oldest_updated => sort_title_oldest_updated
+      sort_value_oldest_updated   => sort_title_oldest_updated
     }
+  end
+
+  def subgroups_sort_options_hash
+    groups_sort_options_hash.merge(
+      sort_value_most_stars => sort_title_most_stars
+    )
   end
 
   def admin_groups_sort_options_hash
@@ -99,8 +109,78 @@ module SortingHelper
     }
   end
 
+  def label_sort_options_hash
+    {
+      sort_value_name => sort_title_name,
+      sort_value_name_desc => sort_title_name_desc,
+      sort_value_recently_created => sort_title_recently_created,
+      sort_value_oldest_created => sort_title_oldest_created,
+      sort_value_recently_updated => sort_title_recently_updated,
+      sort_value_oldest_updated => sort_title_oldest_updated
+    }
+  end
+
+  def users_sort_options_hash
+    {
+      sort_value_name => sort_title_name,
+      sort_value_recently_signin => sort_title_recently_signin,
+      sort_value_oldest_signin => sort_title_oldest_signin,
+      sort_value_recently_created => sort_title_recently_created,
+      sort_value_oldest_created => sort_title_oldest_created,
+      sort_value_recently_updated => sort_title_recently_updated,
+      sort_value_oldest_updated => sort_title_oldest_updated
+    }
+  end
+
   def sortable_item(item, path, sorted_by)
     link_to item, path, class: sorted_by == item ? 'is-active' : ''
+  end
+
+  def issuable_sort_option_overrides
+    {
+      sort_value_oldest_created => sort_value_created_date,
+      sort_value_oldest_updated => sort_value_recently_updated,
+      sort_value_milestone_later => sort_value_milestone
+    }
+  end
+
+  def issuable_reverse_sort_order_hash
+    {
+      sort_value_created_date => sort_value_oldest_created,
+      sort_value_recently_created => sort_value_oldest_created,
+      sort_value_recently_updated => sort_value_oldest_updated,
+      sort_value_milestone => sort_value_milestone_later
+    }.merge(issuable_sort_option_overrides)
+  end
+
+  def issuable_sort_option_title(sort_value)
+    sort_value = issuable_sort_option_overrides[sort_value] || sort_value
+
+    sort_options_hash[sort_value]
+  end
+
+  def issuable_sort_direction_button(sort_value)
+    link_class = 'btn btn-default has-tooltip reverse-sort-btn qa-reverse-sort'
+    reverse_sort = issuable_reverse_sort_order_hash[sort_value]
+
+    if reverse_sort
+      reverse_url = page_filter_path(sort: reverse_sort)
+    else
+      reverse_url = '#'
+      link_class += ' disabled'
+    end
+
+    link_to(reverse_url, type: 'button', class: link_class, title: 'Sort direction') do
+      icon_suffix =
+        case sort_value
+        when sort_value_milestone, sort_value_due_date, /_asc\z/
+          'lowest'
+        else
+          'highest'
+        end
+
+      sprite_icon("sort-#{icon_suffix}", size: 16)
+    end
   end
 
   # Titles.
@@ -228,6 +308,14 @@ module SortingHelper
     s_('SortOptions|Most popular')
   end
 
+  def sort_title_contacted_date
+    s_('SortOptions|Last Contact')
+  end
+
+  def sort_title_most_stars
+    s_('SortOptions|Most stars')
+  end
+
   # Values.
   def sort_value_access_level_asc
     'access_level_asc'
@@ -347,5 +435,13 @@ module SortingHelper
 
   def sort_value_upvotes
     'upvotes_desc'
+  end
+
+  def sort_value_contacted_date
+    'contacted_asc'
+  end
+
+  def sort_value_most_stars
+    'stars_desc'
   end
 end

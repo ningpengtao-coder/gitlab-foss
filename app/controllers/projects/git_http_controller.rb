@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Projects::GitHttpController < Projects::GitHttpClientController
   include WorkhorseRequest
 
@@ -6,6 +8,7 @@ class Projects::GitHttpController < Projects::GitHttpClientController
   rescue_from Gitlab::GitAccess::UnauthorizedError, with: :render_403
   rescue_from Gitlab::GitAccess::NotFoundError, with: :render_404
   rescue_from Gitlab::GitAccess::ProjectCreationError, with: :render_422
+  rescue_from Gitlab::GitAccess::TimeoutError, with: :render_503
 
   # GET /foo/bar.git/info/refs?service=git-upload-pack (git pull)
   # GET /foo/bar.git/info/refs?service=git-receive-pack (git push)
@@ -60,11 +63,15 @@ class Projects::GitHttpController < Projects::GitHttpClientController
     render plain: exception.message, status: :unprocessable_entity
   end
 
+  def render_503(exception)
+    render plain: exception.message, status: :service_unavailable
+  end
+
   def access
     @access ||= access_klass.new(access_actor, project,
       'http', authentication_abilities: authentication_abilities,
               namespace_path: params[:namespace_id], project_path: project_path,
-              redirected_path: redirected_path)
+              redirected_path: redirected_path, auth_result_type: auth_result_type)
   end
 
   def access_actor

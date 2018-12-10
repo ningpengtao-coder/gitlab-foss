@@ -1,104 +1,109 @@
 <script>
-  import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
-  import tooltip from '../../vue_shared/directives/tooltip';
-  import popover from '../../vue_shared/directives/popover';
+import { GlLink, GlTooltipDirective } from '@gitlab/ui';
+import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
+import popover from '~/vue_shared/directives/popover';
 
-  export default {
-    components: {
-      userAvatarLink,
+export default {
+  components: {
+    UserAvatarLink,
+    GlLink,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+    popover,
+  },
+  props: {
+    pipeline: {
+      type: Object,
+      required: true,
     },
-    directives: {
-      tooltip,
-      popover,
+    autoDevopsHelpPath: {
+      type: String,
+      required: true,
     },
-    props: {
-      pipeline: {
-        type: Object,
-        required: true,
-      },
-      autoDevopsHelpPath: {
-        type: String,
-        required: true,
-      },
+  },
+  computed: {
+    user() {
+      return this.pipeline.user;
     },
-    computed: {
-      user() {
-        return this.pipeline.user;
-      },
-      popoverOptions() {
-        return {
-          html: true,
-          trigger: 'focus',
-          placement: 'top',
-          title: `<div class="autodevops-title">
+    popoverOptions() {
+      return {
+        html: true,
+        trigger: 'focus',
+        placement: 'top',
+        title: `<div class="autodevops-title">
             This pipeline makes use of a predefined CI/CD configuration enabled by <b>Auto DevOps.</b>
           </div>`,
-          content: `<a
+        content: `<a
             class="autodevops-link"
             href="${this.autoDevopsHelpPath}"
             target="_blank"
             rel="noopener noreferrer nofollow">
             Learn more about Auto DevOps
           </a>`,
-        };
-      },
+      };
     },
-  };
+  },
+};
 </script>
 <template>
-  <div class="table-section section-15 hidden-xs hidden-sm pipeline-tags">
-    <a
-      :href="pipeline.path"
-      class="js-pipeline-url-link">
+  <div class="table-section section-15 d-none d-sm-none d-md-block pipeline-tags">
+    <gl-link :href="pipeline.path" class="js-pipeline-url-link">
       <span class="pipeline-id">#{{ pipeline.id }}</span>
-    </a>
+    </gl-link>
     <span>by</span>
     <user-avatar-link
       v-if="user"
-      class="js-pipeline-url-user"
       :link-href="pipeline.user.path"
       :img-src="pipeline.user.avatar_url"
       :tooltip-text="pipeline.user.name"
+      class="js-pipeline-url-user"
     />
-    <span
-      v-if="!user"
-      class="js-pipeline-url-api api">
-      API
-    </span>
+    <span v-if="!user" class="js-pipeline-url-api api"> API </span>
     <div class="label-container">
       <span
         v-if="pipeline.flags.latest"
-        v-tooltip
-        class="js-pipeline-url-latest label label-success"
-        title="Latest pipeline for this branch">
+        v-gl-tooltip
+        class="js-pipeline-url-latest badge badge-success"
+        title="__('Latest pipeline for this branch')"
+      >
         latest
       </span>
       <span
         v-if="pipeline.flags.yaml_errors"
-        v-tooltip
-        class="js-pipeline-url-yaml label label-danger"
-        :title="pipeline.yaml_errors">
+        v-gl-tooltip
+        :title="pipeline.yaml_errors"
+        class="js-pipeline-url-yaml badge badge-danger"
+      >
         yaml invalid
       </span>
       <span
         v-if="pipeline.flags.failure_reason"
-        v-tooltip
-        class="js-pipeline-url-failure label label-danger"
-        :title="pipeline.failure_reason">
+        v-gl-tooltip
+        :title="pipeline.failure_reason"
+        class="js-pipeline-url-failure badge badge-danger"
+      >
         error
       </span>
-      <a
+      <gl-link
         v-if="pipeline.flags.auto_devops"
-        tabindex="0"
-        class="js-pipeline-url-autodevops label label-info autodevops-badge"
         v-popover="popoverOptions"
-        role="button">
+        tabindex="0"
+        class="js-pipeline-url-autodevops badge badge-info autodevops-badge"
+        role="button"
+      >
         Auto DevOps
-      </a>
-      <span
-        v-if="pipeline.flags.stuck"
-        class="js-pipeline-url-stuck label label-warning">
+      </gl-link>
+      <span v-if="pipeline.flags.stuck" class="js-pipeline-url-stuck badge badge-warning">
         stuck
+      </span>
+      <span
+        v-if="pipeline.flags.merge_request"
+        v-gl-tooltip
+        title="__('This pipeline is run in a merge request context')"
+        class="js-pipeline-url-mergerequest badge badge-info"
+      >
+        merge request
       </span>
     </div>
   </div>

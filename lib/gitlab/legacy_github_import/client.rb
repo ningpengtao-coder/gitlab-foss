@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module LegacyGithubImport
     class Client
@@ -83,7 +85,7 @@ module Gitlab
       end
 
       def config
-        Gitlab.config.omniauth.providers.find { |provider| provider.name == "github" }
+        Gitlab::Auth::OAuth::Provider.config_for('github')
       end
 
       def github_options

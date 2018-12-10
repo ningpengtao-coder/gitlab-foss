@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IssueEntity < IssuableEntity
   include TimeTrackableEntity
 
@@ -29,6 +31,10 @@ class IssueEntity < IssuableEntity
     expose :can_update do |issue|
       can?(request.current_user, :update_issue, issue)
     end
+
+    expose :can_award_emoji do |issue|
+      can?(request.current_user, :award_emoji, issue)
+    end
   end
 
   expose :create_note_path do |issue|
@@ -36,6 +42,6 @@ class IssueEntity < IssuableEntity
   end
 
   expose :preview_note_path do |issue|
-    preview_markdown_path(issue.project, quick_actions_target_type: 'Issue', quick_actions_target_id: issue.id)
+    preview_markdown_path(issue.project, quick_actions_target_type: 'Issue', quick_actions_target_id: issue.iid)
   end
 end

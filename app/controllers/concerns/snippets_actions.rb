@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SnippetsActions
   extend ActiveSupport::Concern
 
@@ -8,6 +10,8 @@ module SnippetsActions
   def raw
     disposition = params[:inline] == 'false' ? 'attachment' : 'inline'
 
+    workhorse_set_content_type!
+
     send_data(
       convert_line_endings(@snippet.content),
       type: 'text/plain; charset=utf-8',
@@ -16,6 +20,10 @@ module SnippetsActions
     )
   end
   # rubocop:enable Gitlab/ModuleWithInstanceVariables
+
+  def js_request?
+    request.format.js?
+  end
 
   private
 

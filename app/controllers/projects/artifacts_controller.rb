@@ -1,20 +1,21 @@
+# frozen_string_literal: true
+
 class Projects::ArtifactsController < Projects::ApplicationController
   include ExtractsPath
   include RendersBlob
+  include SendFileUpload
 
   layout 'project'
   before_action :authorize_read_build!
   before_action :authorize_update_build!, only: [:keep]
   before_action :extract_ref_name_and_path
-  before_action :validate_artifacts!
+  before_action :validate_artifacts!, except: [:download]
   before_action :entry, only: [:file]
 
   def download
-    if artifacts_file.file_storage?
-      send_file artifacts_file.path, disposition: 'attachment'
-    else
-      redirect_to artifacts_file.url
-    end
+    return render_404 unless artifacts_file
+
+    send_upload(artifacts_file, attachment: artifacts_file.filename, proxy: params[:proxy])
   end
 
   def browse
@@ -45,8 +46,7 @@ class Projects::ArtifactsController < Projects::ApplicationController
   end
 
   def raw
-    path = Gitlab::Ci::Build::Artifacts::Path
-      .new(params[:path])
+    path = Gitlab::Ci::Build::Artifacts::Path.new(params[:path])
 
     send_artifacts_entry(build, path)
   end
@@ -75,7 +75,7 @@ class Projects::ArtifactsController < Projects::ApplicationController
   end
 
   def validate_artifacts!
-    render_404 unless build && build.artifacts?
+    render_404 unless build&.artifacts?
   end
 
   def build
@@ -85,19 +85,23 @@ class Projects::ArtifactsController < Projects::ApplicationController
     end
   end
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def build_from_id
     project.builds.find_by(id: params[:job_id]) if params[:job_id]
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def build_from_ref
     return unless @ref_name
 
     builds = project.latest_successful_builds_for(@ref_name)
     builds.find_by(name: params[:job])
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def artifacts_file
-    @artifacts_file ||= build.artifacts_file
+    @artifacts_file ||= build&.artifacts_file_for_type(params[:file_type] || :archive)
   end
 
   def entry
