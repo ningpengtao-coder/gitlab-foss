@@ -1,0 +1,5 @@
+---
+title: Unsubscribe emails no longer require subaddressing
+merge_request: 23747
+author:
+type: fixed
