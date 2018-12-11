@@ -1,4 +1,7 @@
 - breadcrumb_title _('Error Tracking')
 - page_title _('Error Tracking')
 
-= render "errors"
+- if true #  todo: feature check
+  = render "errors"
+- else
+  = render "empty"
