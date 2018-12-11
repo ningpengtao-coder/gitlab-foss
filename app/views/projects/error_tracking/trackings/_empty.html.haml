@@ -1,0 +1,15 @@
+- page_title _("Error Tracking")
+
+.row.empty-state
+  .col-sm-12
+    .svg-content
+      = image_tag 'illustrations/operations_metrics_empty.svg'
+  .col-12
+    .text-content
+      %h4.text-center
+        = _('Get started with Error Tracking')
+      %p.state-description
+        = _('Monitor you errors by integrating with Sentry.')
+        = link_to _('More information'), help_page_path('ci/environments') # TODO: fix path
+      .text-center
+        = link_to _('Enable Error Tracking'), help_page_path('ci/environments'), class: 'btn btn-success' # TODO: fix path

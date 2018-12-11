@@ -1,0 +1,8 @@
+
+%ul.content-list.issues-list.issuable-list
+  = render partial: "projects/error_tracking/trackings/error", collection: @errors
+  - if @errors.blank?
+    = render "empty"
+
+- if @errors.present?
+  = paginate @errors, theme: "gitlab", total_pages: @total_pages
