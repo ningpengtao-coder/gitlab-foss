@@ -306,6 +306,9 @@ module ProjectsHelper
       end
     end
 
+    # TODO: Either add it as part of the ability map or with its respective condition
+    nav_tabs << :error_tracking
+
     nav_tabs.flatten
   end
 
@@ -563,6 +566,7 @@ module ProjectsHelper
       functions
       user
       gcp
+      trackings
     ]
   end
 end
