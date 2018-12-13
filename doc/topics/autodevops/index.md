@@ -528,6 +528,39 @@ can be used for permanent access to the registry.
 Note: **Note**
 When the GitLab Deploy Token has been manually revoked, it won't be automatically created.
 
+#### Application secret variables
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/49056) in GitLab 11.7.
+
+Most applications would need to define secret variables that is
+accessible by the deployed application. GitLab CI variables are usually
+not available to the deployed application container. Starting in GitLab
+11.7, Auto DevOps will now detect variables where the key starts with
+`K8S_SECRET_` and make these prefixed variables available to the
+deployed application.
+
+To configure your application variables:
+
+1. Go to your project's **Settings > CI/CD**, then expand the section
+   called **Variables**
+
+2. Create a CI Variable, ensuring the key is prefixed with
+   `K8S_SECRET_`. For example, you can create a variable with key
+`K8S_SECRET_RAILS_MASTER_KEY`.
+
+Auto DevOps jobs for your project will now make the prefixed variables
+available as environment variables to the deployed applications. The
+environment variable key will have the prefix removed. Following the
+above example, deployed applications will now be able to use
+`RAILS_MASTER_KEY` as an environment variable.
+
+How this works: Auto DevOps first finds all prefixed CI variables. The
+prefix is then removed. A Kubernetes secret called
+`$CI_ENVIRONMENT_SLUG-secret` will be created in the `$KUBE_NAMESPACE`
+namespace containing the variables. This secret is then used when
+deploying your application to be loaded as environment variables in the
+container running the application.
+
 ### Auto Monitoring
 
 NOTE: **Note:**
