@@ -595,12 +595,13 @@ rollout 100%:
     fi
   }
 
-  # "Returns" any prefixed variables with
-  # the global variable $K8S_VARIABLES
-  function get_prefixed_variables() {
-    prefix="K8S_SECRET"
+  # Finds any variables prefixed with `K8S_SECRET_`, and exports them as the
+  # global $K8S_VARIABLES with prefix removed.
+  function extract_prefixed_variables() {
+    prefix="K8S_SECRET_"
+    k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]) | sed "s/^${prefix}//")
 
-    export K8S_VARIABLES=$(env | (grep "^${prefix}_" || [[ $? == 1 ]]) | sed "s/^${prefix}_//")
+    export K8S_VARIABLES=$k8s_variables
   }
 
   function deploy() {
@@ -628,14 +629,14 @@ rollout 100%:
       secret_name=''
     fi
 
-    get_prefixed_variables
+    extract_prefixed_variables
     if [[ -n "$K8S_VARIABLES" ]]; then
       echo "Prefixed CI variables found, creating secret..."
       application_secret_name="${name}-secret"
-
       fromLiteralArgs=""
-      for var in ${K8S_VARIABLES}; do
-        fromLiteralArgs="${fromLiteralArgs:+${fromLiteralArgs} }--from-literal=${var}"
+
+      for k8s_variable in ${K8S_VARIABLES}; do
+        fromLiteralArgs="${fromLiteralArgs:+${fromLiteralArgs} }--from-literal=${k8s_variable}"
       done
 
       # We want fromLiteralArgs to be interpreted as args, so don't quote it!
