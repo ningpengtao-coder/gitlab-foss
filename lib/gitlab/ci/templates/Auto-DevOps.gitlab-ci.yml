@@ -604,7 +604,30 @@ rollout 100%:
     export K8S_VARIABLES=$k8s_variables
   }
 
+  # Its own function so that we can isolate IFS
+  function create_application_secret() {
+    prefix="K8S_SECRET_"
+    k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
+
+    local IFS=$(echo -en "\n\b")
+    for k8s_variable in $k8s_variables; do
+      param="${k8s_variable#K8S_SECRET_}"
+
+      fromLiteralArgs+=("--from-literal")
+      fromLiteralArgs+=("${param}")
+    done
+
+    # We want fromLiteralArgs to be interpreted as args, so don't quote it!
+    kubectl create secret -n "$KUBE_NAMESPACE" \
+      generic "$application_secret_name" \
+      ${fromLiteralArgs[@]} \
+      -o yaml --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+  }
+
   function deploy() {
+    echo "$SHELL"
+    ps
+
     track="${1-stable}"
     percentage="${2:-100}"
     name="$CI_ENVIRONMENT_SLUG"
@@ -629,22 +652,7 @@ rollout 100%:
       secret_name=''
     fi
 
-    extract_prefixed_variables
-    if [[ -n "$K8S_VARIABLES" ]]; then
-      echo "Prefixed CI variables found, creating secret..."
-      application_secret_name="${name}-secret"
-      fromLiteralArgs=""
-
-      for k8s_variable in ${K8S_VARIABLES}; do
-        fromLiteralArgs="${fromLiteralArgs:+${fromLiteralArgs} }--from-literal=${k8s_variable}"
-      done
-
-      # We want fromLiteralArgs to be interpreted as args, so don't quote it!
-      kubectl create secret -n "$KUBE_NAMESPACE" \
-        generic "$application_secret_name" \
-        ${fromLiteralArgs} \
-        -o yaml --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
-    fi
+    create_application_secret
 
     if [[ -n "$DB_INITIALIZE" && -z "$(helm ls -q "^$name$")" ]]; then
       echo "Deploying first release with database initialization..."
