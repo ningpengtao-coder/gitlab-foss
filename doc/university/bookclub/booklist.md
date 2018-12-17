@@ -16,7 +16,7 @@ List of books and resources, that may be worth reading.
 
 1.  **Design Patterns: Elements of Reusable Object-Oriented Software**
 
-    Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides, 1994 ([amazon](https://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612))
+    Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides, 1994 ([amazon](https://www.amazon.com/dp/0201633612))
 
 1.  **Clean Code: A Handbook of Agile Software Craftsmanship**
 
