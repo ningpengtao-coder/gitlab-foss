@@ -50,8 +50,12 @@ describe('Issue Due Date component', () => {
     date.setDate(date.getDate() + 17);
     vm = createComponent(date);
 
+    const currentYear = new Date().getFullYear();
+
     expect(vm.$el.querySelector('time').textContent.trim()).toEqual(
-      dateFormat(date, 'mmm d', true),
+      date.getFullYear() !== currentYear
+        ? dateFormat(date, 'mmm d, yyyy', true)
+        : dateFormat(date, 'mmm d', true),
     );
   });
 
