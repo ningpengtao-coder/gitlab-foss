@@ -623,9 +623,6 @@ rollout 100%:
   }
 
   function deploy() {
-    echo "$SHELL"
-    ps
-
     track="${1-stable}"
     percentage="${2:-100}"
     name="$CI_ENVIRONMENT_SLUG"
