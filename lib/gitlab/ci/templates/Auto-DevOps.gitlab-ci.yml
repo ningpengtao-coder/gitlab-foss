@@ -39,6 +39,7 @@
 # Note: Auto CI does not work with multiple buildpacks yet
 
 image: alpine:latest
+image: "registry.gitlab.com/tkuah/alpine-bash:master"
 
 variables:
   # AUTO_DEVOPS_DOMAIN is the application deployment domain and should be set as a variable at the group or project level.
@@ -606,20 +607,20 @@ rollout 100%:
 
   # Its own function so that we can isolate IFS
   function create_application_secret() {
-    bash -c '
-      prefix="K8S_SECRET_" \
-      k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]])); \
-      IFS=$(echo -en "\n\b")
-      for k8s_variable in $k8s_variables; do
-        param="${k8s_variable#K8S_SECRET_}"
+    prefix="K8S_SECRET_"
+    k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
 
-        fromLiteralArgs+=("--from-literal")
-        fromLiteralArgs+=("${param}")
-      done \
-    && kubectl create secret \
+    local IFS=$'\n'
+    for k8s_variable in $k8s_variables; do
+      param="${k8s_variable#K8S_SECRET_}"
+
+      fromLiteralArgs+=("--from-literal")
+      fromLiteralArgs+=("${param}")
+    done
+
+    kubectl create secret \
       -n "$KUBE_NAMESPACE" generic "$APPLICATION_SECRET_NAME" ${fromLiteralArgs[@]} -o yaml \
       --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
-    '
   }
 
   function deploy() {
