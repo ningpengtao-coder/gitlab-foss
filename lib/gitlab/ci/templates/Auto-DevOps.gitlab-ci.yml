@@ -606,22 +606,20 @@ rollout 100%:
 
   # Its own function so that we can isolate IFS
   function create_application_secret() {
-    prefix="K8S_SECRET_"
-    k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]]))
+    bash -c '
+      prefix="K8S_SECRET_" \
+      k8s_variables=$(env | (grep "^${prefix}" || [[ $? == 1 ]])); \
+      IFS=$(echo -en "\n\b")
+      for k8s_variable in $k8s_variables; do
+        param="${k8s_variable#K8S_SECRET_}"
 
-    local IFS=$(echo -en "\n\b")
-    for k8s_variable in $k8s_variables; do
-      param="${k8s_variable#K8S_SECRET_}"
-
-      fromLiteralArgs+=("--from-literal")
-      fromLiteralArgs+=("${param}")
-    done
-
-    # We want fromLiteralArgs to be interpreted as args, so don't quote it!
-    kubectl create secret -n "$KUBE_NAMESPACE" \
-      generic "$application_secret_name" \
-      ${fromLiteralArgs[@]} \
-      -o yaml --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+        fromLiteralArgs+=("--from-literal")
+        fromLiteralArgs+=("${param}")
+      done \
+    && kubectl create secret \
+      -n "$KUBE_NAMESPACE" generic "$APPLICATION_SECRET_NAME" ${fromLiteralArgs[@]} -o yaml \
+      --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+    '
   }
 
   function deploy() {
@@ -652,6 +650,7 @@ rollout 100%:
       secret_name=''
     fi
 
+    export APPLICATION_SECRET_NAME="${name}-secret"
     create_application_secret
 
     if [[ -n "$DB_INITIALIZE" && -z "$(helm ls -q "^$name$")" ]]; then
@@ -666,7 +665,7 @@ rollout 100%:
         --set image.secrets[0].name="$secret_name" \
         --set application.track="$track" \
         --set application.database_url="$DATABASE_URL" \
-        --set application.secretName="$application_secret_name" \
+        --set application.secretName="$APPLICATION_SECRET_NAME" \
         --set service.url="$CI_ENVIRONMENT_URL" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
@@ -699,7 +698,7 @@ rollout 100%:
         --set image.secrets[0].name="$secret_name" \
         --set application.track="$track" \
         --set application.database_url="$DATABASE_URL" \
-        --set application.secretName="$application_secret_name" \
+        --set application.secretName="$APPLICATION_SECRET_NAME" \
         --set service.url="$CI_ENVIRONMENT_URL" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
