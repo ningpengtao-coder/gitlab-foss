@@ -3238,6 +3238,9 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.integer "cached_markdown_version"
     t.text "description"
     t.text "description_html"
+    t.string "encrypted_secret"
+    t.string "encrypted_secret_iv"
+    t.string "encrypted_secret_salt"
     t.index ["author_id"], name: "index_snippets_on_author_id"
     t.index ["file_name"], name: "index_snippets_on_file_name_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["project_id"], name: "index_snippets_on_project_id"
