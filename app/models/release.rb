@@ -16,6 +16,14 @@ class Release < ActiveRecord::Base
 
   validates :description, :project, :tag, presence: true
 
+  ##
+  # There are several projects which have been violating this rule on gitlab.com.
+  # We should not create such duplicate rows anymore.
+  validates :tag, uniqueness: { scope: :project }, on: :create
+
+  validates :sha, presence: true, on: :create
+  validates :name, presence: true
+
   scope :sorted, -> { order(created_at: :desc) }
 
   delegate :repository, to: :project

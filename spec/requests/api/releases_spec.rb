@@ -17,21 +17,8 @@ describe API::Releases do
 
   describe 'GET /projects/:id/releases' do
     context 'when there are two releases' do
-      let!(:release_1) do
-        create(:release,
-               project: project,
-               tag: 'v0.1',
-               author: maintainer,
-               created_at: 2.days.ago)
-      end
-
-      let!(:release_2) do
-        create(:release,
-               project: project,
-               tag: 'v0.2',
-               author: maintainer,
-               created_at: 1.day.ago)
-      end
+      let!(:release_1) { create(:release, project: project, tag: 'v0.1', author: maintainer) }
+      let!(:release_2) { create(:release, project: project, tag: 'v0.2', author: maintainer) }
 
       it 'returns 200 HTTP status' do
         get api("/projects/#{project.id}/releases", maintainer)
@@ -182,7 +169,7 @@ describe API::Releases do
       it 'cannot find the release entry' do
         get api("/projects/#{project.id}/releases/non_exist_tag", maintainer)
 
-        expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -242,6 +229,24 @@ describe API::Releases do
       expect(project.releases.last.name).to eq('New release')
       expect(project.releases.last.tag).to eq('v0.1')
       expect(project.releases.last.description).to eq('Super nice release')
+    end
+
+    context 'when name is empty' do
+      let(:params) do
+        {
+          name: '',
+          tag_name: 'v0.1',
+          description: 'Super nice release'
+        }
+      end
+
+      it 'returns an error as validation failure' do
+        post api("/projects/#{project.id}/releases", maintainer), params: params
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response['message'])
+          .to eq("Validation failed: Name can't be blank")
+      end
     end
 
     context 'when description is empty' do
@@ -534,7 +539,7 @@ describe API::Releases do
       it 'forbids the request' do
         put api("/projects/#{project.id}/releases/v0.1", maintainer), params: params
 
-        expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -619,7 +624,7 @@ describe API::Releases do
       it 'forbids the request' do
         delete api("/projects/#{project.id}/releases/v0.1", maintainer)
 
-        expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
