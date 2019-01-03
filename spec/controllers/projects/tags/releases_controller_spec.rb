@@ -42,8 +42,8 @@ describe Projects::Tags::ReleasesController do
       expect(release.description).to eq("description updated")
     end
 
-    it 'deletes release note when description is null' do
-      expect { update_release('') }.to change(project.releases, :count).by(-1)
+    it 'does not delete release object when description is null' do
+      expect { update_release('') }.not_to change(project.releases, :count)
     end
   end
 
