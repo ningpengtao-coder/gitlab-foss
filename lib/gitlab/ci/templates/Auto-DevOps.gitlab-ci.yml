@@ -681,7 +681,7 @@ rollout 100%:
         --set application.database_url="$DATABASE_URL" \
         --set application.secretName="$APPLICATION_SECRET_NAME" \
         --set service.url="$CI_ENVIRONMENT_URL" \
-        --set service.additionalHosts="$ADDITIONAL_HOSTS" \
+        --set service.additionalHosts="{$ADDITIONAL_HOSTS}" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
         --set postgresql.nameOverride="postgres" \
@@ -715,7 +715,7 @@ rollout 100%:
         --set application.database_url="$DATABASE_URL" \
         --set application.secretName="$APPLICATION_SECRET_NAME" \
         --set service.url="$CI_ENVIRONMENT_URL" \
-        --set service.additionalHosts="$ADDITIONAL_HOSTS" \
+        --set service.additionalHosts="{$ADDITIONAL_HOSTS}" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
         --set postgresql.nameOverride="postgres" \
