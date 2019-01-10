@@ -667,6 +667,12 @@ rollout 100%:
 
     create_application_secret "$track"
 
+    env_slug=$(echo ${CI_ENVIRONMENT_SLUG//-/_} | tr -s '[:lower:]' '[:upper:]')
+    eval env_ADDITIONAL_HOSTS=\$${env_slug}_ADDITIONAL_HOSTS
+    if [[ -n "$env_ADDITIONAL_HOSTS" ]]; then
+      ADDITIONAL_HOSTS="$env_ADDITIONAL_HOSTS"
+    fi
+
     if [[ -n "$DB_INITIALIZE" && -z "$(helm ls -q "^$name$")" ]]; then
       echo "Deploying first release with database initialization..."
       helm upgrade --install \
