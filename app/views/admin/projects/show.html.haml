@@ -100,6 +100,11 @@
             %strong.cred
               does not exist
 
+          %li
+            %span.light Expected path:
+            %strong
+              = @project.repository.path
+
         - if @project.archived?
           %li
             %span.light archived:
