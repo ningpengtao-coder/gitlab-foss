@@ -52,6 +52,7 @@ stages:
   - test
   - post-test
   - pages
+  - release
   - post-cleanup
 
 # Predefined scopes
@@ -878,6 +879,21 @@ pages:
   only:
     - master@gitlab-org/gitlab-ce
     - master@gitlab-org/gitlab-ee
+
+##
+# Create a release note
+# You can check it in https://gitlab.com/gitlab-org/gitlab-ce/releases
+release:
+  <<: *dedicated-no-docs-no-db-pull-cache-job
+  before_script: []
+  stage: release
+  script:
+    - ./scripts/create_release.rb
+  only:
+    refs:
+      - tags@gitlab-org/gitlab-ce
+    variables:
+      - $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+\$/
 
 # Insurance in case a gem needed by one of our releases gets yanked from
 # rubygems.org in the future.
