@@ -1,0 +1,5 @@
+---
+title: Expose the expected repo path on the Admin Project page when it is not found
+merge_request: 24328
+author: Harish Ramachandran
+type: added
