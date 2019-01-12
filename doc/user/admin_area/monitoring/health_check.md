@@ -28,12 +28,11 @@ With default whitelist settings, the probes can be accessed from localhost:
 - `http://localhost/-/readiness`
 - `http://localhost/-/liveness`
 
-
 The first endpoint, `/-/health`, only checks whether the application server is running. It does
 -not verify the database or other services are running. A successful response will return
 a 200 status code with the following message:
 
-```
+```text
 GitLab OK
 ```
 
@@ -41,7 +40,7 @@ The readiness and liveness probes will provide a report of system health in JSON
 
 Readiness example output:
 
-```
+```json
 {
    "queues_check" : {
       "status" : "ok"
@@ -63,7 +62,7 @@ Readiness example output:
 
 Liveness example output:
 
-```
+```json
 {
    "cache_check" : {
       "status" : "ok"
@@ -102,7 +101,7 @@ accepted token can be found under the **Admin area ➔ Monitoring ➔ Health che
 
 The access token can be passed as a URL parameter:
 
-```
+```text
 https://gitlab.example.com/-/readiness?token=ACCESS_TOKEN
 ```
 
