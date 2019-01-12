@@ -29,7 +29,7 @@ With default whitelist settings, the probes can be accessed from localhost:
 - `http://localhost/-/liveness`
 
 
-The first endpoint, `/-/health/`, only checks whether the application server is running. It does
+The first endpoint, `/-/health`, only checks whether the application server is running. It does
 -not verify the database or other services are running. A successful response will return
 a 200 status code with the following message:
 
