@@ -670,7 +670,9 @@ rollout 100%:
     env_slug=$(echo ${CI_ENVIRONMENT_SLUG//-/_} | tr -s '[:lower:]' '[:upper:]')
     eval env_ADDITIONAL_HOSTS=\$${env_slug}_ADDITIONAL_HOSTS
     if [[ -n "$env_ADDITIONAL_HOSTS" ]]; then
-      ADDITIONAL_HOSTS="$env_ADDITIONAL_HOSTS"
+      additional_hosts="$env_ADDITIONAL_HOSTS"
+    else
+      additional_hosts="$ADDITIONAL_HOSTS"
     fi
 
     if [[ -n "$DB_INITIALIZE" && -z "$(helm ls -q "^$name$")" ]]; then
@@ -687,7 +689,7 @@ rollout 100%:
         --set application.database_url="$DATABASE_URL" \
         --set application.secretName="$APPLICATION_SECRET_NAME" \
         --set service.url="$CI_ENVIRONMENT_URL" \
-        --set service.additionalHosts="{$ADDITIONAL_HOSTS}" \
+        --set service.additionalHosts="{$additional_hosts}" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
         --set postgresql.nameOverride="postgres" \
@@ -721,7 +723,7 @@ rollout 100%:
         --set application.database_url="$DATABASE_URL" \
         --set application.secretName="$APPLICATION_SECRET_NAME" \
         --set service.url="$CI_ENVIRONMENT_URL" \
-        --set service.additionalHosts="{$ADDITIONAL_HOSTS}" \
+        --set service.additionalHosts="{$additional_hosts}" \
         --set replicaCount="$replicas" \
         --set postgresql.enabled="$postgres_enabled" \
         --set postgresql.nameOverride="postgres" \
