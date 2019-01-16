@@ -24,13 +24,24 @@ The requirement for adding a new metric is to make each query to have an unique 
 
 After you add or change existing _common_ metric you have to create a new database migration that will query and update all existing metrics.
 
+```
+bin/rails generate migration ImportCommonMetrics
+
+      invoke  active_record
+      create    db/migrate/20190116085834_import_common_metrics.rb
+```
+
 NOTE: **Note:**
 If a query metric (which is identified by `id:`) is removed it will not be removed from database by default.
 You might want to add additional database migration that makes a decision what to do with removed one.
 For example: you might be interested in migrating all dependent data to a different metric.
 
+Replace the contents of the generated migration (`db/migrate/20190116085834_import_common_metrics.rb`) with the following:
+
 ```ruby
-class ImportCommonMetrics < ActiveRecord::Migration[4.2]
+# frozen_string_literal: true
+
+class ImportCommonMetrics < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
 
   require Rails.root.join('db/importers/common_metrics_importer.rb')
@@ -45,4 +56,16 @@ class ImportCommonMetrics < ActiveRecord::Migration[4.2]
     # no-op
   end
 end
+```
+
+NOTE: **Note:** Make sure that the class name (`ImportCommonMetrics`) matches the migration file name (`X_import_common_metrics.rb`).
+
+Run the migrations and verify the changes of the `prometheus_metrics` database table:
+
+```
+bin/rake db:migrate
+
+gdk psql -d gitlabhq_development
+
+gitlabhq_development=# SELECT * FROM prometheus_metrics;
 ```
