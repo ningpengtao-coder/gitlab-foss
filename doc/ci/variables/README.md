@@ -36,7 +36,7 @@ version of Runner required.
 
 NOTE: **Note:**
 Starting with GitLab 9.0, we have deprecated some variables. Read the
-[9.0 Renaming](#9-0-renaming) section to find out their replacements. **You are
+[9.0 Renaming](#gitlab-9-0-renaming) section to find out their replacements. **You are
 strongly advised to use the new variables as we will remove the old ones in
 future GitLab releases.**
 
