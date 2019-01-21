@@ -1,0 +1,5 @@
+---
+title: Mask filterable parameters from sanitised URLs
+merge_request: 24537
+author:
+type: security

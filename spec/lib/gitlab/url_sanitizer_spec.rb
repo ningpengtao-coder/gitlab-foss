@@ -4,12 +4,18 @@ describe Gitlab::UrlSanitizer do
   using RSpec::Parameterized::TableSyntax
 
   describe '.sanitize' do
-    def sanitize_url(url)
+    def generate_message(url)
       # We want to try with multi-line content because is how error messages are formatted
-      described_class.sanitize(%Q{
-         remote: Not Found
-         fatal: repository '#{url}' not found
-      })
+      %Q{
+        remote: Not Found
+        fatal: repository '#{url}' not found.
+        With Double Quotes: "#{url}"
+        With backticks: \`#{url}\`
+     }
+    end
+
+    def sanitize_url(url)
+      described_class.sanitize(generate_message(url))
     end
 
     where(:input, :output) do
@@ -27,10 +33,15 @@ describe Gitlab::UrlSanitizer do
 
       # return an empty string for invalid URLs
       'ssh://' | ''
+
+      # Filter secrets from the querystring
+      'http://gitlab.com/api/v4/projects?private_token=1234&a=b' | 'http://gitlab.com/api/v4/projects?private_token=%5BFILTERED%5D&a=b'
+      'http://gitlab.com/api/v4/projects?password=1234&a=b'      | 'http://gitlab.com/api/v4/projects?password=%5BFILTERED%5D&a=b'
+      'http://gitlab.com/api/v4/projects?token=1234&a=b'         | 'http://gitlab.com/api/v4/projects?token=%5BFILTERED%5D&a=b'
     end
 
     with_them do
-      it { expect(sanitize_url(input)).to include("repository '#{output}' not found") }
+      it { expect(sanitize_url(input)).to eq(generate_message(output)) }
     end
   end
 
@@ -51,6 +62,7 @@ describe Gitlab::UrlSanitizer do
       true  | 'git://foo:bar@example.com/group/group/project.git'
       true  | 'http://foo:bar@example.com/group/group/project.git'
       true  | 'https://foo:bar@example.com/group/group/project.git'
+      true  | 'https://foo:bar@example.com/group/group/project.git?token=password'
     end
 
     with_them do
@@ -92,14 +104,13 @@ describe Gitlab::UrlSanitizer do
 
     context 'credentials in URL' do
       where(:url, :credentials) do
-        'http://foo:bar@example.com' | { user: 'foo', password: 'bar' }
+        'http://foo:bar@example.com'     | { user: 'foo', password: 'bar' }
         'http://foo:bar:baz@example.com' | { user: 'foo', password: 'bar:baz' }
-        'http://:bar@example.com'    | { user: nil,   password: 'bar' }
-        'http://foo:@example.com'    | { user: 'foo', password: nil }
-        'http://foo@example.com'     | { user: 'foo', password: nil }
-        'http://:@example.com'       | { user: nil,   password: nil }
-        'http://@example.com'        | { user: nil,   password: nil }
-        'http://example.com'         | { user: nil,   password: nil }
+        'http://foo:@example.com'        | { user: 'foo', password: nil }
+        'http://foo@example.com'         | { user: 'foo', password: nil }
+        'http://:@example.com'           | { user: nil,   password: nil }
+        'http://@example.com'            | { user: nil,   password: nil }
+        'http://example.com'             | { user: nil,   password: nil }
 
         # Other invalid URLs
         nil  | { user: nil, password: nil }

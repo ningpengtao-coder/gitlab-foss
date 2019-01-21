@@ -3,11 +3,25 @@
 module Gitlab
   class UrlSanitizer
     ALLOWED_SCHEMES = %w[http https ssh git].freeze
+    SINGLE_QUOTE = "'"
 
     def self.sanitize(content)
       regexp = URI::DEFAULT_PARSER.make_regexp(ALLOWED_SCHEMES)
 
-      content.gsub(regexp) { |url| new(url).masked_url }
+      content.gsub(regexp) do |url|
+        # Unfortunately, URI::DEFAULT_PARSER.make_regexp returns a regular expression which hungrily consumes
+        # single quotes at the end of a string. When the querystring is filtered, the quote is converted into a %27
+        # which can affect error messages which quote the URL with singlequotes.
+        #
+        # Note the regular expression issue does not affect double-quotes nor backticks.
+        if url.end_with?(SINGLE_QUOTE)
+          url_without_quote = url.delete_suffix(SINGLE_QUOTE)
+          masked_unquoted_url = new(url_without_quote).masked_url
+          masked_unquoted_url + SINGLE_QUOTE
+        else
+          new(url).masked_url
+        end
+      end
     rescue Addressable::URI::InvalidURIError
       content.gsub(regexp, '')
     end
@@ -40,6 +54,7 @@ module Gitlab
       url = @url.dup
       url.password = "*****" if url.password.present?
       url.user = "*****" if url.user.present?
+      url.query = filter_query(url.query) if url.query.present?
       url.to_s
     end
 
@@ -52,6 +67,16 @@ module Gitlab
     end
 
     private
+
+    def param_filter
+      @param_filter ||= ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters)
+    end
+
+    def filter_query(query)
+      qs = CGI.parse(query)
+      qs = param_filter.filter(qs)
+      URI.encode_www_form(qs)
+    end
 
     def parse_url(url)
       url             = url.to_s.strip
