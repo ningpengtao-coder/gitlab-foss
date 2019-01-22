@@ -960,6 +960,15 @@ review-build-cng:
     - source ./review-apps.sh
     - wait_for_job_to_be_done "gitlab:assets:compile"
     - BUILD_TRIGGER_TOKEN=$REVIEW_APPS_BUILD_TRIGGER_TOKEN ./$SCRIPT_NAME cng
+  only:
+    refs:
+      - branches@gitlab-org/gitlab-ce
+      - branches@gitlab-org/gitlab-ee
+    kubernetes: active
+  except:
+    refs:
+      - master
+      - /(^docs[\/-].*|.*-docs$)/
 
 review-deploy:
   <<: *review-base
