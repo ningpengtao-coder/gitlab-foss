@@ -13,19 +13,17 @@
       = f.text_area :redirect_uri, class: 'form-control'
       = doorkeeper_errors_for application, :redirect_uri
       %span.form-text.text-muted
-        Use one line per URI
+        = _('Use one line per URI')
       - if Doorkeeper.configuration.native_redirect_uri
         %span.form-text.text-muted
-          Use
-          %code= Doorkeeper.configuration.native_redirect_uri
-          for local tests
+          = _('Use <code>%{doorkeeper_uri}</code> for local tests').html_safe % { doorkeeper_uri: Doorkeeper.configuration.native_redirect_uri }
 
   = content_tag :div, class: 'form-group row' do
     = f.label :trusted, class: 'col-sm-2 col-form-label pt-0'
     .col-sm-10
       = f.check_box :trusted
       %span.form-text.text-muted
-        Trusted applications are automatically authorized on GitLab OAuth flow.
+        = _('Trusted applications are automatically authorized on GitLab OAuth flow.')
 
   .form-group.row
     = f.label :scopes, class: 'col-sm-2 col-form-label pt-0'
@@ -33,5 +31,5 @@
       = render 'shared/tokens/scopes_form', prefix: 'doorkeeper_application', token: application, scopes: @scopes
 
   .form-actions
-    = f.submit 'Submit', class: "btn btn-success wide"
-    = link_to "Cancel", admin_applications_path, class: "btn btn-cancel"
+    = f.submit _('Submit'), class: "btn btn-success wide"
+    = link_to _('Cancel'), admin_applications_path, class: "btn btn-cancel"

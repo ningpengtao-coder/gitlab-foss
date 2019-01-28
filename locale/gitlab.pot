@@ -681,6 +681,9 @@ msgstr ""
 msgid "Application ID"
 msgstr ""
 
+msgid "Application: %{application_name}"
+msgstr ""
+
 msgid "Application: %{name}"
 msgstr ""
 
@@ -2061,6 +2064,12 @@ msgid "Configure storage path settings."
 msgstr ""
 
 msgid "Configure the way a user creates a new account."
+msgstr ""
+
+msgid "Confirmation|N"
+msgstr ""
+
+msgid "Confirmation|Y"
 msgstr ""
 
 msgid "Connect"
@@ -4524,6 +4533,9 @@ msgstr ""
 msgid "New Snippets"
 msgstr ""
 
+msgid "New application"
+msgstr ""
+
 msgid "New branch"
 msgstr ""
 
@@ -6057,6 +6069,9 @@ msgstr ""
 msgid "Scope"
 msgstr ""
 
+msgid "Scopes"
+msgstr ""
+
 msgid "Scroll down to <strong>Google Code Project Hosting</strong> and enable the switch on the right."
 msgstr ""
 
@@ -6686,6 +6701,9 @@ msgstr ""
 msgid "Subgroups and projects"
 msgstr ""
 
+msgid "Submit"
+msgstr ""
+
 msgid "Submit as spam"
 msgstr ""
 
@@ -6723,6 +6741,12 @@ msgid "System Hooks"
 msgstr ""
 
 msgid "System Info"
+msgstr ""
+
+msgid "System OAuth applications"
+msgstr ""
+
+msgid "System OAuth applications don't belong to any user and can only be managed by admins"
 msgstr ""
 
 msgid "System metrics (Custom)"
@@ -7491,6 +7515,12 @@ msgstr ""
 msgid "Triggers can force a specific branch or tag to get rebuilt with an API call.  These tokens will impersonate their associated user including their access to projects and their project permissions."
 msgstr ""
 
+msgid "Trusted"
+msgstr ""
+
+msgid "Trusted applications are automatically authorized on GitLab OAuth flow."
+msgstr ""
+
 msgid "Try again"
 msgstr ""
 
@@ -7609,6 +7639,9 @@ msgid "Usage ping is not enabled"
 msgstr ""
 
 msgid "Usage statistics"
+msgstr ""
+
+msgid "Use <code>%{doorkeeper_uri}</code> for local tests"
 msgstr ""
 
 msgid "Use <code>%{native_redirect_uri}</code> for local tests"

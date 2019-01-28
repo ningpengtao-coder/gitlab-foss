@@ -1,17 +1,17 @@
-- page_title "Applications"
+- page_title _('Applications')
 %h3.page-title
-  System OAuth applications
+  = _('System OAuth applications')
 %p.light
-  System OAuth applications don't belong to any user and can only be managed by admins
+  = _("System OAuth applications don't belong to any user and can only be managed by admins")
 %hr
-%p= link_to 'New application', new_admin_application_path, class: 'btn btn-success'
+%p= link_to _('New application'), new_admin_application_path, class: 'btn btn-success'
 %table.table
   %thead
     %tr
-      %th Name
-      %th Callback URL
-      %th Clients
-      %th Trusted
+      %th= _('Name')
+      %th= _('Callback URL')
+      %th= _('Clients')
+      %th= _('Trusted')
       %th
       %th
   %tbody.oauth-applications
@@ -20,6 +20,6 @@
         %td= link_to application.name, admin_application_path(application)
         %td= application.redirect_uri
         %td= application.access_tokens.map(&:resource_owner_id).uniq.count
-        %td= application.trusted? ? 'Y': 'N'
-        %td= link_to 'Edit', edit_admin_application_path(application), class: 'btn btn-link'
+        %td= application.trusted? ? s_('Confirmation|Y') : s_('Confirmation|N')
+        %td= link_to _('Edit'), edit_admin_application_path(application), class: 'btn btn-link'
         %td= render 'delete_form', application: application
