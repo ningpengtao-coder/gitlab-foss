@@ -1,9 +1,12 @@
+- gfm_link_start = "<a href='#{help_page_path('user/markdown')}' target='_blank' rel='noopener noreferrer'>".html_safe
+- link_end = '</a>'.html_safe
+
 = form_for @appearance, url: admin_appearances_path do |f|
   = form_errors(@appearance)
 
   %fieldset.app_logo
     %legend
-      Navigation bar:
+      = _('Navigation bar:')
   .form-group.row
     = f.label :header_logo, 'Header logo', class: 'col-sm-2 col-form-label pt-0'
     .col-sm-10
@@ -11,35 +14,35 @@
         = image_tag @appearance.header_logo_path, class: 'appearance-light-logo-preview'
         - if @appearance.persisted?
           %br
-          = link_to 'Remove header logo', header_logos_admin_appearances_path, data: { confirm: "Header logo will be removed. Are you sure?"}, method: :delete, class: "btn btn-inverted btn-remove btn-sm remove-logo"
+          = link_to _('Remove header logo'), header_logos_admin_appearances_path, data: { confirm: _('Header logo will be removed. Are you sure?') }, method: :delete, class: "btn btn-inverted btn-remove btn-sm remove-logo"
         %hr
       = f.hidden_field :header_logo_cache
       = f.file_field :header_logo, class: ""
       .hint
-        Maximum file size is 1MB. Pages are optimized for a 28px tall header logo
+        = _('Maximum file size is 1MB. Pages are optimized for a 28px tall header logo')
 
   %fieldset.app_logo
     %legend
-      Favicon:
+      = _('Favicon:')
   .form-group.row
-    = f.label :favicon, 'Favicon', class: 'col-sm-2 col-form-label pt-0'
+    = f.label :favicon, _('Favicon'), class: 'col-sm-2 col-form-label pt-0'
     .col-sm-10
       - if @appearance.favicon?
         = image_tag @appearance.favicon_path, class: 'appearance-light-logo-preview'
         - if @appearance.persisted?
           %br
-          = link_to 'Remove favicon', favicon_admin_appearances_path, data: { confirm: "Favicon will be removed. Are you sure?"}, method: :delete, class: "btn btn-inverted btn-remove btn-sm remove-logo"
+          = link_to _('Remove favicon'), favicon_admin_appearances_path, data: { confirm: _('Favicon will be removed. Are you sure?') }, method: :delete, class: "btn btn-inverted btn-remove btn-sm remove-logo"
         %hr
       = f.hidden_field :favicon_cache
       = f.file_field :favicon, class: ''
       .hint
-        Maximum file size is 1MB. Image size must be 32x32px. Allowed image formats are #{favicon_extension_whitelist}.
+        = _('Maximum file size is 1MB. Image size must be 32x32px. Allowed image formats are %{favicon_extension_whitelist}.') % { favicon_extension_whitelist: favicon_extension_whitelist }
         %br
-        Images with incorrect dimensions are not resized automatically, and may result in unexpected behavior.
+        = _('Images with incorrect dimensions are not resized automatically, and may result in unexpected behavior.')
 
   %fieldset.sign-in
     %legend
-      Sign in/Sign up pages:
+      = _('Sign in/Sign up pages:')
   .form-group.row
     = f.label :title, class: 'col-sm-2 col-form-label'
     .col-sm-10
@@ -49,7 +52,7 @@
     .col-sm-10
       = f.text_area :description, class: "form-control", rows: 10
       .hint
-        Description parsed with #{link_to "GitLab Flavored Markdown", help_page_path('user/markdown'), target: '_blank'}.
+        = _('Description parsed with %{gfm_link_start}GitLab Flavored Markdown%{link_end}.').html_safe % { gfm_link_start: gfm_link_start, link_end: link_end }
   .form-group.row
     = f.label :logo, class: 'col-sm-2 col-form-label pt-0'
     .col-sm-10
@@ -57,30 +60,30 @@
         = image_tag @appearance.logo_path, class: 'appearance-logo-preview'
         - if @appearance.persisted?
           %br
-          = link_to 'Remove logo', logo_admin_appearances_path, data: { confirm: "Logo will be removed. Are you sure?"}, method: :delete, class: "btn btn-inverted btn-remove btn-sm remove-logo"
+          = link_to _('Remove logo'), logo_admin_appearances_path, data: { confirm: _('Logo will be removed. Are you sure?') }, method: :delete, class: "btn btn-inverted btn-remove btn-sm remove-logo"
         %hr
       = f.hidden_field :logo_cache
       = f.file_field :logo, class: ""
       .hint
-        Maximum file size is 1MB. Pages are optimized for a 640x360 px logo.
+        = _('Maximum file size is 1MB. Pages are optimized for a 640x360 px logo.')
 
   %fieldset
     %legend
-      New project pages:
+      = _('New project pages:')
   .form-group.row
     = f.label :new_project_guidelines, class: 'col-sm-2 col-form-label'
     .col-sm-10
       = f.text_area :new_project_guidelines, class: "form-control", rows: 10
       .hint
-        Guidelines parsed with #{link_to "GitLab Flavored Markdown", help_page_path('user/markdown'), target: '_blank'}.
+        = _('Guidelines parsed with %{gfm_link_start}GitLab Flavored Markdown%{link_end}.').html_safe % { gfm_link_start: gfm_link_start, link_end: link_end }
 
   .form-actions
-    = f.submit 'Save', class: 'btn btn-success append-right-10'
+    = f.submit _('Save'), class: 'btn btn-success append-right-10'
     - if @appearance.persisted?
-      Preview last save:
-      = link_to 'Sign-in page', preview_sign_in_admin_appearances_path, class: 'btn', target: '_blank', rel: 'noopener noreferrer'
-      = link_to 'New project page', new_project_path, class: 'btn', target: '_blank', rel: 'noopener noreferrer'
+      = _('Preview last save:')
+      = link_to _('Sign-in page'), preview_sign_in_admin_appearances_path, class: 'btn', target: '_blank', rel: 'noopener noreferrer'
+      = link_to _('New project page'), new_project_path, class: 'btn', target: '_blank', rel: 'noopener noreferrer'
 
     - if @appearance.updated_at
       %span.float-right
-        Last edit #{time_ago_with_tooltip(@appearance.updated_at)}
+        = _('Last edit %{updated_at_time_ago}').html_safe % { updated_at_time_ago: time_ago_with_tooltip(@appearance.updated_at) }

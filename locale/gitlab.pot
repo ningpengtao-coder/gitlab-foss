@@ -675,6 +675,9 @@ msgstr ""
 msgid "Appearance"
 msgstr ""
 
+msgid "Appearance settings"
+msgstr ""
+
 msgid "Application"
 msgstr ""
 
@@ -2581,6 +2584,9 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
+msgid "Description parsed with %{gfm_link_start}GitLab Flavored Markdown%{link_end}."
+msgstr ""
+
 msgid "Description:"
 msgstr ""
 
@@ -3130,6 +3136,15 @@ msgstr ""
 msgid "Faster as it re-uses the project workspace (falling back to clone if it doesn't exist)"
 msgstr ""
 
+msgid "Favicon"
+msgstr ""
+
+msgid "Favicon will be removed. Are you sure?"
+msgstr ""
+
+msgid "Favicon:"
+msgstr ""
+
 msgid "Feb"
 msgstr ""
 
@@ -3547,6 +3562,12 @@ msgstr ""
 msgid "GroupsTree|Search by name"
 msgstr ""
 
+msgid "Guidelines parsed with %{gfm_link_start}GitLab Flavored Markdown%{link_end}."
+msgstr ""
+
+msgid "Header logo will be removed. Are you sure?"
+msgstr ""
+
 msgid "Health Check"
 msgstr ""
 
@@ -3682,6 +3703,9 @@ msgid "ImageDiffViewer|Onion skin"
 msgstr ""
 
 msgid "ImageDiffViewer|Swipe"
+msgstr ""
+
+msgid "Images with incorrect dimensions are not resized automatically, and may result in unexpected behavior."
 msgstr ""
 
 msgid "Impersonation has been disabled"
@@ -4025,6 +4049,9 @@ msgstr ""
 msgid "Last contact"
 msgstr ""
 
+msgid "Last edit %{updated_at_time_ago}"
+msgstr ""
+
 msgid "Last edited %{date}"
 msgstr ""
 
@@ -4147,6 +4174,9 @@ msgstr ""
 msgid "Locked to current projects"
 msgstr ""
 
+msgid "Logo will be removed. Are you sure?"
+msgstr ""
+
 msgid "Logs"
 msgstr ""
 
@@ -4247,6 +4277,15 @@ msgid "MarkdownToolbar|Insert code"
 msgstr ""
 
 msgid "Max access level"
+msgstr ""
+
+msgid "Maximum file size is 1MB. Image size must be 32x32px. Allowed image formats are %{favicon_extension_whitelist}."
+msgstr ""
+
+msgid "Maximum file size is 1MB. Pages are optimized for a 28px tall header logo"
+msgstr ""
+
+msgid "Maximum file size is 1MB. Pages are optimized for a 640x360 px logo."
 msgstr ""
 
 msgid "Maximum job timeout"
@@ -4474,6 +4513,9 @@ msgstr ""
 msgid "Naming, visibility"
 msgstr ""
 
+msgid "Navigation bar:"
+msgstr ""
+
 msgid "Nav|Help"
 msgstr ""
 
@@ -4558,6 +4600,12 @@ msgid "New pipelines will cancel older, pending pipelines on the same branch"
 msgstr ""
 
 msgid "New project"
+msgstr ""
+
+msgid "New project page"
+msgstr ""
+
+msgid "New project pages:"
 msgstr ""
 
 msgid "New schedule"
@@ -5180,6 +5228,9 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
+msgid "Preview last save:"
+msgstr ""
+
 msgid "Preview payload"
 msgstr ""
 
@@ -5791,7 +5842,16 @@ msgstr ""
 msgid "Remove avatar"
 msgstr ""
 
+msgid "Remove favicon"
+msgstr ""
+
 msgid "Remove group"
+msgstr ""
+
+msgid "Remove header logo"
+msgstr ""
+
+msgid "Remove logo"
 msgstr ""
 
 msgid "Remove priority"
@@ -6383,7 +6443,13 @@ msgstr ""
 msgid "Sign in via 2FA code"
 msgstr ""
 
+msgid "Sign in/Sign up pages:"
+msgstr ""
+
 msgid "Sign out"
+msgstr ""
+
+msgid "Sign-in page"
 msgstr ""
 
 msgid "Sign-in restrictions"
@@ -8005,6 +8071,9 @@ msgid "You can easily install a Runner on a Kubernetes cluster. %{link_to_help_p
 msgstr ""
 
 msgid "You can invite a new member to <strong>%{project_name}</strong> or invite another group."
+msgstr ""
+
+msgid "You can modify the look and feel of GitLab here"
 msgstr ""
 
 msgid "You can move around the graph by using the arrow keys."
