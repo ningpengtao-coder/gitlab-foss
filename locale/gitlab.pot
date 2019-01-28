@@ -387,6 +387,9 @@ msgstr ""
 msgid "Add a table"
 msgstr ""
 
+msgid "Add broadcast message"
+msgstr ""
+
 msgid "Add image comment"
 msgstr ""
 
@@ -903,6 +906,9 @@ msgstr ""
 msgid "Average per day: %{average}"
 msgstr ""
 
+msgid "Background Color"
+msgstr ""
+
 msgid "Background Jobs"
 msgstr ""
 
@@ -1144,6 +1150,12 @@ msgid "Branches|project settings"
 msgstr ""
 
 msgid "Branches|protected"
+msgstr ""
+
+msgid "Broadcast Messages"
+msgstr ""
+
+msgid "Broadcast messages are displayed for every user and can be used to notify users about scheduled maintenance, recent upgrades and more."
 msgstr ""
 
 msgid "Browse Directory"
@@ -2330,6 +2342,9 @@ msgstr ""
 msgid "Custom notification levels are the same as participating levels. With custom notification levels you will also receive notifications for select events. To find out more, check out %{notification_link}."
 msgstr ""
 
+msgid "Customize colors"
+msgstr ""
+
 msgid "Customize how FogBugz email addresses and usernames are imported into GitLab. In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
@@ -2806,6 +2821,9 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
+msgid "Ends"
+msgstr ""
+
 msgid "Ends at (UTC)"
 msgstr ""
 
@@ -3227,6 +3245,9 @@ msgid "FogBugz import"
 msgstr ""
 
 msgid "Follow the steps below to export your Google Code project data."
+msgstr ""
+
+msgid "Font Color"
 msgstr ""
 
 msgid "For internal projects, any logged in user can view pipelines and access job details (output logs and artifacts)"
@@ -6650,6 +6671,9 @@ msgstr ""
 msgid "Started %{startsIn}"
 msgstr ""
 
+msgid "Starts"
+msgstr ""
+
 msgid "Starts %{startsIn}"
 msgstr ""
 
@@ -7575,6 +7599,9 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
+msgid "Update broadcast message"
+msgstr ""
+
 msgid "Update now"
 msgstr ""
 
@@ -8155,6 +8182,9 @@ msgid "Your issues are being imported. Once finished, you'll get a confirmation 
 msgstr ""
 
 msgid "Your issues will be imported in the background. Once finished, you'll get a confirmation email."
+msgstr ""
+
+msgid "Your message here"
 msgstr ""
 
 msgid "Your name"

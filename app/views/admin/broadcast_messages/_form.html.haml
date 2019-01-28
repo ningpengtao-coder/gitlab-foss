@@ -4,7 +4,7 @@
     - if @broadcast_message.message.present?
       = render_broadcast_message(@broadcast_message)
     - else
-      Your message here
+      = _('Your message here')
 
 = form_for [:admin, @broadcast_message], html: { class: 'broadcast-message-form js-quick-submit js-requires-input'} do |f|
   = form_errors(@broadcast_message)
@@ -17,13 +17,13 @@
         data: { preview_path: preview_admin_broadcast_messages_path }
   .form-group.row.js-toggle-colors-container
     .col-sm-10.offset-sm-2
-      = link_to 'Customize colors', '#', class: 'js-toggle-colors-link'
+      = link_to _('Customize colors'), '#', class: 'js-toggle-colors-link'
   .form-group.row.js-toggle-colors-container.toggle-colors.hide
-    = f.label :color, "Background Color", class: 'col-form-label col-sm-2'
+    = f.label :color, _('Background Color'), class: 'col-form-label col-sm-2'
     .col-sm-10
       = f.color_field :color, class: "form-control"
   .form-group.row.js-toggle-colors-container.toggle-colors.hide
-    = f.label :font, "Font Color", class: 'col-form-label col-sm-2'
+    = f.label :font, _('Font Color'), class: 'col-form-label col-sm-2'
     .col-sm-10
       = f.color_field :font, class: "form-control"
   .form-group.row
@@ -36,6 +36,6 @@
       = f.datetime_select :ends_at, {}, class: 'form-control form-control-inline'
   .form-actions
     - if @broadcast_message.persisted?
-      = f.submit "Update broadcast message", class: "btn btn-success"
+      = f.submit _('Update broadcast message'), class: "btn btn-success"
     - else
-      = f.submit "Add broadcast message", class: "btn btn-success"
+      = f.submit _('Add broadcast message'), class: "btn btn-success"
