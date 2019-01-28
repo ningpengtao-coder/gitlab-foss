@@ -191,6 +191,9 @@ msgstr ""
 msgid "(external source)"
 msgstr ""
 
+msgid "(removed)"
+msgstr ""
+
 msgid "+ %{count} more"
 msgstr ""
 
@@ -355,6 +358,9 @@ msgid "Account"
 msgstr ""
 
 msgid "Account and limit"
+msgstr ""
+
+msgid "Action"
 msgstr ""
 
 msgid "Active"
@@ -529,6 +535,9 @@ msgid "Allow users to request access if visibility is public or internal."
 msgstr ""
 
 msgid "Allows you to add and manage Kubernetes clusters."
+msgstr ""
+
+msgid "Already blocked"
 msgstr ""
 
 msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
@@ -1000,6 +1009,9 @@ msgid "Bitbucket Server Import"
 msgstr ""
 
 msgid "Bitbucket import"
+msgstr ""
+
+msgid "Block user"
 msgstr ""
 
 msgid "Blocked"
@@ -3930,6 +3942,9 @@ msgstr ""
 msgid "Job|This job is stuck because the project doesn't have any runners online assigned to it."
 msgstr ""
 
+msgid "Joined %{created_at_timeago}"
+msgstr ""
+
 msgid "Jul"
 msgstr ""
 
@@ -4328,6 +4343,9 @@ msgid "MergeRequest|No files found"
 msgstr ""
 
 msgid "Merged"
+msgstr ""
+
+msgid "Message"
 msgstr ""
 
 msgid "Messages"
@@ -5800,6 +5818,12 @@ msgstr ""
 msgid "Remove project"
 msgstr ""
 
+msgid "Remove report"
+msgstr ""
+
+msgid "Remove user & report"
+msgstr ""
+
 msgid "Removed group can not be restored!"
 msgstr ""
 
@@ -5819,6 +5843,9 @@ msgid "Reply to this email directly or %{view_it_on_gitlab}."
 msgstr ""
 
 msgid "Report abuse to GitLab"
+msgstr ""
+
+msgid "Reported by"
 msgstr ""
 
 msgid "Reporting"
@@ -6938,6 +6965,9 @@ msgstr ""
 msgid "The value lying at the midpoint of a series of observed values. E.g., between 3, 5, 9, the median is 5. Between 3, 5, 7, 8, the median is (5+7)/2 = 6."
 msgstr ""
 
+msgid "There are no abuse reports!"
+msgstr ""
+
 msgid "There are no archived projects yet"
 msgstr ""
 
@@ -7509,6 +7539,12 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "USER %{username} WILL BE REMOVED! Are you sure?"
+msgstr ""
+
+msgid "USER WILL BE BLOCKED! Are you sure?"
+msgstr ""
+
 msgid "Unable to load the diff. %{button_try_again}"
 msgstr ""
 
@@ -7627,6 +7663,9 @@ msgid "Use the following registration token during setup:"
 msgstr ""
 
 msgid "Use your global notification setting"
+msgstr ""
+
+msgid "User"
 msgstr ""
 
 msgid "User Cohorts are only shown when the %{usage_ping_link_start}usage ping%{usage_ping_link_end} is enabled."
