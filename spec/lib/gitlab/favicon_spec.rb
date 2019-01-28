@@ -14,7 +14,7 @@ RSpec.describe Gitlab::Favicon, :request_store do
 
     it 'has yellow favicon for canary' do
       stub_env('CANARY', 'true')
-      expect(described_class.main).to match_asset_path 'favicon-yellow.png'
+      expect(described_class.main).to match_asset_path 'favicon-canary.png'
     end
 
     it 'uses the custom favicon if a favicon appearance is present' do

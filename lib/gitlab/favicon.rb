@@ -8,7 +8,7 @@ module Gitlab
           if appearance_favicon.exists?
             appearance_favicon.url
           elsif Gitlab::Utils.to_boolean(ENV['CANARY'])
-            'favicon-yellow.png'
+            'favicon-canary.png'
           elsif Rails.env.development?
             'favicon-blue.png'
           else
