@@ -47,12 +47,34 @@
     font-family: $monospace-font;
     white-space: pre-wrap;
     word-wrap: normal;
+
+    &.math:before {
+      content: 'math: ';
+      font-size: 80%;
+      position: relative;
+      top: -1px;
+    }
   }
 
   // Multi-line code blocks should scroll horizontally
   pre {
+    position: relative;
+
     code {
       white-space: pre;
+    }
+
+    &[lang]:not([lang='plaintext']):not(.js-syntax-highlight):before {
+      content: attr(lang);
+      display: block;
+      font-size: 80%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0 7px;
+      border: 1px solid #e5e5e5;
+      border-width: 0 0 1px 1px;
+      border-radius: 0 0 0 2px;
     }
   }
 
@@ -209,6 +231,10 @@
       margin-left: 28px;
       padding-left: 0;
     }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
   }
 
   ul.task-list {
@@ -219,10 +245,24 @@
       padding-left: 28px;
       margin-left: 0 !important;
 
-      > input.task-list-item-checkbox {
+      > input.task-list-item-checkbox, > p:last-child > input.task-list-item-checkbox {
         position: absolute;
         left: 8px;
         top: 5px;
+      }
+
+      > .todo-content {
+        margin-left: -4px;
+      }
+    }
+  }
+
+  .task-list > li.task-list-item {
+    > .todo-content {
+      display: inline-block;
+
+      > :last-child {
+        margin-bottom: 0;
       }
     }
   }

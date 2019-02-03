@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 import { Mark } from 'tiptap';
+import { toggleMark, markInputRule } from 'tiptap-commands';
 import { defaultMarkdownSerializer } from 'prosemirror-markdown';
 
 // Transforms generated HTML back to GFM for Banzai::Filter::MathFilter
@@ -37,5 +38,13 @@ export default class MathMark extends Mark {
         return `${defaultMarkdownSerializer.marks.code.close(state, mark, parent, index)}$`;
       },
     };
+  }
+
+  commands({ type }) {
+    return () => toggleMark(type);
+  }
+
+  inputRules({ type }) {
+    return [markInputRule(/(?:\$`)([^`]+)(?:`)$/, type)];
   }
 }

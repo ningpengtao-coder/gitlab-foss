@@ -80,7 +80,7 @@ export default class ZenMode {
     Mousetrap.pause();
     this.active_backdrop = $(backdrop);
     this.active_backdrop.addClass('fullscreen');
-    this.active_textarea = this.active_backdrop.find('textarea');
+    this.active_textarea = this.active_backdrop.find('textarea, .ProseMirror');
     // Prevent a user-resized textarea from persisting to fullscreen
     this.active_textarea.removeAttr('style');
     this.active_textarea.focus();

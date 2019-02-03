@@ -100,7 +100,7 @@ export default [
   new InlineDiff(),
 
   new Link(),
-  new Code(),
   new MathMark(),
+  new Code(),
   new InlineHTML(),
 ];

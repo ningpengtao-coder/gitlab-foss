@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 import { Mark } from 'tiptap';
+import { toggleMark, markInputRule } from 'tiptap-commands';
 
 // Transforms generated HTML back to GFM for Banzai::Filter::InlineDiffFilter
 export default class InlineDiff extends Mark {
@@ -37,5 +38,16 @@ export default class InlineDiff extends Mark {
         return mark.attrs.addition ? '+}' : '-}';
       },
     };
+  }
+
+  commands({ type }) {
+    return () => toggleMark(type);
+  }
+
+  inputRules({ type }) {
+    return [
+      markInputRule(/(?:\[\+|\{\+)([^+]+)(?:\+\]|\+\})$/, type, { addition: true }),
+      markInputRule(/(?:\[-|\{-)([^-]+)(?:-\]|-\})$/, type, { addition: false }),
+    ];
   }
 }

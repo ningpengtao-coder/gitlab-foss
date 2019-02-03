@@ -113,11 +113,23 @@
     margin: 0;
   }
 }
+// Fix height issue!
 
 .md-preview-holder {
-  min-height: 167px;
+  min-height: 140px + 32px;
   padding: 10px 0;
   overflow-x: auto;
+}
+
+.md-rich-holder {
+  .md-rich-editor {
+    padding: 10px 0;
+    min-height: 140px;
+
+    .ProseMirror {
+      min-height: 140px - 20px;
+    }
+  }
 }
 
 .markdown-area {
@@ -312,5 +324,21 @@
 
   .referenced-users {
     margin-right: 0;
+  }
+}
+
+.md-rich-holder {
+  .editor {
+    p.is-empty:first-child::before {
+      content: attr(data-empty-text);
+      float: left;
+      color: #aaa;
+      pointer-events: none;
+      height: 0;
+    }
+  }
+
+  [contenteditable]:focus {
+    outline: none;
   }
 }

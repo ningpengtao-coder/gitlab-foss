@@ -3,10 +3,13 @@ import $ from 'jquery';
 import _ from 'underscore';
 import Autosave from '~/autosave';
 import Autosize from 'autosize';
+import { Editor, EditorContent } from 'tiptap';
+import { Placeholder, History } from 'tiptap-extensions';
+import { DOMParser } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
 import { __ } from '~/locale';
 import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
-import { CopyAsGFM } from '~/behaviors/markdown/copy_as_gfm';
 import markdownHeader from './header.vue';
 import markdownToolbar from './toolbar.vue';
 import icon from '../icon.vue';
@@ -14,9 +17,13 @@ import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 import { updateText } from '~/lib/utils/text_markdown';
 import GfmAutoComplete, * as GFMConfig from '~/gfm_auto_complete';
 import dropzoneInput from '~/dropzone_input';
+import editorExtensions from '~/behaviors/markdown/editor_extensions';
+import markdownSerializer from '~/behaviors/markdown/serializer';
+import { UP_KEY_CODE, ENTER_KEY_CODE, ESC_KEY_CODE } from '~/lib/utils/keycodes';
 
 export default {
   components: {
+    EditorContent,
     markdownHeader,
     markdownToolbar,
     icon,
@@ -120,7 +127,10 @@ export default {
       autosave: null,
       autocomplete: null,
       dropzone: null,
+      editor: null,
       currentValue: this.value,
+      editorContent: null,
+      editorContentOutdated: true,
       renderedLoading: false,
       renderedValue: null,
       rendered: '',
@@ -134,7 +144,10 @@ export default {
       return this.currentValue !== this.renderedValue;
     },
     needsMarkdownRender() {
-      return this.renderedOutdated && this.mode === 'preview';
+      return (
+        this.renderedOutdated &&
+        ((this.mode === 'rich' && this.editorContentOutdated) || this.mode === 'preview')
+      );
     },
     needsPreviewGFMRender() {
       return !this.renderedOutdated && this.mode === 'preview';
@@ -191,9 +204,30 @@ export default {
         this.$nextTick(this.renderMarkdown);
       }
     },
+    renderedOutdated() {
+      if (!this.renderedOutdated) {
+        this.editorContent = this.rendered;
+      }
+    },
     needsPreviewGFMRender() {
       if (this.needsPreviewGFMRender) {
         this.$nextTick(this.renderPreviewGFM);
+      }
+    },
+    editorContentOutdated() {
+      if (this.editorContentOutdated) {
+        if (this.renderedOutdated) {
+          this.editor.clearContent();
+          this.editorContent = null;
+        } else {
+          this.editorContent = this.rendered;
+        }
+      }
+    },
+    editorContent() {
+      if (this.editorContentOutdated && this.editorContent !== null) {
+        this.editor.setContent(this.editorContent);
+        this.editorContentOutdated = false;
       }
     },
     value() {
@@ -201,7 +235,7 @@ export default {
     },
     currentValue() {
       if (this.autosave) {
-        this.$nextTick(() => this.autosave.save());
+        this.$nextTick(this.autosave.save);
       }
 
       if (this.mode === 'markdown') {
@@ -210,6 +244,8 @@ export default {
     },
   },
   mounted() {
+    this.editor = this.createEditor();
+
     if (this.autosaveKey.length) {
       this.autosave = new Autosave($(this.$refs.textarea), this.autosaveKey);
     }
@@ -224,6 +260,8 @@ export default {
     this.autosizeTextarea();
   },
   beforeDestroy() {
+    this.editor.destroy();
+
     if (this.autosave) {
       this.autosave.reset();
       this.autosave.dispose();
@@ -256,9 +294,33 @@ export default {
       return autocomplete;
     },
 
-    setCurrentValue(newValue, { emitEvent = true } = {}) {
+    createEditor() {
+      return new Editor({
+        useBuiltInExtensions: false,
+        extensions: [
+          ...editorExtensions,
+
+          new History(),
+          new Placeholder({
+            emptyClass: 'is-empty',
+            emptyNodeText: 'Write a comment here…',
+          }),
+        ],
+        editable: this.editable,
+        onInit: ({ view }) =>
+          $(view.dom)
+            .addClass('md md-preview')
+            .on('keydown', this.onEditorKeydown),
+        onFocus: () => this.isFocused = true,
+        onBlur: () => this.isFocused = false,
+        onUpdate: this.onEditorUpdate,
+      });
+    },
+
+    setCurrentValue(newValue, { editorContentOutdated = true, emitEvent = true } = {}) {
       if (newValue === this.currentValue) return;
 
+      this.editorContentOutdated = editorContentOutdated;
       this.currentValue = newValue;
 
       if (emitEvent) {
@@ -270,13 +332,43 @@ export default {
       const blockquoteEl = document.createElement('blockquote');
       blockquoteEl.appendChild(node.cloneNode(true));
 
-      const markdown = CopyAsGFM.nodeToGFM(blockquoteEl);
+      const wrapEl = document.createElement('div');
+      wrapEl.appendChild(blockquoteEl);
+      const quoteDoc = DOMParser.fromSchema(this.editor.schema).parse(wrapEl);
 
-      const current = this.currentValue.trim();
-      const separator = current.length ? '\n\n' : '';
-      this.setCurrentValue(`${current}${separator}${markdown}\n\n`);
+      this.appendDocToValue(quoteDoc);
 
       this.$nextTick(this.focus);
+    },
+
+    appendDocToValue(appendableDoc) {
+      if (this.mode === 'rich') {
+        const { view, schema } = this.editor;
+        const { state } = view;
+        const { doc, tr } = state;
+        const endPos = doc.content.size;
+
+        // Add empty paragraph to end
+        tr.insert(endPos, schema.nodes.paragraph.create());
+
+        let replaceStart = endPos;
+        const { lastChild } = doc;
+        // If the last child is an empty paragraph, we want to replace it
+        if (lastChild.type.name === 'paragraph' && lastChild.content.size === 0) {
+          replaceStart -= lastChild.nodeSize;
+        }
+
+        // Add quote node just before empty paragraph
+        tr.replaceWith(replaceStart, endPos, appendableDoc);
+
+        view.dispatch(tr);
+      } else {
+        const markdown = markdownSerializer.serialize(appendableDoc);
+
+        const current = this.currentValue.trim();
+        const separator = current.length ? '\n\n' : '';
+        this.setCurrentValue(`${current}${separator}${markdown}\n\n`);
+      }
     },
 
     blur() {
@@ -286,8 +378,24 @@ export default {
     },
 
     focus() {
-      if (this.mode === 'markdown') {
-        this.$refs.textarea.focus();
+      switch (this.mode) {
+        case 'markdown':
+          this.$refs.textarea.focus();
+          break;
+        case 'rich': {
+          const { view } = this.editor;
+          const { state } = view;
+          const { doc } = state;
+
+          // Move cursor to end
+          const endPos = doc.resolve(doc.content.size);
+          view.dispatch(state.tr.setSelection(TextSelection.between(endPos, endPos)));
+
+          this.editor.focus();
+          break;
+        }
+        default:
+          break;
       }
     },
 
@@ -319,6 +427,10 @@ export default {
 
       this.renderedLoading = false;
       this.renderedValue = text;
+
+      if (this.mode === 'rich') {
+        this.$nextTick(this.focus);
+      }
     },
 
     renderPreviewGFM() {
@@ -330,15 +442,53 @@ export default {
     },
 
     toolbarButtonClicked(button) {
-      updateText({
-        textArea: this.$refs.textarea,
-        tag: button.tag,
-        blockTag: button.tagBlock,
-        wrap: !button.prepend,
-        select: button.tagSelect,
-        cursorOffset: button.cursorOffset,
-        tagContent: button.tagContent,
-      });
+      if (this.mode === 'markdown') {
+        updateText({
+          textArea: this.$refs.textarea,
+          tag: button.tag,
+          blockTag: button.tagBlock,
+          wrap: !button.prepend,
+          select: button.tagSelect,
+          cursorOffset: button.cursorOffset,
+          tagContent: button.tagContent,
+        });
+      } else {
+        const { commands, view, schema, isActive } = this.editor;
+
+        switch (button.name) {
+          case 'code':
+            if (isActive.code()) {
+              commands.code();
+            } else if (isActive.code_block()) {
+              commands.code_block();
+            } else {
+              const selectionFragment = view.state.selection.content().content;
+              const selectionDoc = schema.nodes.doc.create({}, selectionFragment);
+              const selectionMarkdown = markdownSerializer.serialize(selectionDoc);
+              if (selectionMarkdown.indexOf('\n') === -1) {
+                commands.code();
+              } else {
+                commands.code_block();
+              }
+            }
+            break;
+          case 'suggestion':
+            if (isActive.code_block()) {
+              commands.code_block();
+            } else {
+              commands.code_block({ lang: 'suggestion' });
+              if (view.state.selection.empty) {
+                view.dispatch(view.state.tr.insertText(button.tagContent));
+              }
+            }
+            break;
+          default: {
+            const command = commands[button.name];
+            if (command) command();
+            break;
+          }
+        }
+      }
     },
 
     triggerEditPrevious() {
@@ -355,6 +505,31 @@ export default {
 
     onTextareaInput() {
       this.setCurrentValue(this.$refs.textarea.value);
+    },
+
+    onEditorUpdate({ state: { doc } }) {
+      this.editorContent = doc.toJSON();
+      this.setCurrentValue(markdownSerializer.serialize(doc), { editorContentOutdated: false });
+    },
+
+    onEditorKeydown(e) {
+      switch (e.keyCode) {
+        case UP_KEY_CODE:
+          this.triggerEditPrevious();
+          break;
+        case ENTER_KEY_CODE:
+          if (e.metaKey || e.ctrlKey) {
+            e.preventDefault();
+            this.triggerSave();
+          }
+          break;
+        case ESC_KEY_CODE:
+          e.preventDefault();
+          this.triggerCancel();
+          break;
+        default:
+          break;
+      }
     },
   },
 };
@@ -375,6 +550,7 @@ export default {
       :mode="mode"
       @preview="mode = 'preview'"
       @markdown="mode = 'markdown'"
+      @rich="mode = 'rich'"
       @toolbar-button-clicked="toolbarButtonClicked"
     />
     <div v-show="mode === 'markdown'" class="md-write-holder">
@@ -408,6 +584,20 @@ export default {
           :can-attach-file="canAttachFile"
         />
       </div>
+    </div>
+
+    <div v-show="mode === 'rich'" class="md-rich-holder">
+      <div :class="{ 'md-rich-editor': true, 'zen-backdrop': mode === 'rich' }">
+        <editor-content v-show="!editorContentOutdated" :editor="editor" class="editor" />
+        <span v-if="editorContentOutdated">
+          {{ __('Loading…') }}
+        </span>
+      </div>
+
+      <a class="zen-control zen-control-leave js-zen-leave" href="#" aria-label="Exit zen mode">
+        <icon :size="32" name="screen-normal" />
+      </a>
+      <markdown-toolbar :rich-text="true" :can-attach-file="false" />
     </div>
 
     <div v-show="mode === 'preview'" class="js-vue-md-preview md-preview-holder">

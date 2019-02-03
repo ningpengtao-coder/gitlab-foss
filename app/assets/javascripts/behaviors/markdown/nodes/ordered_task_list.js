@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 import { Node } from 'tiptap';
+import { toggleList, wrappingInputRule } from 'tiptap-commands';
 
 // Transforms generated HTML back to GFM for Banzai::Filter::TaskListFilter
 export default class OrderedTaskList extends Node {
@@ -24,5 +25,13 @@ export default class OrderedTaskList extends Node {
 
   toMarkdown(state, node) {
     state.renderList(node, '   ', () => '1. ');
+  }
+
+  commands({ type, schema }) {
+    return () => toggleList(type, schema.nodes.task_list_item);
+  }
+
+  inputRules({ type }) {
+    return [wrappingInputRule(/^\s*(\d+)\.\s(\[ \])\s$/, type)];
   }
 }

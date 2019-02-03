@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 import { Node } from 'tiptap';
+import { setBlockType } from 'tiptap-commands';
 import { defaultMarkdownSerializer } from 'prosemirror-markdown';
 
 // Transforms generated HTML back to GFM for Banzai::Filter::MarkdownFilter
@@ -20,5 +21,9 @@ export default class Paragraph extends Node {
 
   toMarkdown(state, node) {
     defaultMarkdownSerializer.nodes.paragraph(state, node);
+  }
+
+  commands({ type }) {
+    return () => setBlockType(type);
   }
 }

@@ -6,9 +6,15 @@ export default {
     GlLink,
   },
   props: {
+    richText: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     markdownDocsPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     quickActionsDocsPath: {
       type: String,
@@ -32,18 +38,26 @@ export default {
 <template>
   <div class="comment-toolbar clearfix">
     <div class="toolbar-text">
-      <template v-if="!hasQuickActionsDocsPath && markdownDocsPath">
-        <gl-link :href="markdownDocsPath" target="_blank" tabindex="-1">
-          Markdown is supported
+      <template v-if="hasQuickActionsDocsPath">
+        <template v-if="richText">
+          Rich text editing
+        </template>
+        <gl-link v-else :href="markdownDocsPath" target="_blank" tabindex="-1">
+          Markdown
         </gl-link>
-      </template>
-      <template v-if="hasQuickActionsDocsPath && markdownDocsPath">
-        <gl-link :href="markdownDocsPath" target="_blank" tabindex="-1"> Markdown </gl-link>
         and
         <gl-link :href="quickActionsDocsPath" target="_blank" tabindex="-1">
           quick actions
         </gl-link>
         are supported
+      </template>
+      <template v-else>
+        <template v-if="richText">
+          Rich text editing is supported
+        </template>
+        <gl-link v-else :href="markdownDocsPath" target="_blank" tabindex="-1">
+          Markdown is supported
+        </gl-link>
       </template>
     </div>
     <span v-if="canAttachFile" class="uploading-container">

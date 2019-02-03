@@ -71,6 +71,13 @@ export default {
       this.$emit('markdown');
     },
 
+    richTab(event, form) {
+      if (event.target.blur) event.target.blur();
+      if (!this.isValid(form)) return;
+
+      this.$emit('rich');
+    },
+
     toolbarButtonClicked(button) {
       this.$emit('toolbar-button-clicked', button);
     },
@@ -83,7 +90,12 @@ export default {
     <ul class="nav-links clearfix">
       <li :class="{ active: mode == 'markdown' }" class="md-header-tab">
         <button class="js-write-link" tabindex="-1" type="button" @click="markdownTab($event)">
-          Write
+          Markdown
+        </button>
+      </li>
+      <li :class="{ active: mode == 'rich' }" class="md-header-tab">
+        <button class="js-rich-link" tabindex="-1" type="button" @click="richTab($event)">
+          Rich
         </button>
       </li>
       <li :class="{ active: mode == 'preview' }" class="md-header-tab">
@@ -123,6 +135,7 @@ export default {
           @click="toolbarButtonClicked"
         />
         <toolbar-button
+          v-if="mode == 'markdown'"
           name="link"
           tag="[{text}](url)"
           tag-select="url"
@@ -155,6 +168,7 @@ export default {
           @click="toolbarButtonClicked"
         />
         <toolbar-button
+          v-if="mode == 'markdown'"
           name="table"
           :tag="mdTable"
           :prepend="true"

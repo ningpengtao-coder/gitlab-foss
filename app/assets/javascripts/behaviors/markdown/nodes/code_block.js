@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 import { CodeBlock as BaseCodeBlock } from 'tiptap-extensions';
+import { toggleBlockType } from 'tiptap-commands';
 
 const PLAINTEXT_LANG = 'plaintext';
 
@@ -68,7 +69,14 @@ export default class CodeBlock extends BaseCodeBlock {
           attrs: { lang: 'suggestion' },
         },
       ],
-      toDOM: node => ['pre', { class: 'code highlight', lang: node.attrs.lang }, ['code', 0]],
+      toDOM: node => [
+        'pre',
+        {
+          class: `code highlight ${node.attrs.lang} ${gon.user_color_scheme}`,
+          lang: node.attrs.lang,
+        },
+        ['code', 0],
+      ],
     };
   }
 
@@ -95,5 +103,9 @@ export default class CodeBlock extends BaseCodeBlock {
 
     state.write('```');
     state.closeBlock(node);
+  }
+
+  commands({ type, schema }) {
+    return attrs => toggleBlockType(type, schema.nodes.paragraph, attrs);
   }
 }
