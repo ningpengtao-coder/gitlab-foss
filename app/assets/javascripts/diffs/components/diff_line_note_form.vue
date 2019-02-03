@@ -2,14 +2,12 @@
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { s__ } from '~/locale';
 import noteForm from '../../notes/components/note_form.vue';
-import autosave from '../../notes/mixins/autosave';
 import { DIFF_NOTE_TYPE } from '../constants';
 
 export default {
   components: {
     noteForm,
   },
-  mixins: [autosave],
   props: {
     diffFileHash: {
       type: String,
@@ -51,18 +49,20 @@ export default {
         linePosition: this.linePosition,
       };
     },
-  },
-  mounted() {
-    if (this.isLoggedIn) {
-      const keys = [
+    autosaveKey() {
+      if (!this.isLoggedIn) return [];
+
+      return [
+        'Note',
+        this.noteableType,
+        this.noteableData.id,
+        'new',
         this.noteableData.diff_head_sha,
         DIFF_NOTE_TYPE,
         this.noteableData.source_project_id,
         this.line.line_code,
       ];
-
-      this.initAutoSave(this.noteableData, keys);
-    }
+    },
   },
   methods: {
     ...mapActions('diffs', ['cancelCommentForm', 'assignDiscussionsToDiff', 'saveDiffDiscussion']),
@@ -79,9 +79,6 @@ export default {
       this.cancelCommentForm({
         lineCode: this.line.line_code,
         fileHash: this.diffFileHash,
-      });
-      this.$nextTick(() => {
-        this.resetAutoSave();
       });
     },
     handleSaveNote(note) {
@@ -103,6 +100,7 @@ export default {
       :help-page-path="helpPagePath"
       save-button-title="Comment"
       class="diff-comment-form"
+      :autosave-key="autosaveKey"
       @cancelForm="handleCancelCommentForm"
       @handleFormUpdate="handleSaveNote"
     />

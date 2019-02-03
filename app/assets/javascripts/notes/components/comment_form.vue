@@ -2,16 +2,10 @@
 import $ from 'jquery';
 import { mapActions, mapGetters, mapState } from 'vuex';
 import _ from 'underscore';
-import Autosize from 'autosize';
 import { __, sprintf } from '~/locale';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
 import Flash from '../../flash';
-import Autosave from '../../autosave';
-import {
-  capitalizeFirstCharacter,
-  convertToCamelCase,
-  splitCamelCase,
-} from '../../lib/utils/text_utility';
+import { capitalizeFirstCharacter, splitCamelCase } from '../../lib/utils/text_utility';
 import * as constants from '../constants';
 import eventHub from '../event_hub';
 import issueWarning from '../../vue_shared/components/issue/issue_warning.vue';
@@ -126,6 +120,11 @@ export default {
         ? 'merge request'
         : 'issue';
     },
+    autosaveKey() {
+      if (!this.isLoggedIn) return [];
+
+      return ['Note', this.noteableType, this.getNoteableData.id, 'new'];
+    },
   },
   watch: {
     note(newNote) {
@@ -140,8 +139,6 @@ export default {
     $(document).on('issuable:change', (e, isClosed) => {
       this.toggleIssueLocalState(isClosed ? constants.CLOSED : constants.REOPENED);
     });
-
-    this.initAutoSave();
   },
   methods: {
     ...mapActions([
@@ -183,7 +180,6 @@ export default {
         }
 
         this.note = ''; // Empty textarea while being requested. Repopulate in catch
-        this.resizeTextarea();
         this.stopPolling();
 
         this.saveNote(noteData)
@@ -261,46 +257,29 @@ Please check your network connection and try again.`;
     discard(shouldClear = true) {
       // `blur` is needed to clear slash commands autocomplete cache if event fired.
       // `focus` is needed to remain cursor in the textarea.
-      this.$refs.textarea.blur();
-      this.$refs.textarea.focus();
+      const field = this.$refs.markdownField;
+      field.blur();
+      field.focus();
 
       if (shouldClear) {
         this.note = '';
-        this.resizeTextarea();
-        this.$refs.markdownField.previewMarkdown = false;
-      }
 
-      this.autosave.reset();
+        if (field.mode === 'preview') {
+          field.mode = 'markdown';
+        }
+      }
     },
     setNoteType(type) {
       this.noteType = type;
     },
     editCurrentUserLastNote() {
-      if (this.note === '') {
-        const lastNote = this.getCurrentUserLastNote;
+      const lastNote = this.getCurrentUserLastNote;
 
-        if (lastNote) {
-          eventHub.$emit('enterEditMode', {
-            noteId: lastNote.id,
-          });
-        }
+      if (lastNote) {
+        eventHub.$emit('enterEditMode', {
+          noteId: lastNote.id,
+        });
       }
-    },
-    initAutoSave() {
-      if (this.isLoggedIn) {
-        const noteableType = capitalizeFirstCharacter(convertToCamelCase(this.noteableType));
-
-        this.autosave = new Autosave($(this.$refs.textarea), [
-          'Note',
-          noteableType,
-          this.getNoteableData.id,
-        ]);
-      }
-    },
-    resizeTextarea() {
-      this.$nextTick(() => {
-        Autosize.update(this.$refs.textarea);
-      });
     },
   },
 };
@@ -334,29 +313,22 @@ Please check your network connection and try again.`;
 
             <markdown-field
               ref="markdownField"
+              v-model="note"
               :markdown-preview-path="markdownPreviewPath"
               :markdown-docs-path="markdownDocsPath"
               :quick-actions-docs-path="quickActionsDocsPath"
               :add-spacing-classes="false"
-            >
-              <textarea
-                id="note-body"
-                ref="textarea"
-                slot="textarea"
-                v-model="note"
-                :disabled="isSubmitting"
-                name="note[note]"
-                class="note-textarea js-vue-comment-form js-note-text
-js-gfm-input js-autosize markdown-area js-vue-textarea qa-comment-input"
-                data-supports-quick-actions="true"
-                aria-label="Description"
-                placeholder="Write a comment or drag your files here…"
-                @keydown.up="editCurrentUserLastNote()"
-                @keydown.meta.enter="handleSave()"
-                @keydown.ctrl.enter="handleSave()"
-              >
-              </textarea>
-            </markdown-field>
+              :autosave-key="autosaveKey"
+              textarea-id="note-body"
+              textarea-name="note[note]"
+              textarea-class="js-note-text qa-comment-input"
+              :textarea-supports-quick-actions="true"
+              textarea-label="Comment"
+              :editable="!isSubmitting"
+              @edit-previous="editCurrentUserLastNote()"
+              @save="handleSave()"
+              @cancel="cancelHandler(true)"
+            />
             <div class="note-form-actions">
               <div
                 class="float-left btn-group

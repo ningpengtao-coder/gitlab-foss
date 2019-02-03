@@ -10,6 +10,10 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   props: {
+    name: {
+      type: String,
+      required: true,
+    },
     buttonTitle: {
       type: String,
       required: true,
@@ -48,24 +52,24 @@ export default {
       default: 0,
     },
   },
+  methods: {
+    clicked() {
+      this.$emit('click', this);
+    },
+  },
 };
 </script>
 
 <template>
   <button
     v-gl-tooltip
-    :data-md-tag="tag"
-    :data-md-cursor-offset="cursorOffset"
-    :data-md-select="tagSelect"
-    :data-md-block="tagBlock"
-    :data-md-tag-content="tagContent"
-    :data-md-prepend="prepend"
     :title="buttonTitle"
     :aria-label="buttonTitle"
     type="button"
-    class="toolbar-btn js-md"
+    class="toolbar-btn"
     tabindex="-1"
     data-container="body"
+    @click="clicked"
   >
     <icon :name="icon" />
   </button>

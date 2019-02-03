@@ -13,8 +13,8 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   props: {
-    previewMarkdown: {
-      type: Boolean,
+    mode: {
+      type: String,
       required: true,
     },
     lineContent: {
@@ -42,12 +42,12 @@ export default {
     },
   },
   mounted() {
-    $(document).on('markdown-preview:show.vue', this.previewMarkdownTab);
-    $(document).on('markdown-preview:hide.vue', this.writeMarkdownTab);
+    $(document).on('markdown-preview:show.vue', this.previewTab);
+    $(document).on('markdown-preview:hide.vue', this.markdownTab);
   },
   beforeDestroy() {
-    $(document).off('markdown-preview:show.vue', this.previewMarkdownTab);
-    $(document).off('markdown-preview:hide.vue', this.writeMarkdownTab);
+    $(document).off('markdown-preview:show.vue', this.previewTab);
+    $(document).off('markdown-preview:hide.vue', this.markdownTab);
   },
   methods: {
     isValid(form) {
@@ -57,18 +57,22 @@ export default {
       );
     },
 
-    previewMarkdownTab(event, form) {
+    previewTab(event, form) {
       if (event.target.blur) event.target.blur();
       if (!this.isValid(form)) return;
 
-      this.$emit('preview-markdown');
+      this.$emit('preview');
     },
 
-    writeMarkdownTab(event, form) {
+    markdownTab(event, form) {
       if (event.target.blur) event.target.blur();
       if (!this.isValid(form)) return;
 
-      this.$emit('write-markdown');
+      this.$emit('markdown');
+    },
+
+    toolbarButtonClicked(button) {
+      this.$emit('toolbar-button-clicked', button);
     },
   },
 };
@@ -77,65 +81,97 @@ export default {
 <template>
   <div class="md-header">
     <ul class="nav-links clearfix">
-      <li :class="{ active: !previewMarkdown }" class="md-header-tab">
-        <button class="js-write-link" tabindex="-1" type="button" @click="writeMarkdownTab($event)">
+      <li :class="{ active: mode == 'markdown' }" class="md-header-tab">
+        <button class="js-write-link" tabindex="-1" type="button" @click="markdownTab($event)">
           Write
         </button>
       </li>
-      <li :class="{ active: previewMarkdown }" class="md-header-tab">
-        <button
-          class="js-preview-link js-md-preview-button"
-          tabindex="-1"
-          type="button"
-          @click="previewMarkdownTab($event)"
-        >
+      <li :class="{ active: mode == 'preview' }" class="md-header-tab">
+        <button class="js-preview-link" tabindex="-1" type="button" @click="previewTab($event)">
           Preview
         </button>
       </li>
-      <li :class="{ active: !previewMarkdown }" class="md-header-toolbar">
-        <toolbar-button tag="**" button-title="Add bold text" icon="bold" />
-        <toolbar-button tag="*" button-title="Add italic text" icon="italic" />
-        <toolbar-button :prepend="true" tag="> " button-title="Insert a quote" icon="quote" />
-        <toolbar-button tag="`" tag-block="```" button-title="Insert code" icon="code" />
+      <li :class="{ active: mode != 'preview' }" class="md-header-toolbar">
         <toolbar-button
+          name="bold"
+          tag="**"
+          button-title="Add bold text"
+          icon="bold"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="italic"
+          tag="*"
+          button-title="Add italic text"
+          icon="italic"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="blockquote"
+          :prepend="true"
+          tag="> "
+          button-title="Insert a quote"
+          icon="quote"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="code"
+          tag="`"
+          tag-block="```"
+          button-title="Insert code"
+          icon="code"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="link"
           tag="[{text}](url)"
           tag-select="url"
           button-title="Add a link"
           icon="link"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="bullet_list"
           :prepend="true"
           tag="* "
           button-title="Add a bullet list"
           icon="list-bulleted"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="ordered_list"
           :prepend="true"
           tag="1. "
           button-title="Add a numbered list"
           icon="list-numbered"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="task_list"
           :prepend="true"
           tag="* [ ] "
           button-title="Add a task list"
           icon="task-done"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="table"
           :tag="mdTable"
           :prepend="true"
           :button-title="__('Add a table')"
           icon="table"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
           v-if="canSuggest"
+          name="suggestion"
           :tag="mdSuggestion"
-          :prepend="true"
           :button-title="__('Insert suggestion')"
           :cursor-offset="4"
           :tag-content="lineContent"
           icon="doc-code"
           class="qa-suggestion-btn"
+          @click="toolbarButtonClicked"
         />
         <button
           v-gl-tooltip

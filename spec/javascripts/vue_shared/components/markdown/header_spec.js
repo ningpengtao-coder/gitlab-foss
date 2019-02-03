@@ -10,7 +10,7 @@ describe('Markdown field header component', () => {
 
     vm = new Component({
       propsData: {
-        previewMarkdown: false,
+        mode: 'markdown',
       },
     }).$mount();
 
@@ -38,12 +38,12 @@ describe('Markdown field header component', () => {
     });
   });
 
-  it('renders `write` link as active when previewMarkdown is false', () => {
+  it('renders `write` link as active when mode is markdown', () => {
     expect(vm.$el.querySelector('li:nth-child(1)').classList.contains('active')).toBeTruthy();
   });
 
-  it('renders `preview` link as active when previewMarkdown is true', done => {
-    vm.previewMarkdown = true;
+  it('renders `preview` link as active when mode is preview', done => {
+    vm.mode = 'preview';
 
     Vue.nextTick(() => {
       expect(vm.$el.querySelector('li:nth-child(2)').classList.contains('active')).toBeTruthy();
@@ -57,11 +57,11 @@ describe('Markdown field header component', () => {
 
     vm.$el.querySelector('.js-preview-link').click();
 
-    expect(vm.$emit).toHaveBeenCalledWith('preview-markdown');
+    expect(vm.$emit).toHaveBeenCalledWith('preview');
 
     vm.$el.querySelector('.js-write-link').click();
 
-    expect(vm.$emit).toHaveBeenCalledWith('write-markdown');
+    expect(vm.$emit).toHaveBeenCalledWith('markdown');
   });
 
   it('does not emit toggle markdown event when triggered from another form', () => {

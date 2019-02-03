@@ -46,12 +46,5 @@ describe('issue_note_body component', () => {
     it('renders edit form', () => {
       expect(vm.$el.querySelector('textarea.js-task-list-field')).not.toBeNull();
     });
-
-    it('adds autosave', () => {
-      const autosaveKey = `autosave/Note/${note.noteable_type}/${note.id}`;
-
-      expect(vm.autosave).toExist();
-      expect(vm.autosave.key).toEqual(autosaveKey);
-    });
   });
 });

@@ -1,11 +1,12 @@
 import $ from 'jquery';
 import Vue from 'vue';
+import '~/behaviors/markdown/render_gfm';
 import fieldComponent from '~/vue_shared/components/markdown/field.vue';
 
 function assertMarkdownTabs(isWrite, writeLink, previewLink, vm) {
   expect(writeLink.parentNode.classList.contains('active')).toEqual(isWrite);
   expect(previewLink.parentNode.classList.contains('active')).toEqual(!isWrite);
-  expect(vm.$el.querySelector('.md-preview').style.display).toEqual(isWrite ? 'none' : '');
+  expect(vm.$el.querySelector('.md-preview-holder').style.display).toEqual(isWrite ? 'none' : '');
 }
 
 describe('Markdown field component', () => {
@@ -23,14 +24,10 @@ describe('Markdown field component', () => {
       },
       template: `
         <field-component
+          v-model="text"
           markdown-preview-path="/preview"
           markdown-docs-path="/docs"
-        >
-          <textarea
-            slot="textarea"
-            v-model="text">
-          </textarea>
-        </field-component>
+        />
       `,
     }).$mount();
 
@@ -50,7 +47,7 @@ describe('Markdown field component', () => {
         spyOn(Vue.http, 'post').and.callFake(
           () =>
             new Promise(resolve => {
-              setTimeout(() => {
+              Vue.nextTick(() => {
                 resolve({
                   json() {
                     return {
@@ -80,7 +77,9 @@ describe('Markdown field component', () => {
         previewLink.click();
 
         Vue.nextTick(() => {
-          expect(vm.$el.querySelector('.md-preview').textContent.trim()).toContain('Loading…');
+          expect(vm.$el.querySelector('.md-preview-holder').textContent.trim()).toContain(
+            'Loading…',
+          );
 
           done();
         });
@@ -89,13 +88,16 @@ describe('Markdown field component', () => {
       it('renders markdown preview', done => {
         previewLink.click();
 
-        setTimeout(() => {
-          expect(vm.$el.querySelector('.md-preview').innerHTML).toContain(
-            '<p>markdown preview</p>',
-          );
-
-          done();
-        });
+        Vue.nextTick()
+          .then(Vue.nextTick)
+          .then(Vue.nextTick)
+          .then(() => {
+            expect(vm.$el.querySelector('.md-preview').innerHTML).toContain(
+              '<p>markdown preview</p>',
+            );
+          })
+          .then(done)
+          .catch(done.fail);
       });
 
       it('renders GFM with jQuery', done => {
@@ -103,11 +105,14 @@ describe('Markdown field component', () => {
 
         previewLink.click();
 
-        setTimeout(() => {
-          expect($.fn.renderGFM).toHaveBeenCalled();
-
-          done();
-        }, 0);
+        Vue.nextTick()
+          .then(Vue.nextTick)
+          .then(Vue.nextTick)
+          .then(() => {
+            expect($.fn.renderGFM).toHaveBeenCalled()
+          })
+          .then(done)
+          .catch(done.fail);
       });
 
       it('clicking already active write or preview link does nothing', done => {
@@ -133,7 +138,7 @@ describe('Markdown field component', () => {
         const textarea = vm.$el.querySelector('textarea');
 
         textarea.setSelectionRange(0, 7);
-        vm.$el.querySelector('.js-md').click();
+        vm.$el.querySelector('.toolbar-btn').click();
 
         Vue.nextTick(() => {
           expect(textarea.value).toContain('**testing**');
@@ -146,7 +151,7 @@ describe('Markdown field component', () => {
         const textarea = vm.$el.querySelector('textarea');
 
         textarea.setSelectionRange(0, 0);
-        vm.$el.querySelectorAll('.js-md')[5].click();
+        vm.$el.querySelectorAll('.toolbar-btn')[5].click();
 
         Vue.nextTick(() => {
           expect(textarea.value).toContain('*  testing');
@@ -159,7 +164,7 @@ describe('Markdown field component', () => {
         const textarea = vm.$el.querySelector('textarea');
 
         textarea.setSelectionRange(0, 50);
-        vm.$el.querySelectorAll('.js-md')[5].click();
+        vm.$el.querySelectorAll('.toolbar-btn')[5].click();
 
         Vue.nextTick(() => {
           expect(textarea.value).toContain('* testing\n* 123');

@@ -132,7 +132,7 @@
 }
 
 .md:not(.use-csslab) {
-  &.md-preview-holder {
+  &.md-preview {
     // Reset ul style types since we're nested inside a ul already
     @include bulleted-list;
   }

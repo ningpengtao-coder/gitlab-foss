@@ -29,7 +29,7 @@ export default class Autosave {
     this.field.trigger('input');
     // v-model does not update with jQuery trigger
     // https://github.com/vuejs/vue/issues/2804#issuecomment-216968137
-    const event = new Event('change', { bubbles: true, cancelable: false });
+    const event = new Event('input', { bubbles: true, cancelable: false });
     const field = this.field.get(0);
     if (field) {
       field.dispatchEvent(event);

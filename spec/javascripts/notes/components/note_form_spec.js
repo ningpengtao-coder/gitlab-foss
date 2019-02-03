@@ -85,8 +85,8 @@ describe('issue_note_form component', () => {
     describe('keyboard events', () => {
       describe('up', () => {
         it('should ender edit mode', () => {
-          spyOn(vm, 'editMyLastNote').and.callThrough();
-          vm.$el.querySelector('textarea').value = 'Foo';
+          spyOn(vm, 'editMyLastNote');
+          vm.$refs.markdownField.setCurrentValue('');
           vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(38, true));
 
           expect(vm.editMyLastNote).toHaveBeenCalled();
@@ -95,16 +95,16 @@ describe('issue_note_form component', () => {
 
       describe('enter', () => {
         it('should save note when cmd+enter is pressed', () => {
-          spyOn(vm, 'handleUpdate').and.callThrough();
-          vm.$el.querySelector('textarea').value = 'Foo';
+          spyOn(vm, 'handleUpdate');
+          vm.$refs.markdownField.setCurrentValue('Foo');
           vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, true));
 
           expect(vm.handleUpdate).toHaveBeenCalled();
         });
 
         it('should save note when ctrl+enter is pressed', () => {
-          spyOn(vm, 'handleUpdate').and.callThrough();
-          vm.$el.querySelector('textarea').value = 'Foo';
+          spyOn(vm, 'handleUpdate');
+          vm.$refs.markdownField.setCurrentValue('Foo');
           vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, false, true));
 
           expect(vm.handleUpdate).toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe('issue_note_form component', () => {
 
     describe('actions', () => {
       it('should be possible to cancel', done => {
-        spyOn(vm, 'cancelHandler').and.callThrough();
+        spyOn(vm, 'cancelHandler');
         vm.isEditing = true;
 
         Vue.nextTick(() => {
@@ -131,7 +131,7 @@ describe('issue_note_form component', () => {
         vm.isEditing = true;
 
         Vue.nextTick(() => {
-          vm.$el.querySelector('textarea').value = 'Foo';
+          vm.$refs.markdownField.setCurrentValue('Foo');
           vm.$el.querySelector('.js-vue-issue-save').click();
 
           Vue.nextTick(() => {

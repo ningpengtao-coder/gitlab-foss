@@ -55,7 +55,6 @@ describe('DiffLineNoteForm', () => {
       it('should call cancelCommentForm with lineCode', done => {
         spyOn(window, 'confirm');
         spyOn(component, 'cancelCommentForm');
-        spyOn(component, 'resetAutoSave');
         component.handleCancelCommentForm();
 
         expect(window.confirm).not.toHaveBeenCalled();
@@ -64,8 +63,6 @@ describe('DiffLineNoteForm', () => {
             lineCode: diffLines[0].line_code,
             fileHash: component.diffFileHash,
           });
-
-          expect(component.resetAutoSave).toHaveBeenCalled();
 
           done();
         });
@@ -90,15 +87,6 @@ describe('DiffLineNoteForm', () => {
           .then(done)
           .catch(done.fail);
       });
-    });
-  });
-
-  describe('mounted', () => {
-    it('should init autosave', () => {
-      const key = 'autosave/Note/Issue/98//DiffNote//1c497fbb3a46b78edf04cc2a2fa33f67e3ffbe2a_1_1';
-
-      expect(component.autosave).toBeDefined();
-      expect(component.autosave.key).toEqual(key);
     });
   });
 

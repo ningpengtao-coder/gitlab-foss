@@ -65,6 +65,11 @@ export default {
       required: false,
       default: '',
     },
+    autosaveKey: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -129,7 +134,7 @@ export default {
     },
   },
   mounted() {
-    this.$refs.textarea.focus();
+    this.$refs.markdownField.focus();
   },
   methods: {
     ...mapActions(['toggleResolveNote']),
@@ -161,14 +166,12 @@ export default {
       });
     },
     editMyLastNote() {
-      if (this.updatedNoteBody === '') {
-        const lastNoteInDiscussion = this.getDiscussionLastNote(this.discussion);
+      const lastNoteInDiscussion = this.getDiscussionLastNote(this.discussion);
 
-        if (lastNoteInDiscussion) {
-          eventHub.$emit('enterEditMode', {
-            noteId: lastNoteInDiscussion.id,
-          });
-        }
+      if (lastNoteInDiscussion) {
+        eventHub.$emit('enterEditMode', {
+          noteId: lastNoteInDiscussion.id,
+        });
       }
     },
     cancelHandler(shouldConfirm = false) {
@@ -195,6 +198,8 @@ export default {
       />
 
       <markdown-field
+        ref="markdownField"
+        v-model="updatedNoteBody"
         :markdown-preview-path="markdownPreviewPath"
         :markdown-docs-path="markdownDocsPath"
         :quick-actions-docs-path="quickActionsDocsPath"
@@ -203,23 +208,17 @@ export default {
         :can-suggest="canSuggest"
         :add-spacing-classes="false"
         :help-page-path="helpPagePath"
-      >
-        <textarea
-          id="note_note"
-          ref="textarea"
-          slot="textarea"
-          v-model="updatedNoteBody"
-          :data-supports-quick-actions="!isEditing"
-          name="note[note]"
-          class="note-textarea js-gfm-input js-note-text js-autosize markdown-area js-vue-issue-note-form js-vue-textarea qa-reply-input"
-          aria-label="Description"
-          placeholder="Write a comment or drag your files here…"
-          @keydown.meta.enter="handleKeySubmit()"
-          @keydown.ctrl.enter="handleKeySubmit()"
-          @keydown.up="editMyLastNote()"
-          @keydown.esc="cancelHandler(true)"
-        ></textarea>
-      </markdown-field>
+        :autosave-key="autosaveKey"
+        textarea-id="note_note"
+        textarea-name="note[note]"
+        textarea-class="js-vue-issue-note-form js-note-text qa-reply-input"
+        :textarea-supports-quick-actions="!isEditing"
+        textarea-label="Comment"
+        :editable="!isSubmitting"
+        @save="handleKeySubmit()"
+        @edit-previous="editMyLastNote()"
+        @cancel="cancelHandler(true)"
+      />
       <div class="note-form-actions clearfix">
         <button
           :disabled="isDisabled"

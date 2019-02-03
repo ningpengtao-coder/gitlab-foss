@@ -3025,9 +3025,6 @@ msgstr ""
 msgid "Error loading last commit."
 msgstr ""
 
-msgid "Error loading markdown preview"
-msgstr ""
-
 msgid "Error loading merge requests."
 msgstr ""
 
@@ -3043,7 +3040,7 @@ msgstr ""
 msgid "Error occurred when toggling the notification subscription"
 msgstr ""
 
-msgid "Error rendering markdown preview"
+msgid "Error rendering markdown"
 msgstr ""
 
 msgid "Error saving label update."
