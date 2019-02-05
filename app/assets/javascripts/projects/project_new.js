@@ -2,6 +2,7 @@ import $ from 'jquery';
 import { addSelectOnFocusBehaviour } from '../lib/utils/common_utils';
 import { slugify } from '../lib/utils/text_utility';
 import { s__ } from '~/locale';
+import initSettingsPanels from '~/settings_panels';
 
 let hasUserDefinedProjectPath = false;
 
@@ -227,6 +228,11 @@ const bindEvents = () => {
   $projectName.on('keyup change', () => {
     onProjectNameChange($projectName, $projectPath);
     hasUserDefinedProjectPath = $projectPath.val().trim().length > 0;
+  });
+
+  initSettingsPanels({
+    expandedText: 'Hide avatar, license and features settings',
+    collapsedText: 'Show avatar, license and features settings',
   });
 };
 
