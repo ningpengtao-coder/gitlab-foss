@@ -3,6 +3,9 @@ import { addSelectOnFocusBehaviour } from '../lib/utils/common_utils';
 import { slugify } from '../lib/utils/text_utility';
 import { s__ } from '~/locale';
 import initSettingsPanels from '~/settings_panels';
+import setupToggleButtons from '~/toggle_buttons';
+import LicenseSelector from '~/blob/template_selectors/license_selector';
+import fileUpload from '~/lib/utils/file_upload';
 
 let hasUserDefinedProjectPath = false;
 
@@ -37,6 +40,19 @@ const deriveProjectPathFromUrl = $projectImportUrl => {
 const onProjectNameChange = ($projectNameInput, $projectPathInput) => {
   const slug = slugify($projectNameInput.val());
   $projectPathInput.val(slug);
+};
+
+const initLicenseField = field => {
+  const newProjectFileMediator = {
+    selectTemplateFile: (_, query) => {
+      field.val(query);
+    },
+    // reportSelection: opts => {
+    //   console.log('fake::newProjectFileMediator::opts', opts);
+    // },
+  };
+
+  return new LicenseSelector({ mediator: newProjectFileMediator }).show();
 };
 
 const bindEvents = () => {
@@ -234,6 +250,23 @@ const bindEvents = () => {
     expandedText: 'Hide avatar, license and features settings',
     collapsedText: 'Show avatar, license and features settings',
   });
+
+  setupToggleButtons(document.querySelector('.project-feature-settings'));
+
+  // TODO: Fixup behaviour for the toggles
+  // - Dropdown should be available with all options on load
+  // - Hide toggles on load
+  // - If js
+  //   - show toggles
+  //   - dropdown should default to 0 (enable ....)
+  //   - if a toggle is on, then set the options to (10 only members, 20 everyone..)
+
+  // init the license template selector
+  const $licenseField = $('.js-project-license');
+  initLicenseField($licenseField);
+
+  // setup avatar file uploader
+  fileUpload('.js-choose-project-avatar-button', '.js-project-avatar-input');
 };
 
 export default {
