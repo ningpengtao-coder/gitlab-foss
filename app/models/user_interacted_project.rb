@@ -42,13 +42,8 @@ class UserInteractedProject < ActiveRecord::Base
 
     # Check if we can safely call .track (table exists)
     def available?
-      @available_flag ||= ActiveRecord::Migrator.current_version >= REQUIRED_SCHEMA_VERSION # rubocop:disable Gitlab/PredicateMemoization
-    end
-
-    # Flushes cached information about schema
-    def reset_column_information
-      @available_flag = nil
-      super
+      # TODO: remove
+      true
     end
 
     private
