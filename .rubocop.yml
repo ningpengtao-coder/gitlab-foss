@@ -6,6 +6,7 @@ inherit_from: .rubocop_todo.yml
 require:
   - ./rubocop/rubocop
   - rubocop-rspec
+  - rubocop-thread_safety
 
 AllCops:
   TargetRubyVersion: 2.5
@@ -211,3 +212,9 @@ ActiveRecordAssociationReload:
   Exclude:
     - 'spec/**/*'
     - 'ee/spec/**/*'
+
+ThreadSafety/NewThread:
+  Enabled: true
+  Exclude:
+    - 'db/post_migrate/**/*'
+    - 'db/migrate/**/*'

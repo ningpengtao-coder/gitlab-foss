@@ -10,21 +10,21 @@ module SystemCheck
     #
     # @param [String] term used when check passed (default: 'yes')
     def self.set_check_pass(term)
-      @check_pass = term
+      @check_pass = term # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Define a custom term for when check failed
     #
     # @param [String] term used when check failed (default: 'no')
     def self.set_check_fail(term)
-      @check_fail = term
+      @check_fail = term # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Define the name of the SystemCheck that will be displayed during execution
     #
     # @param [String] name of the check
     def self.set_name(name)
-      @name = name
+      @name = name # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Define the reason why we skipped the SystemCheck
@@ -33,35 +33,35 @@ module SystemCheck
     #
     # @param [String] reason to be displayed
     def self.set_skip_reason(reason)
-      @skip_reason = reason
+      @skip_reason = reason # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Term to be displayed when check passed
     #
     # @return [String] term when check passed ('yes' if not re-defined in a subclass)
     def self.check_pass
-      call_or_return(@check_pass) || 'yes'
+      call_or_return(@check_pass) || 'yes' # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     ## Term to be displayed when check failed
     #
     # @return [String] term when check failed ('no' if not re-defined in a subclass)
     def self.check_fail
-      call_or_return(@check_fail) || 'no'
+      call_or_return(@check_fail) || 'no' # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Name of the SystemCheck defined by the subclass
     #
     # @return [String] the name
     def self.display_name
-      call_or_return(@name) || self.name
+      call_or_return(@name) || self.name # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Skip reason defined by the subclass
     #
     # @return [String] the reason
     def self.skip_reason
-      call_or_return(@skip_reason) || 'skipped'
+      call_or_return(@skip_reason) || 'skipped' # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
     end
 
     # Define a reason why we skipped the SystemCheck (during runtime)

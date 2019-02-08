@@ -360,6 +360,7 @@ group :development, :test do
   gem 'rubocop', '~> 0.69.0'
   gem 'rubocop-performance', '~> 1.1.0'
   gem 'rubocop-rspec', '~> 1.22.1'
+  gem 'rubocop-thread_safety', '~> 0.3.4'
 
   gem 'scss_lint', '~> 0.56.0', require: false
   gem 'haml_lint', '~> 0.31.0', require: false
