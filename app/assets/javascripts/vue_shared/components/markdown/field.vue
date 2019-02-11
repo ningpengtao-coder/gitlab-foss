@@ -6,7 +6,6 @@ import Autosize from 'autosize';
 import { __ } from '~/locale';
 import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
-import GLForm from '../../../gl_form';
 import markdownHeader from './header.vue';
 import markdownToolbar from './toolbar.vue';
 import icon from '../icon.vue';
@@ -213,20 +212,6 @@ export default {
     },
   },
   mounted() {
-    /*
-        GLForm class handles all the toolbar buttons
-      */
-    return new GLForm($(this.$refs['gl-form']), {
-      emojis: this.enableAutocomplete,
-      members: this.enableAutocomplete,
-      issues: this.enableAutocomplete,
-      mergeRequests: this.enableAutocomplete,
-      epics: this.enableAutocomplete,
-      milestones: this.enableAutocomplete,
-      labels: this.enableAutocomplete,
-      snippets: this.enableAutocomplete,
-    });
-
     if (this.autosaveKey.length) {
       const draft = getDraft(this.autosaveKey);
 
@@ -245,11 +230,6 @@ export default {
     this.autosizeTextarea();
   },
   beforeDestroy() {
-    const glForm = $(this.$refs['gl-form']).data('glForm');
-    if (glForm) {
-      glForm.destroy();
-    }
-
     if (this.autocomplete) {
       this.autocomplete.destroy();
     }
