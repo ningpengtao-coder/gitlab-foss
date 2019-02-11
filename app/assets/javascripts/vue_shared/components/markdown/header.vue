@@ -76,6 +76,10 @@ export default {
 
       this.$emit('mode-changed', 'markdown');
     },
+
+    toolbarButtonClicked(button) {
+      this.$emit('toolbar-button-clicked', button);
+    },
   },
 };
 </script>
@@ -94,47 +98,79 @@ export default {
         </button>
       </li>
       <li :class="{ active: !modeIsPreview }" class="md-header-toolbar">
-        <toolbar-button tag="**" button-title="__('Add bold text')" icon="bold" />
-        <toolbar-button tag="*" button-title="__('Add italic text')" icon="italic" />
         <toolbar-button
+          name="bold"
+          tag="**"
+          button-title="__('Add bold text')"
+          icon="bold"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="italic"
+          tag="*"
+          button-title="__('Add italic text')"
+          icon="italic"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="blockquote"
           :prepend="true"
           tag="> "
-          :button-title="__('Insert a quote')"
+          button-title="__('Insert a quote')"
           icon="quote"
+          @click="toolbarButtonClicked"
         />
-        <toolbar-button tag="`" tag-block="```" button-title="__('Insert code')" icon="code" />
         <toolbar-button
+          name="code"
+          tag="`"
+          tag-block="```"
+          button-title="__('Insert code')"
+          icon="code"
+          @click="toolbarButtonClicked"
+        />
+        <toolbar-button
+          name="link"
           tag="[{text}](url)"
           tag-select="url"
           :button-title="__('Add a link')"
           icon="link"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="bullet_list"
           :prepend="true"
           tag="* "
           :button-title="__('Add a bullet list')"
           icon="list-bulleted"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="ordered_list"
           :prepend="true"
           tag="1. "
           :button-title="__('Add a numbered list')"
           icon="list-numbered"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="task_list"
           :prepend="true"
           tag="* [ ] "
           :button-title="__('Add a task list')"
           icon="task-done"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
+          name="table"
           :tag="mdTable"
           :prepend="true"
           :button-title="__('Add a table')"
           icon="table"
+          @click="toolbarButtonClicked"
         />
         <toolbar-button
           v-if="canSuggest"
+          name="suggestion"
           :tag="mdSuggestion"
           :prepend="true"
           :button-title="__('Insert suggestion')"
@@ -142,6 +178,7 @@ export default {
           :tag-content="lineContent"
           icon="doc-code"
           class="qa-suggestion-btn"
+          @click="toolbarButtonClicked"
         />
         <button
           v-gl-tooltip

@@ -138,7 +138,7 @@ describe('Markdown field component', () => {
         const textarea = vm.$el.querySelector('textarea');
 
         textarea.setSelectionRange(0, 7);
-        vm.$el.querySelector('.js-md').click();
+        vm.$el.querySelector('.toolbar-btn').click();
 
         Vue.nextTick(() => {
           expect(textarea.value).toContain('**testing**');
@@ -151,7 +151,7 @@ describe('Markdown field component', () => {
         const textarea = vm.$el.querySelector('textarea');
 
         textarea.setSelectionRange(0, 0);
-        vm.$el.querySelectorAll('.js-md')[5].click();
+        vm.$el.querySelectorAll('.toolbar-btn')[5].click();
 
         Vue.nextTick(() => {
           expect(textarea.value).toContain('*  testing');
@@ -164,7 +164,7 @@ describe('Markdown field component', () => {
         const textarea = vm.$el.querySelector('textarea');
 
         textarea.setSelectionRange(0, 50);
-        vm.$el.querySelectorAll('.js-md')[5].click();
+        vm.$el.querySelectorAll('.toolbar-btn')[5].click();
 
         Vue.nextTick(() => {
           expect(textarea.value).toContain('* testing\n* 123');

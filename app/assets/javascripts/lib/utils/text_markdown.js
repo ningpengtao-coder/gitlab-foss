@@ -262,7 +262,7 @@ export function insertMarkdownText({
   });
 }
 
-function updateText({ textArea, tag, cursorOffset, blockTag, wrap, select, tagContent }) {
+export function updateText({ textArea, tag, cursorOffset, blockTag, wrap, select, tagContent }) {
   var $textArea, selected, text;
   $textArea = $(textArea);
   textArea = $textArea.get(0);

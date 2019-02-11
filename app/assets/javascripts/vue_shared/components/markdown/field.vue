@@ -9,6 +9,7 @@ import markdownHeader from './header.vue';
 import markdownToolbar from './toolbar.vue';
 import icon from '../icon.vue';
 import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
+import { updateText } from '~/lib/utils/text_markdown';
 
 export default {
   components: {
@@ -283,6 +284,18 @@ export default {
       $(this.$refs.markdownPreview).renderGFM();
     },
 
+    toolbarButtonClicked(button) {
+      updateText({
+        textArea: this.$refs.textarea,
+        tag: button.tag,
+        blockTag: button.tagBlock,
+        wrap: !button.prepend,
+        select: button.tagSelect,
+        cursorOffset: button.cursorOffset,
+        tagContent: button.tagContent,
+      });
+    },
+
     triggerEditPrevious() {
       if (!this.currentValue.length) this.$emit('edit-previous');
     },
@@ -316,6 +329,7 @@ export default {
       :can-suggest="canSuggest"
       :mode="mode"
       @mode-changed="setMode"
+      @toolbar-button-clicked="toolbarButtonClicked"
     />
     <div v-show="modeIsMarkdown" class="md-write-holder">
       <div :class="{ 'zen-backdrop': modeIsMarkdown }">
