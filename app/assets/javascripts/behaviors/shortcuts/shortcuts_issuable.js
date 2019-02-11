@@ -1,8 +1,8 @@
-import $ from 'jquery';
 import Mousetrap from 'mousetrap';
 import Sidebar from '../../right_sidebar';
 import Shortcuts from './shortcuts';
 import { CopyAsGFM } from '../markdown/copy_as_gfm';
+import eventHub from '../markdown/event_hub';
 import { getSelectedFragment } from '~/lib/utils/common_utils';
 
 export default class ShortcutsIssuable extends Shortcuts {
@@ -23,16 +23,10 @@ export default class ShortcutsIssuable extends Shortcuts {
   }
 
   static replyWithSelectedText() {
-    const $replyField = $('.js-main-target-form .js-vue-comment-form');
-
-    if (!$replyField.length || $replyField.is(':hidden') /* Other tab selected in MR */) {
-      return false;
-    }
-
     const documentFragment = getSelectedFragment(document.querySelector('#content-body'));
 
     if (!documentFragment) {
-      $replyField.focus();
+      eventHub.$emit('focus');
       return false;
     }
 
@@ -56,38 +50,13 @@ export default class ShortcutsIssuable extends Shortcuts {
 
       // If there is no message, just select the reply field
       if (!foundMessage) {
-        $replyField.focus();
+        eventHub.$emit('focus');
         return false;
       }
     }
 
     const el = CopyAsGFM.transformGFMSelection(documentFragment.cloneNode(true));
-    const blockquoteEl = document.createElement('blockquote');
-    blockquoteEl.appendChild(el);
-    CopyAsGFM.nodeToGFM(blockquoteEl)
-      .then(text => {
-        if (text.trim() === '') {
-          return false;
-        }
-
-        // If replyField already has some content, add a newline before our quote
-        const separator = ($replyField.val().trim() !== '' && '\n\n') || '';
-        $replyField
-          .val((a, current) => `${current}${separator}${text}\n\n`)
-          .trigger('input')
-          .trigger('change');
-
-        // Trigger autosize
-        const event = document.createEvent('Event');
-        event.initEvent('autosize:update', true, false);
-        $replyField.get(0).dispatchEvent(event);
-
-        // Focus the input field
-        $replyField.focus();
-
-        return false;
-      })
-      .catch(() => {});
+    eventHub.$emit('quoteNode', el);
 
     return false;
   }

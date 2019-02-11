@@ -332,6 +332,7 @@ Please check your network connection and try again.`;
               :textarea-supports-quick-actions="true"
               :textarea-label="__('Comment')"
               :editable="!isSubmitting"
+              :subscribe-to-global-events="true"
               @edit-previous="editCurrentUserLastNote()"
               @save="handleSave()"
               @cancel="cancelHandler(true)"

@@ -6,6 +6,8 @@ import Autosize from 'autosize';
 import { __ } from '~/locale';
 import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
+import { CopyAsGFM } from '~/behaviors/markdown/copy_as_gfm';
+import eventHub from '~/behaviors/markdown/event_hub';
 import markdownHeader from './header.vue';
 import markdownToolbar from './toolbar.vue';
 import icon from '../icon.vue';
@@ -110,6 +112,11 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    subscribeToGlobalEvents: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -228,6 +235,11 @@ export default {
 
     Autosize(this.$refs.textarea);
     this.autosizeTextarea();
+
+    if (this.subscribeToGlobalEvents) {
+      eventHub.$on('focus', this.focusIfVisible);
+      eventHub.$on('quoteNode', this.quoteNodeIfVisible);
+    }
   },
   beforeDestroy() {
     if (this.autocomplete) {
@@ -239,6 +251,11 @@ export default {
     }
 
     Autosize.destroy(this.$refs.textarea);
+
+    if (this.subscribeToGlobalEvents) {
+      eventHub.$off('focus', this.focusIfVisible);
+      eventHub.$off('quoteNode', this.quoteNodeIfVisible);
+    }
   },
   methods: {
     setupAutocomplete() {
@@ -293,6 +310,31 @@ export default {
       }
     },
 
+    quoteNode(node) {
+      const blockquoteEl = document.createElement('blockquote');
+      blockquoteEl.appendChild(node.cloneNode(true));
+
+      const current = this.currentValue.trim();
+      const separator = current.length ? '\n\n' : '';
+
+      CopyAsGFM.nodeToGFM(blockquoteEl)
+        .then(markdown => this.setCurrentValue(`${current}${separator}${markdown}\n\n`))
+        .then(this.switchToEditor)
+        .then(this.$nextTick)
+        .then(this.focus)
+        .catch(() => {});
+    },
+
+    ifVisible(func) {
+      if ($(this.$el).is(':visible')) {
+        func();
+      }
+    },
+
+    quoteNodeIfVisible(node) {
+      this.ifVisible(() => this.quoteNode(node));
+    },
+
     blur() {
       if (this.modeIsMarkdown) {
         this.$refs.textarea.blur();
@@ -303,6 +345,10 @@ export default {
       if (this.modeIsMarkdown) {
         this.$refs.textarea.focus();
       }
+    },
+
+    focusIfVisible() {
+      this.ifVisible(this.focus);
     },
 
     renderMarkdown() {
