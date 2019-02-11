@@ -197,14 +197,12 @@ export default {
       return shouldResolve || shouldToggleState;
     },
     editMyLastNote() {
-      if (this.updatedNoteBody === '') {
-        const lastNoteInDiscussion = this.getDiscussionLastNote(this.discussion);
+      const lastNoteInDiscussion = this.getDiscussionLastNote(this.discussion);
 
-        if (lastNoteInDiscussion) {
-          eventHub.$emit('enterEditMode', {
-            noteId: lastNoteInDiscussion.id,
-          });
-        }
+      if (lastNoteInDiscussion) {
+        eventHub.$emit('enterEditMode', {
+          noteId: lastNoteInDiscussion.id,
+        });
       }
     },
     cancelHandler(shouldConfirm = false) {
@@ -237,6 +235,8 @@ export default {
       />
 
       <markdown-field
+        ref="markdownField"
+        v-model="updatedNoteBody"
         :markdown-preview-path="markdownPreviewPath"
         :markdown-docs-path="markdownDocsPath"
         :quick-actions-docs-path="quickActionsDocsPath"
@@ -245,25 +245,17 @@ export default {
         :can-suggest="canSuggest"
         :add-spacing-classes="false"
         :help-page-path="helpPagePath"
-      >
-        <textarea
-          id="note_note"
-          ref="textarea"
-          slot="textarea"
-          v-model="updatedNoteBody"
-          :data-supports-quick-actions="!isEditing"
-          name="note[note]"
-          class="note-textarea js-gfm-input js-note-text js-autosize markdown-area js-vue-issue-note-form js-vue-textarea qa-reply-input"
-          dir="auto"
-          aria-label="Description"
-          placeholder="Write a comment or drag your files here…"
-          @keydown.meta.enter="handleKeySubmit()"
-          @keydown.ctrl.enter="handleKeySubmit()"
-          @keydown.exact.up="editMyLastNote()"
-          @keydown.exact.esc="cancelHandler(true)"
-          @input="onInput"
-        ></textarea>
-      </markdown-field>
+        textarea-id="note_note"
+        textarea-name="note[note]"
+        textarea-class="js-vue-issue-note-form js-note-text qa-reply-input"
+        :textarea-supports-quick-actions="!isEditing"
+        :textarea-label="__('Comment')"
+        :editable="!isSubmitting"
+        @save="handleKeySubmit()"
+        @edit-previous="editMyLastNote()"
+        @cancel="cancelHandler(true)"
+        @input="onInput"
+      />
       <div class="note-form-actions clearfix">
         <template v-if="showBatchCommentsActions">
           <p v-if="showResolveDiscussionToggle">

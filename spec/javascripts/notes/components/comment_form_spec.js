@@ -228,6 +228,7 @@ describe('issue_comment_form component', () => {
       });
 
       it('updates button text with noteable type', done => {
+        vm.note = '';
         vm.noteableType = constants.MERGE_REQUEST_NOTEABLE_TYPE;
 
         Vue.nextTick(() => {
@@ -241,6 +242,8 @@ describe('issue_comment_form component', () => {
       describe('when clicking close/reopen button', () => {
         it('should disable button and show a loading spinner', done => {
           const toggleStateButton = vm.$el.querySelector('.js-action-button');
+
+          vm.note = '';
 
           toggleStateButton.click();
           Vue.nextTick(() => {

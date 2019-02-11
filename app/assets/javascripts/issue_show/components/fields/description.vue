@@ -41,26 +41,17 @@ export default {
   <div class="common-note-form">
     <label class="sr-only" for="issue-description"> Description </label>
     <markdown-field
+      ref="markdownField"
+      v-model="formState.description"
       :markdown-preview-path="markdownPreviewPath"
       :markdown-docs-path="markdownDocsPath"
       :can-attach-file="canAttachFile"
       :enable-autocomplete="enableAutocomplete"
-    >
-      <textarea
-        id="issue-description"
-        ref="textarea"
-        slot="textarea"
-        v-model="formState.description"
-        class="note-textarea js-gfm-input js-autosize markdown-area
-        qa-description-textarea"
-        dir="auto"
-        data-supports-quick-actions="false"
-        aria-label="Description"
-        placeholder="Write a comment or drag your files here…"
-        @keydown.meta.enter="updateIssuable"
-        @keydown.ctrl.enter="updateIssuable"
-      >
-      </textarea>
-    </markdown-field>
+      textarea-id="issue-description"
+      textarea-class="qa-description-textarea"
+      :textarea-supports-quick-actions="false"
+      :textarea-label="__('Description')"
+      @save="updateIssuable"
+    />
   </div>
 </template>

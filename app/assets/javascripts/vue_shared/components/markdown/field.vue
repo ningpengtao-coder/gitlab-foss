@@ -18,6 +18,11 @@ export default {
     Suggestions,
   },
   props: {
+    value: {
+      type: String,
+      required: false,
+      default: '',
+    },
     markdownPreviewPath: {
       type: String,
       required: false,
@@ -67,10 +72,41 @@ export default {
       required: false,
       default: '',
     },
+    editable: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    textareaId: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    textareaName: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    textareaClass: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    textareaSupportsQuickActions: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    textareaLabel: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
       markdownPreview: '',
+      currentValue: this.value,
       referencedCommands: '',
       referencedUsers: '',
       hasSuggestion: false,
@@ -114,6 +150,11 @@ export default {
       return this.line ? this.line.type : '';
     },
   },
+  watch: {
+    value() {
+      this.setCurrentValue(this.value, { emitEvent: false });
+    },
+  },
   mounted() {
     /*
         GLForm class handles all the toolbar buttons
@@ -136,6 +177,16 @@ export default {
     }
   },
   methods: {
+    setCurrentValue(newValue, { emitEvent = true } = {}) {
+      if (newValue === this.currentValue) return;
+
+      this.currentValue = newValue;
+
+      if (emitEvent) {
+        this.$emit('input', this.currentValue);
+      }
+    },
+
     showPreviewTab() {
       if (this.previewMarkdown) return;
 
@@ -179,6 +230,21 @@ export default {
       this.$nextTick()
         .then(() => $(this.$refs['markdown-preview']).renderGFM())
         .catch(() => new Flash(__('Error rendering markdown preview')));
+
+    triggerEditPrevious() {
+      if (!this.currentValue.length) this.$emit('edit-previous');
+    },
+
+    triggerSave() {
+      this.$emit('save');
+    },
+
+    triggerCancel() {
+      this.$emit('cancel');
+    },
+
+    onTextareaInput() {
+      this.setCurrentValue(this.$refs.textarea.value);
     },
   },
 };
@@ -199,8 +265,27 @@ export default {
     />
     <div v-show="!previewMarkdown" class="md-write-holder">
       <div class="zen-backdrop">
-        <slot name="textarea"></slot>
-        <a class="zen-control zen-control-leave js-zen-leave" href="#" aria-label="Enter zen mode">
+        <textarea
+          :id="textareaId"
+          ref="textarea"
+          placeholder="Write a comment or drag your files here…"
+          dir="auto"
+          :value="currentValue"
+          :name="textareaName"
+          class="note-textarea markdown-area js-gfm-input js-vue-textarea"
+          :class="textareaClass"
+          :data-supports-quick-actions="textareaSupportsQuickActions"
+          :aria-label="textareaLabel"
+          :disabled="!editable"
+          @keydown.up="triggerEditPrevious"
+          @keydown.meta.enter="triggerSave"
+          @keydown.ctrl.enter="triggerSave"
+          @keydown.esc="triggerCancel"
+          @input="onTextareaInput"
+        >
+        </textarea>
+
+        <a class="zen-control zen-control-leave js-zen-leave" href="#" aria-label="Exit zen mode">
           <icon :size="32" name="screen-normal" />
         </a>
         <markdown-toolbar

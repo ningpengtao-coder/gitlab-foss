@@ -23,14 +23,10 @@ describe('Markdown field component', () => {
       },
       template: `
         <field-component
+          v-model="text"
           markdown-preview-path="/preview"
           markdown-docs-path="/docs"
-        >
-          <textarea
-            slot="textarea"
-            v-model="text">
-          </textarea>
-        </field-component>
+        />
       `,
     }).$mount();
 
@@ -50,7 +46,7 @@ describe('Markdown field component', () => {
         spyOn(Vue.http, 'post').and.callFake(
           () =>
             new Promise(resolve => {
-              setTimeout(() => {
+              Vue.nextTick(() => {
                 resolve({
                   json() {
                     return {

@@ -283,14 +283,12 @@ Please check your network connection and try again.`;
       this.noteType = type;
     },
     editCurrentUserLastNote() {
-      if (this.note === '') {
-        const lastNote = this.getCurrentUserLastNote;
+      const lastNote = this.getCurrentUserLastNote;
 
-        if (lastNote) {
-          eventHub.$emit('enterEditMode', {
-            noteId: lastNote.id,
-          });
-        }
+      if (lastNote) {
+        eventHub.$emit('enterEditMode', {
+          noteId: lastNote.id,
+        });
       }
     },
     initAutoSave() {
@@ -341,30 +339,21 @@ Please check your network connection and try again.`;
 
             <markdown-field
               ref="markdownField"
+              v-model="note"
               :markdown-preview-path="markdownPreviewPath"
               :markdown-docs-path="markdownDocsPath"
               :quick-actions-docs-path="quickActionsDocsPath"
               :add-spacing-classes="false"
-            >
-              <textarea
-                id="note-body"
-                ref="textarea"
-                slot="textarea"
-                v-model="note"
-                dir="auto"
-                :disabled="isSubmitting"
-                name="note[note]"
-                class="note-textarea js-vue-comment-form js-note-text
-js-gfm-input js-autosize markdown-area js-vue-textarea qa-comment-input"
-                data-supports-quick-actions="true"
-                aria-label="Description"
-                placeholder="Write a comment or drag your files here…"
-                @keydown.up="editCurrentUserLastNote()"
-                @keydown.meta.enter="handleSave()"
-                @keydown.ctrl.enter="handleSave()"
-              >
-              </textarea>
-            </markdown-field>
+              textarea-id="note-body"
+              textarea-name="note[note]"
+              textarea-class="js-note-text qa-comment-input"
+              :textarea-supports-quick-actions="true"
+              :textarea-label="__('Comment')"
+              :editable="!isSubmitting"
+              @edit-previous="editCurrentUserLastNote()"
+              @save="handleSave()"
+              @cancel="cancelHandler(true)"
+            />
             <div class="note-form-actions">
               <div
                 class="float-left btn-group

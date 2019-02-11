@@ -131,7 +131,7 @@ describe('issue_note_form component', () => {
 
       beforeEach(() => {
         textarea = wrapper.find('textarea');
-        textarea.setValue('Foo');
+        wrapper.vm.$refs.markdownField.setCurrentValue('Foo');
       });
 
       describe('up', () => {

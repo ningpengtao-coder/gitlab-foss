@@ -17,7 +17,7 @@ describe 'Blob shortcuts', :js do
       select_element('.note-text')
       find('body').native.send_key('r')
 
-      expect(find('.js-main-target-form .js-vue-comment-form').value).to include(note_text)
+      expect(find('.js-main-target-form .js-note-text').value).to include(note_text)
     end
   end
 

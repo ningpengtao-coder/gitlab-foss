@@ -49,7 +49,7 @@ describe('Description field component', () => {
   });
 
   it('focuses field when mounted', () => {
-    expect(document.activeElement).toBe(vm.$refs.textarea);
+    expect(document.activeElement).toBe(vm.$refs.markdownField.$refs.textarea);
   });
 
   it('triggers update with meta+enter', () => {
