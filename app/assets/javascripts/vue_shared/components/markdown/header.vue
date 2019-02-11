@@ -13,8 +13,8 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   props: {
-    previewMarkdown: {
-      type: Boolean,
+    mode: {
+      type: String,
       required: true,
     },
     lineContent: {
@@ -29,6 +29,12 @@ export default {
     },
   },
   computed: {
+    modeIsMarkdown() {
+      return this.mode === 'markdown';
+    },
+    modeIsPreview() {
+      return this.mode === 'preview';
+    },
     mdTable() {
       return [
         '| header | header |',
@@ -42,12 +48,12 @@ export default {
     },
   },
   mounted() {
-    $(document).on('markdown-preview:show.vue', this.previewMarkdownTab);
-    $(document).on('markdown-preview:hide.vue', this.writeMarkdownTab);
+    $(document).on('markdown-preview:show.vue', this.previewTab);
+    $(document).on('markdown-preview:hide.vue', this.markdownTab);
   },
   beforeDestroy() {
-    $(document).off('markdown-preview:show.vue', this.previewMarkdownTab);
-    $(document).off('markdown-preview:hide.vue', this.writeMarkdownTab);
+    $(document).off('markdown-preview:show.vue', this.previewTab);
+    $(document).off('markdown-preview:hide.vue', this.markdownTab);
   },
   methods: {
     isValid(form) {
@@ -57,18 +63,18 @@ export default {
       );
     },
 
-    previewMarkdownTab(event, form) {
+    previewTab(event, form) {
       if (event.target.blur) event.target.blur();
       if (!this.isValid(form)) return;
 
-      this.$emit('preview-markdown');
+      this.$emit('mode-changed', 'preview');
     },
 
-    writeMarkdownTab(event, form) {
+    markdownTab(event, form) {
       if (event.target.blur) event.target.blur();
       if (!this.isValid(form)) return;
 
-      this.$emit('write-markdown');
+      this.$emit('mode-changed', 'markdown');
     },
   },
 };
@@ -77,31 +83,26 @@ export default {
 <template>
   <div class="md-header">
     <ul class="nav-links clearfix">
-      <li :class="{ active: !previewMarkdown }" class="md-header-tab">
-        <button class="js-write-link" tabindex="-1" type="button" @click="writeMarkdownTab($event)">
+      <li :class="{ active: modeIsMarkdown }" class="md-header-tab">
+        <button class="js-write-link" tabindex="-1" type="button" @click="markdownTab($event)">
           {{ __('Write') }}
         </button>
       </li>
-      <li :class="{ active: previewMarkdown }" class="md-header-tab">
-        <button
-          class="js-preview-link js-md-preview-button"
-          tabindex="-1"
-          type="button"
-          @click="previewMarkdownTab($event)"
-        >
+      <li :class="{ active: modeIsPreview }" class="md-header-tab">
+        <button class="js-preview-link" tabindex="-1" type="button" @click="previewTab($event)">
           {{ __('Preview') }}
         </button>
       </li>
-      <li :class="{ active: !previewMarkdown }" class="md-header-toolbar">
-        <toolbar-button tag="**" :button-title="__('Add bold text')" icon="bold" />
-        <toolbar-button tag="*" :button-title="__('Add italic text')" icon="italic" />
+      <li :class="{ active: !modeIsPreview }" class="md-header-toolbar">
+        <toolbar-button tag="**" button-title="__('Add bold text')" icon="bold" />
+        <toolbar-button tag="*" button-title="__('Add italic text')" icon="italic" />
         <toolbar-button
           :prepend="true"
           tag="> "
           :button-title="__('Insert a quote')"
           icon="quote"
         />
-        <toolbar-button tag="`" tag-block="```" :button-title="__('Insert code')" icon="code" />
+        <toolbar-button tag="`" tag-block="```" button-title="__('Insert code')" icon="code" />
         <toolbar-button
           tag="[{text}](url)"
           tag-select="url"

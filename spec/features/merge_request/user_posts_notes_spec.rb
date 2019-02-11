@@ -40,7 +40,7 @@ describe 'Merge request > User posts notes', :js do
       it 'has enable submit button and preview button' do
         page.within('.js-main-target-form') do
           expect(page).not_to have_css('.js-comment-button[disabled]')
-          expect(page).to have_css('.js-md-preview-button', visible: true)
+          expect(page).to have_css('.js-preview-link', visible: true)
         end
       end
     end
@@ -50,7 +50,7 @@ describe 'Merge request > User posts notes', :js do
     before do
       page.within('.js-main-target-form') do
         fill_in 'note[note]', with: 'This is awesome!'
-        find('.js-md-preview-button').click
+        find('.js-preview-link').click
         click_button 'Comment'
       end
     end
@@ -97,7 +97,7 @@ describe 'Merge request > User posts notes', :js do
 
     it 'hides the toolbar buttons when previewing a note' do
       wait_for_requests
-      find('.js-md-preview-button').click
+      find('.js-preview-link').click
       page.within('.js-main-target-form') do
         expect(page).not_to have_css('.md-header-toolbar.active')
       end

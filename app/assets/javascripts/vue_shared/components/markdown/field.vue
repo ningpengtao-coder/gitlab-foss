@@ -106,6 +106,7 @@ export default {
   data() {
     return {
       markdownPreview: '',
+      mode: 'markdown',
       currentValue: this.value,
       referencedCommands: '',
       referencedUsers: '',
@@ -116,6 +117,12 @@ export default {
     };
   },
   computed: {
+    modeIsMarkdown() {
+      return this.mode === 'markdown';
+    },
+    modeIsPreview() {
+      return this.mode === 'preview';
+    },
     shouldShowReferencedUsers() {
       const referencedUsersThreshold = 10;
       return this.referencedUsers.length >= referencedUsersThreshold;
@@ -177,6 +184,10 @@ export default {
     }
   },
   methods: {
+    setMode(newMode) {
+      this.mode = newMode;
+    },
+
     setCurrentValue(newValue, { emitEvent = true } = {}) {
       if (newValue === this.currentValue) return;
 
@@ -187,10 +198,18 @@ export default {
       }
     },
 
-    showPreviewTab() {
-      if (this.previewMarkdown) return;
+    clear() {
+      this.setCurrentValue('');
+      this.switchToEditor();
+    },
 
-      this.previewMarkdown = true;
+    switchToEditor() {
+      if (this.modeIsPreview) {
+        this.setMode('markdown');
+      }
+    },
+
+    renderMarkdownPreview() {
 
       /*
           Can't use `$refs` as the component is technically in the parent component
@@ -209,11 +228,6 @@ export default {
       } else {
         this.renderMarkdown();
       }
-    },
-
-    showWriteTab() {
-      this.markdownPreview = '';
-      this.previewMarkdown = false;
     },
 
     renderMarkdown(data = {}) {
@@ -257,14 +271,13 @@ export default {
     class="js-vue-markdown-field md-area position-relative"
   >
     <markdown-header
-      :preview-markdown="previewMarkdown"
       :line-content="lineContent"
       :can-suggest="canSuggest"
-      @preview-markdown="showPreviewTab"
-      @write-markdown="showWriteTab"
+      :mode="mode"
+      @mode-changed="setMode"
     />
-    <div v-show="!previewMarkdown" class="md-write-holder">
-      <div class="zen-backdrop">
+    <div v-show="modeIsMarkdown" class="md-write-holder">
+      <div :class="{ 'zen-backdrop': modeIsMarkdown }">
         <textarea
           :id="textareaId"
           ref="textarea"
@@ -321,7 +334,8 @@ export default {
         v-html="markdownPreview"
       ></div>
     </template>
-    <template v-if="previewMarkdown && !markdownPreviewLoading">
+
+    <template v-if="mode === 'preview' && !markdownPreviewLoading">
       <div v-if="referencedCommands" class="referenced-commands" v-html="referencedCommands"></div>
       <div v-if="shouldShowReferencedUsers" class="referenced-users">
         <span>

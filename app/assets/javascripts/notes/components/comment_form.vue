@@ -270,11 +270,12 @@ Please check your network connection and try again.`;
       // `focus` is needed to remain cursor in the textarea.
       this.$refs.textarea.blur();
       this.$refs.textarea.focus();
+      const field = this.$refs.markdownField;
 
       if (shouldClear) {
-        this.note = '';
+        field.clear();
+
         this.resizeTextarea();
-        this.$refs.markdownField.previewMarkdown = false;
       }
 
       this.autosave.reset();

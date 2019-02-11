@@ -25,7 +25,7 @@ describe "Jira", :js, :quarantine do
     end
 
     it "creates a link to the referenced issue on the preview" do
-      find(".js-md-preview-button").click
+      find(".js-preview-link").click
 
       wait_for_requests
 
