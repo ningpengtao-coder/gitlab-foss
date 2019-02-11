@@ -4,7 +4,6 @@ import { mapActions, mapGetters } from 'vuex';
 import { GlTooltipDirective } from '@gitlab/ui';
 import { truncateSha } from '~/lib/utils/text_utility';
 import { s__, __, sprintf } from '~/locale';
-import { clearDraft, getDiscussionReplyKey } from '~/lib/utils/autosave';
 import icon from '~/vue_shared/components/icon.vue';
 import diffLineNoteFormMixin from 'ee_else_ce/notes/mixins/diff_line_note_form';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
@@ -92,7 +91,7 @@ export default {
       return this.firstNote.author;
     },
     autosaveKey() {
-      return getDiscussionReplyKey(this.firstNote.noteable_type, this.discussion.id);
+      return ['Note', 'Discussion', this.discussion.id, 'reply'];
     },
     newNotePath() {
       return this.getNoteableData.create_note_path;
@@ -246,7 +245,7 @@ export default {
       }
 
       this.isReplying = false;
-      clearDraft(this.autosaveKey);
+      this.$refs.noteForm.clearDraft();
     },
     saveReply(noteText, form, callback) {
       const postData = {
@@ -272,7 +271,8 @@ export default {
       this.isReplying = false;
       this.saveNote(replyData)
         .then(() => {
-          clearDraft(this.autosaveKey);
+          // TODO: TypeError: "_this.$refs.noteForm is undefined", because `isReplying = false`
+          this.$refs.noteForm.clearDraft();
           callback();
         })
         .catch(err => {
@@ -282,6 +282,8 @@ export default {
             const msg = `Your comment could not be submitted!
 Please check your network connection and try again.`;
             Flash(msg, 'alert', this.$el);
+            // TODO:  Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's value. Prop being mutated: "note"
+            // TODO: Invalid prop: type check failed for prop "note". Expected Object, got String with value "foo".
             this.$refs.noteForm.note = noteText;
             callback(err);
           });

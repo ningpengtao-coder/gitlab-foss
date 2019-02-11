@@ -7,7 +7,7 @@ import * as constants from '~/notes/constants';
 import { loggedOutnoteableData, notesDataMock, userDataMock, noteableDataMock } from '../mock_data';
 import { keyboardDownEvent } from '../../issue_show/helpers';
 
-describe('issue_comment_form component', () => {
+describe('comment_form component', () => {
   let store;
   let vm;
   const Component = Vue.extend(CommentForm);
@@ -162,11 +162,6 @@ describe('issue_comment_form component', () => {
             .dispatchEvent(keyboardDownEvent(38, true));
 
           expect(vm.editCurrentUserLastNote).toHaveBeenCalled();
-        });
-
-        it('inits autosave', () => {
-          expect(vm.autosave).toBeDefined();
-          expect(vm.autosave.key).toEqual(`autosave/Note/Issue/${noteableDataMock.id}`);
         });
       });
 

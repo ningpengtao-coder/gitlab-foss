@@ -6,10 +6,8 @@ import Autosize from 'autosize';
 import { __, sprintf } from '~/locale';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
 import Flash from '../../flash';
-import Autosave from '../../autosave';
 import {
   capitalizeFirstCharacter,
-  convertToCamelCase,
   splitCamelCase,
   slugifyWithUnderscore,
 } from '../../lib/utils/text_utility';
@@ -133,6 +131,11 @@ export default {
     trackingLabel() {
       return slugifyWithUnderscore(`${this.commentButtonTitle} button`);
     },
+    autosaveKey() {
+      if (!this.isLoggedIn) return [];
+
+      return ['Note', this.noteableType, this.getNoteableData.id, 'new'];
+    },
   },
   watch: {
     note(newNote) {
@@ -147,8 +150,6 @@ export default {
     $(document).on('issuable:change', (e, isClosed) => {
       this.toggleIssueLocalState(isClosed ? constants.CLOSED : constants.REOPENED);
     });
-
-    this.initAutoSave();
   },
   methods: {
     ...mapActions([
@@ -278,8 +279,6 @@ Please check your network connection and try again.`;
 
       // `focus` is needed to remain cursor in the textarea.
       this.$nextTick(() => field.focus());
-
-      this.autosave.reset();
     },
     setNoteType(type) {
       this.noteType = type;
@@ -291,17 +290,6 @@ Please check your network connection and try again.`;
         eventHub.$emit('enterEditMode', {
           noteId: lastNote.id,
         });
-      }
-    },
-    initAutoSave() {
-      if (this.isLoggedIn) {
-        const noteableType = capitalizeFirstCharacter(convertToCamelCase(this.noteableType));
-
-        this.autosave = new Autosave($(this.$refs.textarea), [
-          'Note',
-          noteableType,
-          this.getNoteableData.id,
-        ]);
       }
     },
     resizeTextarea() {
@@ -346,6 +334,7 @@ Please check your network connection and try again.`;
               :markdown-docs-path="markdownDocsPath"
               :quick-actions-docs-path="quickActionsDocsPath"
               :add-spacing-classes="false"
+              :autosave-key="autosaveKey"
               textarea-id="note-body"
               textarea-name="note[note]"
               textarea-class="js-note-text qa-comment-input"

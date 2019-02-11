@@ -151,7 +151,7 @@ export default {
       this.isRequesting = false;
       this.oldContent = null;
       $(this.$refs.noteBody.$el).renderGFM();
-      this.$refs.noteBody.resetAutoSave();
+      this.$refs.noteBody.clearDraft();
       this.$emit('updateSuccess');
     },
     formUpdateHandler(noteText, parentElement, callback, resolveDiscussion) {
@@ -197,7 +197,7 @@ export default {
         // eslint-disable-next-line no-alert
         if (!window.confirm('Are you sure you want to cancel editing this comment?')) return;
       }
-      this.$refs.noteBody.resetAutoSave();
+      this.$refs.noteBody.clearDraft();
       if (this.oldContent) {
         this.note.note_html = this.oldContent;
         this.oldContent = null;

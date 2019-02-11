@@ -1,8 +1,8 @@
-import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
+const autosaveStorageKey = autosaveKey => ['autosave', ...autosaveKey].join('/');
 
 export const clearDraft = autosaveKey => {
   try {
-    window.localStorage.removeItem(`autosave/${autosaveKey}`);
+    window.localStorage.removeItem(autosaveStorageKey(autosaveKey));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -11,7 +11,7 @@ export const clearDraft = autosaveKey => {
 
 export const getDraft = autosaveKey => {
   try {
-    return window.localStorage.getItem(`autosave/${autosaveKey}`);
+    return window.localStorage.getItem(autosaveStorageKey(autosaveKey));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -21,12 +21,9 @@ export const getDraft = autosaveKey => {
 
 export const updateDraft = (autosaveKey, text) => {
   try {
-    window.localStorage.setItem(`autosave/${autosaveKey}`, text);
+    window.localStorage.setItem(autosaveStorageKey(autosaveKey), text);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
   }
 };
-
-export const getDiscussionReplyKey = (noteableType, discussionId) =>
-  ['Note', capitalizeFirstCharacter(noteableType), discussionId, 'Reply'].join('/');

@@ -6,7 +6,6 @@ import noteEditedText from './note_edited_text.vue';
 import noteAwardsList from './note_awards_list.vue';
 import noteAttachment from './note_attachment.vue';
 import noteForm from './note_form.vue';
-import autosave from '../mixins/autosave';
 import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 
 export default {
@@ -17,7 +16,7 @@ export default {
     noteForm,
     Suggestions,
   },
-  mixins: [autosave, getDiscussion],
+  mixins: [getDiscussion],
   props: {
     note: {
       type: Object,
@@ -53,27 +52,21 @@ export default {
     lineType() {
       return this.line ? this.line.type : null;
     },
+    autosaveKey() {
+      return ['Note', this.note.id, 'edit'];
+    },
   },
   mounted() {
     this.renderGFM();
-
-    if (this.isEditing) {
-      this.initAutoSave(this.note);
-    }
   },
   updated() {
     this.renderGFM();
-
-    if (this.isEditing) {
-      if (!this.autosave) {
-        this.initAutoSave(this.note);
-      } else {
-        this.setAutoSave();
-      }
-    }
   },
   methods: {
     ...mapActions(['submitSuggestion']),
+    clearDraft() {
+      this.$refs.noteForm.clearDraft();
+    },
     renderGFM() {
       $(this.$refs['note-body']).renderGFM();
     },
@@ -114,6 +107,7 @@ export default {
       :help-page-path="helpPagePath"
       :discussion="discussion"
       :resolve-discussion="note.resolve_discussion"
+      :autosave-key="autosaveKey"
       @handleFormUpdate="handleFormUpdate"
       @cancelForm="formCancelHandler"
     />

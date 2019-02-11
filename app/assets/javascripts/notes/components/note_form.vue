@@ -7,7 +7,6 @@ import markdownField from '../../vue_shared/components/markdown/field.vue';
 import issuableStateMixin from '../mixins/issuable_state';
 import resolvable from '../mixins/resolvable';
 import { __ } from '~/locale';
-import { getDraft, updateDraft } from '~/lib/utils/autosave';
 import noteFormMixin from 'ee_else_ce/notes/mixins/note_form';
 
 export default {
@@ -73,20 +72,14 @@ export default {
       default: '',
     },
     autosaveKey: {
-      type: String,
+      type: Array,
       required: false,
-      default: '',
+      default: () => [],
     },
   },
   data() {
-    let updatedNoteBody = this.noteBody;
-
-    if (!updatedNoteBody && this.autosaveKey) {
-      updatedNoteBody = getDraft(this.autosaveKey) || '';
-    }
-
     return {
-      updatedNoteBody,
+      updatedNoteBody: this.noteBody,
       conflictWhileEditing: false,
       isSubmitting: false,
       isResolving: this.resolveDiscussion,
@@ -184,6 +177,9 @@ export default {
   },
   methods: {
     ...mapActions(['toggleResolveNote']),
+    clearDraft() {
+      this.$refs.markdownField.clearDraft();
+    },
     shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState) {
       // shouldBeResolved() checks the actual resolution state,
       // considering batchComments (EEP), if applicable/enabled.
@@ -208,12 +204,6 @@ export default {
     cancelHandler(shouldConfirm = false) {
       // Sends information about confirm message and if the textarea has changed
       this.$emit('cancelForm', shouldConfirm, this.noteBody !== this.updatedNoteBody);
-    },
-    onInput() {
-      if (this.autosaveKey) {
-        const { autosaveKey, updatedNoteBody: text } = this;
-        updateDraft(autosaveKey, text);
-      }
     },
   },
 };
@@ -245,6 +235,7 @@ export default {
         :can-suggest="canSuggest"
         :add-spacing-classes="false"
         :help-page-path="helpPagePath"
+        :autosave-key="autosaveKey"
         textarea-id="note_note"
         textarea-name="note[note]"
         textarea-class="js-vue-issue-note-form js-note-text qa-reply-input"
@@ -254,7 +245,6 @@ export default {
         @save="handleKeySubmit()"
         @edit-previous="editMyLastNote()"
         @cancel="cancelHandler(true)"
-        @input="onInput"
       />
       <div class="note-form-actions clearfix">
         <template v-if="showBatchCommentsActions">

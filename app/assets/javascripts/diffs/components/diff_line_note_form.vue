@@ -3,14 +3,13 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import { s__ } from '~/locale';
 import diffLineNoteFormMixin from 'ee_else_ce/notes/mixins/diff_line_note_form';
 import noteForm from '../../notes/components/note_form.vue';
-import autosave from '../../notes/mixins/autosave';
 import { DIFF_NOTE_TYPE } from '../constants';
 
 export default {
   components: {
     noteForm,
   },
-  mixins: [autosave, diffLineNoteFormMixin],
+  mixins: [diffLineNoteFormMixin],
   props: {
     diffFileHash: {
       type: String,
@@ -55,18 +54,20 @@ export default {
     diffFile() {
       return this.getDiffFileByHash(this.diffFileHash);
     },
-  },
-  mounted() {
-    if (this.isLoggedIn) {
-      const keys = [
+    autosaveKey() {
+      if (!this.isLoggedIn) return [];
+
+      return [
+        'Note',
+        this.noteableType,
+        this.noteableData.id,
+        'new',
         this.noteableData.diff_head_sha,
         DIFF_NOTE_TYPE,
         this.noteableData.source_project_id,
         this.line.line_code,
       ];
-
-      this.initAutoSave(this.noteableData, keys);
-    }
+    },
   },
   methods: {
     ...mapActions('diffs', ['cancelCommentForm', 'assignDiscussionsToDiff', 'saveDiffDiscussion']),
@@ -80,12 +81,11 @@ export default {
         }
       }
 
+      this.$refs.noteForm.clearDraft();
+
       this.cancelCommentForm({
         lineCode: this.line.line_code,
         fileHash: this.diffFileHash,
-      });
-      this.$nextTick(() => {
-        this.resetAutoSave();
       });
     },
     handleSaveNote(note) {
@@ -108,6 +108,7 @@ export default {
       :diff-file="diffFile"
       save-button-title="Comment"
       class="diff-comment-form"
+      :autosave-key="autosaveKey"
       @handleFormUpdateAddToReview="addToReview"
       @cancelForm="handleCancelCommentForm"
       @handleFormUpdate="handleSaveNote"

@@ -1,6 +1,7 @@
 <script>
 import $ from 'jquery';
 import _ from 'underscore';
+import { getDraft, updateDraft, clearDraft } from '~/lib/utils/autosave';
 import { __ } from '~/locale';
 import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
@@ -77,6 +78,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    autosaveKey: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
     textareaId: {
       type: String,
@@ -185,6 +191,11 @@ export default {
     value() {
       this.setCurrentValue(this.value, { emitEvent: false });
     },
+    currentValue() {
+      if (this.autosaveKey.length) {
+        updateDraft(this.autosaveKey, this.currentValue);
+      }
+    },
   },
   mounted() {
     /*
@@ -200,6 +211,14 @@ export default {
       labels: this.enableAutocomplete,
       snippets: this.enableAutocomplete,
     });
+
+    if (this.autosaveKey.length) {
+      const draft = getDraft(this.autosaveKey);
+
+      if (draft && draft.length) {
+        this.setCurrentValue(draft);
+      }
+    }
   },
   beforeDestroy() {
     const glForm = $(this.$refs['gl-form']).data('glForm');
@@ -228,7 +247,14 @@ export default {
 
     clear() {
       this.setCurrentValue('');
+      this.clearDraft();
       this.switchToEditor();
+    },
+
+    clearDraft() {
+      if (this.autosaveKey.length) {
+        clearDraft(this.autosaveKey);
+      }
     },
 
     switchToEditor() {
