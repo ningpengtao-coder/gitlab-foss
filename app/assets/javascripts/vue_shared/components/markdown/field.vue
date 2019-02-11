@@ -13,6 +13,7 @@ import icon from '../icon.vue';
 import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 import { updateText } from '~/lib/utils/text_markdown';
 import GfmAutoComplete, * as GFMConfig from '~/gfm_auto_complete';
+import dropzoneInput from '~/dropzone_input';
 
 export default {
   components: {
@@ -117,6 +118,7 @@ export default {
       isFocused: false,
       mode: 'markdown',
       autocomplete: null,
+      dropzone: null,
       currentValue: this.value,
       renderedLoading: false,
       renderedValue: null,
@@ -237,6 +239,8 @@ export default {
       this.autocomplete = this.setupAutocomplete();
     }
 
+    this.dropzone = dropzoneInput($(this.$refs.glForm));
+
     Autosize(this.$refs.textarea);
     this.autosizeTextarea();
   },
@@ -248,6 +252,10 @@ export default {
 
     if (this.autocomplete) {
       this.autocomplete.destroy();
+    }
+
+    if (this.dropzone) {
+      this.dropzone.disable();
     }
 
     Autosize.destroy(this.$refs.textarea);
@@ -404,7 +412,7 @@ export default {
       @toolbar-button-clicked="toolbarButtonClicked"
     />
     <div v-show="modeIsMarkdown" class="md-write-holder">
-      <div :class="{ 'zen-backdrop': modeIsMarkdown }">
+      <div class="div-dropzone-wrapper" :class="{ 'zen-backdrop': modeIsMarkdown }">
         <textarea
           :id="textareaId"
           ref="textarea"
