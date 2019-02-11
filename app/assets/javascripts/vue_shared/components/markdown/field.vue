@@ -105,6 +105,7 @@ export default {
   },
   data() {
     return {
+      isFocused: false,
       mode: 'markdown',
       currentValue: this.value,
       renderedLoading: false,
@@ -167,6 +168,9 @@ export default {
     },
   },
   watch: {
+    mode() {
+      this.$nextTick(this.focus);
+    },
     needsMarkdownRender() {
       if (this.needsMarkdownRender) {
         this.$nextTick(this.renderMarkdown);
@@ -207,6 +211,10 @@ export default {
       this.mode = newMode;
     },
 
+    setFocused(newFocused) {
+      this.isFocused = newFocused;
+    },
+
     setCurrentValue(newValue, { emitEvent = true } = {}) {
       if (newValue === this.currentValue) return;
 
@@ -225,6 +233,18 @@ export default {
     switchToEditor() {
       if (this.modeIsPreview) {
         this.setMode('markdown');
+      }
+    },
+
+    blur() {
+      if (this.modeIsMarkdown) {
+        this.$refs.textarea.blur();
+      }
+    },
+
+    focus() {
+      if (this.modeIsMarkdown) {
+        this.$refs.textarea.focus();
       }
     },
 
@@ -284,8 +304,11 @@ export default {
 
 <template>
   <div
-    ref="gl-form"
-    :class="{ 'prepend-top-default append-bottom-default': addSpacingClasses }"
+    ref="glForm"
+    :class="{
+      'prepend-top-default append-bottom-default': addSpacingClasses,
+      'is-focused': isFocused,
+    }"
     class="js-vue-markdown-field md-area position-relative"
   >
     <markdown-header
@@ -313,6 +336,8 @@ export default {
           @keydown.ctrl.enter="triggerSave"
           @keydown.esc="triggerCancel"
           @input="onTextareaInput"
+          @focus="setFocused(true)"
+          @blur="setFocused(false)"
         >
         </textarea>
 

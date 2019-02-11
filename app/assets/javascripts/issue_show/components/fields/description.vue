@@ -32,7 +32,7 @@ export default {
     },
   },
   mounted() {
-    this.$refs.textarea.focus();
+    this.$refs.markdownField.focus();
   },
 };
 </script>

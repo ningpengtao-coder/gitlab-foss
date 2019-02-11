@@ -267,16 +267,17 @@ Please check your network connection and try again.`;
     },
     discard(shouldClear = true) {
       // `blur` is needed to clear slash commands autocomplete cache if event fired.
-      // `focus` is needed to remain cursor in the textarea.
-      this.$refs.textarea.blur();
-      this.$refs.textarea.focus();
       const field = this.$refs.markdownField;
+      field.blur();
 
       if (shouldClear) {
         field.clear();
 
         this.resizeTextarea();
       }
+
+      // `focus` is needed to remain cursor in the textarea.
+      this.$nextTick(() => field.focus());
 
       this.autosave.reset();
     },
