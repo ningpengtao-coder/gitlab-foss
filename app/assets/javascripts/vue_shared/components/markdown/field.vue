@@ -2,6 +2,7 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import { getDraft, updateDraft, clearDraft } from '~/lib/utils/autosave';
+import Autosize from 'autosize';
 import { __ } from '~/locale';
 import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
@@ -176,7 +177,13 @@ export default {
   },
   watch: {
     mode() {
-      this.$nextTick(this.focus);
+      this.$nextTick(() => {
+        this.focus();
+
+        if (this.modeIsMarkdown) {
+          this.autosizeTextarea();
+        }
+      });
     },
     needsMarkdownRender() {
       if (this.needsMarkdownRender) {
@@ -194,6 +201,10 @@ export default {
     currentValue() {
       if (this.autosaveKey.length) {
         updateDraft(this.autosaveKey, this.currentValue);
+      }
+
+      if (this.modeIsMarkdown) {
+        this.$nextTick(this.autosizeTextarea);
       }
     },
   },
@@ -219,12 +230,17 @@ export default {
         this.setCurrentValue(draft);
       }
     }
+
+    Autosize(this.$refs.textarea);
+    this.autosizeTextarea();
   },
   beforeDestroy() {
     const glForm = $(this.$refs['gl-form']).data('glForm');
     if (glForm) {
       glForm.destroy();
     }
+
+    Autosize.destroy(this.$refs.textarea);
   },
   methods: {
     setMode(newMode) {
@@ -308,6 +324,10 @@ export default {
 
     renderPreviewGFM() {
       $(this.$refs.markdownPreview).renderGFM();
+    },
+
+    autosizeTextarea() {
+      Autosize.update(this.$refs.textarea);
     },
 
     toolbarButtonClicked(button) {

@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import Vue from 'vue';
-import Autosize from 'autosize';
 import createStore from '~/notes/stores';
 import CommentForm from '~/notes/components/comment_form.vue';
 import * as constants from '~/notes/constants';
@@ -47,7 +46,6 @@ describe('comment_form component', () => {
       it('should request to save note when note is entered', () => {
         vm.note = 'hello world';
         spyOn(vm, 'saveNote').and.returnValue(new Promise(() => {}));
-        spyOn(vm, 'resizeTextarea');
         spyOn(vm, 'stopPolling');
 
         vm.handleSave();
@@ -56,7 +54,6 @@ describe('comment_form component', () => {
         expect(vm.note).toEqual('');
         expect(vm.saveNote).toHaveBeenCalled();
         expect(vm.stopPolling).toHaveBeenCalled();
-        expect(vm.resizeTextarea).toHaveBeenCalled();
       });
 
       it('should toggle issue state when no note', () => {
@@ -138,19 +135,6 @@ describe('comment_form component', () => {
         expect(
           vm.$el.querySelector(`a[href="${quickActionsDocsPath}"]`).textContent.trim(),
         ).toEqual('quick actions');
-      });
-
-      it('should resize textarea after note discarded', done => {
-        spyOn(Autosize, 'update');
-        spyOn(vm, 'discard').and.callThrough();
-
-        vm.note = 'foo';
-        vm.discard();
-
-        Vue.nextTick(() => {
-          expect(Autosize.update).toHaveBeenCalled();
-          done();
-        });
       });
 
       describe('edit mode', () => {

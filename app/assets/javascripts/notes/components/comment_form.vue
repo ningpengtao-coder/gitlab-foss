@@ -2,7 +2,6 @@
 import $ from 'jquery';
 import { mapActions, mapGetters, mapState } from 'vuex';
 import _ from 'underscore';
-import Autosize from 'autosize';
 import { __, sprintf } from '~/locale';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
 import Flash from '../../flash';
@@ -191,7 +190,6 @@ export default {
         }
 
         this.note = ''; // Empty textarea while being requested. Repopulate in catch
-        this.resizeTextarea();
         this.stopPolling();
 
         this.saveNote(noteData)
@@ -273,8 +271,6 @@ Please check your network connection and try again.`;
 
       if (shouldClear) {
         field.clear();
-
-        this.resizeTextarea();
       }
 
       // `focus` is needed to remain cursor in the textarea.
@@ -291,11 +287,6 @@ Please check your network connection and try again.`;
           noteId: lastNote.id,
         });
       }
-    },
-    resizeTextarea() {
-      this.$nextTick(() => {
-        Autosize.update(this.$refs.textarea);
-      });
     },
   },
 };
