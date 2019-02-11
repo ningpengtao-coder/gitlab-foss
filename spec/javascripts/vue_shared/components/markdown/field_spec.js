@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import Vue from 'vue';
+import '~/behaviors/markdown/render_gfm';
 import fieldComponent from '~/vue_shared/components/markdown/field.vue';
 
 function assertMarkdownTabs(isWrite, writeLink, previewLink, vm) {
@@ -87,13 +88,16 @@ describe('Markdown field component', () => {
       it('renders markdown preview', done => {
         previewLink.click();
 
-        setTimeout(() => {
-          expect(vm.$el.querySelector('.md-preview-holder').innerHTML).toContain(
-            '<p>markdown preview</p>',
-          );
-
-          done();
-        });
+        Vue.nextTick()
+          .then(Vue.nextTick)
+          .then(Vue.nextTick)
+          .then(() => {
+            expect(vm.$el.querySelector('.md-preview-holder').innerHTML).toContain(
+              '<p>markdown preview</p>',
+            );
+          })
+          .then(done)
+          .catch(done.fail);
       });
 
       it('renders GFM with jQuery', done => {
@@ -101,11 +105,14 @@ describe('Markdown field component', () => {
 
         previewLink.click();
 
-        setTimeout(() => {
-          expect($.fn.renderGFM).toHaveBeenCalled();
-
-          done();
-        }, 0);
+        Vue.nextTick()
+          .then(Vue.nextTick)
+          .then(Vue.nextTick)
+          .then(() => {
+            expect($.fn.renderGFM).toHaveBeenCalled();
+          })
+          .then(done)
+          .catch(done.fail);
       });
 
       it('clicking already active write or preview link does nothing', done => {

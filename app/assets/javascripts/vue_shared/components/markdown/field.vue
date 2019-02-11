@@ -105,14 +105,14 @@ export default {
   },
   data() {
     return {
-      markdownPreview: '',
       mode: 'markdown',
       currentValue: this.value,
+      renderedLoading: false,
+      renderedValue: null,
+      rendered: '',
       referencedCommands: '',
       referencedUsers: '',
       hasSuggestion: false,
-      markdownPreviewLoading: false,
-      previewMarkdown: false,
       suggestions: this.note.suggestions || [],
     };
   },
@@ -122,6 +122,15 @@ export default {
     },
     modeIsPreview() {
       return this.mode === 'preview';
+    },
+    renderedOutdated() {
+      return this.currentValue !== this.renderedValue;
+    },
+    needsMarkdownRender() {
+      return this.renderedOutdated && this.modeIsPreview;
+    },
+    needsPreviewGFMRender() {
+      return !this.renderedOutdated && this.modeIsPreview;
     },
     shouldShowReferencedUsers() {
       const referencedUsersThreshold = 10;
@@ -158,6 +167,16 @@ export default {
     },
   },
   watch: {
+    needsMarkdownRender() {
+      if (this.needsMarkdownRender) {
+        this.$nextTick(this.renderMarkdown);
+      }
+    },
+    needsPreviewGFMRender() {
+      if (this.needsPreviewGFMRender) {
+        this.$nextTick(this.renderPreviewGFM);
+      }
+    },
     value() {
       this.setCurrentValue(this.value, { emitEvent: false });
     },
@@ -209,30 +228,25 @@ export default {
       }
     },
 
-    renderMarkdownPreview() {
+    renderMarkdown() {
+      if (!this.renderedOutdated || this.renderedLoading) return;
 
-      /*
-          Can't use `$refs` as the component is technically in the parent component
-          so we access the VNode & then get the element
-        */
-      const text = this.$slots.textarea[0].elm.value;
+      const text = this.currentValue;
 
-      if (text) {
-        this.markdownPreviewLoading = true;
-        this.markdownPreview = __('Loading…');
+      if (text.length) {
+        this.renderedLoading = true;
         this.$http
           .post(this.markdownPreviewPath, { text })
           .then(resp => resp.json())
-          .then(data => this.renderMarkdown(data))
-          .catch(() => new Flash(__('Error loading markdown preview')));
+          .then(data => this.updateRendered(text, data))
+          .catch(() => new Flash(__('Error rendering markdown')));
       } else {
-        this.renderMarkdown();
+        this.updateRendered(text);
       }
     },
 
-    renderMarkdown(data = {}) {
-      this.markdownPreviewLoading = false;
-      this.markdownPreview = data.body || 'Nothing to preview.';
+    updateRendered(text, data = {}) {
+      this.rendered = data.body || '';
 
       if (data.references) {
         this.referencedCommands = data.references.commands;
@@ -241,9 +255,13 @@ export default {
         this.suggestions = data.references.suggestions;
       }
 
-      this.$nextTick()
-        .then(() => $(this.$refs['markdown-preview']).renderGFM())
-        .catch(() => new Flash(__('Error rendering markdown preview')));
+      this.renderedLoading = false;
+      this.renderedValue = text;
+    },
+
+    renderPreviewGFM() {
+      $(this.$refs.markdownPreview).renderGFM();
+    },
 
     triggerEditPrevious() {
       if (!this.currentValue.length) this.$emit('edit-previous');
@@ -308,34 +326,28 @@ export default {
         />
       </div>
     </div>
-    <template v-if="hasSuggestion">
-      <div
-        v-show="previewMarkdown"
-        ref="markdown-preview"
-        class="js-vue-md-preview md-preview-holder"
-      >
-        <suggestions
-          v-if="hasSuggestion"
-          :note-html="markdownPreview"
-          :from-line="lineNumber"
-          :from-content="lineContent"
-          :line-type="lineType"
-          :disabled="true"
-          :suggestions="suggestions"
-          :help-page-path="helpPagePath"
-        />
-      </div>
-    </template>
-    <template v-else>
-      <div
-        v-show="previewMarkdown"
-        ref="markdown-preview"
-        class="js-vue-md-preview md md-preview-holder"
-        v-html="markdownPreview"
-      ></div>
-    </template>
 
-    <template v-if="mode === 'preview' && !markdownPreviewLoading">
+    <div v-show="modeIsPreview" ref="markdownPreview" class="js-vue-md-preview md-preview-holder">
+      <span v-if="renderedOutdated">
+        {{ __('Loading…') }}
+      </span>
+      <span v-else-if="rendered.length === 0">
+        {{ __('Nothing to preview.') }}
+      </span>
+      <suggestions
+        v-else-if="hasSuggestion"
+        :note-html="rendered"
+        :from-line="lineNumber"
+        :from-content="lineContent"
+        :line-type="lineType"
+        :disabled="true"
+        :suggestions="suggestions"
+        :help-page-path="helpPagePath"
+      />
+      <div v-else class="md" v-html="rendered"></div>
+    </div>
+
+    <template v-if="modeIsPreview && !renderedOutdated">
       <div v-if="referencedCommands" class="referenced-commands" v-html="referencedCommands"></div>
       <div v-if="shouldShowReferencedUsers" class="referenced-users">
         <span>
