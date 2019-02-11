@@ -12,6 +12,7 @@ import markdownToolbar from './toolbar.vue';
 import icon from '../icon.vue';
 import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 import { updateText } from '~/lib/utils/text_markdown';
+import GfmAutoComplete, * as GFMConfig from '~/gfm_auto_complete';
 
 export default {
   components: {
@@ -115,6 +116,7 @@ export default {
     return {
       isFocused: false,
       mode: 'markdown',
+      autocomplete: null,
       currentValue: this.value,
       renderedLoading: false,
       renderedValue: null,
@@ -231,6 +233,10 @@ export default {
       }
     }
 
+    if (this.enableAutocomplete) {
+      this.autocomplete = this.setupAutocomplete();
+    }
+
     Autosize(this.$refs.textarea);
     this.autosizeTextarea();
   },
@@ -240,9 +246,29 @@ export default {
       glForm.destroy();
     }
 
+    if (this.autocomplete) {
+      this.autocomplete.destroy();
+    }
+
     Autosize.destroy(this.$refs.textarea);
   },
   methods: {
+    setupAutocomplete() {
+      const autocompleteConfig = Object.assign({}, GFMConfig.defaultAutocompleteConfig);
+      const dataSources = (gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources) || {};
+
+      // Disable autocomplete for keywords which do not have dataSources available
+      Object.keys(autocompleteConfig).forEach(item => {
+        if (item !== 'emojis') {
+          autocompleteConfig[item] = autocompleteConfig[item] && !!dataSources[item];
+        }
+      });
+
+      const autocomplete = new GfmAutoComplete(dataSources);
+      autocomplete.setup($(this.$refs.textarea), autocompleteConfig);
+      return autocomplete;
+    },
+
     setMode(newMode) {
       this.mode = newMode;
     },
