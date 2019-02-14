@@ -736,6 +736,24 @@ describe Ci::CreatePipelineService do
               end
             end
 
+            context 'when ref is merge request head ref' do
+              let(:merge_request) do
+                create(:merge_request,
+                  source_project: project,
+                  source_branch: 'feature',
+                  target_project: project,
+                  target_branch: 'master')
+              end
+
+              let(:ref_name) { merge_request.ref_path }
+
+              it 'creates a merge request pipeline' do
+                expect(pipeline).to be_persisted
+                expect(pipeline).to be_merge_request
+                expect(pipeline.ref).to eq("refs/merge-requests/#{merge_request.iid}/head")
+              end
+            end
+
             context 'when merge request is created from a forked project' do
               let(:merge_request) do
                 create(:merge_request,
