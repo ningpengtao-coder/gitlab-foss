@@ -32,6 +32,12 @@ module Gitlab
             end
           end
 
+          def ref_exists?
+            strong_memoize(:is_ref) do
+              project.repository.ref_exists?(ref)
+            end
+          end
+
           def ref
             strong_memoize(:ref) do
               Gitlab::Git.ref_name(origin_ref)
