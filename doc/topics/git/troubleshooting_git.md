@@ -95,3 +95,18 @@ and provide GitLab with more information on how to improve the service.
 
 [SSH troubleshooting]: ../../ssh/README.md#troubleshooting "SSH Troubleshooting"
 [Broken-Pipe]: https://stackoverflow.com/questions/19120120/broken-pipe-when-pushing-to-git-repository/36971469#36971469 "StackOverflow: 'Broken pipe when pushing to Git repository'"
+
+## fatal: reference is not a tree error
+
+During a git action and you receive an error something like the following:
+
+```
+Cloning into `/tmp/build/get`...
+fatal: reference is not a tree: xxxxxxxxxx
+```
+
+This means git is referencing a git object that does not exist anymore.
+
+This most likely happened when you do a `git push` with `-f` or `--force` (force push) which could have removed the object in question from the repository. Force push is a destructive action and it might [overwrite refs](https://git-scm.com/docs/git-push#git-push--f)
+
+There are no silver bullet actions to solve this. If you still need the referenced object, you will need to retrieve them back from your local repository or your team local repo. You can read this [great article regarding how to deal with force push](https://evilmartians.com/chronicles/git-push---force-and-how-to-deal-with-it)
