@@ -1,0 +1,92 @@
+@import "./variables_colors";
+
+@mixin dark_theme() {
+  $white: $color-gray-950 !global;
+  $gray-50: $color-gray-900 !global;
+  $gray-100: $color-gray-800 !global;
+  $gray-200: $color-gray-700 !global;
+  $gray-300: $color-gray-600 !global;
+  $gray-400: $color-gray-500 !global;
+  $gray-500: $color-gray-400 !global;
+  $gray-600: $color-gray-300 !global;
+  $gray-700: $color-gray-200 !global;
+  $gray-800: $color-gray-100 !global;
+  $gray-900: $color-gray-50 !global;
+  $gray-950: $color-gray-0 !global;
+
+  $green-50: $color-green-950 !global;
+  $green-100: $color-green-900 !global;
+  $green-200: $color-green-800 !global;
+  $green-300: $color-green-700 !global;
+  $green-400: $color-green-600 !global;
+  $green-500: $color-green-500 !global;
+  $green-600: $color-green-400 !global;
+  $green-700: $color-green-300 !global;
+  $green-800: $color-green-200 !global;
+  $green-900: $color-green-100 !global;
+  $green-950: $color-green-50 !global;
+
+  $blue-50: $color-blue-950 !global;
+  $blue-100: $color-blue-900 !global;
+  $blue-200: $color-blue-800 !global;
+  $blue-300: $color-blue-700 !global;
+  $blue-400: $color-blue-600 !global;
+  $blue-500: $color-blue-500 !global;
+  $blue-600: $color-blue-400 !global;
+  $blue-700: $color-blue-300 !global;
+  $blue-800: $color-blue-200 !global;
+  $blue-900: $color-blue-100 !global;
+  $blue-950: $color-blue-50 !global;
+
+  $orange-50: $color-orange-950 !global;
+  $orange-100: $color-orange-900 !global;
+  $orange-200: $color-orange-800 !global;
+  $orange-300: $color-orange-700 !global;
+  $orange-400: $color-orange-600 !global;
+  $orange-500: $color-orange-500 !global;
+  $orange-600: $color-orange-400 !global;
+  $orange-700: $color-orange-300 !global;
+  $orange-800: $color-orange-200 !global;
+  $orange-900: $color-orange-100 !global;
+  $orange-950: $color-orange-50 !global;
+
+  $red-50: $color-red-950 !global;
+  $red-100: $color-red-900 !global;
+  $red-200: $color-red-800 !global;
+  $red-300: $color-red-700 !global;
+  $red-400: $color-red-600 !global;
+  $red-500: $color-red-500 !global;
+  $red-600: $color-red-400 !global;
+  $red-700: $color-red-300 !global;
+  $red-800: $color-red-200 !global;
+  $red-900: $color-red-100 !global;
+  $red-950: $color-red-50 !global;
+
+  $indigo-50: $color-indigo-950 !global;
+  $indigo-100: $color-indigo-900 !global;
+  $indigo-200: $color-indigo-800 !global;
+  $indigo-300: $color-indigo-700 !global;
+  $indigo-400: $color-indigo-600 !global;
+  $indigo-500: $color-indigo-500 !global;
+  $indigo-600: $color-indigo-400 !global;
+  $indigo-700: $color-indigo-300 !global;
+  $indigo-800: $color-indigo-200 !global;
+  $indigo-900: $color-indigo-100 !global;
+  $indigo-950: $color-indigo-50 !global;
+
+  $gray-darker: #333 !global;
+
+  $black: #fff !global;
+
+  $body-bg: $color-gray-950 !global;
+  $input-bg: $color-gray-900 !global;
+  $input-group-addon-bg: $color-gray-900 !global;
+  $body-color: $color-gray-0 !global;
+
+  // TODO: these should probably go in variable_overrides.scss
+  $tooltip-bg: $color-gray-800 !global;
+  $tooltip-color: $color-gray-0 !global;
+
+  $popover-color: $gray-950 !global;
+  $popover-arrow-outer-color: $gray-800 !global;
+}

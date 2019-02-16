@@ -133,10 +133,13 @@ module Gitlab
     config.assets.paths << Gemojione.images_path
     config.assets.paths << "#{config.root}/vendor/assets/fonts"
 
+    config.assets.precompile << "application.css"
+    config.assets.precompile << "application_dark.css"
     config.assets.precompile << "print.css"
     config.assets.precompile << "notify.css"
     config.assets.precompile << "mailers/*.css"
     config.assets.precompile << "page_bundles/ide.css"
+    config.assets.precompile << "page_bundles/ide_dark.css"
     config.assets.precompile << "page_bundles/xterm.css"
     config.assets.precompile << "performance_bar.css"
     config.assets.precompile << "lib/ace.js"

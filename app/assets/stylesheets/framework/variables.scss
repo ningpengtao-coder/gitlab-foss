@@ -12,6 +12,28 @@ $contextual-sidebar-width: 220px;
 $contextual-sidebar-collapsed-width: 50px;
 $toggle-sidebar-height: 48px;
 
+@import "./variables_colors";
+@import "./variables_dark_theme";
+
+$dark-mode: false !default;
+
+@if $dark-mode {
+  @include dark-theme;
+}
+
+$white: #fff !default;
+$gray-50: $color-gray-50 !default;
+$gray-100: $color-gray-100 !default;
+$gray-200: $color-gray-200 !default;
+$gray-300: $color-gray-300 !default;
+$gray-400: $color-gray-400 !default;
+$gray-500: $color-gray-500 !default;
+$gray-600: $color-gray-600 !default;
+$gray-700: $color-gray-700 !default;
+$gray-800: $color-gray-800 !default;
+$gray-900: $color-gray-900 !default;
+$gray-950: $color-gray-950 !default;
+
 /*
  * Color schema
  */
@@ -20,19 +42,19 @@ $darken-dark-factor: 10%;
 $darken-border-factor: 5%;
 $darken-border-dashed-factor: 25%;
 
-$white-light: #fff;
-$white-normal: #f0f0f0;
-$white-dark: #eaeaea;
+$white-light: $white !default;
+$white-normal: $gray-100 !default;
+$white-dark: $gray-200 !default;
 
-$gray-lightest: #fdfdfd;
-$gray-light: #fafafa;
-$gray-lighter: #f9f9f9;
+$gray-lightest: $gray-50;
+$gray-light: $gray-50;
+$gray-lighter: $gray-50;
 $gray-normal: #f5f5f5;
 $gray-dark: darken($gray-light, $darken-dark-factor);
-$gray-darker: #eee;
+$gray-darker: #eee !default;
 $gray-darkest: #c4c4c4;
 
-$black: #000;
+$black: #000 !default;
 $black-transparent: rgba(0, 0, 0, 0.3);
 $almost-black: #242424;
 
@@ -49,79 +71,67 @@ $gl-gray-500: #777777;
 $gl-gray-600: #666666;
 $gl-gray-700: #555555;
 
-$green-50: #f1fdf6;
-$green-100: #dcf5e7;
-$green-200: #b3e6c8;
-$green-300: #75d09b;
-$green-400: #37b96d;
-$green-500: #1aaa55;
-$green-600: #168f48;
-$green-700: #12753a;
-$green-800: #0e5a2d;
-$green-900: #0a4020;
-$green-950: #072b15;
+$green-50: $color-green-50 !default;
+$green-100: $color-green-100 !default;
+$green-200: $color-green-200 !default;
+$green-300: $color-green-300 !default;
+$green-400: $color-green-400 !default;
+$green-500: $color-green-500 !default;
+$green-600: $color-green-600 !default;
+$green-700: $color-green-700 !default;
+$green-800: $color-green-800 !default;
+$green-900: $color-green-900 !default;
+$green-950: $color-green-950 !default;
 
-$blue-50: #f6fafe;
-$blue-100: #e4f0fb;
-$blue-200: #b8d6f4;
-$blue-300: #73afea;
-$blue-400: #418cd8;
-$blue-500: #1f78d1;
-$blue-600: #1b69b6;
-$blue-700: #17599c;
-$blue-800: #134a81;
-$blue-900: #0f3b66;
-$blue-950: #0a2744;
+$blue-50: $color-blue-50 !default;
+$blue-100: $color-blue-100 !default;
+$blue-200: $color-blue-200 !default;
+$blue-300: $color-blue-300 !default;
+$blue-400: $color-blue-400 !default;
+$blue-500: $color-blue-500 !default;
+$blue-600: $color-blue-600 !default;
+$blue-700: $color-blue-700 !default;
+$blue-800: $color-blue-800 !default;
+$blue-900: $color-blue-900 !default;
+$blue-950: $color-blue-950 !default;
 
-$orange-50: #fffaf4;
-$orange-100: #fff1de;
-$orange-200: #fed69f;
-$orange-300: #fdbc60;
-$orange-400: #fca429;
-$orange-500: #fc9403;
-$orange-600: #de7e00;
-$orange-700: #c26700;
-$orange-800: #a35200;
-$orange-900: #853c00;
-$orange-950: #592800;
+$orange-50: $color-orange-50 !default;
+$orange-100: $color-orange-100 !default;
+$orange-200: $color-orange-200 !default;
+$orange-300: $color-orange-300 !default;
+$orange-400: $color-orange-400 !default;
+$orange-500: $color-orange-500 !default;
+$orange-600: $color-orange-600 !default;
+$orange-700: $color-orange-700 !default;
+$orange-800: $color-orange-800 !default;
+$orange-900: $color-orange-900 !default;
+$orange-950: $color-orange-950 !default;
 
-$red-50: #fef6f5;
-$red-100: #fbe5e1;
-$red-200: #f2b4a9;
-$red-300: #ea8271;
-$red-400: #e05842;
-$red-500: #db3b21;
-$red-600: #c0341d;
-$red-700: #a62d19;
-$red-800: #8b2615;
-$red-900: #711e11;
-$red-950: #4b140b;
-
-$gray-50: #fafafa;
-$gray-100: #f2f2f2;
-$gray-200: #dfdfdf;
-$gray-300: #cccccc;
-$gray-400: #bababa;
-$gray-500: #a7a7a7;
-$gray-600: #919191;
-$gray-700: #707070;
-$gray-800: #4f4f4f;
-$gray-900: #2e2e2e;
-$gray-950: #1f1f1f;
+$red-50: $color-red-50 !default;
+$red-100: $color-red-100 !default;
+$red-200: $color-red-200 !default;
+$red-300: $color-red-300 !default;
+$red-400: $color-red-400 !default;
+$red-500: $color-red-500 !default;
+$red-600: $color-red-600 !default;
+$red-700: $color-red-700 !default;
+$red-800: $color-red-800 !default;
+$red-900: $color-red-900 !default;
+$red-950: $color-red-950 !default;
 
 // GitLab themes
 
-$indigo-50: #f7f7ff;
-$indigo-100: #ebebfa;
-$indigo-200: #d1d1f0;
-$indigo-300: #a6a6de;
-$indigo-400: #7c7ccc;
-$indigo-500: #6666c4;
-$indigo-600: #5b5bbd;
-$indigo-700: #4b4ba3;
-$indigo-800: #393982;
-$indigo-900: #292961;
-$indigo-950: #1a1a40;
+$indigo-50: $color-indigo-50 !default;
+$indigo-100: $color-indigo-100 !default;
+$indigo-200: $color-indigo-200 !default;
+$indigo-300: $color-indigo-300 !default;
+$indigo-400: $color-indigo-400 !default;
+$indigo-500: $color-indigo-500 !default;
+$indigo-600: $color-indigo-600 !default;
+$indigo-700: $color-indigo-700 !default;
+$indigo-800: $color-indigo-800 !default;
+$indigo-900: $color-indigo-900 !default;
+$indigo-950: $color-indigo-950 !default;
 
 $theme-blue-50: #f4f8fc;
 $theme-blue-100: #e6edf5;
@@ -206,8 +216,8 @@ $gl-font-size-small: 12px;
 $gl-font-size-large: 16px;
 $gl-font-weight-normal: 400;
 $gl-font-weight-bold: 600;
-$gl-text-color: #2e2e2e;
-$gl-text-color-secondary: #707070;
+$gl-text-color: $gray-900;
+$gl-text-color-secondary: $gray-700;
 $gl-text-color-tertiary: #919191;
 $gl-text-color-quaternary: #d6d6d6;
 $gl-text-color-inverted: rgba(255, 255, 255, 1);
@@ -346,7 +356,7 @@ $dropdown-shadow-color: rgba(#000, 0.1);
 $dropdown-title-btn-color: #bfbfbf;
 $dropdown-input-fa-color: #c7c7c7;
 $dropdown-input-focus-shadow: rgba($blue-300, 0.4);
-$dropdown-loading-bg: rgba(#fff, 0.6);
+$dropdown-loading-bg: rgba($white, 0.6);
 $dropdown-chevron-size: 10px;
 $dropdown-toggle-active-border-color: darken($border-color, 14%);
 $dropdown-fade-mask-height: 32px;
