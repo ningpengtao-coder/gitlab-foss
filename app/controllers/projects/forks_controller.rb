@@ -8,6 +8,7 @@ class Projects::ForksController < Projects::ApplicationController
   before_action :require_non_empty_project
   before_action :authorize_download_code!
   before_action :authenticate_user!, only: [:new, :create]
+  before_action :check_forking_availability, only: [:new, :create]
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
@@ -62,7 +63,13 @@ class Projects::ForksController < Projects::ApplicationController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  private
+
   def whitelist_query_limiting
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42335')
+  end
+
+  def check_forking_availability
+    access_denied!(message: _('Forking is disabled for this project.')) unless @project.forking_allowed?
   end
 end

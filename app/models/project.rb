@@ -84,6 +84,9 @@ class Project < ActiveRecord::Base
   default_value_for :wiki_enabled, gitlab_config_features.wiki
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
+  default_value_for :forking_access_level,
+                    { value: Gitlab::ForkingAccessLevel::ALLOW_FORKS,
+                      allows_nil: false }
 
   add_authentication_token_field :runners_token, encrypted: true, migrating: true
 
@@ -1233,6 +1236,10 @@ class Project < ActiveRecord::Base
     return nil unless forked?
 
     forked_from_project || fork_network&.root_project
+  end
+
+  def forking_allowed?
+    forking_access_level > Gitlab::ForkingAccessLevel::NO_FORKS
   end
 
   def lfs_storage_project

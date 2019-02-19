@@ -10,6 +10,23 @@ describe Projects::ForksController do
     group.add_owner(user)
   end
 
+  shared_examples 'forking disabled' do
+    context 'when forking is disabled' do
+      before do
+        sign_in(user)
+
+        project.forking_access_level = Gitlab::ForkingAccessLevel::NO_FORKS
+        project.save
+      end
+
+      it 'renders 403' do
+        subject
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
   describe 'GET index' do
     def get_forks
       get :index,
@@ -83,7 +100,7 @@ describe Projects::ForksController do
   end
 
   describe 'GET new' do
-    def get_new
+    subject do
       get :new,
         params: {
           namespace_id: project.namespace,
@@ -95,7 +112,7 @@ describe Projects::ForksController do
       it 'responds with status 200' do
         sign_in(user)
 
-        get_new
+        subject
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -105,15 +122,17 @@ describe Projects::ForksController do
       it 'redirects to the sign-in page' do
         sign_out(user)
 
-        get_new
+        subject
 
         expect(response).to redirect_to(new_user_session_path)
       end
     end
+
+    it_behaves_like 'forking disabled'
   end
 
   describe 'POST create' do
-    def post_create
+    subject do
       post :create,
         params: {
           namespace_id: project.namespace,
@@ -126,7 +145,7 @@ describe Projects::ForksController do
       it 'responds with status 302' do
         sign_in(user)
 
-        post_create
+        subject
 
         expect(response).to have_gitlab_http_status(302)
         expect(response).to redirect_to(namespace_project_import_path(user.namespace, project))
@@ -137,10 +156,12 @@ describe Projects::ForksController do
       it 'redirects to the sign-in page' do
         sign_out(user)
 
-        post_create
+        subject
 
         expect(response).to redirect_to(new_user_session_path)
       end
     end
+
+    it_behaves_like 'forking disabled'
   end
 end

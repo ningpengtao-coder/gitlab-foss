@@ -97,6 +97,39 @@ describe Projects::UpdateService do
           expect(project.reload).to be_internal
         end
       end
+
+      context 'when parent project allow private forks only' do
+        let(:project) { create(:project, :public, forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY) }
+        let(:forked_project) { fork_project(project) }
+
+        subject { update_project(forked_project, admin, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
+
+        context 'updating visibility_level of the forked project to public' do
+          it 'fails' do
+            expect(subject).to eq({ status: :error, message: 'New visibility level not allowed by the forking policy of the parent project!' })
+          end
+
+          it 'does not update the project' do
+            expect {subject}.not_to change(forked_project, :visibility_level)
+          end
+        end
+      end
+    end
+
+    context 'when changing forking access level' do
+      let(:forking_access_level) { Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY }
+
+      subject { update_project(project, user, forking_access_level: forking_access_level) }
+
+      context 'updating forking_access_level to PRIVATE_FORKS_ONLY' do
+        it 'succeeds' do
+          expect(subject).to eq({ status: :success })
+        end
+
+        it 'updates the project' do
+          expect {subject}.to change(project, :forking_access_level).to(forking_access_level)
+        end
+      end
     end
 
     describe 'when updating project that has forks' do

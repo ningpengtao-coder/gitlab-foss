@@ -169,6 +169,46 @@ describe Projects::ForkService do
           end
         end
       end
+
+      context 'forking access level' do
+        context 'when forking is not limited' do
+          before do
+            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC,
+                                 forking_access_level: Gitlab::ForkingAccessLevel::ALLOW_FORKS)
+          end
+
+          it 'creates fork with public visibility levels' do
+            to_project = fork_project(@from_project, @to_user, namespace: @to_user.namespace)
+
+            expect(to_project.visibility_level).to eq(Gitlab::VisibilityLevel::PUBLIC)
+          end
+        end
+
+        context 'when forking is limited to private forks' do
+          before do
+            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC,
+                                 forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY)
+          end
+
+          it 'creates fork with private visibility levels' do
+            to_project = fork_project(@from_project, @to_user, namespace: @to_user.namespace)
+
+            expect(to_project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+          end
+        end
+
+        context 'when forking is disabled' do
+          before do
+            @from_project.update(forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS)
+          end
+
+          it 'fails' do
+            to_project = fork_project(@from_project, @to_user, namespace: @to_user.namespace)
+
+            expect(to_project.errors[:forked_from_project_id]).to eq(['is forbidden'])
+          end
+        end
+      end
     end
 
     describe 'fork to namespace' do
