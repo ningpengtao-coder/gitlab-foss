@@ -36,7 +36,7 @@
                     %span
                       = _('Press Enter or click to search')
               %ul.filter-dropdown{ data: { dynamic: true, dropdown: true } }
-                %li.filter-dropdown-item
+                %li.filter-dropdown-item{ class: '{{rowClass}}' }
                   %button.btn.btn-link{ type: 'button' }
                     -# Encapsulate static class name `{{icon}}` inside #{} to bypass
                     -# haml lint's ClassAttributeWithStaticValue

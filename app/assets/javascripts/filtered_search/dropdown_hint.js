@@ -71,6 +71,7 @@ export default class DropdownHint extends FilteredSearchDropdown {
       hint: tokenKey.key,
       tag: `:${tokenKey.tag}`,
       type: tokenKey.type,
+      rowClass: tokenKey.rowClass,
     }));
 
     this.droplab.changeHookList(this.hookId, this.dropdown, [Filter], this.config);

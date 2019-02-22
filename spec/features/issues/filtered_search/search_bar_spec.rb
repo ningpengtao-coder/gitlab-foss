@@ -86,7 +86,7 @@ describe 'Search bar', :js do
       expect(find('#js-dropdown-hint')).to have_selector('.filter-dropdown .filter-dropdown-item', count: original_size)
     end
 
-    it 'resets the dropdown filters', :quarantine do
+    it 'resets the dropdown filters' do
       filtered_search.click
 
       hint_offset = get_left_style(find('#js-dropdown-hint')['style'])
@@ -100,7 +100,14 @@ describe 'Search bar', :js do
       find('.filtered-search-box .clear-search').click
       filtered_search.click
 
-      expect(find('#js-dropdown-hint')).to have_selector('.filter-dropdown .filter-dropdown-item', count: 6)
+      find('#js-dropdown-hint .filter-dropdown .filter-dropdown-item', match: :first)
+
+      expect(page).to have_selector('.author')
+      expect(page).to have_selector('.assignee')
+      expect(page).to have_selector('.milestone')
+      expect(page).to have_selector('.label')
+      expect(page).to have_selector('.my-reaction')
+      expect(page).to have_selector('.confidential')
       expect(get_left_style(find('#js-dropdown-hint')['style'])).to eq(hint_offset)
     end
   end

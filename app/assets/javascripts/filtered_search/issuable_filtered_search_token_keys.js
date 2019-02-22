@@ -8,6 +8,7 @@ export const tokenKeys = [
     symbol: '@',
     icon: 'pencil',
     tag: '@author',
+    rowClass: 'author',
   },
   {
     key: 'assignee',
@@ -16,6 +17,7 @@ export const tokenKeys = [
     symbol: '@',
     icon: 'user',
     tag: '@assignee',
+    rowClass: 'assignee',
   },
   {
     key: 'milestone',
@@ -24,6 +26,7 @@ export const tokenKeys = [
     symbol: '%',
     icon: 'clock',
     tag: '%milestone',
+    rowClass: 'milestone',
   },
   {
     key: 'label',
@@ -32,6 +35,7 @@ export const tokenKeys = [
     symbol: '~',
     icon: 'labels',
     tag: '~label',
+    rowClass: 'label',
   },
 ];
 
@@ -44,6 +48,7 @@ if (gon.current_user_id) {
     symbol: '',
     icon: 'thumb-up',
     tag: 'emoji',
+    rowClass: 'my-reaction',
   });
 }
 
