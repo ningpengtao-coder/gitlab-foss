@@ -38,6 +38,7 @@ storage2:
 > mount point and the GitLab user should have correct permissions for the parent
 > directory of the path. In Omnibus GitLab this is taken care of automatically,
 > but for source installations you should be extra careful.
+> but for source installations you should be extra careful.
 >
 > The thing is that for compatibility reasons `gitlab.yml` has a different
 > structure than Omnibus. In `gitlab.yml` you indicate the path for the
@@ -61,6 +62,8 @@ Now that you've read that big fat warning above, let's edit the configuration
 files and add the full paths of the alternative repository storage paths. In
 the example below, we add two more mountpoints that are named `nfs` and `cephfs`
 respectively.
+
+NOTE: **Note:** This example uses NFS and CephFS. We do not recommend using EFS for storage as it may impact GitLab's performance. See the [relevant documentation](./high_availability/nfs.md#avoid-using-awss-elastic-file-system-efs) for more details.
 
 **For installations from source**
 
