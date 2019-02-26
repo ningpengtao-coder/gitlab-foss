@@ -8,6 +8,8 @@ import fileUpload from '~/lib/utils/file_upload';
 import setupToggleButtons from '~/toggle_buttons';
 
 let hasUserDefinedProjectPath = false;
+const ACCESS_LEVEL_OPTIONS_PRIVATE = [[0, 'Enable feature to choose access level']];
+const ACCESS_LEVEL_OPTIONS_PUBLIC = [[10, 'Only Project Members'], [20, 'Everyone With Access']];
 
 const deriveProjectPathFromUrl = $projectImportUrl => {
   const $currentProjectPath = $projectImportUrl
@@ -52,9 +54,6 @@ const initLicenseField = field => {
   return new LicenseSelector({ mediator: newProjectFileMediator }).show();
 };
 
-const ACCESS_LEVEL_OPTIONS_PRIVATE = [[0, 'Enable feature to choose access level']];
-const ACCESS_LEVEL_OPTIONS_PUBLIC = [[10, 'Only Project Members'], [20, 'Everyone With Access']];
-
 const getAccessLevelOptionsForFeature = (featureEnabled = false) =>
   featureEnabled ? ACCESS_LEVEL_OPTIONS_PUBLIC : ACCESS_LEVEL_OPTIONS_PRIVATE;
 
@@ -75,7 +74,7 @@ function updateFeatureVisibilityOptions(
 
   const accessLevelOptions = getAccessLevelOptionsForFeature(featureEnabled);
   const computedSelectedIndex = accessLevelOptions.findIndex(
-    opt => opt[0] === projectVisibilityLevel,
+    opt => Number(opt[0]) === Number(projectVisibilityLevel),
   );
   const selectedIndex = computedSelectedIndex > -1 ? computedSelectedIndex : 0;
 
@@ -95,10 +94,9 @@ function onToggleFeatureSetting(featureEnabled, toggle) {
   $(toggle).attr('aria-label', featureEnabled ? 'Toggle Status: ON' : 'Toggle Status: OFF');
 }
 
-function onProjectVisitbilityChange(featuresSelectors) {
+function onProjectVisitbilityChange(featureSelectors) {
   const projectVisibilityLevel = getProjectVisibilityLevel();
-
-  featuresSelectors.forEach(context => {
+  featureSelectors.forEach(context => {
     const featureEnabled = parseBoolean(
       context.querySelector('.js-project-feature-toggle-input').getAttribute('value'),
     );
@@ -301,9 +299,7 @@ const bindEvents = () => {
     hasUserDefinedProjectPath = $projectPath.val().trim().length > 0;
   });
 
-  $projectVisibilityLevel.on('change', onProjectVisitbilityChange($projectFeatures));
-
-  // select all the hidden fields
+  $projectVisibilityLevel.on('change', () => onProjectVisitbilityChange($projectFeatures));
 
   initSettingsPanels({
     expandedText: 'Hide avatar, license and features settings',
