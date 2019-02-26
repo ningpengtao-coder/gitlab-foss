@@ -38,7 +38,6 @@ storage2:
 > mount point and the GitLab user should have correct permissions for the parent
 > directory of the path. In Omnibus GitLab this is taken care of automatically,
 > but for source installations you should be extra careful.
-> but for source installations you should be extra careful.
 >
 > The thing is that for compatibility reasons `gitlab.yml` has a different
 > structure than Omnibus. In `gitlab.yml` you indicate the path for the
