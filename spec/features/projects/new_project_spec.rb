@@ -56,7 +56,7 @@ describe 'New project' do
       find('.js-settings-toggle')
     end
 
-    it 'will hide the extra settings when i click the show / hide toggle' do 
+    it 'will hide the extra settings when i click the show / hide toggle' do
       find_button('Hide avatar, license and features settings').click
       expect(page).not_to have_content('Project description')
       expect(page).not_to have_content('Project avatar')
@@ -65,7 +65,7 @@ describe 'New project' do
       expect(page).not_to have_content('Lightweight issue tracking system for this project')
       expect(page).not_to have_content('View and edit files in this project')
       expect(page).not_to have_content('Pages for project documentation')
-      expect(page).not_to have_content('Share code pastes with others out of Git repository')      
+      expect(page).not_to have_content('Share code pastes with others out of Git repository')
       expect(page).not_to have_css('.settings.expanded')
     end
   end
@@ -126,12 +126,12 @@ describe 'New project' do
   context 'Feature settings', :js do
     context 'with private visibility' do
       before do
-        visit new_project_path            
+        visit new_project_path
         choose("Private")
-        expect(find_field("project[visibility_level]", checked: true).value.to_i).to eq(Gitlab::VisibilityLevel::PRIVATE)          
+        expect(find_field("project[visibility_level]", checked: true).value.to_i).to eq(Gitlab::VisibilityLevel::PRIVATE)
 
         page.all('.project-feature-controls').each do |el|
-          el.find('.project-feature-toggle').click()
+          el.find('.project-feature-toggle').click
         end
       end
 
@@ -146,23 +146,21 @@ describe 'New project' do
           expect(el.find('.project-repo-select', visible: false).value.to_i).to eq(Gitlab::VisibilityLevel::INTERNAL)
         end
       end
-      
-      # TODO: This is failing, fix the js
-      it 'sets each feature select to "Only project members" when the feature is enabled' do      
+
+      it 'sets each feature select to "Only project members" when the feature is enabled' do
         page.all('.project-feature-controls').each do |el|
           expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Only Project Members')
         end
       end
 
-
       context 'with each feature enabled' do
         before do
-          visit new_project_path         
+          visit new_project_path
           choose("Private")
 
-          page.all('.project-feature-controls').each do |el|        
-            el.find('.project-feature-toggle').click()          
-          end          
+          page.all('.project-feature-controls').each do |el|
+            el.find('.project-feature-toggle').click
+          end
         end
 
         it 'switching to internal' do
@@ -181,13 +179,13 @@ describe 'New project' do
             expect(el.find('.project-repo-select', visible: false).value.to_i).to eq(Gitlab::VisibilityLevel::PUBLIC)
             expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Everyone With Access')
           end
-        end      
-      end      
+        end
+      end
     end
 
     context 'with internal visibility' do
       before do
-        visit new_project_path  
+        visit new_project_path
 
         choose("Internal")
         expect(find_field("project[visibility_level]", checked: true).value.to_i).to eq(Gitlab::VisibilityLevel::INTERNAL)
@@ -195,31 +193,31 @@ describe 'New project' do
 
       it 'enables feature select boxes when the feature is also enabled' do
         page.all('.project-feature-controls').each do |el|
-          el.find('.project-feature-toggle').click()
+          el.find('.project-feature-toggle').click
           expect(el.find('.project-repo-select')).not_to be_disabled
         end
       end
 
       it 'defaults each feature select to "Only Project Members" when enabled' do
         page.all('.project-feature-controls').each do |el|
-          el.find('.project-feature-toggle').click()
+          el.find('.project-feature-toggle').click
           expect(el.find('.project-repo-select', visible: false).value.to_i).to eq(Gitlab::VisibilityLevel::INTERNAL)
-          expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Only Project Members') 
+          expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Only Project Members')
         end
       end
 
       context 'with each feature enabled' do
         before do
-          visit new_project_path         
+          visit new_project_path
 
-          choose('Internal')     
-          page.all('.project-feature-controls').each do |el|        
-            el.find('.project-feature-toggle').click()          
+          choose('Internal')
+          page.all('.project-feature-controls').each do |el|
+            el.find('.project-feature-toggle').click
             expect(el.find('.project-repo-select')).not_to be_disabled
             expect(el.find('.project-repo-select', visible: false).value.to_i).to eq(Gitlab::VisibilityLevel::INTERNAL)
             expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Only Project Members')
           end
-        end 
+        end
 
         it 'switching to private' do
           choose("Private")
@@ -238,46 +236,45 @@ describe 'New project' do
             expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Everyone With Access')
           end
         end
-      end      
+      end
     end
 
     context 'with public visibility' do
       before do
-        visit new_project_path         
+        visit new_project_path
 
-        choose('Public')   
+        choose('Public')
         expect(find_field("project[visibility_level]", checked: true).value.to_i).to eq(Gitlab::VisibilityLevel::PUBLIC)
       end
 
       it 'enables feature select boxes when the feature is also enabled' do
         page.all('.project-feature-controls').each do |el|
-          el.find('.project-feature-toggle').click()
+          el.find('.project-feature-toggle').click
           expect(el.find('.project-repo-select')).not_to be_disabled
         end
       end
 
       it 'defaults each feature select to "Everyone with access" when enabled' do
         page.all('.project-feature-controls').each do |el|
-          el.find('.project-feature-toggle').click()
+          el.find('.project-feature-toggle').click
           expect(el.find('.project-repo-select', visible: false).value.to_i).to eq(Gitlab::VisibilityLevel::PUBLIC)
-          expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Everyone With Access') 
+          expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Everyone With Access')
         end
       end
 
-
       context 'with each feature enabled' do
         before do
-          visit new_project_path         
+          visit new_project_path
 
           choose('Public')
           page.all('.project-feature-controls').each do |el|
-            el.find('.project-feature-toggle').click()          
+            el.find('.project-feature-toggle').click
             expect(el.find('.project-repo-select')).not_to be_disabled
             expect(el.find('.project-repo-select', visible: false).value.to_i).to eq(Gitlab::VisibilityLevel::PUBLIC)
             expect(el.find('.project-repo-select').find('option[selected]').text).to eq('Everyone With Access')
-          end   
-        end          
-        
+          end
+        end
+
         it 'switching to internal' do
           choose("Internal")
           page.all('.project-feature-controls').each do |el|
@@ -287,7 +284,7 @@ describe 'New project' do
           end
         end
 
-        it 'switching to private' do          
+        it 'switching to private' do
           choose("Private")
           page.all('.project-feature-controls').each do |el|
             expect(el.find('.project-repo-select')).to be_disabled
@@ -295,7 +292,7 @@ describe 'New project' do
             expect(el.find('.project-repo-select').find('option[selected]', visible: false).text).to eq('Only Project Members')
           end
         end
-      end 
+      end
     end
   end
 
@@ -312,7 +309,7 @@ describe 'New project' do
       find('#create-from-template-pane').click
       first('.choose-template').click
 
-      page.within '.project-fields-form' do 
+      page.within '.project-fields-form' do
         expect(page).not_to have_css('input#project_initialize_with_readme')
         expect(page).not_to have_content('Initialize repository with a README')
       end
