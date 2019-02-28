@@ -118,7 +118,7 @@ module Gitlab
       # mod  - The module containing the method.
       # name - The name of the method to instrument.
       def self.instrument(type, mod, name)
-        return unless ::Gitlab::Metrics.enabled?
+        return unless ::Gitlab::Metrics.enabled? or ::Gitlab::Tracing.enabled?
 
         name = name.to_sym
         target = type == :instance ? mod : mod.singleton_class
@@ -132,8 +132,7 @@ module Gitlab
           method_name = ".#{name}"
           method = mod.method(name)
         end
-
-        label = "#{mod.name}#{method_name}"
+        method_label = "#{mod.name}#{method_name}"
 
         unless instrumented?(target)
           target.instance_variable_set(PROXY_IVAR, Module.new)
@@ -154,18 +153,45 @@ module Gitlab
             '*args'
           end
 
+        method_body = if ::Gitlab::Metrics.enabled?
+          measure_eval(method_label, mod, method_name)
+        else
+          "super"
+        end
+
+        if ::Gitlab::Tracing.enabled?
+          method_body = trace_eval(method_label, method_body)
+        end
+
         proxy_module.class_eval <<-EOF, __FILE__, __LINE__ + 1
           def #{name}(#{args_signature})
-            if trans = Gitlab::Metrics::Instrumentation.transaction
-              trans.method_call_for(#{label.to_sym.inspect}, #{mod.name.inspect}, "#{method_name}")
-                .measure { super }
-            else
-              super
-            end
+            #{method_body}
           end
         EOF
 
         target.prepend(proxy_module)
+      end
+
+      def self.trace_eval(method_label, inner)
+        <<-EOF
+        retval = nil
+        OpenTracing.start_active_span("#{method_label}", { tags: {}}) do |scope|
+          retval = #{inner}
+        end
+
+        retval
+        EOF
+      end
+
+      def self.measure_eval(method_label, mod, method_name)
+        <<-EOF
+        if trans = Gitlab::Metrics::Instrumentation.transaction
+          trans.method_call_for(#{method_label.to_sym.inspect}, #{mod.name.inspect}, "#{method_name}")
+            .measure { super }
+        else
+          super
+        end
+        EOF
       end
 
       # Small layer of indirection to make it easier to stub out the current
