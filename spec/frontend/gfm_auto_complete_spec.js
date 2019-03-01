@@ -9,6 +9,8 @@ import 'vendor/jquery.atwho';
 import { TEST_HOST } from 'helpers/test_constants';
 import labelsFixture from 'fixtures/autocomplete_sources/labels.json'; // eslint-disable-line import/no-unresolved
 
+const JEST_TIMEOUT = 500;
+
 describe('GfmAutoComplete', () => {
   const gfmAutoCompleteCallbacks = GfmAutoComplete.prototype.getDefaultCallbacks.call({
     fetchData: () => {},
@@ -340,4 +342,4 @@ describe('GfmAutoComplete', () => {
       `('$input shows $output.length labels', expectLabels);
     });
   });
-});
+}, JEST_TIMEOUT);
