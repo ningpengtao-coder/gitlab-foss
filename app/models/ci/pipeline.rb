@@ -676,6 +676,10 @@ module Ci
         end
     end
 
+    def first_merge_request
+      all_merge_requests.first
+    end
+
     def detailed_status(current_user)
       Gitlab::Ci::Status::Pipeline::Factory
         .new(self, current_user)

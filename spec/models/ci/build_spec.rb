@@ -1630,7 +1630,7 @@ describe Ci::Build do
     end
   end
 
-  describe '#merge_request' do
+  describe '#first_merge_request' do
     def create_mr(build, pipeline, factory: :merge_request, created_at: Time.now)
       create(factory, source_project: pipeline.project,
                       target_project: pipeline.project,
@@ -1648,13 +1648,13 @@ describe Ci::Build do
       end
 
       it 'returns the single associated MR' do
-        expect(build.merge_request.id).to eq(@merge_request.id)
+        expect(build.first_merge_request.id).to eq(@merge_request.id)
       end
     end
 
     context 'when there is not a MR referencing the pipeline' do
       it 'returns nil' do
-        expect(build.merge_request).to be_nil
+        expect(build.first_merge_request).to be_nil
       end
     end
 
@@ -1671,7 +1671,7 @@ describe Ci::Build do
       end
 
       it 'returns the first MR' do
-        expect(build.merge_request.id).to eq(@merge_request.id)
+        expect(build.first_merge_request.id).to eq(@merge_request.id)
       end
     end
 
@@ -1687,7 +1687,7 @@ describe Ci::Build do
       end
 
       it 'returns the current MR' do
-        expect(@build2.merge_request.id).to eq(@merge_request.id)
+        expect(@build2.first_merge_request.id).to eq(@merge_request.id)
       end
     end
   end
