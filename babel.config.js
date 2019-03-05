@@ -16,6 +16,15 @@ const presets = [
 
 // include stage 3 proposals
 const plugins = [
+  [
+    '@babel/plugin-transform-runtime',
+    {
+      corejs: false,
+      helpers: false,
+      regenerator: true,
+      useESModules: false
+    }
+  ],
   '@babel/plugin-syntax-dynamic-import',
   '@babel/plugin-syntax-import-meta',
   '@babel/plugin-proposal-class-properties',

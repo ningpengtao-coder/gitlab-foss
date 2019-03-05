@@ -14,6 +14,7 @@ import { localTimeAgo } from './lib/utils/datetime_utility';
 import { getLocationHash, visitUrl } from './lib/utils/url_utility';
 
 // everything else
+import './component_wrappers';
 import loadAwardsHandler from './awards_handler';
 import bp from './breakpoints';
 import Flash, { removeFlashClickListener } from './flash';

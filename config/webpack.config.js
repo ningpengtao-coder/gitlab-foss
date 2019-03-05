@@ -110,7 +110,8 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        exclude: path => /node_modules|vendor[\\/]assets/.test(path) && !/\.vue\.js/.test(path),
+        // exclude: path => /node_modules|vendor[\\/]assets/.test(path) && !/\.vue\.js/.test(path),
+        exclude: path => /node_modules\/(?!(@webcomponents\/shadycss|lit-element|lit-html|@polymer|@vaadin|@lit))|vendor[\\/]assets/.test(path) && !/\.vue\.js/.test(path),
         loader: 'babel-loader',
         options: {
           cacheDirectory: path.join(CACHE_PATH, 'babel-loader'),
@@ -166,6 +167,7 @@ module.exports = {
       },
       {
         test: /.css$/,
+        exclude: /app\/assets\/javascripts\/component_wrappers/,
         use: [
           'vue-style-loader',
           {
@@ -175,6 +177,29 @@ module.exports = {
             },
           },
         ],
+      },
+      {
+        test: /\.css$/,
+        include: /app\/assets\/javascripts\/component_wrappers/,
+        use: [
+          {
+            loader: path.resolve('./config/loaders/lit-css.js')
+          },
+          'to-string-loader',
+          'css-loader',
+        ]
+      },
+      {
+        test: /\.scss$/,
+        include: /app\/assets\/javascripts\/component_wrappers/,
+        use: [
+          {
+            loader: path.resolve('./config/loaders/lit-css.js')
+          },
+          'to-string-loader',
+          'css-loader',
+          'sass-loader', // compiles Sass to CSS, using Node Sass by default
+        ]
       },
       {
         test: /\.(eot|ttf|woff|woff2)$/,
