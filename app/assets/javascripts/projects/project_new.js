@@ -47,7 +47,7 @@ const onProjectNameChange = ($projectNameInput, $projectPathInput) => {
 const initLicenseField = field => {
   const newProjectFileMediator = {
     selectTemplateFile: (_, query) => {
-      field.val(query);
+      field.setAttribute('value', query);
     },
   };
 
