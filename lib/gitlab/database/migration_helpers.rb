@@ -6,6 +6,10 @@ module Gitlab
       BACKGROUND_MIGRATION_BATCH_SIZE = 1000 # Number of rows to process per job
       BACKGROUND_MIGRATION_JOB_BUFFER_SIZE = 1000 # Number of jobs to bulk queue at a time
 
+      class PgClass < ActiveRecord::Base
+        self.table_name = 'pg_class'
+      end
+
       # Adds `created_at` and `updated_at` columns with timezone information.
       #
       # This method is an improved version of Rails' built-in method `add_timestamps`.
@@ -39,6 +43,25 @@ module Gitlab
         end
       end
 
+      # Check if the given index is INVALID (PostgreSQL only).
+      #
+      # Concurrent index creation may fail and leave behind indexes marked as INVALID.
+      def index_invalid?(table_name, column_name, options)
+        return false unless Database.postgresql?
+
+        column_names = Array(column_name).map(&:to_s)
+        index_name = options.key?(:name) ? options[:name].to_s : index_name(table_name, column: column_names)
+
+        invalid_indexes = PgClass.joins('JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace')
+          .joins('JOIN pg_catalog.pg_index ON pg_index.indexrelid = pg_class.oid')
+          .where('indisvalid = false OR indisready = false')
+          .where('pg_namespace.nspname': 'public')
+          .where(relname: index_name)
+          .count
+
+        invalid_indexes > 0
+      end
+
       # Creates a new index, concurrently when supported
       #
       # On PostgreSQL this method creates an index concurrently, on MySQL this
@@ -58,6 +81,13 @@ module Gitlab
 
         if Database.postgresql?
           options = options.merge({ algorithm: :concurrently })
+
+          # For PostgreSQL, concurrent index creation may fail and leave behind INVALID indexes
+          # from failed migrations. We must remove an invalid index before attempting
+          # to re-create it.
+          if index_invalid?(table_name, column_name, options)
+            remove_concurrent_index(table_name, column_name, options)
+          end
         end
 
         if index_exists?(table_name, column_name, options)
