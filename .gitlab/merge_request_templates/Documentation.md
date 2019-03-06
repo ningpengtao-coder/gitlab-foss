@@ -15,8 +15,15 @@
 ## Author's checklist
 
 - [ ] Follow the [Documentation Guidelines](https://docs.gitlab.com/ee/development/documentation/) and [Style Guide](https://docs.gitlab.com/ee/development/documentation/styleguide.html).
-- [ ] Link docs to and from the higher-level index page, plus other related docs where helpful.
-- [ ] Apply the ~Documentation label.
+- [ ] Link the document from the higher-level index page.
+- [ ] Link other related docs where helpful.
+- [ ] Add the [product badges](https://docs.gitlab.com/ee/development/documentation/styleguide.html#product-badges) when applicable.
+- [ ] Add the [GitLab version and tier](https://docs.gitlab.com/ee/development/documentation/styleguide.html#gitlab-versions-and-tiers) the feature was introduced in.
+- [ ] Submit the [EE-equivalent MR](https://docs.gitlab.com/ee/development/documentation/#cherry-picking-from-ce-to-ee) (required if `ee-compat-check` job fails).
+- [ ] If the feature is moving tiers, make sure the change is also reflected in [`features.yml`](https://gitlab.com/gitlab-com/www-gitlab-com/blob/master/data/features.yml).
+- [ ] Set the realease milestone.
+- [ ] Apply the DevOps stages and feature labels to the MR.
+- [ ] Apply the label "Pick into X.Y" and ~"missed\-deliverable" to the MR if the feature freeze date has passed.
 
 ## Review checklist
 
@@ -33,7 +40,7 @@ All reviewers can help ensure accuracy, clarity, completeness, and adherence to 
 **3. Maintainer**
 
 1. [ ] Review by assigned maintainer, who can always request/require the above reviews. Maintainer's review can occur before or after a technical writer review.
-1. [ ] Ensure a release milestone is set and that you merge the equivalent EE MR before the CE MR if both exist.
+1. [ ] Merge the equivalent EE MR before the CE MR if both exist.
 1. [ ] If there has not been a technical writer review, [create an issue for one using the Doc Review template](https://gitlab.com/gitlab-org/gitlab-ce/issues/new?issuable_template=Doc%20Review).
 
 /label ~Documentation
