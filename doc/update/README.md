@@ -136,6 +136,149 @@ If you need to downgrade your Enterprise Edition installation back to Community
 Edition, you can follow [this guide][ee-ce] to make the process as smooth as
 possible.
 
+## Migrating data between projects and GitLab instances
+
+### Bulk migrate projects fron one self-managed GiLab instance to another
+
+##### Requirements:
+
+* `ssh` access to both source and destination GitLab servers.
+* Source GitLab server has ability to `ssh` to the destination GitLab server.
+
+##### Grant SSH access from source GitLab server to the destination GitLab server:
+
+* Access GitLab source server and check a directory for the ssh key `ls ~/.ssh`, it should contain a file with extension `*.pub` if this file does not exist generate SSH hey in the source GitLab server by running `ssh-keygen -t rsa`
+
+* Copy ssh key from `cat ~/.ssh/id_rsa.pub`
+
+* Access GitLab destination server and add copied ssh key to the following file `vi ~/.ssh/authorized_keys`
+
+* Validate ssh access from the source GitLab server to the destination GitLab server `ssh root@<your_server_host>`
+
+
+##### Troubleshooting SSH access from source GitLab server to the destination GitLab server.
+
+* In case ssh access does not work, check whether you have to add ssh key to GitLab specific folders `/var/opt/gitlab/.ssh/` and `/var/opt/gitlab/.ssh/authorized_keys`
+
+##### Export Projects
+
+* Access source GitLab server's rails console `sudo gitlab-rails console` and run the below code snippet, be sure to change values `SERVER, KEY_FILE, SERVER_USERNAME` to your own:
+
+```ruby
+# Export
+
+SERVER = <your_server_host>
+KEY_FILE = <your_ssh_keyfile_path>
+SERVER_USERNAME = <username> 
+jobs = []
+user = User.find_by_username('your_username')
+projects = Project.all
+
+projects = Project.all
+
+projects.each do |p|
+    # p.add_export_job(current_user: user)
+    job_id = ProjectExportWorker.perform_async(user.id, p.id, {}, {})
+    jobs << job_id
+ end
+
+def check_job_status(ids)
+    if Gitlab::SidekiqStatus.running?(ids)
+        wait_and_check_again(ids)
+    end
+end
+
+def wait_and_check_again(ids)
+    puts "checking jobs status"
+    sleep(60)
+    check_job_status(ids)
+end
+
+check_job_status(jobs)
+
+exec("ssh #{SERVER_USERNAME}@#{SERVER} mkdir -p /tmp/exports && scp -pr /opt/gitlab/embedded/service/gitlab-rails/public/uploads/-/system/import_export_upload/export_file/* #{SERVER_USERNAME}@#{SERVER}:/tmp/exports")
+```
+
+* This should have exported all the projects to the following destination path `/opt/gitlab/embedded/service/gitlab-rails/public/uploads/-/system/import_export_upload/export_file/`
+* It should have transfered all the files to the destination GitLab server location `/tmp/exports`
+
+
+##### Import Projects
+
+* Access destination GitLab server's rails console `sudo gitlab-rails console` and run the below code snippet, be sure to change value `user` to your own:
+
+##### To import projects by entering names on project import:
+
+```ruby
+path_string = ''
+user = User.find_by_username('your_username')
+file_paths = Dir.glob('/tmp/exports/*').select { |fn| File.directory?(fn) }
+
+
+file_paths.each do |path|
+    path_string = Dir.glob(path + '/*')[0]
+    puts "Enter project name for #{path_string} : "
+    project_name = gets.chomp
+    project_params = {
+        :name => project_name,
+        :path => '',
+        :namespace_id => user.namespace_id,
+        :file => File.open(path_string)
+    }
+    @project = ::Projects::GitlabProjectsImportService.new(user, project_params).execute
+    puts @project.name
+end
+```
+
+##### To Import projects which name will be taken from the exported file name. Please note if project was nested in groups the new project name will not be correct:
+
+```ruby
+# Import
+
+path_string = ''
+user = User.find_by_username('your_username')
+file_paths = Dir.glob('/tmp/exports/*').select { |fn| File.directory?(fn) }
+
+def format_name(name)
+   final_name = ''
+   char_array = name.scan /\w/
+   name_array = ((char_array.drop(17))[0..-13]).join('').split("_")
+   name_array.delete_at(0)
+   name_array.each do |n|
+      final_name += n 
+      final_name += " "
+   end 
+   return final_name
+end
+
+file_paths.each do |path|
+    path_string = Dir.glob(path + '/*')[0]
+    project_params = {
+        :name => format_name(path_string.split('/')[4]),
+        :path => '',
+        :namespace_id => user.namespace_id,
+        :file => File.open(path_string)
+    }
+    @project = ::Projects::GitlabProjectsImportService.new(user, project_params).execute
+    puts @project.name
+end
+```
+
+* This will import all the projects in the `/tmp/exports/` directory
+
+### Bulk migrate issues from one project to another in the same instance 
+
+##### To access rails console run `sudo gitlab-rails console` on the GitLab server and run the below script. Please be sure to change **project**, **admin_user** and **target_project** to your values.
+
+```ruby
+project = Project.find_by_full_path('full path of the project where issues are moved from')
+issues = project.issues
+admin_user = User.find_by_username('username of admin user') # make sure user has permissions to move the issues
+   end
+end; nil
+
+``` 
+
 ## Miscellaneous
 
 - [MySQL to PostgreSQL](mysql_to_postgresql.md) guides you through migrating
