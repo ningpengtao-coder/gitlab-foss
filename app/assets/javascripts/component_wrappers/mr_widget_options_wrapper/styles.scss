@@ -1,0 +1,14 @@
+@import "../../../stylesheets/framework";
+@import "../../../stylesheets/pages/merge_requests";
+
+button,
+.btn {
+  background-color: blue;
+  color: White;
+}
+.btn-transparent {
+  background-color: transparent
+}
+a {
+  color: green;
+}

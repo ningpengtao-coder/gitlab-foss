@@ -131,6 +131,7 @@ export default {
     if (this.shouldRenderMergedPipeline) {
       this.initPostMergeDeploymentsPolling();
     }
+    this.notifyListeners();
   },
   beforeDestroy() {
     eventHub.$off('mr.discussion.updated', this.checkStatus);
@@ -142,6 +143,14 @@ export default {
     }
   },
   methods: {
+    notifyListeners() {
+      this.$nextTick(() => {
+        // Dispatch event in the old-fashioned way to support IE
+        const event = document.createEvent('Event');
+        event.initEvent('vueRenderingComplete', true, true);
+        this.$el.dispatchEvent(event);
+      });
+    },
     getServiceEndpoints(store) {
       return {
         mergePath: store.mergePath,
