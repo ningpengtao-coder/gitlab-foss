@@ -302,7 +302,7 @@ export default {
 </script>
 <template>
   <div class="mr-state-widget prepend-top-default">
-    <mr-widget-header :mr="mr" />
+    <mr-widget-header-wrapper><mr-widget-header :mr="mr"/></mr-widget-header-wrapper>
     <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"
       class="mr-widget-workflow"
