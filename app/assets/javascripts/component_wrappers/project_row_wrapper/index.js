@@ -1,15 +1,10 @@
-import { css } from 'lit-element';
 import Frank from '~/frankenstein_component';
+
+import styles from './styles.scss';
 
 class ProjectRowWrapper extends Frank {
   static get styles() {
-    return [
-      css`
-        :host {
-          display: block;
-        }
-      `,
-    ];
+    return [styles];
   }
 }
 // Register the element with the browser
