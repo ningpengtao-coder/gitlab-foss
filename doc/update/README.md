@@ -153,12 +153,7 @@ possible.
 
 * Access GitLab destination server and add copied ssh key to the following file `vi ~/.ssh/authorized_keys`
 
-* Validate ssh access from the source GitLab server to the destination GitLab server `ssh root@<your_server_host>`
-
-
-##### Troubleshooting SSH access from source GitLab server to the destination GitLab server.
-
-* In case ssh access does not work, check whether you have to add ssh key to GitLab specific folders `/var/opt/gitlab/.ssh/` and `/var/opt/gitlab/.ssh/authorized_keys`
+* Validate ssh access from the source GitLab server to the destination GitLab server `ssh <username>@<your_server_host>`
 
 ##### Export Projects
 
@@ -265,6 +260,10 @@ end
 ```
 
 * This will import all the projects in the `/tmp/exports/` directory
+
+##### Troubleshooting SSH access from source GitLab server to the destination GitLab server.
+
+* In case ssh access does not work, check whether you have to add ssh key to GitLab specific folders `/var/opt/gitlab/.ssh/` and `/var/opt/gitlab/.ssh/authorized_keys`
 
 ### Bulk migrate issues from one project to another in the same instance 
 
