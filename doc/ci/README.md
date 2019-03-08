@@ -61,6 +61,7 @@ into more features:
 | [Connecting GitLab with a Kubernetes cluster](../user/project/clusters/index.md)                       | Integrate one or more Kubernetes clusters to your project.                                                                   |
 | [ChatOps](chatops/README.md)                                                                           | Trigger CI jobs from chat, with results sent back to the channel.                                                            |
 | [Interactive web terminals](interactive_web_terminal/index.md)                                         | Open an interactive web terminal to debug the running jobs.                                                                  |
+| [Review Apps](review_apps/index.md)                                                                    | Configure GitLab CI/CD to preview code changes in a per-branch basis                                                         |
 
 ### GitLab Pages
 
