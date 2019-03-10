@@ -84,9 +84,6 @@ class Project < ActiveRecord::Base
   default_value_for :wiki_enabled, gitlab_config_features.wiki
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
-  default_value_for :forking_access_level,
-                    { value: Gitlab::ForkingAccessLevel::ALLOW_FORKS,
-                      allows_nil: false }
 
   add_authentication_token_field :runners_token, encrypted: true, migrating: true
 
@@ -236,6 +233,7 @@ class Project < ActiveRecord::Base
   has_many :internal_ids
 
   has_one :import_data, class_name: 'ProjectImportData', inverse_of: :project, autosave: true
+  has_one :project_setting
   has_one :project_feature, inverse_of: :project
   has_one :statistics, class_name: 'ProjectStatistics'
 
@@ -292,6 +290,7 @@ class Project < ActiveRecord::Base
 
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
+  accepts_nested_attributes_for :project_setting, update_only: true
   accepts_nested_attributes_for :import_data
   accepts_nested_attributes_for :auto_devops, update_only: true
 
@@ -310,6 +309,7 @@ class Project < ActiveRecord::Base
   delegate :group_clusters_enabled?, to: :group, allow_nil: true
   delegate :root_ancestor, to: :namespace, allow_nil: true
   delegate :last_pipeline, to: :commit, allow_nil: true
+  delegate :forking_access_level, to: :project_setting, allow_nil: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -590,6 +590,10 @@ class Project < ActiveRecord::Base
     def group_ids
       joins(:namespace).where(namespaces: { type: 'Group' }).select(:namespace_id)
     end
+  end
+
+  def project_setting
+    super.presence || build_project_setting
   end
 
   def all_pipelines

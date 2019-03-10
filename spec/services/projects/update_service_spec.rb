@@ -99,10 +99,16 @@ describe Projects::UpdateService do
       end
 
       context 'when parent project allow private forks only' do
-        let(:project) { create(:project, :public, forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY) }
+        let(:project) { create(:project, :public) }
         let(:forked_project) { fork_project(project) }
 
         subject { update_project(forked_project, admin, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
+
+        before do
+          create(:project_setting,
+                 { project: project,
+                   forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY })
+        end
 
         context 'updating visibility_level of the forked project to public' do
           it 'fails' do
@@ -119,7 +125,10 @@ describe Projects::UpdateService do
     context 'when changing forking access level' do
       let(:forking_access_level) { Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY }
 
-      subject { update_project(project, user, forking_access_level: forking_access_level) }
+      subject do
+        update_project(project, user,
+                       project_setting_attributes: { forking_access_level: forking_access_level } )
+      end
 
       context 'updating forking_access_level to PRIVATE_FORKS_ONLY' do
         it 'succeeds' do

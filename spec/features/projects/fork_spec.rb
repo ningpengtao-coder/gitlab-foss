@@ -27,8 +27,9 @@ describe 'Project fork' do
 
   context 'forking_access_level' do
     before do
-      project.forking_access_level = forking_access_level
-      project.save
+      create(:project_setting,
+             { project: project,
+               forking_access_level: forking_access_level })
     end
 
     context 'forking is enabled' do

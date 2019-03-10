@@ -2278,8 +2278,9 @@ describe API::Projects do
 
     context 'forking disabled' do
       before do
-        project.forking_access_level = Gitlab::ForkingAccessLevel::NO_FORKS
-        project.save
+        create(:project_setting,
+               { project: project,
+                 forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS })
       end
 
       it 'denies project to be forked' do

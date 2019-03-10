@@ -173,8 +173,10 @@ describe Projects::ForkService do
       context 'forking access level' do
         context 'when forking is not limited' do
           before do
-            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC,
-                                 forking_access_level: Gitlab::ForkingAccessLevel::ALLOW_FORKS)
+            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            create(:project_setting,
+                   { project: @from_project,
+                     forking_access_level: Gitlab::ForkingAccessLevel::ALLOW_FORKS })
           end
 
           it 'creates fork with public visibility levels' do
@@ -186,8 +188,10 @@ describe Projects::ForkService do
 
         context 'when forking is limited to private forks' do
           before do
-            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC,
-                                 forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY)
+            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            create(:project_setting,
+                   { project: @from_project,
+                     forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY })
           end
 
           it 'creates fork with private visibility levels' do
@@ -199,7 +203,9 @@ describe Projects::ForkService do
 
         context 'when forking is disabled' do
           before do
-            @from_project.update(forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS)
+            create(:project_setting,
+                   { project: @from_project,
+                     forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS })
           end
 
           it 'fails' do

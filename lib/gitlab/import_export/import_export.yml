@@ -69,6 +69,7 @@ project_tree:
   - protected_tags:
     - :create_access_levels
   - :project_feature
+  - :project_setting
   - :custom_attributes
   - :prometheus_metrics
   - :project_badges
@@ -117,7 +118,6 @@ excluded_attributes:
     - :description_html
     - :repository_languages
     - :bfg_object_map
-    - :forking_access_level
   namespaces:
     - :runners_token
     - :runners_token_encrypted

@@ -1667,6 +1667,14 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.index ["shard_id"], name: "index_project_repositories_on_shard_id", using: :btree
   end
 
+  create_table "project_settings", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "forking_access_level", limit: 2, default: 30, null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["project_id"], name: "index_project_settings_on_project_id", unique: true, using: :btree
+  end
+
   create_table "project_statistics", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "namespace_id", null: false
@@ -1734,7 +1742,6 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.bigint "pool_repository_id"
     t.string "runners_token_encrypted"
     t.string "bfg_object_map"
-    t.integer "forking_access_level"
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree
@@ -2492,6 +2499,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
   add_foreign_key "project_mirror_data", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
+  add_foreign_key "project_settings", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify
   add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade

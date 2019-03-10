@@ -15,8 +15,9 @@ describe Projects::ForksController do
       before do
         sign_in(user)
 
-        project.forking_access_level = Gitlab::ForkingAccessLevel::NO_FORKS
-        project.save
+        create(:project_setting,
+               { project: project,
+                 forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS })
       end
 
       it 'renders 403' do

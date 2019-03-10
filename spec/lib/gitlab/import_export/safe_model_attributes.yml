@@ -509,6 +509,12 @@ ProjectFeature:
 - pages_access_level
 - created_at
 - updated_at
+ProjectSetting:
+- id
+- project_id
+- forking_access_level
+- created_at
+- updated_at
 ProtectedBranch::MergeAccessLevel:
 - id
 - protected_branch_id
