@@ -7259,6 +7259,9 @@ msgstr ""
 msgid "Pages Domains"
 msgstr ""
 
+msgid "Pages for project documentation"
+msgstr ""
+
 msgid "Pages getting started guide"
 msgstr ""
 
@@ -8175,6 +8178,9 @@ msgid "Project cannot be shared with the group it is in or one of its ancestors.
 msgstr ""
 
 msgid "Project configuration, including services"
+msgstr ""
+
+msgid "Project description (optional)"
 msgstr ""
 
 msgid "Project description (optional)"
@@ -9541,6 +9547,9 @@ msgid "Settings"
 msgstr ""
 
 msgid "Share"
+msgstr ""
+
+msgid "Share code pastes with others out of Git repository"
 msgstr ""
 
 msgid "Shared Runners"
@@ -11862,6 +11871,9 @@ msgid "Verified"
 msgstr ""
 
 msgid "Version"
+msgstr ""
+
+msgid "View and edit files in this project"
 msgstr ""
 
 msgid "View app"
