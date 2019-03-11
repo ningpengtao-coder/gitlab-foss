@@ -116,28 +116,40 @@ describe Projects::UpdateService do
           end
 
           it 'does not update the project' do
-            expect {subject}.not_to change(forked_project, :visibility_level)
+            expect { subject }.not_to change(forked_project, :visibility_level)
           end
         end
       end
     end
 
     context 'when changing forking access level' do
-      let(:forking_access_level) { Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY }
+      shared_examples 'valid forking_access_level change' do
+        subject do
+          update_project(project, user,
+                         project_setting_attributes: { forking_access_level: forking_access_level } )
+        end
 
-      subject do
-        update_project(project, user,
-                       project_setting_attributes: { forking_access_level: forking_access_level } )
+        context 'updating forking_access_level' do
+          it 'succeeds' do
+            expect(subject).to eq({ status: :success })
+          end
+
+          it 'updates the project' do
+            expect { subject }.to change(project, :forking_access_level).to(forking_access_level)
+          end
+        end
       end
 
-      context 'updating forking_access_level to PRIVATE_FORKS_ONLY' do
-        it 'succeeds' do
-          expect(subject).to eq({ status: :success })
-        end
+      context 'to allow private forks only' do
+        let(:forking_access_level) { Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY }
 
-        it 'updates the project' do
-          expect {subject}.to change(project, :forking_access_level).to(forking_access_level)
-        end
+        it_behaves_like 'valid forking_access_level change'
+      end
+
+      context 'to disable forking' do
+        let(:forking_access_level) { Gitlab::ForkingAccessLevel::NO_FORKS }
+
+        it_behaves_like 'valid forking_access_level change'
       end
     end
 

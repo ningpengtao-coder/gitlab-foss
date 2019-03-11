@@ -53,10 +53,10 @@ describe 'Project fork' do
     context 'forking is disabled' do
       let(:forking_access_level) { Gitlab::ForkingAccessLevel::NO_FORKS }
 
-      it 'disables fork button' do
+      it 'does not render fork button' do
         visit project_path(project)
 
-        expect(page).to have_css('a.disabled', text: 'Fork')
+        expect(page).not_to have_css('a', text: 'Fork')
       end
 
       it 'does not render new project fork page' do

@@ -70,6 +70,6 @@ class Projects::ForksController < Projects::ApplicationController
   end
 
   def check_forking_availability
-    access_denied!(message: _('Forking is disabled for this project.')) unless @project.forking_allowed?
+    access_denied!(_('Forking is disabled for this project.')) unless @project.forking_allowed?
   end
 end

@@ -13,7 +13,7 @@ module Projects
     private
 
     def allowed_fork?
-      current_user.can?(:fork_project, @project) && @project.forking_allowed?
+      current_user.can?(:fork_project, @project)
     end
 
     def link_existing_project(fork_to_project)
@@ -107,11 +107,13 @@ module Projects
     end
 
     def allowed_visibility_level
+      candidate_levels = [@project.visibility_level, target_namespace.visibility_level]
+
       if @project.forking_access_level == Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY
-        return Gitlab::VisibilityLevel::PRIVATE
+        candidate_levels << Gitlab::VisibilityLevel::PRIVATE
       end
 
-      target_level = [@project.visibility_level, target_namespace.visibility_level].min
+      target_level = candidate_levels.min
 
       Gitlab::VisibilityLevel.closest_allowed_level(target_level)
     end
