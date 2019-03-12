@@ -48,7 +48,7 @@ into more features:
 | [Introduction to pipelines and jobs](pipelines.md)                                                     | Provides an overview of GitLab CI/CD and jobs.                                                                               |
 | [CI/CD Variables](variables/README.md)                                                                 | How environment variables can be configured and made available in pipelines.                                                 |
 | [Where variables can be used](variables/where_variables_can_be_used.md)                                | A deeper look into where and how CI/CD variables can be used.                                                                |
-| [User](../user/permissions.md#gitlab-cicd-permissions) and [job](../user/permissions.md#job-permissions) permissions | Learn about the access levels a user can have for performing certain CI actions.                               |
+| [User](../user/permissions.md#gitlab-cicd-permissions) and [job](../user/permissions.md#job-permissions) permissions | Learn about the access levels a user can have for performing certain CI actions.                                             |
 | [Configuring GitLab Runners](runners/README.md)                                                        | Documentation for configuring [GitLab Runner](https://docs.gitlab.com/runner/).                                              |
 | [Introduction to environments and deployments](environments.md)                                        | Learn how to separate your jobs into environments and use them for different purposes like testing, building and, deploying. |
 | [Job artifacts](../user/project/pipelines/job_artifacts.md)                                            | Learn about the output of jobs.                                                                                              |
@@ -61,6 +61,10 @@ into more features:
 | [Connecting GitLab with a Kubernetes cluster](../user/project/clusters/index.md)                       | Integrate one or more Kubernetes clusters to your project.                                                                   |
 | [ChatOps](chatops/README.md)                                                                           | Trigger CI jobs from chat, with results sent back to the channel.                                                            |
 | [Interactive web terminals](interactive_web_terminal/index.md)                                         | Open an interactive web terminal to debug the running jobs.                                                                  |
+| [Review Apps](review_apps/index.md)                                                                    | Configure GitLab CI/CD to preview code changes in a per-branch basis.                                                        |
+| [Deploy Boards](../user/project/deploy_boards.md) **[PREMIUM]**                                        | Check the current health and status of each CI/CD environment running on Kubernetes.                                         |
+| [GitLab CI/CD for external repositories](ci_cd_for_external_repos/index.md) **[PREMIUM]**              | Get the benefits of GitLab CI/CD combined with repositories in GitHub and BitBucket Cloud.                                   |
+| [Protected environments](environments/protected_environments.md) **[PREMIUM]**                         | Ensure that only people with the right privileges can deploy to an environment.                                              |
 
 ### GitLab Pages
 

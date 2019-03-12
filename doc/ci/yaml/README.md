@@ -19,7 +19,7 @@ We have complete examples of configuring pipelines:
 - To see a large `.gitlab-ci.yml` file used in an enterprise, see the [`.gitlab-ci.yml` file for `gitlab-ce`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab-ci.yml).
 
 NOTE: **Note:**
-If you have a [mirrored repository where GitLab pulls from](https://docs.gitlab.com/ee/workflow/repository_mirroring.html#pulling-from-a-remote-repository-starter),
+If you have a [mirrored repository where GitLab pulls from](../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter),
 you may need to enable pipeline triggering in your project's
 **Settings > Repository > Pull from a remote repository > Trigger pipelines for mirror updates**.
 
@@ -56,7 +56,7 @@ independently from each other.
 
 Each instance of GitLab CI has an embedded debug tool called Lint, which validates the
 content of your `.gitlab-ci.yml` files. You can find the Lint under the page `ci/lint` of your
-project namespace. For example, `http://gitlab.example.com/gitlab-org/project-123/-/ci/lint`.
+project namespace. For example, `https://gitlab.example.com/gitlab-org/project-123/-/ci/lint`.
 
 ### Unavailable names for jobs
 
@@ -1632,7 +1632,7 @@ test:
 from `trigger` definition is started by GitLab, a downstream pipeline gets
 created.
 
-Learn more about [multi-project pipelines](https://docs.gitlab.com/ee/ci/multi_project_pipelines.html#creating-cross-project-pipelines-from-gitlab-ci-yml).
+Learn more about [multi-project pipelines](../multi_project_pipelines.md#creating-cross-project-pipelines-from-gitlab-ci-yml).
 
 #### Simple `trigger` syntax
 

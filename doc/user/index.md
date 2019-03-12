@@ -64,6 +64,7 @@ With GitLab Enterprise Edition, you can also:
 - [Lock files](https://docs.gitlab.com/ee/user/project/file_lock.html) to prevent conflicts
 - View the current health and status of each CI environment running on Kubernetes with [Deploy Boards](https://docs.gitlab.com/ee/user/project/deploy_boards.html)
 - Leverage continuous delivery method with [Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html)
+- Scan your code for vulnerabilities and [display them in merge requests](project/merge_requests/sast.md).
 
 You can also [integrate](project/integrations/project_services.md) GitLab with
 numerous third-party applications, such as Mattermost, Microsoft Teams, Trello,
@@ -173,3 +174,8 @@ Learn what is [Git](../topics/git/index.md) and its best practices.
 ## Instance statistics
 
 See [various statistics](instance_statistics/index.md) of your GitLab instance.
+
+## Operations Dashboard
+
+See [Operations Dashboard](operations_dashboard/index.md) for a summary of each
+project's operational health.

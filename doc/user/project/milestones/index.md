@@ -83,7 +83,12 @@ From the project issue/merge request list pages and the group issue/merge reques
 
 ### Filtering in issue boards
 
-From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [search and filter bar](../../search/index.md#issue-boards).
+- From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [search and filter bar](../../search/index.md#issue-boards).
+- From [group issue boards](../issue_board.md#group-issue-boards), you can filter by only group milestones in the [search and filter bar](../../search/index.md#issue-boards). **[PREMIUM]**
+- From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [issue board configuration](../issue_board.md#board-with-configuration). **[STARTER]**
+- From [group issue boards](../issue_board.md#group-issue-boards) you can filter by only group milestones in the [issue board configuration](../issue_board.md#board-with-configuration). **[PREMIUM]**
+
+
 
 ### Special milestone filters
 
@@ -108,6 +113,7 @@ Not all features in the project milestone view are available in the group milest
 | Start date and due date | ✓ | ✓ |
 | Total issue time spent | ✓ | ✓ |
 | Total issue weight | ✓ |  |
+| Burndown chart | ✓ | ✓ |
 
 The milestone view shows the title and description.
 
@@ -118,6 +124,17 @@ These features are only available for project milestones and not group milestone
 - Issues assigned to the milestone are displayed in three columns: Unstarted issues, ongoing issues, and completed issues.
 - Merge requests assigned to the milestone are displayed in four columns: Work in progress merge requests, waiting for merge, rejected, and closed.
 - Participants and labels that are used in issues and merge requests that have the milestone assigned are displayed.
+- [Burndown chart](#project-burndown-charts-starter).
+
+### Project Burndown Charts **[STARTER]**
+
+For project milestones in [GitLab Starter](https://about.gitlab.com/pricing), a [burndown chart](burndown_charts.md) is in the milestone view, showing the progress of completing a milestone.
+
+![burndown chart](img/burndown_chart.png)
+
+### Group Burndown Charts **[PREMIUM]**
+
+For group milestones in [GitLab Premium](https://about.gitlab.com/pricing), a [burndown chart](burndown_charts.md) is in the milestone view, showing the progress of completing a milestone.
 
 ### Milestone sidebar
 

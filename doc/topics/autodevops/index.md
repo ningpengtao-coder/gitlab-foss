@@ -179,7 +179,7 @@ Those environments are tied to jobs that use [Auto Deploy](#auto-deploy), so
 except for the environment scope, they would also need to have a different
 domain they would be deployed to. This is why you need to define a separate
 `KUBE_INGRESS_BASE_DOMAIN` variable for all the above
-[based on the environment](https://docs.gitlab.com/ee/ci/variables/index.html#limiting-environment-scopes-of-variables-premium).
+[based on the environment](../../ci/variables/README.md#limiting-environment-scopes-of-variables-premium).
 
 The following table is an example of how the three different clusters would
 be configured.
@@ -348,7 +348,7 @@ created, and is uploaded as an artifact which you can later download and check
 out.
 
 Any differences between the source and target branches are also
-[shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html).
+[shown in the merge request widget](../../user/project/merge_requests/code_quality.md).
 
 ### Auto SAST **[ULTIMATE]**
 
@@ -361,7 +361,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 Any security warnings are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/sast.html).
+[shown in the merge request widget](../../user/project/merge_requests/sast.md).
 
 NOTE: **Note:**
 The Auto SAST stage will be skipped on licenses other than Ultimate.
@@ -380,7 +380,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 Any security warnings are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/dependency_scanning.html).
+[shown in the merge request widget](../../user/project/merge_requests/dependency_scanning.md).
 
 NOTE: **Note:**
 The Auto Dependency Scanning stage will be skipped on licenses other than Ultimate.
@@ -399,7 +399,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 Any licenses are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/license_management.html).
+[shown in the merge request widget](../../user/project/merge_requests/license_management.md).
 
 NOTE: **Note:**
 The Auto License Management stage will be skipped on licenses other than Ultimate.
