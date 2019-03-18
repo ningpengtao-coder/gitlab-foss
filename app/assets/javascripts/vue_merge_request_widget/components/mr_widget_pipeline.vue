@@ -83,11 +83,11 @@ export default {
         false,
       );
     },
-    isMergeRequestPipeline() {
+    isTriggeredByMergeRequest() {
       return Boolean(this.pipeline.merge_request);
     },
-    isDetachedMergeRequestPipeline() {
-      return this.pipeline.flags && this.pipeline.flags.detached_merge_request_pipeline;
+    isMergeRequestPipeline() {
+      return this.pipeline.flags && this.pipeline.flags.merge_request_pipeline;
     },
   },
 };
@@ -124,7 +124,7 @@ export default {
                   >{{ pipeline.commit.short_id }}</gl-link
                 >
                 {{ s__('Pipeline|on') }}
-                <template v-if="isMergeRequestPipeline">
+                <template v-if="isTriggeredByMergeRequest">
                   <gl-link
                     v-gl-tooltip
                     :href="pipeline.merge_request.path"
@@ -145,7 +145,7 @@ export default {
                     >
                   </tooltip-on-truncate>
 
-                  <template v-if="isDetachedMergeRequestPipeline">
+                  <template v-if="isMergeRequestPipeline">
                     {{ s__('Pipeline|into') }}
                     <tooltip-on-truncate
                       :title="pipeline.merge_request.target_branch"
