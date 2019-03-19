@@ -171,8 +171,11 @@ read through the documentation on [permissions and access to confidential issues
 
 ### Releases permissions
 
-[Project Releases](project/releases/index.md) can be read by all project
-members (Reporters, Developers, Maintainers, Owners) **except Guests**.
+[Project Releases](project/releases/index.md) can be read by project
+members with Reporter, Developer, Maintainer, and Owner permissions.
+Guest users can access the Release pages for downloading assets, except for items
+related to source code.
+
 Releases can be created, updated, or deleted via [Releases APIs](../api/releases/index.md)
 by project Developers, Maintainers, and Owners.
 
