@@ -194,8 +194,8 @@ export default {
       this.tooltip.title = dateFormat(params.value, 'dd mmm yyyy, h:MMTT');
       this.tooltip.content = [];
       params.seriesData.forEach(seriesData => {
-        if (seriesData.componentSubType === graphTypes.deploymentData) {
-          this.tooltip.isDeployment = true;
+        this.tooltip.isDeployment = seriesData.componentSubType === graphTypes.deploymentData;
+        if (this.tooltip.isDeployment) {
           const [deploy] = this.recentDeployments.filter(
             deployment => deployment.createdAt === seriesData.value[0],
           );

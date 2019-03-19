@@ -1,0 +1,5 @@
+---
+title: Fix deployment tooltip on metrics dashboard
+merge_request: 26416
+author:
+type: fixed
