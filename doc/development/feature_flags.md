@@ -26,8 +26,8 @@ the time, you should execute `/chatops run feature set my_feature_flag 50`.
 
 ## Feature flags for user applications
 
-This document only covers feature flags used in the development of GitLab 
-itself. Feature flags in deployed user applications can be found at 
+This document only covers feature flags used in the development of GitLab
+itself. Feature flags in deployed user applications can be found at
 [Feature Flags](https://docs.gitlab.com/ee/user/project/operations/feature_flags.html)
 
 ## Developing with feature flags
@@ -103,6 +103,8 @@ that checking for `gon.features.vim_bindings` would not work.
 
 ### Specs
 
+#### RSpec
+
 In the test environment `Feature.enabled?` is stubbed to always respond to `true`,
 so we make sure behavior under feature flag doesn't go untested in some non-specific
 contexts.
@@ -112,6 +114,18 @@ feature flag. You can stub a feature flag as follows:
 
 ```ruby
 stub_feature_flags(my_feature_flag: false)
+```
+
+#### Karma / Jest
+
+You can mock a feature flag by setting the boolean flag property on `gon.features`,
+which is reset `beforeEach` test to an empty object.
+
+```js
+it('works great when newFeature is enabled', () => {
+   Object.assign(gon.features, { newFeature: true });
+   // ...
+});
 ```
 
 ## Enabling a feature flag (in development)
