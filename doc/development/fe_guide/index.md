@@ -45,9 +45,9 @@ or make changes to our frontend development guidelines.
 How we write frontend tests, run the GitLab test suite, and debug test related
 issues.
 
-## [Design Patterns](design_patterns.md)
+## [Best Practices](best_practices.md)
 
-Common JavaScript design patterns in GitLab's codebase.
+Frontend design patterns and practices.
 
 ## [Vue.js Best Practices](vue.md)
 
