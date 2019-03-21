@@ -1,0 +1,5 @@
+---
+title: Destroy project remote mirrors instead of disabling
+merge_request: 26444
+author:
+type: security
