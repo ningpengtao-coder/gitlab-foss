@@ -97,6 +97,7 @@ describe 'Projects > Settings > User manages merge request settings' do
       end
 
       # Wait for save to complete and page to reload
+      find('.flash-notice')
       checkbox = find_field('project_printing_merge_request_link_enabled')
       expect(checkbox).not_to be_checked
 
