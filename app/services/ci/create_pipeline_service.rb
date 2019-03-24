@@ -14,6 +14,7 @@ module Ci
                 Gitlab::Ci::Pipeline::Chain::Skip,
                 Gitlab::Ci::Pipeline::Chain::Limit::Size,
                 Gitlab::Ci::Pipeline::Chain::Populate,
+                Gitlab::Ci::Pipeline::Chain::PopulateSourceProject,
                 Gitlab::Ci::Pipeline::Chain::Create,
                 Gitlab::Ci::Pipeline::Chain::Limit::Activity].freeze
 

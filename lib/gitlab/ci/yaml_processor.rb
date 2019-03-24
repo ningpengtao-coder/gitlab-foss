@@ -54,7 +54,8 @@ module Gitlab
             parallel: job[:parallel],
             instance: job[:instance],
             start_in: job[:start_in],
-            trigger: job[:trigger]
+            trigger: job[:trigger],
+            triggered_by: job[:triggered_by]
           }.compact }.compact
       end
 

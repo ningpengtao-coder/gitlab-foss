@@ -22,16 +22,34 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
   describe '#bridge?' do
     context 'when job is a bridge' do
-      let(:attributes) do
-        { name: 'rspec', ref: 'master', options: { trigger: 'my/project' } }
+      context 'when job is a downstream bridge' do
+        let(:attributes) do
+          { name: 'rspec', ref: 'master', options: { trigger: 'my/project' } }
+        end
+
+        it { is_expected.to be_bridge }
       end
 
-      it { is_expected.to be_bridge }
+      context 'when job is an upstream bridge' do
+        let(:attributes) do
+          { name: 'rspec', ref: 'master', options: { triggered_by: 'my/project' } }
+        end
+
+        it { is_expected.to be_bridge }
+      end
     end
 
     context 'when trigger definition is empty' do
       let(:attributes) do
         { name: 'rspec', ref: 'master', options: { trigger: '' } }
+      end
+
+      it { is_expected.not_to be_bridge }
+    end
+
+    context 'when triggered_by definition is empty' do
+      let(:attributes) do
+        { name: 'rspec', ref: 'master', options: { triggered_by: '' } }
       end
 
       it { is_expected.not_to be_bridge }
@@ -51,13 +69,26 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
     end
 
     context 'when job is a bridge' do
-      let(:attributes) do
-        { name: 'rspec', ref: 'master', options: { trigger: 'my/project' } }
+      context 'when bridge is downstream' do
+        let(:attributes) do
+          { name: 'rspec', ref: 'master', options: { trigger: 'my/project' } }
+        end
+
+        it 'returns a valid bridge resource' do
+          expect(subject.to_resource).to be_a(::Ci::Bridge)
+          expect(subject.to_resource).to be_valid
+        end
       end
 
-      it 'returns a valid bridge resource' do
-        expect(subject.to_resource).to be_a(::Ci::Bridge)
-        expect(subject.to_resource).to be_valid
+      context 'when bridge is upstream' do
+        let(:attributes) do
+          { name: 'rspec', ref: 'master', options: { triggered_by: 'my/project' } }
+        end
+
+        it 'returns a valid bridge resource' do
+          expect(subject.to_resource).to be_a(::Ci::Bridge)
+          expect(subject.to_resource).to be_valid
+        end
       end
     end
 

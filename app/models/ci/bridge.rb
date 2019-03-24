@@ -19,6 +19,10 @@ module Ci
       raise NotImplementedError
     end
 
+    def self.fabricate(attributes)
+      ::Ci::Bridge.new(attributes)
+    end
+
     def tags
       [:bridge]
     end

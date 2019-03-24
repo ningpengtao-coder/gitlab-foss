@@ -41,7 +41,7 @@ class CommitStatus < ActiveRecord::Base
   scope :latest_ordered, -> { latest.ordered.includes(project: :namespace) }
   scope :retried_ordered, -> { retried.ordered.includes(project: :namespace) }
   scope :after_stage, -> (index) { where('stage_idx > ?', index) }
-  scope :processables, -> { where(type: %w[Ci::Build Ci::Bridge]) }
+  scope :processables, -> { where(type: processable_types) }
 
   # We use `CommitStatusEnums.failure_reasons` here so that EE can more easily
   # extend this `Hash` with new values.
@@ -137,6 +137,10 @@ class CommitStatus < ActiveRecord::Base
       end
       # rubocop: enable CodeReuse/ServiceClass
     end
+  end
+
+  def self.processable_types
+    %w[Ci::Build Ci::Bridge]
   end
 
   def locking_enabled?
