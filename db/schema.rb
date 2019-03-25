@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190301182457) do
+ActiveRecord::Schema.define(version: 20190325014456) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1510,6 +1510,16 @@ ActiveRecord::Schema.define(version: 20190301182457) do
     t.integer "access_grant_id", null: false
     t.string "nonce", null: false
     t.index ["access_grant_id"], name: "index_oauth_openid_requests_on_access_grant_id", using: :btree
+  end
+
+  create_table "paas_clusters", id: :bigserial, force: :cascade do |t|
+    t.string "name", null: false
+    t.text "api_url", null: false
+    t.text "ca_cert"
+    t.text "encrypted_token"
+    t.string "encrypted_token_iv"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
   end
 
   create_table "pages_domains", force: :cascade do |t|
