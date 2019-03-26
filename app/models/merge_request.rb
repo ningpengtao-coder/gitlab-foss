@@ -317,7 +317,7 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def authors
-    User.from_union([commit_authors, User.where(id: self.author_id)])
+    @authors ||= User.from_union([commit_authors, User.where(id: self.author_id)])
   end
 
   # Verifies if title has changed not taking into account WIP prefix
