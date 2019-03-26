@@ -20,6 +20,7 @@ module QA
           element :project_description, 'text_area :description' # rubocop:disable QA/ElementWithPattern
           element :project_create_button, "submit 'Create project'" # rubocop:disable QA/ElementWithPattern
           element :visibility_radios, 'visibility_level:' # rubocop:disable QA/ElementWithPattern
+          element :toggle_additional_project_settings_button
         end
 
         view 'app/views/projects/_import_project_pane.html.haml' do
@@ -68,6 +69,10 @@ module QA
 
         def enable_initialize_with_readme
           check_element :initialize_with_readme_checkbox
+        end
+
+        def toggle_additional_project_settings
+          click_element :toggle_additional_project_settings_button
         end
       end
     end
