@@ -9,7 +9,7 @@ class CreatePaasServices < ActiveRecord::Migration[5.0]
       t.text :image, null: false
       t.string :domain
 
-      t.references :namespace, null: false, index: true, foreign_key: { to_table: :paas_clusters, on_delete: :cascade }
+      t.references :namespace, type: :bigint, null: false, index: true, foreign_key: { to_table: :paas_namespaces, on_delete: :cascade }
     end
   end
 end

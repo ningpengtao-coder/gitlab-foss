@@ -1536,7 +1536,7 @@ ActiveRecord::Schema.define(version: 20190325032617) do
     t.string "name", null: false
     t.text "image", null: false
     t.string "domain"
-    t.integer "namespace_id", null: false
+    t.bigint "namespace_id", null: false
     t.index ["namespace_id"], name: "index_paas_services_on_namespace_id", using: :btree
   end
 
@@ -2508,7 +2508,7 @@ ActiveRecord::Schema.define(version: 20190325032617) do
   add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_oauth_openid_requests_oauth_access_grants_access_grant_id"
   add_foreign_key "paas_namespaces", "clusters", on_delete: :cascade
   add_foreign_key "paas_namespaces", "projects", on_delete: :nullify
-  add_foreign_key "paas_services", "paas_clusters", column: "namespace_id", on_delete: :cascade
+  add_foreign_key "paas_services", "paas_namespaces", column: "namespace_id", on_delete: :cascade
   add_foreign_key "pages_domains", "projects", name: "fk_ea2f6dfc6f", on_delete: :cascade
   add_foreign_key "personal_access_tokens", "users"
   add_foreign_key "pool_repositories", "projects", column: "source_project_id", on_delete: :nullify
