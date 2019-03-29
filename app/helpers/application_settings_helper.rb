@@ -155,6 +155,8 @@ module ApplicationSettingsHelper
   def visible_attributes
     [
       :admin_notification_email,
+      :acme_notification_email,
+      :acme_terms_of_service_accepted,
       :after_sign_out_path,
       :after_sign_up_text,
       :akismet_api_key,
