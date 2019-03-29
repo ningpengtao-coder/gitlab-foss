@@ -155,8 +155,6 @@ module ApplicationSettingsHelper
   def visible_attributes
     [
       :admin_notification_email,
-      :acme_notification_email,
-      :acme_terms_of_service_accepted,
       :after_sign_out_path,
       :after_sign_up_text,
       :akismet_api_key,
@@ -270,7 +268,7 @@ module ApplicationSettingsHelper
       :commit_email_hostname,
       :protected_ci_variables,
       :local_markdown_version
-    ]
+    ] + acme_visible_attributes
   end
 
   def external_authorization_service_attributes
@@ -287,5 +285,14 @@ module ApplicationSettingsHelper
 
   def expanded_by_default?
     Rails.env.test?
+  end
+
+  def acme_visible_attributes
+    return [] unless Feature.enabled?(:pages_auto_ssl)
+
+    [
+      :acme_notification_email,
+      :acme_terms_of_service_accepted
+    ]
   end
 end
