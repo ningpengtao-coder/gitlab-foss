@@ -71,7 +71,7 @@ module QA
           check_element :initialize_with_readme_checkbox
         end
 
-        def toggle_additional_project_settings
+        def click_toggle_additional_project_settings_button
           click_element :toggle_additional_project_settings_button
         end
       end
