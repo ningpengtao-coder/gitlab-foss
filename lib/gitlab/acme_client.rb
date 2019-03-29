@@ -34,20 +34,7 @@ module Gitlab
       # generates and saves one if it doesn't exist
       def private_key
         private_key_string = ApplicationSetting.current.acme_private_key
-        return OpenSSL::PKey::RSA.new(private_key_string) if private_key_string
-
-        private_key = OpenSSL::PKey::RSA.new(4096)
-
-        application_setting = ApplicationSetting.current
-
-        application_setting.with_lock do
-          application_setting.reload
-          raise "Acme private key already created" if application_setting.acme_private_key
-
-          ApplicationSetting.current.update(acme_private_key: private_key.to_s)
-        end
-
-        private_key
+        OpenSSL::PKey::RSA.new(private_key_string) if private_key_string
       end
 
       def acme_account_kid
