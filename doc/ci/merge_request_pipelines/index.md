@@ -30,29 +30,31 @@ build:
   stage: build
   script: ./build
   only:
-  - branches
-  - tags
-  - merge_requests
+    - branches
+    - tags
+    - merge_requests
 
 test:
   stage: test
   script: ./test
   only:
-  - merge_requests
+    - merge_requests
 
 deploy:
   stage: deploy
   script: ./deploy
+  only:
+   - master
 ```
 
 After the merge request is updated with new commits:
 
 - GitLab detects that changes have occurred and creates a new pipeline for the merge request.
-- The pipeline fetches the latest code from the source branch and run tests against it.
+- The pipeline fetches the latest code from the source branch and runs tests against it.
 
 In the above example, the pipeline contains only `build` and `test` jobs.
-Since the `deploy` job doesn't have the `only: merge_requests` parameter,
-deployment jobs will not happen in the merge request.
+Because the `deploy` job doesn't have the `only: merge_requests` parameter,
+deployment jobs will not happen for merge requests.
 
 Pipelines tagged with the **merge request** badge indicate that they were triggered
 when a merge request was created or updated. For example:
