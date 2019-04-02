@@ -33,9 +33,12 @@ Make sure to remove this comment when you are done.
 ## Community Contributions
 
 - [ ] Maintainer: Label as ~security and @ mention `@gitlab-com/gl-security/appsec` if the change affects:
- - [ ] authentication: passwords, oauth, etc.
- - [ ] authorization and permissions: permissions checks (for example, changes visibility of a UI element), token usage, etc.
- - [ ] handling and storage of secrets, for example, any field that uses `attr_encrypted`
+ - [ ] Processing credentials/tokens
+ - [ ] Storing credentials/tokens (e.g., any field that uses `attr_encrypted`)
+ - [ ] Logic for privilege escalation
+ - [ ] Authorization logic (e.g., permissions checks such as changes visibility of a UI element, token usage, etc.)
+ - [ ] User/account access controls
+ - [ ] Authentication mechanisms (e.g., passwords, oauth, etc.)
 - [ ] Maintainer: Does the MR include necessary changes to maintain consistency between UI, API, email, or other methods?
 - [ ] Security Engineer: review if labeled as ~security, ~permissions.
 
