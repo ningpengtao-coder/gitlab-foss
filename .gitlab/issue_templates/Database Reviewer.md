@@ -15,6 +15,7 @@ an mention `@abrandl`.
 - [ ] Review [database best practices](https://docs.gitlab.com/ee/development/#best-practices)
 - [ ] Review how we use [database instances restored from a backup](https://ops.gitlab.net/gitlab-com/gl-infra/gitlab-restore/postgres-gprd) for testing and make sure you're set up to execute pipelines (check [README.md](https://ops.gitlab.net/gitlab-com/gl-infra/gitlab-restore/postgres-gprd/blob/master/README.md) and reach out to @abrandl since this is currently subject to being changed)
 - [ ] Get yourself added to [`@gl-database`](https://gitlab.com/groups/gl-database/-/group_members) group and respond to @-mentions to the group (reach out to any maintainer on the group to get added). You will get TODOs on gitlab.com for group mentions.
+- [ ] Create an account on dev.gitlab.org if you haven't already (same username like on GitLab.com)
 - [ ] Make sure you have proper access to at least a read-only replica in staging and production
 - [ ] Indicate in `data/team.yml` your role as a database reviewer ([example MR](https://gitlab.com/gitlab-com/www-gitlab-com/merge_requests/19600/diffs)). Assign MR to your manager for merge.
 - [ ] Send one MR to improve the [review documentation](https://about.gitlab.com/handbook/engineering/workflow/code-review/database.html) or the [issue template](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab/issue_templates/Database%20Reviewer.md)
