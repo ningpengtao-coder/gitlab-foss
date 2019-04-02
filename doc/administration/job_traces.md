@@ -86,6 +86,10 @@ To archive those legacy job traces, please follow the instruction below.
 
     If the count becomes zero, the archiving processes are done
 
+NOTE: **NOTE** As of GitLab 11.10, those legacy traces are deprecated and will be
+removed in the next major version update. You can preserve those legacy traces by enabling a feature flag
+`Feature.enable(:ci_enable_legacy_traces)` and archiving it according to the above steps.
+
 ## How to migrate archived job traces to object storage
 
 > [Introduced][ce-21193] in GitLab 11.3.

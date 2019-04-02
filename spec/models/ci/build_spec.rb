@@ -776,6 +776,14 @@ describe Ci::Build do
       end
 
       it { is_expected.to be_truthy }
+
+      context 'when ci_enable_legacy_traces feature flag is disabled' do
+        before do
+          stub_feature_flags(ci_enable_legacy_traces: false)
+        end
+
+        it { is_expected.to be_falsy }
+      end
     end
 
     context 'when old trace does not exist' do
@@ -798,6 +806,16 @@ describe Ci::Build do
 
     it "expect to receive data from database" do
       is_expected.to eq('old trace')
+    end
+
+    context 'when ci_enable_legacy_traces feature flag is disabled' do
+      before do
+        stub_feature_flags(ci_enable_legacy_traces: false)
+      end
+
+      it 'does not return old trace' do
+        is_expected.to be_nil
+      end
     end
   end
 

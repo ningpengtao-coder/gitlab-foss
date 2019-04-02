@@ -2139,6 +2139,10 @@ class Project < ApplicationRecord
     pool_repository.present?
   end
 
+  def legacy_traces_enabled?
+    Feature.enabled?(:ci_enable_legacy_traces, self)
+  end
+
   private
 
   def merge_requests_allowing_collaboration(source_branch = nil)

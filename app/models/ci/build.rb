@@ -548,7 +548,7 @@ module Ci
     end
 
     def has_old_trace?
-      old_trace.present?
+      project.legacy_traces_enabled? && old_trace.present?
     end
 
     def trace=(data)
@@ -556,6 +556,8 @@ module Ci
     end
 
     def old_trace
+      return unless project.legacy_traces_enabled?
+
       read_attribute(:trace)
     end
 
