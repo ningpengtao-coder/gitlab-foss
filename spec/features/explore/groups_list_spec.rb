@@ -78,7 +78,7 @@ describe 'Explore Groups page', :js do
       expect(page).not_to have_content('Below you will find all the groups that are public.')
     end
 
-    it 'persistentlies not show once dismissed' do
+    it 'does not show persistently once dismissed' do
       find('.dismiss-button').click
 
       visit explore_groups_path

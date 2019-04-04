@@ -58,7 +58,7 @@ describe Projects::AutoDevops::DisableService, '#execute' do
           create_list(:ci_pipeline, 2, :failed, :auto_devops_source, project: project)
         end
 
-        it 'explicitlies disable Auto DevOps for project' do
+        it 'explicitly disables Auto DevOps for project' do
           subject
 
           expect(auto_devops.reload.enabled).to eq(false)

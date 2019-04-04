@@ -98,7 +98,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
         kubernetes_service.save
       end
 
-      it 'deactives the service' do
+      it 'deactivates the service' do
         expect(kubernetes_service.active?).to be_falsy
       end
 

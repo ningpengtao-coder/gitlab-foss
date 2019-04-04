@@ -49,7 +49,7 @@ describe MigrateAutoDevOpsDomainToClusterDomain, :migration do
       setup_cluster_projects_with_domain(quantity: 25, domain: nil)
     end
 
-    it 'only update specific cluster projects' do
+    it 'only updates specific cluster projects' do
       migrate!
 
       expect(clusters_with_domain.count).to eq(20)

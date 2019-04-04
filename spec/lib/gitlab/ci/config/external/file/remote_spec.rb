@@ -147,7 +147,7 @@ describe Gitlab::Ci::Config::External::File::Remote do
         WebMock.stub_request(:get, location).to_timeout
       end
 
-      it 'returnses error message about a timeout' do
+      it 'returns error message about a timeout' do
         expect(subject).to match /could not be fetched because of a timeout error!/
       end
     end
@@ -157,7 +157,7 @@ describe Gitlab::Ci::Config::External::File::Remote do
         WebMock.stub_request(:get, location).to_raise(Gitlab::HTTP::Error)
       end
 
-      it 'returnses error message about a HTTP error' do
+      it 'returns error message about a HTTP error' do
         expect(subject).to match /could not be fetched because of HTTP error!/
       end
     end
@@ -167,7 +167,7 @@ describe Gitlab::Ci::Config::External::File::Remote do
         WebMock.stub_request(:get, location).to_return(body: remote_file_content, status: 404)
       end
 
-      it 'returnses error message about a timeout' do
+      it 'returns error message about a timeout' do
         expect(subject).to match /could not be fetched because of HTTP code `404` error!/
       end
     end

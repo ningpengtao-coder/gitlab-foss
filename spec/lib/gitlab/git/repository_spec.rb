@@ -850,7 +850,7 @@ describe Gitlab::Git::Repository, :seed_helper do
       context "where provides 'after' timestamp" do
         options = { after: Time.iso8601('2014-03-03T20:15:01+00:00') }
 
-        it "returnses commits on or after that timestamp" do
+        it "returns commits on or after that timestamp" do
           commits = repository.log(options)
 
           expect(commits.size).to be > 0
@@ -863,7 +863,7 @@ describe Gitlab::Git::Repository, :seed_helper do
       context "where provides 'before' timestamp" do
         options = { before: Time.iso8601('2014-03-03T20:15:01+00:00') }
 
-        it "returnses commits on or before that timestamp" do
+        it "returns commits on or before that timestamp" do
           commits = repository.log(options)
 
           expect(commits.size).to be > 0
