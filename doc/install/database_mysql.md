@@ -1,7 +1,8 @@
 # Database MySQL
 
 NOTE: **Note:**
-We do not recommend using MySQL due to various issues.
+Using MySQL with the Omnibus GitLab package is considered deprecated and 
+there are various issues with MySQL that may cause problems.
 For example, there have been bugs with case
 [(in)sensitivity](https://dev.mysql.com/doc/refman/5.7/en/case-sensitivity.html).
 
@@ -11,6 +12,9 @@ Bugs relating to case sensitivity:
 - <https://bugs.mysql.com/bug.php?id=50909>
 - <https://bugs.mysql.com/bug.php?id=65830>
 - <https://bugs.mysql.com/bug.php?id=63164>
+
+CAUTION: **Caution:**
+GitLab does not support [MySQL Strict SQL Mode](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict).
 
 ## Initial database setup
 
