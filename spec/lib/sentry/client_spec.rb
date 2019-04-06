@@ -61,6 +61,13 @@ describe Sentry::Client do
     end
   end
 
+  shared_examples 'maps exceptions' do |message|
+    it 'calls sentry api' do
+      expect { subject }
+        .to raise_exception(Sentry::Client::Error, message)
+    end
+  end
+
   describe '#list_issues' do
     let(:issue_status) { 'unresolved' }
     let(:limit) { 20 }
@@ -169,6 +176,14 @@ describe Sentry::Client do
         expect { subject }.to raise_error(Sentry::Client::MissingKeysError, 'Sentry API response is missing keys. key not found: "id"')
       end
     end
+
+    context 'when exception is raised' do
+      before do
+        stub_sentry_request_raising(StandardError.new('ignore message'))
+      end
+
+      it_behaves_like 'maps exceptions', 'Sentry request failed due to StandardError'
+    end
   end
 
   describe '#list_projects' do
@@ -260,16 +275,28 @@ describe Sentry::Client do
         expect(valid_req_stub).to have_been_requested
       end
     end
+
+    context 'when exception is raised' do
+      before do
+        stub_sentry_request_raising(StandardError.new('ignore message'))
+      end
+
+      it_behaves_like 'maps exceptions', 'Sentry request failed due to StandardError'
+    end
   end
 
   private
 
   def stub_sentry_request(url, body: {}, status: 200, headers: {})
-    WebMock.stub_request(:get, url)
+    stub_request(:get, url)
       .to_return(
         status: status,
         headers: { 'Content-Type' => 'application/json' }.merge(headers),
         body: body.to_json
       )
+  end
+
+  def stub_sentry_request_raising(error)
+    stub_request(:any, /.*/).to_raise(error)
   end
 end

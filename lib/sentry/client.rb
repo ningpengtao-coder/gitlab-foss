@@ -47,9 +47,11 @@ module Sentry
     end
 
     def http_get(url, params = {})
-      resp = Gitlab::HTTP.get(url, **request_params.merge(params))
+      response = handle_request_exceptions do
+        Gitlab::HTTP.get(url, **request_params.merge(params))
+      end
 
-      handle_response(resp)
+      handle_response(response)
     end
 
     def get_issues(issue_status:, limit:)
@@ -63,12 +65,22 @@ module Sentry
       http_get(projects_api_url)
     end
 
+    def handle_request_exceptions
+      yield
+    rescue => e
+      raise_error "Sentry request failed due to #{e.class}"
+    end
+
     def handle_response(response)
       unless response.code == 200
-        raise Client::Error, "Sentry response status code: #{response.code}"
+        raise_error "Sentry response status code: #{response.code}"
       end
 
       response
+    end
+
+    def raise_error(message)
+      raise Client::Error, message
     end
 
     def projects_api_url

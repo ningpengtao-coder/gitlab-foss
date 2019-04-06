@@ -15,8 +15,6 @@ module ErrorTracking
         result = setting.list_sentry_projects
       rescue Sentry::Client::Error => e
         return error(e.message, :bad_request)
-      rescue Sentry::Client::SentryError => e
-        return error(e.message, :unprocessable_entity)
       end
 
       success(projects: result[:projects])
