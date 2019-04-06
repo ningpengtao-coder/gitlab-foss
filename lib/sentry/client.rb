@@ -67,8 +67,17 @@ module Sentry
 
     def handle_request_exceptions
       yield
-    rescue => e
-      raise_error "Sentry request failed due to #{e.class}"
+    rescue HTTParty::Error => e
+      Gitlab::Sentry.track_acceptable_exception(e)
+      raise_error 'Error when connecting to Sentry'
+    rescue Net::OpenTimeout
+      raise_error 'Connection to Sentry timed out'
+    rescue SocketError
+      raise_error 'Received SocketError when trying to connect to Sentry'
+    rescue OpenSSL::SSL::SSLError
+      raise_error 'Sentry returned invalid SSL data'
+    rescue Errno::ECONNREFUSED
+      raise_error 'Connection refused'
     end
 
     def handle_response(response)
