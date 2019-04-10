@@ -503,7 +503,7 @@
 
 .dropdown-menu-selectable {
   li {
-    a,
+    a:not(.btn),
     button {
       padding: 8px 40px;
       position: relative;
