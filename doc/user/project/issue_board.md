@@ -101,10 +101,17 @@ With [Multiple Issue Boards](#multiple-issue-boards-starter), available only in
 [GitLab Enterprise Edition](https://about.gitlab.com/pricing/),
 each team can have their own board to organize their workflow individually.
 
-#### Scrum team
+#### Kanban team
 
 With Multiple Issue Boards, each team has one board. Now you can move issues through each
 part of the process. For instance: **To Do**, **Doing**, and **Done**.
+The default board that you find is a Kanban board, you can manage different columns basing on specific label, moving the issue between the columns will update relative labels.
+
+#### Scrum team
+
+If you need a Scrum board you can create a board filtering the issues basing on the **Started** [Milestone](milestones/index.md#milestones), so you will have just issues relating your active sprint.
+In the issues view you can see your backlog, understanding if an issue is already associated to a milestone or not.
+For planning activities you can create a board with [Milestone lists](#milestone-lists).
 
 #### Organization of topics
 
