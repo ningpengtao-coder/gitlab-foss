@@ -111,7 +111,7 @@ The default board that you find is a Kanban board, you can manage different colu
 
 If you need a Scrum board you can create a board filtering the issues basing on the **Started** [Milestone](milestones/index.md#milestones), so you will have just issues relating your active sprint.
 In the issues view you can see your backlog, understanding if an issue is already associated to a milestone or not.
-For planning activities you can create a board with [Milestone lists](#milestone-lists).
+For planning activities you can create a board with [Milestone lists](#milestone-lists-premium).
 
 #### Organization of topics
 
