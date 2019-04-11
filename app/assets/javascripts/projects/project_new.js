@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { addSelectOnFocusBehaviour } from '../lib/utils/common_utils';
+import { addSelectOnFocusBehaviour, isEE } from '../lib/utils/common_utils';
 import { slugifyWithHyphens } from '../lib/utils/text_utility';
 
 let hasUserDefinedProjectPath = false;
@@ -216,6 +216,14 @@ const bindEvents = () => {
   });
 
   $projectImportUrl.keyup(() => deriveProjectPathFromUrl($projectImportUrl));
+
+  if (isEE()) {
+    $('.js-import-git-toggle-button').on('click', () => {
+      const $projectMirror = $('#project_mirror');
+
+      $projectMirror.attr('disabled', !$projectMirror.attr('disabled'));
+    });
+  }
 
   $projectName.on('keyup change', () => {
     onProjectNameChange($projectName, $projectPath);
