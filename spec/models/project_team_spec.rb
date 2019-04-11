@@ -35,6 +35,18 @@ describe ProjectTeam do
       it { expect(project.team.member?(guest, Gitlab::Access::REPORTER)).to be_falsey }
       it { expect(project.team.member?(nonmember, Gitlab::Access::GUEST)).to be_falsey }
     end
+
+    describe '#maintainer?' do
+      it 'does not produce n+1 queries' do
+        3.times { project.add_maintainer(create(:user)) }
+
+        queries = ActiveRecord::QueryRecorder.new { project.team.maintainer?(maintainer) }
+        expect(queries.count).to eq(1)
+
+        queries = ActiveRecord::QueryRecorder.new { project.team.maintainer?(maintainer) }
+        expect(queries.count).to eq(0)
+      end
+    end
   end
 
   context 'group project' do
