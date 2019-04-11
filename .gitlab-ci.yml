@@ -609,15 +609,8 @@ docs lint:
   dependencies: []
   before_script: []
   script:
-    - echo $0
-    - bash
-    - echo $0
     - ls -la doc/ci/introduction/img/rollback.png
-    - echo $0
-    - ls -la doc/**/*.png
-    - echo $0
     - scripts/lint-doc.sh
-    - echo $0
     - scripts/lint-changelog-yaml
     - mv doc/ /tmp/gitlab-docs/content/$DOCS_GITLAB_REPO_SUFFIX
     - cd /tmp/gitlab-docs
