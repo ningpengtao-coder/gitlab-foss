@@ -29,6 +29,7 @@ module Gitlab
           def matches_pattern?(pattern, pipeline)
             return true if pipeline.tag? && pattern == 'tags'
             return true if pipeline.branch? && pattern == 'branches'
+            return true if pattern == 'protected_refs' && pipeline.protected_ref?
             return true if sanitized_source_name(pipeline) == pattern
             return true if sanitized_source_name(pipeline)&.pluralize == pattern
 

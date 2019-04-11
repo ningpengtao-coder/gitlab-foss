@@ -11,7 +11,13 @@ module Gitlab
           strategy :RefsPolicy, if: -> (config) { config.is_a?(Array) }
           strategy :ComplexPolicy, if: -> (config) { config.is_a?(Hash) }
 
-          DEFAULT_ONLY = { refs: %w[branches tags] }.freeze
+          def self.default_only
+            if Feature.enable(:ci_new_default_only, project)
+              { refs: %w[protected_refs tags merge_requests] }
+            else
+              { refs: %w[branches tags] }
+            end
+          end
 
           class RefsPolicy < ::Gitlab::Config::Entry::Node
             include ::Gitlab::Config::Entry::Validatable
@@ -29,8 +35,8 @@ module Gitlab
             include ::Gitlab::Config::Entry::Validatable
             include ::Gitlab::Config::Entry::Attributable
 
-            ALLOWED_KEYS = %i[refs kubernetes variables changes].freeze
-            attributes :refs, :kubernetes, :variables, :changes
+            ALLOWED_KEYS = %i[refs kubernetes variables changes projects].freeze
+            attributes :refs, :kubernetes, :variables, :changes, :projects
 
             validations do
               validates :config, presence: true
@@ -42,6 +48,7 @@ module Gitlab
                 validates :kubernetes, allowed_values: %w[active]
                 validates :variables, array_of_strings: true
                 validates :changes, array_of_strings: true
+                validates :projects, array_of_strings: true
               end
 
               def variables_expressions_syntax
