@@ -610,6 +610,8 @@ docs lint:
   before_script: []
   script:
     - shopt -s globstar
+    - ls -la
+    - ls -la scripts/lint-doc.sh
     - ls -la doc/ci/introduction/img/rollback.png
     - ls -la doc/**/*.png
     - scripts/lint-doc.sh
