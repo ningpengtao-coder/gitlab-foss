@@ -70,6 +70,8 @@ module Gitlab
             job = @jobs.fetch(attributes[:name].to_sym)
 
             attributes
+              .merge(global_only: job.fetch(:global_only, {}))
+              .merge(global_except: job.fetch(:global_except, {}))
               .merge(only: job.fetch(:only, {}))
               .merge(except: job.fetch(:except, {}))
           end

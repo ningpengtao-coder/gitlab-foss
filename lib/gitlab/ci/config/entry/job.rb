@@ -71,8 +71,7 @@ module Gitlab
             inherit: true
 
           entry :only, Entry::Policy,
-            description: 'Refs policy this job will be executed for.',
-            default: Entry::Policy::DEFAULT_ONLY
+            description: 'Refs policy this job will be executed for.'
 
           entry :except, Entry::Policy,
             description: 'Refs policy this job will be executed for.'
@@ -137,10 +136,13 @@ module Gitlab
           def inherit!(deps)
             return unless deps
 
+            @global_only = deps.global[:only]
+            @global_except = deps.global[:except]
+
             self.class.nodes.each do |key, factory|
               next unless factory.inheritable?
 
-              global_entry = deps[:global][key]
+              global_entry = deps.global[key]
               job_entry = self[key]
 
               if global_entry.specified? && !job_entry.specified?
@@ -157,6 +159,8 @@ module Gitlab
               services: services_value,
               stage: stage_value,
               cache: cache_value,
+              global_only: @global_only.value,
+              global_except: @global_except.value,
               only: only_value,
               except: except_value,
               variables: variables_defined? ? variables_value : nil,

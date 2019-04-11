@@ -13,6 +13,10 @@ module Gitlab
             @pipeline = pipeline
             @attributes = attributes
 
+            @global_only = Gitlab::Ci::Build::Policy
+              .fabricate(attributes.delete(:global_only))
+            @global_except = Gitlab::Ci::Build::Policy
+              .fabricate(attributes.delete(:global_except))
             @only = Gitlab::Ci::Build::Policy
               .fabricate(attributes.delete(:only))
             @except = Gitlab::Ci::Build::Policy
@@ -21,7 +25,9 @@ module Gitlab
 
           def included?
             strong_memoize(:inclusion) do
-              @only.all? { |spec| spec.satisfied_by?(@pipeline, self) } &&
+              @global_only.all? { |spec| spec.satisfied_by?(@pipeline, self) } &&
+                @global_except.none? { |spec| spec.satisfied_by?(@pipeline, self) } &&
+                @only.all? { |spec| spec.satisfied_by?(@pipeline, self) } &&
                 @except.none? { |spec| spec.satisfied_by?(@pipeline, self) }
             end
           end

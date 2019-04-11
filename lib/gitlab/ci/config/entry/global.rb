@@ -43,8 +43,15 @@ module Gitlab
             description: 'Configure caching between build jobs.',
             inherit: true
 
+          entry :only, Entry::Policy,
+            description: 'Refs policy this job will be executed for.',
+            default: Entry::Policy::DEFAULT_GLOBAL_ONLY
+
+          entry :except, Entry::Policy,
+            description: 'Refs policy this job will be executed for.'
+
           helpers :before_script, :image, :services, :after_script,
-                  :variables, :stages, :types, :cache
+                  :variables, :stages, :types, :cache, :only, :except
 
           def compose!(deps = nil)
             super(self) do

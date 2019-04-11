@@ -156,6 +156,8 @@ module Gitlab
                   when: "on_success",
                   yaml_variables: [],
                   options: { script: ["rspec"] },
+                  global_only: { refs: ["branches", "tags"] },
+                  global_except: {},
                   only: { refs: ["branches"] },
                   except: {} }] },
            { name: "deploy",
@@ -168,6 +170,8 @@ module Gitlab
                   when: "on_success",
                   yaml_variables: [],
                   options: { script: ["cap prod"] },
+                  global_only: { refs: ["branches", "tags"] },
+                  global_except: {},
                   only: { refs: ["tags"] },
                   except: {} }] }]
         end
