@@ -12,31 +12,36 @@ module Gitlab
           include ::Gitlab::Config::Entry::Configurable
 
           entry :before_script, Entry::Script,
-            description: 'Script that will be executed before each job.'
+            description: 'Script that will be executed before each job.',
+            inherit: true
 
           entry :image, Entry::Image,
-            description: 'Docker image that will be used to execute jobs.'
-
-          entry :include, Entry::Includes,
-                description: 'List of external YAML files to include.'
+            description: 'Docker image that will be used to execute jobs.',
+            inherit: true
 
           entry :services, Entry::Services,
-            description: 'Docker images that will be linked to the container.'
+            description: 'Docker images that will be linked to the container.',
+            inherit: true
 
           entry :after_script, Entry::Script,
-            description: 'Script that will be executed after each job.'
+            description: 'Script that will be executed after each job.',
+            inherit: true
 
           entry :variables, Entry::Variables,
-            description: 'Environment variables that will be used.'
+            description: 'Environment variables that will be used.',
+            inherit: true
 
           entry :stages, Entry::Stages,
-            description: 'Configuration of stages for this pipeline.'
+            description: 'Configuration of stages for this pipeline.',
+            inherit: true
 
           entry :types, Entry::Stages,
-            description: 'Deprecated: stages for this pipeline.'
+            description: 'Configuration of stages for this pipeline.',
+            inherit: true
 
           entry :cache, Entry::Cache,
-            description: 'Configure caching between build jobs.'
+            description: 'Configure caching between build jobs.',
+            inherit: true
 
           helpers :before_script, :image, :services, :after_script,
                   :variables, :stages, :types, :cache
@@ -53,7 +58,9 @@ module Gitlab
           def inherit!(deps)
             return unless deps
 
-            self.class.nodes.each_key do |key|
+            self.class.nodes.each do |key, factory|
+              next unless factory.inheritable?
+
               root_entry = deps[key]
               global_entry = self[key]
 

@@ -36,7 +36,7 @@ module Gitlab
       end
 
       def global
-        @root.global_value
+        @root.global
       end
 
       ##

@@ -65,6 +65,7 @@ module Gitlab
             factory = ::Gitlab::Config::Entry::Factory.new(entry)
               .with(description: metadata[:description])
               .with(default: metadata[:default])
+              .with(inherit: metadata[:inherit])
 
             (@nodes ||= {}).merge!(key.to_sym => factory)
           end

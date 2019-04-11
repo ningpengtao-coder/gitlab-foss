@@ -42,7 +42,8 @@ module Gitlab
           end
 
           entry :before_script, Entry::Script,
-            description: 'Global before script overridden in this job.'
+            description: 'Global before script overridden in this job.',
+            inherit: true
 
           entry :script, Entry::Commands,
             description: 'Commands that will be executed in this job.'
@@ -54,16 +55,20 @@ module Gitlab
             description: 'Deprecated: stage this job will be executed into.'
 
           entry :after_script, Entry::Script,
-            description: 'Commands that will be executed when finishing job.'
+            description: 'Commands that will be executed when finishing job.',
+            inherit: true
 
           entry :cache, Entry::Cache,
-            description: 'Cache definition for this job.'
+            description: 'Cache definition for this job.',
+            inherit: true
 
           entry :image, Entry::Image,
-            description: 'Image that will be used to execute this job.'
+            description: 'Image that will be used to execute this job.',
+            inherit: true
 
           entry :services, Entry::Services,
-            description: 'Services that will be used to execute this job.'
+            description: 'Services that will be used to execute this job.',
+            inherit: true
 
           entry :only, Entry::Policy,
             description: 'Refs policy this job will be executed for.',
@@ -132,7 +137,9 @@ module Gitlab
           def inherit!(deps)
             return unless deps
 
-            self.class.nodes.each_key do |key|
+            self.class.nodes.each do |key, factory|
+              next unless factory.inheritable?
+
               global_entry = deps[:global][key]
               job_entry = self[key]
 

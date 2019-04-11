@@ -1262,7 +1262,7 @@ module Gitlab
           config = YAML.dump({ extra: "bundle update" })
           expect do
             Gitlab::Ci::YamlProcessor.new(config)
-          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "jobs:extra config should be a hash")
+          end.to raise_error(Gitlab::Ci::YamlProcessor::ValidationError, "root config contains unknown keys: extra")
         end
 
         it "returns errors if services configuration is not correct" do

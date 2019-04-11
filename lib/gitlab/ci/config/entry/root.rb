@@ -11,9 +11,19 @@ module Gitlab
         class Root < ::Gitlab::Config::Entry::Node
           include ::Gitlab::Config::Entry::Configurable
 
+          ALLOWED_KEYS = %i[global include before_script image services
+            after_script variables stages types cache].freeze
+
+          validations do
+            validates :config, allowed_keys: ALLOWED_KEYS
+          end
+  
           entry :global, Entry::Global,
             description: 'Global configuration.',
             default: {}
+
+          entry :include, Entry::Includes,
+            description: 'List of external YAML files to include.'
 
           entry :before_script, Entry::Script,
             description: 'Script that will be executed before each job.'
@@ -42,14 +52,14 @@ module Gitlab
           helpers :global, :jobs
 
           def initialize(config, **metadata)
-            super
-
-            # Rewrite config hash
-            # to split it into a hash of `jobs`: the @jobs_config
-            # to split it into a hash of `non-jobs`: the @config
-            if @config.is_a?(Hash)
-              @jobs_config = @config.select { |key, hash| a_job?(hash) }
-              @config = @config.except(*@jobs_config.keys)
+            super do
+              # Rewrite config hash
+              # to split it into a hash of `jobs`: the @jobs_config
+              # to split it into a hash of `non-jobs`: the @config
+              if @config.is_a?(Hash)
+                @jobs_config = @config.select(&method(:a_job?))
+                @config = @config.except(*@jobs_config.keys)
+              end
             end
           end
 
@@ -57,6 +67,10 @@ module Gitlab
             super(self) do
               compose_jobs!
             end
+          end
+
+          def global
+            self[:global]
           end
 
           private
@@ -72,8 +86,9 @@ module Gitlab
           end
           # rubocop: enable CodeReuse/ActiveRecord
 
-          def a_job?(hash)
-            hash.is_a?(Hash) && hash[:script].present?
+          def a_job?(key, config)
+            key.to_s.start_with?('.') ||
+              config.is_a?(Hash) && config[:script].present?
           end
         end
       end
