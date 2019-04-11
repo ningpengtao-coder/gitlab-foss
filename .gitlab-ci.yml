@@ -609,6 +609,7 @@ docs lint:
   dependencies: []
   before_script: []
   script:
+    - bash
     - ls -la doc/ci/introduction/img/rollback.png
     - ls -la doc/**/*.png
     - scripts/lint-doc.sh
