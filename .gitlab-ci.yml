@@ -610,6 +610,7 @@ docs lint:
   before_script: []
   script:
     - ls -la doc/ci/introduction/img/rollback.png
+    - ls -la doc/**/*.png
     - scripts/lint-doc.sh
     - scripts/lint-changelog-yaml
     - mv doc/ /tmp/gitlab-docs/content/$DOCS_GITLAB_REPO_SUFFIX
