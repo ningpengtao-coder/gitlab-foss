@@ -7,7 +7,7 @@ class ProjectTeam
 
   def initialize(project)
     @project = project
-    @cache_max_member_access_by_user = {}
+    @cache_max_member_access = {}
   end
 
   def add_guest(user, current_user: nil)
@@ -176,7 +176,7 @@ class ProjectTeam
   #
   # Returns a Hash mapping user ID -> maximum access level.
   def max_member_access_for_user_ids(user_ids)
-    unknown_user_ids = user_ids.reject { |id| @cache_max_member_access_by_user.key?(id) }
+    unknown_user_ids = user_ids.reject { |id| @cache_max_member_access.key?(id) }
 
     unknown_access_values = max_member_access_for_resource_ids(User, unknown_user_ids, project.id) do |user_ids|
       project.project_authorizations
@@ -185,7 +185,7 @@ class ProjectTeam
              .maximum(:access_level)
     end
 
-    @cache_max_member_access_by_user.merge!(unknown_access_values)
+    @cache_max_member_access.merge!(unknown_access_values)
   end
 
   def max_member_access(user_id)

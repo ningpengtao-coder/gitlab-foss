@@ -37,7 +37,7 @@ describe ProjectTeam do
     end
 
     describe '#maintainer?' do
-      it 'does not produce n+1 queries' do
+      it 'caches results' do
         3.times { project.add_maintainer(create(:user)) }
 
         queries = ActiveRecord::QueryRecorder.new { project.team.maintainer?(maintainer) }
