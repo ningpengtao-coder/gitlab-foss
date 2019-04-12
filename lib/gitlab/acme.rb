@@ -1,0 +1,69 @@
+# frozen_string_literal: true
+
+module Gitlab
+  module Acme
+    PRODUCTION_DIRECTORY_URL = 'https://acme-v02.api.letsencrypt.org/directory'
+    STAGING_DIRECTORY_URL = 'https://acme-staging-v02.api.letsencrypt.org/directory'
+
+    class << self
+      def client
+        raise 'Acme integration is disabled' unless acme_integration_enabled?
+
+        acme_client = ::Acme::Client.new(private_key: private_key,
+                                         directory: directory,
+                                         kid: acme_account_kid)
+
+        # account wasn't yet registered in Let's Encrypt
+        # if it was calling new_account will just return the same id
+        # we save kid to avoid making new_account call every time
+        unless acme_account_kid
+          binding.pry
+          account = acme_client.new_account(contact: contact, terms_of_service_agreed: true)
+          ApplicationSetting.current.update(acme_account_kid: account.kid)
+        end
+
+        acme_client
+      end
+
+      def terms_of_service_url
+        ::Acme::Client.new(directory: directory).terms_of_service
+      end
+
+      private
+
+      def acme_integration_enabled?
+        application_settings = Gitlab::CurrentSettings.current_application_settings
+
+        application_settings.acme_terms_of_service_accepted &&
+          admin_email
+      end
+
+      # gets acme private key from application settings
+      # generates and saves one if it doesn't exist
+      def private_key
+        private_key_string = ApplicationSetting.current.acme_private_key
+        OpenSSL::PKey::RSA.new(private_key_string) if private_key_string
+      end
+
+      def acme_account_kid
+        ApplicationSetting.current.acme_account_kid
+      end
+
+      def admin_email
+        ApplicationSetting.current.acme_notification_email
+      end
+
+      def contact
+        "mailto:#{admin_email}"
+      end
+
+      def directory
+        if Rails.env.production?
+          PRODUCTION_DIRECTORY_URL
+        else
+          STAGING_DIRECTORY_URL
+        end
+      end
+    end
+  end
+end
