@@ -54,6 +54,7 @@ after_script:
   - date
 
 stages:
+  - danger
   - build
   - prepare
   - merge
@@ -529,7 +530,7 @@ build-qa-image:
 danger-review:
   <<: *pull-cache
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:danger
-  stage: test
+  stage: danger
   dependencies: []
   before_script: []
   only:
@@ -546,6 +547,7 @@ danger-review:
     - node --version
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - danger --fail-on-errors=true
+    - exit 1
 
 rspec-pg:
   <<: *rspec-metadata-pg

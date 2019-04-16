@@ -301,6 +301,8 @@ export default {
 };
 </script>
 <template>
+  <!-- testing -->
+
   <div class="mr-state-widget prepend-top-default">
     <mr-widget-header :mr="mr" />
     <mr-widget-pipeline-container
