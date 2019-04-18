@@ -64,13 +64,14 @@ Create a new variable.
 POST /projects/:id/variables
 ```
 
-| Attribute       | Type    | required | Description           |
-|-----------------|---------|----------|-----------------------|
-| `id`            | integer/string | yes      | The ID of a project or [urlencoded NAMESPACE/PROJECT_NAME of the project](README.md#namespaced-path-encoding) owned by the authenticated user   |
-| `key`           | string  | yes      | The `key` of a variable; must have no more than 255 characters; only `A-Z`, `a-z`, `0-9`, and `_` are allowed |
-| `value`         | string  | yes      | The `value` of a variable |
-| `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
-| `protected`     | boolean | no       | Whether the variable is protected |
+| Attribute           | Type    | required | Description           |
+|---------------------|---------|----------|-----------------------|
+| `id`                | integer/string | yes      | The ID of a project or [urlencoded NAMESPACE/PROJECT_NAME of the project](README.md#namespaced-path-encoding) owned by the authenticated user   |
+| `key`               | string  | yes      | The `key` of a variable; must have no more than 255 characters; only `A-Z`, `a-z`, `0-9`, and `_` are allowed |
+| `value`             | string  | yes      | The `value` of a variable |
+| `variable_type`     | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
+| `protected`         | boolean | no       | Whether the variable is protected |
+| `environment_scope` | string  | no       | The `environment_scope` of the variable |
 
 ```
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/variables" --form "key=NEW_VARIABLE" --form "value=new value"
@@ -80,8 +81,9 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitla
 {
     "key": "NEW_VARIABLE",
     "value": "new value",
+    "protected": false,
+    "environment_scope": "*"
     "variable_type": "env_var",
-    "protected": false
 }
 ```
 
@@ -93,13 +95,14 @@ Update a project's variable.
 PUT /projects/:id/variables/:key
 ```
 
-| Attribute       | Type    | required | Description             |
-|-----------------|---------|----------|-------------------------|
-| `id`            | integer/string | yes      | The ID of a project or [urlencoded NAMESPACE/PROJECT_NAME of the project](README.md#namespaced-path-encoding) owned by the authenticated user     |
-| `key`           | string  | yes      | The `key` of a variable   |
-| `value`         | string  | yes      | The `value` of a variable |
-| `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
-| `protected`     | boolean | no       | Whether the variable is protected |
+| Attribute           | Type    | required | Description             |
+|---------------------|---------|----------|-------------------------|
+| `id`                | integer/string | yes      | The ID of a project or [urlencoded NAMESPACE/PROJECT_NAME of the project](README.md#namespaced-path-encoding) owned by the authenticated user     |
+| `key`               | string  | yes      | The `key` of a variable   |
+| `value`             | string  | yes      | The `value` of a variable |
+| `variable_type`     | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
+| `protected`         | boolean | no       | Whether the variable is protected |
+| `environment_scope` | string  | no       | The `environment_scope` of the variable |
 
 ```
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/variables/NEW_VARIABLE" --form "value=updated value"
@@ -110,7 +113,8 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab
     "key": "NEW_VARIABLE",
     "value": "updated value",
     "variable_type": "env_var",
-    "protected": true
+    "protected": true,
+    "environment_scope": "*"
 }
 ```
 
