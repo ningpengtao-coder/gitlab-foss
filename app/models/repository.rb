@@ -844,9 +844,11 @@ class Repository
 
   def merge(user, source_sha, merge_request, message)
     with_cache_hooks do
-      raw_repository.merge(user, source_sha, merge_request.target_branch, message) do |commit_id|
-        merge_request.update(in_progress_merge_commit_sha: commit_id)
-        nil # Return value does not matter.
+      MergeRequest.transaction do
+        raw_repository.merge(user, source_sha, merge_request.target_branch, message) do |commit_id|
+          merge_request.update(in_progress_merge_commit_sha: commit_id)
+          nil # Return value does not matter.
+        end
       end
     end
   end

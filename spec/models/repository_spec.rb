@@ -1364,16 +1364,57 @@ describe Repository do
       expect(repository.blob_at(merge_commit.id, 'files/ruby/feature.rb')).to be_present
     end
 
-    it 'sets the `in_progress_merge_commit_sha` flag for the given merge request' do
-      merge_commit_id = merge(repository, user, merge_request, message)
-
-      expect(merge_request.in_progress_merge_commit_sha).to eq(merge_commit_id)
-    end
-
     it 'removes carriage returns from commit message' do
       merge_commit_id = merge(repository, user, merge_request, message)
 
       expect(repository.commit(merge_commit_id).message).to eq(message.delete("\r"))
+    end
+
+    describe 'setting the `in_progress_merge_commit_sha` for the given merge request' do
+      let(:new_sha) { Digest::SHA1.hexdigest('foo') }
+
+      it 'sets the attribute when there are no errors' do
+        second_response = build_second_response(pre_receive_error: nil)
+        mock_gitaly(second_response)
+
+        merge(repository, user, merge_request, message)
+
+        expect(merge_request.reload.in_progress_merge_commit_sha).to eq(new_sha)
+      end
+
+      it 'rollsback when an error is encountered in the second step' do
+        second_response = build_second_response(pre_receive_error: 'my_error')
+        mock_gitaly(second_response)
+
+        expect do
+          merge(repository, user, merge_request, message)
+        end.to raise_error(Gitlab::Git::PreReceiveError)
+
+        expect(merge_request.reload.in_progress_merge_commit_sha).to be_nil
+      end
+
+      def build_second_response(pre_receive_error:)
+        double(
+          pre_receive_error: pre_receive_error,
+          git_error: nil,
+          branch_update: double(
+            commit_id: new_sha,
+            repo_created: false,
+            branch_created: false
+          )
+        )
+      end
+
+      def mock_gitaly(second_response)
+        responses = [
+          double(commit_id: new_sha, pre_receive_error: nil, git_error: nil),
+          second_response
+        ]
+
+        expect_any_instance_of(
+          Gitaly::OperationService::Stub
+        ).to receive(:user_merge_branch).and_return(responses.each)
+      end
     end
 
     def merge(repository, user, merge_request, message)
