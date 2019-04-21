@@ -16,6 +16,12 @@
       = time_interval_in_words(@pipeline.duration)
     - if @pipeline.queued_duration
       = "(queued for #{time_interval_in_words(@pipeline.queued_duration)})"
+      
+  .well-segment.merge-request-info
+    .icon-container
+      = custom_icon('mr_bold')
+    %span.commit-info.merge-requests{ 'data-project-commit-path' => merge_requests_project_commit_path(@project, @pipeline.commit.id, format: :json) }
+      = icon('spinner spin')
 
   .well-segment.qa-pipeline-badges
     .icon-container
