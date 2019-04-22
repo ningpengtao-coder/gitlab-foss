@@ -8,6 +8,9 @@ import { getParameterValues } from '~/lib/utils/url_utility';
 import Flash from '../../flash';
 import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
+import LineChart from './charts/line.vue';
+import SingleStatChart from './charts/single_stat.vue';
+import HeatmapChart from './charts/heatmap.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import MonitoringStore from '../stores/monitoring_store';
@@ -26,6 +29,9 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlLink,
+    LineChart,
+    SingleStatChart,
+    HeatmapChart,
   },
 
   props: {
@@ -248,23 +254,43 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <monitor-area-chart
-        v-for="(graphData, graphIndex) in groupData.metrics"
-        :key="graphIndex"
-        :graph-data="graphData"
-        :deployment-data="store.deploymentData"
-        :thresholds="getGraphAlertValues(graphData.queries)"
-        :container-width="elWidth"
-        group-id="monitor-area-chart"
-      >
-        <alert-widget
-          v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData"
-          :alerts-endpoint="alertsEndpoint"
-          :relevant-queries="graphData.queries"
-          :alerts-to-manage="getGraphAlerts(graphData.queries)"
-          @setAlerts="setAlerts"
+      <template v-for="(graphData, graphIndex) in groupData.metrics">
+        <monitor-area-chart
+          v-if="graphData.type === undefined || graphData.type === 'area'"
+          :key="`area-${graphIndex}`"
+          :graph-data="graphData"
+          :deployment-data="store.deploymentData"
+          :thresholds="getGraphAlertValues(graphData.queries)"
+          :container-width="elWidth"
+          group-id="monitor-area-chart"
+        >
+          <alert-widget
+            v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData"
+            :alerts-endpoint="alertsEndpoint"
+            :relevant-queries="graphData.queries"
+            :alerts-to-manage="getGraphAlerts(graphData.queries)"
+            @setAlerts="setAlerts"
+          />
+        </monitor-area-chart>
+        <single-stat-chart
+          v-else-if="graphData.type === 'single_stat'"
+          :key="`single-stat-${graphIndex}`"
+          value="100"
+          unit="ms"
+          title="latency"
         />
-      </monitor-area-chart>
+        <line-chart
+          v-else-if="graphData.type === 'line_chart'"
+          :key="`line-${graphIndex}`"
+          :graph-data="graphData"
+          :container-width="elWidth"
+        />
+        <heatmap-chart
+          v-else-if="graphData.type === 'heatmap_chart'"
+          :key="`heatmap-${graphIndex}`"
+          :graph-data="graphData"
+        />
+      </template>
     </graph-group>
   </div>
   <empty-state
