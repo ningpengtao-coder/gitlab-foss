@@ -52,11 +52,21 @@ module Notes
         # We must add the error after we call #save because errors are reset
         # when #save is called
         if only_commands
-          note.errors.add(:commands_only, 'Commands applied')
+          note.errors.add(:commands_only, applied_commands_message(update_params))
         end
       end
 
       note
+    end
+
+    private
+
+    def applied_commands_message(updates)
+      if updates.present?
+        'Commands applied'
+      else
+        'Commands did not apply'
+      end
     end
   end
 end

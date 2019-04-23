@@ -40,7 +40,7 @@ shared_examples 'move quick action' do
 
         wait_for_requests
 
-        expect(page).to have_content 'Commands applied'
+        expect(page).to have_content 'Commands did not apply'
         expect(issue.reload).to be_open
       end
     end

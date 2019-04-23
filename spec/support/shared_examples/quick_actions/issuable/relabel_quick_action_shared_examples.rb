@@ -54,7 +54,7 @@ shared_examples 'relabel quick action' do |issuable_type|
 
       wait_for_requests
       expect(page).not_to have_content '/relabel'
-      expect(page).to have_content 'Commands applied'
+      expect(page).to have_content 'Commands did not apply'
       expect(issuable.reload.labels).to match_array([label_bug])
     end
 
