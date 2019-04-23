@@ -109,6 +109,7 @@ describe Clusters::Applications::Ingress do
       expect(values).to include('repository')
       expect(values).to include('stats')
       expect(values).to include('podAnnotations')
+      expect(values).to include('enable-modsecurity')
     end
   end
 end

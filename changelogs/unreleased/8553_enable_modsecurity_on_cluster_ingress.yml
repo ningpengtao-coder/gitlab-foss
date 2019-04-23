@@ -1,0 +1,5 @@
+---
+title: Enable ModSecurity detection in Ingress cluster apps
+merge_request:
+author:
+type: added
