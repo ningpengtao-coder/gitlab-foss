@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('db', 'post_migrate', '20190322132835_enqueue_ingress_updates.rb')
+require Rails.root.join('db', 'post_migrate', '20190423143911_enqueue_ingress_updates.rb')
 
 describe EnqueueIngressUpdates, :migration, :sidekiq do
   let(:migration) { described_class.new }
