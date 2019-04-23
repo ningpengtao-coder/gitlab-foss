@@ -195,3 +195,6 @@ to integrate your job with [GitLab Merge Request API](../../api/merge_requests.m
 
 You can find the list of avilable variables in [the reference sheet](../variables/predefined_variables.md).
 The variable names begin with the `CI_MERGE_REQUEST_` prefix.
+
+NOTE: **NOTE**:
+- The predefined variable `CI_COMMIT_REF_NAME` might misbehave in your job because it points to a merge request's ref such as `refs/merge-requests/:iid/merge` or `refs/merge-requests/:iid/head` intead of a source branch name such as `feature-1`. In order to correctly look up a source branch name, please use `CI_MERGE_REQUEST_SOURCE_BRANCH_NAME` instead.
