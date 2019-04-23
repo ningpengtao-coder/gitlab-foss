@@ -30,8 +30,13 @@ class Gitlab::BackgroundMigration::UpdateIngressApplication
 
     project_ingress(from, to).each do |project_id, app_id|
       app = Clusters::Applications::Ingress.find(app_id)
-      app.make_scheduled!
-      ClusterUpgradeAppWorker.perform_async(app_name, app_id)
+
+      begin
+        app.make_scheduled!
+        ClusterUpgradeAppWorker.perform_async(app_name, app_id)
+      rescue ActiveRecord::ActiveRecordError => e
+        Rails.logger.error("Unable to update Ingress application #{app_id}: #{e}")
+      end
     end
   end
 
