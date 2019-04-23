@@ -176,4 +176,11 @@ describe('text_utility', () => {
       });
     });
   });
+
+  describe('escapeRegExp', () => {
+    it('escapes regexp special characters', () => {
+      const str = '[\\^$.*+?()[]{}|]';
+      expect(textUtils.escapeRegExp(str)).toBe('\\[\\\\\\^\\$\\.\\*\\+\\?\\(\\)\\[\\]\\{\\}\\|\\]');
+    });
+  });
 });

@@ -192,3 +192,11 @@ export const truncateNamespace = (string = '') => {
 
   return namespace;
 };
+
+/**
+ * Escapes RegExp special characters
+ *
+ * @param {String} str
+ * @returns String
+ */
+export const escapeRegExp = str => str.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
