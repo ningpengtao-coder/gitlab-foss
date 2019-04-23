@@ -29,7 +29,7 @@ future GitLab releases.**
 | `CI_COMMIT_BEFORE_SHA`                  | 11.2   | all    | The previous latest commit present on a branch before a push request. |
 | `CI_COMMIT_DESCRIPTION`                 | 10.8   | all    | The description of the commit: the message without first line, if the title is shorter than 100 characters; full message in other case. |
 | `CI_COMMIT_MESSAGE`                     | 10.8   | all    | The full commit message. |
-| `CI_COMMIT_REF_NAME`                    | 9.0    | all    | The branch or tag name for which project is built |
+| `CI_COMMIT_REF_NAME`                    | 9.0    | all    | The branch/tag/ref name for which project is built |
 | `CI_COMMIT_REF_SLUG`                    | 9.0    | all    | `$CI_COMMIT_REF_NAME` lowercased, shortened to 63 bytes, and with everything except `0-9` and `a-z` replaced with `-`. No leading / trailing `-`. Use in URLs, host names and domain names. |
 | `CI_COMMIT_SHA`                         | 9.0    | all    | The commit revision for which project is built |
 | `CI_COMMIT_SHORT_SHA`                   | 11.7   | all    | The first eight characters of `CI_COMMIT_SHA` |
