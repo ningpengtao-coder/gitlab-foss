@@ -128,7 +128,7 @@ class ApplicationController < ActionController::Base
 
     payload[:ua] = request.env["HTTP_USER_AGENT"]
     payload[:remote_ip] = request.remote_ip
-    payload[Gitlab::CorrelationId::LOG_KEY] = Gitlab::CorrelationId.current_id
+    payload[Labkit::Correlation::CorrelationId::LOG_KEY] = Labkit::Correlation::CorrelationId.current_id
 
     logged_user = auth_user
 
@@ -293,7 +293,7 @@ class ApplicationController < ActionController::Base
 
       unless Gitlab::Auth::LDAP::Access.allowed?(current_user)
         sign_out current_user
-        flash[:alert] = "Access denied for your LDAP account."
+        flash[:alert] = _("Access denied for your LDAP account.")
         redirect_to new_user_session_path
       end
     end
@@ -340,7 +340,7 @@ class ApplicationController < ActionController::Base
 
   def require_email
     if current_user && current_user.temp_oauth_email? && session[:impersonator_id].nil?
-      return redirect_to profile_path, notice: 'Please complete your profile with email address'
+      return redirect_to profile_path, notice: _('Please complete your profile with email address')
     end
   end
 

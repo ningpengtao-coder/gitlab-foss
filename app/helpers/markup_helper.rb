@@ -74,7 +74,7 @@ module MarkupHelper
   # the tag contents are truncated without removing the closing tag.
   def first_line_in_markdown(object, attribute, max_chars = nil, options = {})
     md = markdown_field(object, attribute, options)
-    return nil unless md.present?
+    return unless md.present?
 
     tags = %w(a gl-emoji b pre code p span)
     tags << 'img' if options[:allow_images]
@@ -241,9 +241,7 @@ module MarkupHelper
       node.remove if node.name == 'a' && node.content.blank?
     end
 
-    # Use `Loofah` directly instead of `sanitize`
-    # as we still use the `rails-deprecated_sanitizer` gem
-    Loofah.fragment(text).scrub!(scrubber).to_s
+    sanitize text, scrubber: scrubber
   end
 
   def markdown_toolbar_button(options = {})

@@ -13,12 +13,18 @@ shared_examples 'languages and percentages JSON response' do
     )
   end
 
-  it 'returns expected language values' do
-    get api("/projects/#{project.id}/languages", user)
+  context "when the languages haven't been detected yet" do
+    it 'returns expected language values' do
+      get api("/projects/#{project.id}/languages", user)
 
-    expect(response).to have_gitlab_http_status(:ok)
-    expect(json_response).to eq(expected_languages)
-    expect(json_response.count).to be > 1
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(json_response).to eq({})
+
+      get api("/projects/#{project.id}/languages", user)
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(JSON.parse(response.body)).to eq(expected_languages)
+    end
   end
 
   context 'when the languages were detected before' do
@@ -40,6 +46,8 @@ shared_examples 'languages and percentages JSON response' do
 end
 
 describe API::Projects do
+  include ExternalAuthorizationServiceHelpers
+
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
@@ -1039,7 +1047,6 @@ describe API::Projects do
         expect(json_response['http_url_to_repo']).to be_present
         expect(json_response['web_url']).to be_present
         expect(json_response['owner']).to be_a Hash
-        expect(json_response['owner']).to be_a Hash
         expect(json_response['name']).to eq(project.name)
         expect(json_response['path']).to be_present
         expect(json_response['issues_enabled']).to be_present
@@ -1127,7 +1134,9 @@ describe API::Projects do
           'path' => user.namespace.path,
           'kind' => user.namespace.kind,
           'full_path' => user.namespace.full_path,
-          'parent_id' => nil
+          'parent_id' => nil,
+          'avatar_url' => user.avatar_url,
+          'web_url' => Gitlab::Routing.url_helpers.user_url(user)
         })
       end
 
@@ -1177,6 +1186,16 @@ describe API::Projects do
 
         it "includes statistics if user is a member" do
           project.add_developer(user)
+
+          get api("/projects/#{project.id}", user), params: { statistics: true }
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to include 'statistics'
+        end
+
+        it "includes statistics also when repository is disabled" do
+          project.add_developer(user)
+          project.project_feature.update_attribute(:repository_access_level, ProjectFeature::DISABLED)
 
           get api("/projects/#{project.id}", user), params: { statistics: true }
 
@@ -1317,6 +1336,70 @@ describe API::Projects do
               .to eq(Gitlab::Access::OWNER)
             end
           end
+        end
+      end
+
+      context 'when project belongs to a group namespace' do
+        let(:group) { create(:group, :with_avatar) }
+        let(:project) { create(:project, namespace: group) }
+        let!(:project_member) { create(:project_member, :developer, user: user, project: project) }
+
+        it 'returns group web_url and avatar_url' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+
+          group_data = json_response['namespace']
+          expect(group_data['web_url']).to eq(group.web_url)
+          expect(group_data['avatar_url']).to eq(group.avatar_url)
+        end
+      end
+
+      context 'when project belongs to a user namespace' do
+        let(:user) { create(:user) }
+        let(:project) { create(:project, namespace: user.namespace) }
+
+        it 'returns user web_url and avatar_url' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+
+          user_data = json_response['namespace']
+          expect(user_data['web_url']).to eq("http://localhost/#{user.username}")
+          expect(user_data['avatar_url']).to eq(user.avatar_url)
+        end
+      end
+    end
+
+    context 'with external authorization' do
+      let(:project) do
+        create(:project,
+               namespace: user.namespace,
+               external_authorization_classification_label: 'the-label')
+      end
+
+      context 'when the user has access to the project' do
+        before do
+          external_service_allow_access(user, project)
+        end
+
+        it 'includes the label in the response' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['external_authorization_classification_label']).to eq('the-label')
+        end
+      end
+
+      context 'when the external service denies access' do
+        before do
+          external_service_deny_access(user, project)
+        end
+
+        it 'returns a 404' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(404)
         end
       end
     end
@@ -1872,6 +1955,20 @@ describe API::Projects do
                           request_access_enabled: true }
         put api("/projects/#{project.id}", user3), params: project_param
         expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'when updating external classification' do
+      before do
+        enable_external_authorization_service_check
+      end
+
+      it 'updates the classification label' do
+        put(api("/projects/#{project.id}", user), params: { external_authorization_classification_label: 'new label' })
+
+        expect(response).to have_gitlab_http_status(200)
+
+        expect(project.reload.external_authorization_classification_label).to eq('new label')
       end
     end
   end

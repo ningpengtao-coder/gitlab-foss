@@ -1,6 +1,23 @@
 import { s__ } from '../../locale';
 import { parseBoolean } from '../../lib/utils/common_utils';
-import { INGRESS, JUPYTER, KNATIVE, CERT_MANAGER, RUNNER } from '../constants';
+import {
+  INGRESS,
+  JUPYTER,
+  KNATIVE,
+  CERT_MANAGER,
+  RUNNER,
+  APPLICATION_INSTALLED_STATUSES,
+} from '../constants';
+
+const isApplicationInstalled = appStatus => APPLICATION_INSTALLED_STATUSES.includes(appStatus);
+
+const applicationInitialState = {
+  status: null,
+  statusReason: null,
+  requestReason: null,
+  requestStatus: null,
+  installed: false,
+};
 
 export default class ClusterStore {
   constructor() {
@@ -12,61 +29,43 @@ export default class ClusterStore {
       statusReason: null,
       applications: {
         helm: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|Helm Tiller'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
         },
         ingress: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|Ingress'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
           externalIp: null,
+          externalHostname: null,
         },
         cert_manager: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|Cert-Manager'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
           email: null,
         },
         runner: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|GitLab Runner'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
           version: null,
           chartRepo: 'https://gitlab.com/charts/gitlab-runner',
           upgradeAvailable: null,
         },
         prometheus: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|Prometheus'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
         },
         jupyter: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|JupyterHub'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
           hostname: null,
         },
         knative: {
+          ...applicationInitialState,
           title: s__('ClusterIntegration|Knative'),
-          status: null,
-          statusReason: null,
-          requestStatus: null,
-          requestReason: null,
           hostname: null,
+          isEditingHostName: false,
           externalIp: null,
+          externalHostname: null,
         },
       },
     };
@@ -115,10 +114,12 @@ export default class ClusterStore {
         ...(this.state.applications[appId] || {}),
         status,
         statusReason,
+        installed: isApplicationInstalled(status),
       };
 
       if (appId === INGRESS) {
         this.state.applications.ingress.externalIp = serverAppEntry.external_ip;
+        this.state.applications.ingress.externalHostname = serverAppEntry.external_hostname;
       } else if (appId === CERT_MANAGER) {
         this.state.applications.cert_manager.email =
           this.state.applications.cert_manager.email || serverAppEntry.email;
@@ -129,10 +130,14 @@ export default class ClusterStore {
             ? `jupyter.${this.state.applications.ingress.externalIp}.nip.io`
             : '');
       } else if (appId === KNATIVE) {
-        this.state.applications.knative.hostname =
-          serverAppEntry.hostname || this.state.applications.knative.hostname;
+        if (!this.state.applications.knative.isEditingHostName) {
+          this.state.applications.knative.hostname =
+            serverAppEntry.hostname || this.state.applications.knative.hostname;
+        }
         this.state.applications.knative.externalIp =
           serverAppEntry.external_ip || this.state.applications.knative.externalIp;
+        this.state.applications.knative.externalHostname =
+          serverAppEntry.external_hostname || this.state.applications.knative.externalHostname;
       } else if (appId === RUNNER) {
         this.state.applications.runner.version = version;
         this.state.applications.runner.upgradeAvailable = upgradeAvailable;

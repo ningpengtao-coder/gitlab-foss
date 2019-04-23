@@ -39,6 +39,8 @@ options:
 
 ### Improving NFS performance with GitLab
 
+NOTE: **Note:** This is only available with GitLab 11.9 and up.
+
 If you are using NFS to share Git data, we recommend that you enable a
 number of feature flags that will allow GitLab application processes to
 access Git data directly instead of going through the [Gitaly
@@ -69,9 +71,8 @@ bug](https://bugzilla.redhat.com/show_bug.cgi?id=1552203) that may be fixed in
 [more recent kernels with this
 commit](https://github.com/torvalds/linux/commit/95da1b3a5aded124dd1bda1e3cdb876184813140).
 
-Users encountering a similar issue may be advised to disable the NFS server
-delegation feature, which is an optimization to reduce the number of network
-round-trips needed to read or write files. To disable NFS server delegations
+GitLab recommends all NFS users disable the NFS server
+delegation feature. To disable NFS server delegations
 on an Linux NFS server, do the following:
 
 1. On the NFS server, run:
@@ -144,7 +145,6 @@ mountpoint
 └── gitlab-data
     ├── builds
     ├── git-data
-    ├── home-git
     ├── shared
     └── uploads
 ```
@@ -157,15 +157,10 @@ configuration to move each data location to a subdirectory:
 
 ```ruby
 git_data_dirs({"default" => { "path" => "/gitlab-nfs/gitlab-data/git-data"} })
-user['home'] = '/gitlab-nfs/gitlab-data/home'
 gitlab_rails['uploads_directory'] = '/gitlab-nfs/gitlab-data/uploads'
 gitlab_rails['shared_path'] = '/gitlab-nfs/gitlab-data/shared'
 gitlab_ci['builds_directory'] = '/gitlab-nfs/gitlab-data/builds'
 ```
-
-To move the `git` home directory, all GitLab services must be stopped. Run
-`gitlab-ctl stop && initctl stop gitlab-runsvdir`. Then continue with the
-reconfigure.
 
 Run `sudo gitlab-ctl reconfigure` to start using the central location. Please
 be aware that if you had existing data you will need to manually copy/rsync it
@@ -196,14 +191,13 @@ are empty before attempting a restore. Read more about the
 
 ## Multiple NFS mounts
 
-When using default Omnibus configuration you will need to share 5 data locations
+When using default Omnibus configuration you will need to share 4 data locations
 between all GitLab cluster nodes. No other locations should be shared. The
-following are the 5 locations need to be shared:
+following are the 4 locations need to be shared:
 
 | Location | Description | Default configuration |
 | -------- | ----------- | --------------------- |
 | `/var/opt/gitlab/git-data` | Git repository data. This will account for a large portion of your data | `git_data_dirs({"default" => { "path" => "/var/opt/gitlab/git-data"} })`
-| `/var/opt/gitlab/.ssh` | SSH `authorized_keys` file and keys used to import repositories from some other Git services | `user['home'] = '/var/opt/gitlab/'`
 | `/var/opt/gitlab/gitlab-rails/uploads` | User uploaded attachments | `gitlab_rails['uploads_directory'] = '/var/opt/gitlab/gitlab-rails/uploads'`
 | `/var/opt/gitlab/gitlab-rails/shared` | Build artifacts, GitLab Pages, LFS objects, temp files, etc. If you're using LFS this may also account for a large portion of your data | `gitlab_rails['shared_path'] = '/var/opt/gitlab/gitlab-rails/shared'`
 | `/var/opt/gitlab/gitlab-ci/builds` | GitLab CI build traces | `gitlab_ci['builds_directory'] = '/var/opt/gitlab/gitlab-ci/builds'`

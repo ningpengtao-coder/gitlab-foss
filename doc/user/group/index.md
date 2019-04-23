@@ -58,14 +58,13 @@ By doing so:
 ## Issues and merge requests within a group
 
 Issues and merge requests are part of projects. For a given group, view all the
-[issues](../project/issues/index.md#issues-per-group) and [merge requests](../project/merge_requests/index.md#merge-requests-per-group) across all the projects in that group,
+[issues](../project/issues/index.md#issues-list) and [merge requests](../project/merge_requests/index.md#merge-requests-per-group) across all the projects in that group,
 together in a single list view.
 
 ## Create a new group
 
-> **Notes:**
-> - For a list of words that are not allowed to be used as group names see the
->   [reserved names](../reserved_names.md).
+> For a list of words that are not allowed to be used as group names see the
+> [reserved names](../reserved_names.md).
 
 You can create a group in GitLab from:
 
@@ -152,6 +151,17 @@ There are two different ways to add a new project to a group:
 
     ![Select group](img/select_group_dropdown.png)
 
+### Default project creation level
+
+Group owners or administrators can allow users with the
+Developer role to create projects under groups.
+
+By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group, but this can be changed either within the group settings for a group, or
+be set globally by a GitLab administrator in the Admin area
+at **Settings > General > Visibility and access controls**.
+
+Available settings are `No one`, `Maintainers`, or `Developers + Maintainers`.
+
 ## Transfer projects into groups
 
 Learn how to [transfer a project into a group](../project/settings/index.md#transferring-an-existing-project-into-another-namespace).
@@ -168,19 +178,21 @@ Alternatively, you can [lock the sharing with group feature](#share-with-group-l
 In GitLab Enterprise Edition it is possible to manage GitLab group memberships using LDAP groups.
 See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for more information.
 
-## Transfer groups to another group
+## Transferring groups
 
-From 10.5 there are two different ways to transfer a group:
+From GitLab 10.5, groups can be transferred in the following ways:
 
-- Either by transferring a group into another group (making it a subgroup of that group).
-- Or by converting a subgroup into a root group (a group with no parent).
+- Top-level groups can be transferred to a group, converting them into subgroups.
+- Subgroups can be transferred to a new parent group.
+- Subgroups can be transferred out from a parent group, converting them into top-level groups.
 
-Please make sure to understand that:
+When transferring groups, note:
 
-- Changing a group's parent can have unintended side effects. See [Redirects when changing repository paths](https://docs.gitlab.com/ce/user/project/index.html#redirects-when-changing-repository-paths)
-- You can only transfer the group to a group you manage.
+- Changing a group's parent can have unintended side effects. See [Redirects when changing repository paths](../project/index.md#redirects-when-changing-repository-paths).
+- You can only transfer groups to groups you manage.
 - You will need to update your local repositories to point to the new location.
-- If the parent group's visibility is lower than the group current visibility, visibility levels for subgroups and projects will be changed to match the new parent group's visibility.
+- If the parent group's visibility is lower than the group's current visibility, visibility levels for subgroups and projects will be changed to match the new parent group's visibility.
+- Only explicit group membership is transferred, not inherited membership. If the group's owners have only inherited membership, this would leave the group without an owner. In this case, the user transferring the group becomes the group's owner.
 
 ## Group settings
 

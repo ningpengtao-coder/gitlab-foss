@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::HashedStorage::MigrateAttachmentsService do
@@ -75,6 +77,12 @@ describe Projects::HashedStorage::MigrateAttachmentsService do
 
         expect { service.execute }.to raise_error(Projects::HashedStorage::AttachmentCannotMoveError)
       end
+    end
+
+    it 'works even when project validation fails' do
+      allow(project).to receive(:valid?) { false }
+
+      expect { service.execute }.to change { project.hashed_storage?(:attachments) }.to(true)
     end
   end
 

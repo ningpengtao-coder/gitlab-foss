@@ -54,6 +54,8 @@ module Gitlab
             auto_devops_disabled: count(::ProjectAutoDevops.disabled),
             deploy_keys: count(DeployKey),
             deployments: count(Deployment),
+            successful_deployments: count(Deployment.success),
+            failed_deployments: count(Deployment.failed),
             environments: count(::Environment),
             clusters: count(::Clusters::Cluster),
             clusters_enabled: count(::Clusters::Cluster.enabled),
@@ -82,6 +84,7 @@ module Gitlab
             projects: count(Project),
             projects_imported_from_github: count(Project.where(import_type: 'github')),
             projects_with_repositories_enabled: count(ProjectFeature.where('repository_access_level > ?', ProjectFeature::DISABLED)),
+            projects_with_error_tracking_enabled: count(::ErrorTracking::ProjectErrorTrackingSetting.where(enabled: true)),
             protected_branches: count(ProtectedBranch),
             releases: count(Release),
             remote_mirrors: count(RemoteMirror),
@@ -114,9 +117,11 @@ module Gitlab
           container_registry_enabled: Gitlab.config.registry.enabled,
           gitlab_shared_runners_enabled: Gitlab.config.gitlab_ci.shared_runners_enabled,
           gravatar_enabled: Gitlab::CurrentSettings.gravatar_enabled?,
+          influxdb_metrics_enabled: Gitlab::Metrics.influx_metrics_enabled?,
           ldap_enabled: Gitlab.config.ldap.enabled,
           mattermost_enabled: Gitlab.config.mattermost.enabled,
           omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
+          prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
           reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
           signup_enabled: Gitlab::CurrentSettings.allow_signup?
         }

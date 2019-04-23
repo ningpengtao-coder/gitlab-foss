@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::Ci::LintsController do
@@ -16,15 +18,15 @@ describe Projects::Ci::LintsController do
         get :show, params: { namespace_id: project.namespace, project_id: project }
       end
 
-      it 'should be success' do
+      it 'is success' do
         expect(response).to be_success
       end
 
-      it 'should render show page' do
+      it 'renders show page' do
         expect(response).to render_template :show
       end
 
-      it 'should retrieve project' do
+      it 'retrieves project' do
         expect(assigns(:project)).to eq(project)
       end
     end
@@ -36,7 +38,7 @@ describe Projects::Ci::LintsController do
         get :show, params: { namespace_id: project.namespace, project_id: project }
       end
 
-      it 'should respond with 404' do
+      it 'responds with 404' do
         expect(response).to have_gitlab_http_status(404)
       end
     end
@@ -74,7 +76,7 @@ describe Projects::Ci::LintsController do
         post :create, params: { namespace_id: project.namespace, project_id: project, content: content }
       end
 
-      it 'should be success' do
+      it 'is success' do
         expect(response).to be_success
       end
 
@@ -82,7 +84,7 @@ describe Projects::Ci::LintsController do
         expect(response).to render_template :show
       end
 
-      it 'should retrieve project' do
+      it 'retrieves project' do
         expect(assigns(:project)).to eq(project)
       end
     end
@@ -102,7 +104,7 @@ describe Projects::Ci::LintsController do
         post :create, params: { namespace_id: project.namespace, project_id: project, content: content }
       end
 
-      it 'should assign errors' do
+      it 'assigns errors' do
         expect(assigns[:error]).to eq('jobs:rubocop config contains unknown keys: scriptt')
       end
     end
@@ -114,7 +116,7 @@ describe Projects::Ci::LintsController do
         post :create, params: { namespace_id: project.namespace, project_id: project, content: content }
       end
 
-      it 'should respond with 404' do
+      it 'responds with 404' do
         expect(response).to have_gitlab_http_status(404)
       end
     end

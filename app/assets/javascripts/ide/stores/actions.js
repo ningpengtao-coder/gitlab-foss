@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { visitUrl } from '~/lib/utils/url_utility';
 import flash from '~/flash';
 import * as types from './mutation_types';
-import FilesDecoratorWorker from './workers/files_decorator_worker';
+import { decorateFiles } from '../lib/files';
 import { stageKeys } from '../constants';
 
 export const redirectToUrl = (_, url) => visitUrl(url);
@@ -53,10 +53,9 @@ export const setResizingStatus = ({ commit }, resizing) => {
 
 export const createTempEntry = (
   { state, commit, dispatch },
-  { name, type, content = '', base64 = false },
+  { name, type, content = '', base64 = false, binary = false, rawPath = '' },
 ) =>
   new Promise(resolve => {
-    const worker = new FilesDecoratorWorker();
     const fullName = name.slice(-1) !== '/' && type === 'tree' ? `${name}/` : name;
 
     if (state.entries[name]) {
@@ -74,39 +73,36 @@ export const createTempEntry = (
       return null;
     }
 
-    worker.addEventListener('message', ({ data }) => {
-      const { file, parentPath } = data;
-
-      worker.terminate();
-
-      commit(types.CREATE_TMP_ENTRY, {
-        data,
-        projectId: state.currentProjectId,
-        branchId: state.currentBranchId,
-      });
-
-      if (type === 'blob') {
-        commit(types.TOGGLE_FILE_OPEN, file.path);
-        commit(types.ADD_FILE_TO_CHANGED, file.path);
-        dispatch('setFileActive', file.path);
-      }
-
-      if (parentPath && !state.entries[parentPath].opened) {
-        commit(types.TOGGLE_TREE_OPEN, parentPath);
-      }
-
-      resolve(file);
-    });
-
-    worker.postMessage({
+    const data = decorateFiles({
       data: [fullName],
       projectId: state.currentProjectId,
       branchId: state.currentBranchId,
       type,
       tempFile: true,
-      base64,
       content,
+      base64,
+      binary,
+      rawPath,
     });
+    const { file, parentPath } = data;
+
+    commit(types.CREATE_TMP_ENTRY, {
+      data,
+      projectId: state.currentProjectId,
+      branchId: state.currentBranchId,
+    });
+
+    if (type === 'blob') {
+      commit(types.TOGGLE_FILE_OPEN, file.path);
+      commit(types.ADD_FILE_TO_CHANGED, file.path);
+      dispatch('setFileActive', file.path);
+    }
+
+    if (parentPath && !state.entries[parentPath].opened) {
+      commit(types.TOGGLE_TREE_OPEN, parentPath);
+    }
+
+    resolve(file);
 
     return null;
   });

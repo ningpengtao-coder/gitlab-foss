@@ -2,6 +2,7 @@ import axios from '~/lib/utils/axios_utils';
 import * as commonUtils from '~/lib/utils/common_utils';
 import MockAdapter from 'axios-mock-adapter';
 import { faviconDataUrl, overlayDataUrl, faviconWithOverlayDataUrl } from './mock_data';
+import breakpointInstance from '~/breakpoints';
 
 const PIXEL_TOLERANCE = 0.2;
 
@@ -377,6 +378,38 @@ describe('common_utils', () => {
       };
 
       expect(commonUtils.isMetaClick(e)).toBe(true);
+    });
+  });
+
+  describe('contentTop', () => {
+    it('does not add height for fileTitle or compareVersionsHeader if screen is too small', () => {
+      spyOn(breakpointInstance, 'isDesktop').and.returnValue(false);
+
+      setFixtures(`
+        <div class="diff-file file-title-flex-parent">
+          blah blah blah
+        </div>
+        <div class="mr-version-controls">
+          more blah blah blah
+        </div>
+      `);
+
+      expect(commonUtils.contentTop()).toBe(0);
+    });
+
+    it('adds height for fileTitle and compareVersionsHeader screen is large enough', () => {
+      spyOn(breakpointInstance, 'isDesktop').and.returnValue(true);
+
+      setFixtures(`
+        <div class="diff-file file-title-flex-parent">
+          blah blah blah
+        </div>
+        <div class="mr-version-controls">
+          more blah blah blah
+        </div>
+      `);
+
+      expect(commonUtils.contentTop()).toBe(18);
     });
   });
 
@@ -859,6 +892,16 @@ describe('common_utils', () => {
       document.body.appendChild(el);
 
       expect(commonUtils.isInViewport(el)).toBe(false);
+    });
+  });
+
+  describe('isScopedLabel', () => {
+    it('returns true when `::` is present in title', () => {
+      expect(commonUtils.isScopedLabel({ title: 'foo::bar' })).toBe(true);
+    });
+
+    it('returns false when `::` is not present', () => {
+      expect(commonUtils.isScopedLabel({ title: 'foobar' })).toBe(false);
     });
   });
 });

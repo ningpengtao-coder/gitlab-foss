@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::GraphsController do
@@ -27,6 +29,7 @@ describe Projects::GraphsController do
 
   describe 'charts' do
     context 'when languages were previously detected' do
+      let(:project) { create(:project, :repository, detected_repository_languages: true) }
       let!(:repository_language) { create(:repository_language, project: project) }
 
       it 'sets the languages properly' do

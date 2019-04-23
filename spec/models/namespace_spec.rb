@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Namespace do
@@ -59,6 +61,11 @@ describe Namespace do
         it { expect(group).to be_valid }
       end
     end
+  end
+
+  describe 'delegate' do
+    it { is_expected.to delegate_method(:name).to(:owner).with_prefix.with_arguments(allow_nil: true) }
+    it { is_expected.to delegate_method(:avatar_url).to(:owner).with_arguments(allow_nil: true) }
   end
 
   describe "Respond to" do
@@ -738,14 +745,14 @@ describe Namespace do
 
   describe '#full_path_was' do
     context 'when the group has no parent' do
-      it 'should return the path was' do
+      it 'returns the path was' do
         group = create(:group, parent: nil)
         expect(group.full_path_was).to eq(group.path_was)
       end
     end
 
     context 'when a parent is assigned to a group with no previous parent' do
-      it 'should return the path was' do
+      it 'returns the path was' do
         group = create(:group, parent: nil)
 
         parent = create(:group)
@@ -756,7 +763,7 @@ describe Namespace do
     end
 
     context 'when a parent is removed from the group' do
-      it 'should return the parent full path' do
+      it 'returns the parent full path' do
         parent = create(:group)
         group = create(:group, parent: parent)
         group.parent = nil
@@ -766,13 +773,54 @@ describe Namespace do
     end
 
     context 'when changing parents' do
-      it 'should return the previous parent full path' do
+      it 'returns the previous parent full path' do
         parent = create(:group)
         group = create(:group, parent: parent)
         new_parent = create(:group)
         group.parent = new_parent
         expect(group.full_path_was).to eq("#{parent.full_path}/#{group.path}")
       end
+    end
+  end
+
+  describe '#auto_devops_enabled' do
+    context 'with users' do
+      let(:user) { create(:user) }
+
+      subject { user.namespace.auto_devops_enabled? }
+
+      before do
+        user.namespace.update!(auto_devops_enabled: auto_devops_enabled)
+      end
+
+      context 'when auto devops is explicitly enabled' do
+        let(:auto_devops_enabled) { true }
+
+        it { is_expected.to eq(true) }
+      end
+
+      context 'when auto devops is explicitly disabled' do
+        let(:auto_devops_enabled) { false }
+
+        it { is_expected.to eq(false) }
+      end
+    end
+  end
+
+  describe '#user?' do
+    subject { namespace.user? }
+
+    context 'when type is a user' do
+      let(:user) { create(:user) }
+      let(:namespace) { user.namespace }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when type is a group' do
+      let(:namespace) { create(:group) }
+
+      it { is_expected.to be_falsy }
     end
   end
 end

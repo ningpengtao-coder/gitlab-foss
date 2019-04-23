@@ -12,6 +12,9 @@ class Clusters::ClustersController < Clusters::BaseController
   before_action :authorize_update_cluster!, only: [:update]
   before_action :authorize_admin_cluster!, only: [:destroy]
   before_action :update_applications_status, only: [:cluster_status]
+  before_action only: [:show] do
+    push_frontend_feature_flag(:metrics_time_window)
+  end
 
   helper_method :token_in_session
 
@@ -123,16 +126,7 @@ class Clusters::ClustersController < Clusters::BaseController
   private
 
   def update_params
-    if cluster.managed?
-      params.require(:cluster).permit(
-        :enabled,
-        :environment_scope,
-        :base_domain,
-        platform_kubernetes_attributes: [
-          :namespace
-        ]
-      )
-    else
+    if cluster.provided_by_user?
       params.require(:cluster).permit(
         :enabled,
         :name,
@@ -142,6 +136,15 @@ class Clusters::ClustersController < Clusters::BaseController
           :api_url,
           :token,
           :ca_cert,
+          :namespace
+        ]
+      )
+    else
+      params.require(:cluster).permit(
+        :enabled,
+        :environment_scope,
+        :base_domain,
+        platform_kubernetes_attributes: [
           :namespace
         ]
       )

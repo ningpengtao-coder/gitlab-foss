@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe MergeRequests::MergeService do
   set(:user) { create(:user) }
   set(:user2) { create(:user) }
-  let(:merge_request) { create(:merge_request, :simple, author: user2, assignee: user2) }
+  let(:merge_request) { create(:merge_request, :simple, author: user2, assignees: [user2]) }
   let(:project) { merge_request.project }
 
   before do
@@ -111,7 +113,7 @@ describe MergeRequests::MergeService do
     end
 
     context 'closes related todos' do
-      let(:merge_request) { create(:merge_request, assignee: user, author: user) }
+      let(:merge_request) { create(:merge_request, assignees: [user], author: user) }
       let(:project) { merge_request.project }
       let(:service) { described_class.new(project, user, commit_message: 'Awesome message') }
       let!(:todo) do
@@ -239,12 +241,12 @@ describe MergeRequests::MergeService do
       it 'logs and saves error if there is an PreReceiveError exception' do
         error_message = 'error message'
 
-        allow(service).to receive(:repository).and_raise(Gitlab::Git::PreReceiveError, error_message)
+        allow(service).to receive(:repository).and_raise(Gitlab::Git::PreReceiveError, "GitLab: #{error_message}")
         allow(service).to receive(:execute_hooks)
 
         service.execute(merge_request)
 
-        expect(merge_request.merge_error).to include("Something went wrong during merge pre-receive hook: #{error_message}")
+        expect(merge_request.merge_error).to include('Something went wrong during merge pre-receive hook')
         expect(Rails.logger).to have_received(:error).with(a_string_matching(error_message))
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::TransferService do
@@ -83,6 +85,7 @@ describe Projects::TransferService do
       subject { transfer_project(project, user, group) }
 
       before do
+        stub_feature_flags(ci_preparing_state: false)
         expect(Clusters::Gcp::Kubernetes::CreateOrUpdateServiceAccountService).to receive(:namespace_creator).and_return(service_account_creator)
         expect(Clusters::Gcp::Kubernetes::FetchKubernetesTokenService).to receive(:new).and_return(secrets_fetcher)
       end

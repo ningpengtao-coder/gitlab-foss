@@ -125,9 +125,17 @@ const bindEvents = () => {
         text: 'Spring',
         icon: '.template-option .icon-spring',
       },
+      iosswift: {
+        text: 'iOS (Swift)',
+        icon: '.template-option svg.icon-gitlab',
+      },
       dotnetcore: {
         text: '.NET Core',
         icon: '.template-option .icon-dotnet',
+      },
+      android: {
+        text: 'Android',
+        icon: '.template-option svg.icon-android',
       },
       gomicro: {
         text: 'Go Micro',
@@ -208,6 +216,12 @@ const bindEvents = () => {
   });
 
   $projectImportUrl.keyup(() => deriveProjectPathFromUrl($projectImportUrl));
+
+  $('.js-import-git-toggle-button').on('click', () => {
+    const $projectMirror = $('#project_mirror');
+
+    $projectMirror.attr('disabled', !$projectMirror.attr('disabled'));
+  });
 
   $projectName.on('keyup change', () => {
     onProjectNameChange($projectName, $projectPath);

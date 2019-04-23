@@ -62,7 +62,7 @@ module Gitlab
         end
 
         branch = response.branch
-        return nil unless branch
+        return unless branch
 
         target_commit = Gitlab::Git::Commit.decorate(@repository, branch.target_commit)
         Gitlab::Git::Branch.new(@repository, branch.name, target_commit.id, target_commit)
@@ -294,7 +294,7 @@ module Gitlab
               action: Gitaly::UserCommitFilesAction.new(header: action_header)
             )
 
-            reader = binary_stringio(action[:content])
+            reader = binary_io(action[:content])
 
             until reader.eof?
               chunk = reader.read(MAX_MSG_SIZE)
@@ -327,7 +327,7 @@ module Gitlab
           user: Gitlab::Git::User.from_gitlab(user).to_gitaly,
           target_branch: encode_binary(branch_name)
         )
-        reader = binary_stringio(patches)
+        reader = binary_io(patches)
 
         chunks = Enumerator.new do |chunk|
           chunk.yield Gitaly::UserApplyPatchRequest.new(header: header)

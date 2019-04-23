@@ -14,8 +14,7 @@ class Dashboard::ProjectsController < Dashboard::ApplicationController
 
     respond_to do |format|
       format.html do
-        # n+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/37434
-        # Also https://gitlab.com/gitlab-org/gitlab-ce/issues/40260
+        # n+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/40260
         Gitlab::GitalyClient.allow_n_plus_1_calls do
           render
         end
@@ -26,7 +25,7 @@ class Dashboard::ProjectsController < Dashboard::ApplicationController
       end
       format.json do
         render json: {
-          html: view_to_html_string("dashboard/projects/_projects", locals: { projects: @projects })
+          html: view_to_html_string("dashboard/projects/_projects", projects: @projects)
         }
       end
     end
@@ -43,7 +42,7 @@ class Dashboard::ProjectsController < Dashboard::ApplicationController
       format.html
       format.json do
         render json: {
-          html: view_to_html_string("dashboard/projects/_projects", locals: { projects: @projects })
+          html: view_to_html_string("dashboard/projects/_projects", projects: @projects)
         }
       end
     end

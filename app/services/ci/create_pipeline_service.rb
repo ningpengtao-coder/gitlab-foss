@@ -37,7 +37,7 @@ module Ci
         variables_attributes: params[:variables_attributes],
         project: project,
         current_user: current_user,
-        push_options: params[:push_options],
+        push_options: params[:push_options] || {},
         chat_data: params[:chat_data],
         **extra_options(options))
 
@@ -54,6 +54,10 @@ module Ci
           pipeline.process!
         end
       end
+
+      # If pipeline is not persisted, try to recover IID
+      pipeline.reset_project_iid unless pipeline.persisted? ||
+          Feature.disabled?(:ci_pipeline_rewind_iid, project, default_enabled: true)
 
       pipeline
     end

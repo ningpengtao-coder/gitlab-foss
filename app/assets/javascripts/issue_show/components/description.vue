@@ -140,11 +140,12 @@ export default {
         'issue-realtime-pre-pulse': preAnimation,
         'issue-realtime-trigger-pulse': pulseAnimation,
       }"
-      class="wiki"
+      class="md"
       v-html="descriptionHtml"
     ></div>
     <textarea
       v-if="descriptionText"
+      ref="textarea"
       v-model="descriptionText"
       :data-update-url="updateUrl"
       class="hidden js-task-list-field"

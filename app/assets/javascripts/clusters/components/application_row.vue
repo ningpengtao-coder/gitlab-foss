@@ -6,6 +6,8 @@ import { s__, sprintf } from '../../locale';
 import eventHub from '../event_hub';
 import identicon from '../../vue_shared/components/identicon.vue';
 import loadingButton from '../../vue_shared/components/loading_button.vue';
+import UninstallApplicationButton from './uninstall_application_button.vue';
+
 import {
   APPLICATION_STATUS,
   REQUEST_SUBMITTED,
@@ -19,6 +21,7 @@ export default {
     identicon,
     TimeagoTooltip,
     GlLink,
+    UninstallApplicationButton,
   },
   props: {
     id: {
@@ -47,6 +50,11 @@ export default {
       required: false,
       default: false,
     },
+    uninstallable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     status: {
       type: String,
       required: false,
@@ -62,6 +70,11 @@ export default {
     requestReason: {
       type: String,
       required: false,
+    },
+    installed: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     version: {
       type: String,
@@ -92,15 +105,7 @@ export default {
       return (
         this.status === APPLICATION_STATUS.SCHEDULED ||
         this.status === APPLICATION_STATUS.INSTALLING ||
-        (this.requestStatus === REQUEST_SUBMITTED && !this.statusReason && !this.isInstalled)
-      );
-    },
-    isInstalled() {
-      return (
-        this.status === APPLICATION_STATUS.INSTALLED ||
-        this.status === APPLICATION_STATUS.UPDATED ||
-        this.status === APPLICATION_STATUS.UPDATING ||
-        this.status === APPLICATION_STATUS.UPDATE_ERRORED
+        (this.requestStatus === REQUEST_SUBMITTED && !this.statusReason && !this.installed)
       );
     },
     canInstall() {
@@ -125,6 +130,12 @@ export default {
     rowJsClass() {
       return `js-cluster-application-row-${this.id}`;
     },
+    displayUninstallButton() {
+      return this.installed && this.uninstallable;
+    },
+    displayInstallButton() {
+      return !this.installed || !this.uninstallable;
+    },
     installButtonLoading() {
       return !this.status || this.status === APPLICATION_STATUS.SCHEDULED || this.isInstalling;
     },
@@ -145,7 +156,7 @@ export default {
         label = s__('ClusterIntegration|Install');
       } else if (this.isInstalling) {
         label = s__('ClusterIntegration|Installing');
-      } else if (this.isInstalled) {
+      } else if (this.installed) {
         label = s__('ClusterIntegration|Installed');
       }
 
@@ -191,14 +202,7 @@ export default {
       return this.status === APPLICATION_STATUS.UPDATE_ERRORED;
     },
     upgradeFailureDescription() {
-      return sprintf(
-        s__(
-          'ClusterIntegration|Something went wrong when upgrading %{title}. Please check the logs and try again.',
-        ),
-        {
-          title: this.title,
-        },
-      );
+      return s__('ClusterIntegration|Update failed. Please check the logs and try again.');
     },
     upgradeSuccessDescription() {
       return sprintf(s__('ClusterIntegration|%{title} upgraded successfully.'), {
@@ -210,9 +214,9 @@ export default {
       if (this.upgradeAvailable && !this.upgradeFailed && !this.isUpgrading) {
         label = s__('ClusterIntegration|Upgrade');
       } else if (this.isUpgrading) {
-        label = s__('ClusterIntegration|Upgrading');
+        label = s__('ClusterIntegration|Updating');
       } else if (this.upgradeFailed) {
-        label = s__('ClusterIntegration|Retry upgrade');
+        label = s__('ClusterIntegration|Retry update');
       }
 
       return label;
@@ -222,6 +226,14 @@ export default {
       return (
         this.status === APPLICATION_STATUS.UPDATING ||
         (this.upgradeRequested && !this.upgradeSuccessful)
+      );
+    },
+    shouldShowUpgradeDetails() {
+      // This method only returns true when;
+      // Upgrade was successful OR Upgrade failed
+      //     AND new upgrade is unavailable AND version information is present.
+      return (
+        (this.upgradeSuccessful || this.upgradeFailed) && !this.upgradeAvailable && this.version
       );
     },
   },
@@ -256,7 +268,7 @@ export default {
   <div
     :class="[
       rowJsClass,
-      isInstalled && 'cluster-application-installed',
+      installed && 'cluster-application-installed',
       disabled && 'cluster-application-disabled',
     ]"
     class="cluster-application-row gl-responsive-table-row gl-responsive-table-row-col-span"
@@ -279,10 +291,9 @@ export default {
             target="blank"
             rel="noopener noreferrer"
             class="js-cluster-application-title"
+            >{{ title }}</a
           >
-            {{ title }}
-          </a>
-          <span v-else class="js-cluster-application-title"> {{ title }} </span>
+          <span v-else class="js-cluster-application-title">{{ title }}</span>
         </strong>
         <slot name="description"></slot>
         <div
@@ -303,21 +314,19 @@ export default {
         </div>
 
         <div
-          v-if="(upgradeSuccessful || upgradeFailed) && !upgradeAvailable"
+          v-if="shouldShowUpgradeDetails"
           class="form-text text-muted label p-0 js-cluster-application-upgrade-details"
         >
           {{ versionLabel }}
-
-          <span v-if="upgradeSuccessful"> to</span>
+          <span v-if="upgradeSuccessful">to</span>
 
           <gl-link
             v-if="upgradeSuccessful"
             :href="chartRepo"
             target="_blank"
             class="js-cluster-application-upgrade-version"
+            >chart v{{ version }}</gl-link
           >
-            chart v{{ version }}
-          </gl-link>
         </div>
 
         <div
@@ -332,7 +341,6 @@ export default {
           class="bs-callout bs-callout-success cluster-application-banner mt-2 mb-0 p-0 pl-3"
         >
           {{ upgradeSuccessDescription }}
-
           <button class="close cluster-application-banner-close" @click="dismissUpgradeSuccess">
             &times;
           </button>
@@ -353,17 +361,22 @@ export default {
         role="gridcell"
       >
         <div v-if="showManageButton" class="btn-group table-action-buttons">
-          <a :href="manageLink" :class="{ disabled: disabled }" class="btn">
-            {{ manageButtonLabel }}
-          </a>
+          <a :href="manageLink" :class="{ disabled: disabled }" class="btn">{{
+            manageButtonLabel
+          }}</a>
         </div>
         <div class="btn-group table-action-buttons">
           <loading-button
+            v-if="displayInstallButton"
             :loading="installButtonLoading"
             :disabled="disabled || installButtonDisabled"
             :label="installButtonLabel"
             class="js-cluster-application-install-button"
             @click="installClicked"
+          />
+          <uninstall-application-button
+            v-if="displayUninstallButton"
+            class="js-cluster-application-uninstall-button"
           />
         </div>
       </div>

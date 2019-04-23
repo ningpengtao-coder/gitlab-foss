@@ -2,7 +2,7 @@
 
 require 'carrierwave/orm/activerecord'
 
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   include Gitlab::ConfigHelper
   include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel
@@ -38,7 +38,6 @@ class Project < ActiveRecord::Base
   BoardLimitExceeded = Class.new(StandardError)
 
   STATISTICS_ATTRIBUTE = 'repositories_count'.freeze
-  NUMBER_OF_PERMITTED_BOARDS = 1
   UNKNOWN_IMPORT_URL = 'http://unknown.git'.freeze
   # Hashed Storage versions handle rolling out new storage to project and dependents models:
   # nil: legacy
@@ -85,7 +84,7 @@ class Project < ActiveRecord::Base
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
 
-  add_authentication_token_field :runners_token, encrypted: true, migrating: true
+  add_authentication_token_field :runners_token, encrypted: -> { Feature.enabled?(:projects_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
   before_validation :mark_remote_mirrors_for_removal, if: -> { RemoteMirror.table_exists? }
 
@@ -137,7 +136,7 @@ class Project < ActiveRecord::Base
   alias_attribute :parent_id, :namespace_id
 
   has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event'
-  has_many :boards, before_add: :validate_board_limit
+  has_many :boards
 
   # Project services
   has_one :campfire_service
@@ -147,6 +146,7 @@ class Project < ActiveRecord::Base
   has_one :pipelines_email_service
   has_one :irker_service
   has_one :pivotaltracker_service
+  has_one :hipchat_service
   has_one :flowdock_service
   has_one :assembla_service
   has_one :asana_service
@@ -316,7 +316,7 @@ class Project < ActiveRecord::Base
   validates :description, length: { maximum: 2000 }, allow_blank: true
   validates :ci_config_path,
     format: { without: %r{(\.{2}|\A/)},
-              message: 'cannot include leading slash or directory traversal.' },
+              message: _('cannot include leading slash or directory traversal.') },
     length: { maximum: 255 },
     allow_blank: true
   validates :name,
@@ -331,7 +331,7 @@ class Project < ActiveRecord::Base
 
   validates :namespace, presence: true
   validates :name, uniqueness: { scope: :namespace_id }
-  validates :import_url, public_url: { protocols: ->(project) { project.persisted? ? VALID_MIRROR_PROTOCOLS : VALID_IMPORT_PROTOCOLS },
+  validates :import_url, public_url: { schemes: ->(project) { project.persisted? ? VALID_MIRROR_PROTOCOLS : VALID_IMPORT_PROTOCOLS },
                                        ports: ->(project) { project.persisted? ? VALID_MIRROR_PORTS : VALID_IMPORT_PORTS },
                                        enforce_user: true }, if: [:external_import?, :import_url_changed?]
   validates :star_count, numericality: { greater_than_or_equal_to: 0 }
@@ -423,13 +423,13 @@ class Project < ActiveRecord::Base
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
 
   chronic_duration_attr :build_timeout_human_readable, :build_timeout,
-    default: 3600, error_message: 'Maximum job timeout has a value which could not be accepted'
+    default: 3600, error_message: _('Maximum job timeout has a value which could not be accepted')
 
   validates :build_timeout, allow_nil: true,
                             numericality: { greater_than_or_equal_to: 10.minutes,
                                             less_than: 1.month,
                                             only_integer: true,
-                                            message: 'needs to be beetween 10 minutes and 1 month' }
+                                            message: _('needs to be beetween 10 minutes and 1 month') }
 
   # Used by Projects::CleanupService to hold a map of rewritten object IDs
   mount_uploader :bfg_object_map, AttachmentUploader
@@ -638,12 +638,25 @@ class Project < ActiveRecord::Base
   end
 
   def has_auto_devops_implicitly_enabled?
-    auto_devops&.enabled.nil? &&
-      (Gitlab::CurrentSettings.auto_devops_enabled? || Feature.enabled?(:force_autodevops_on_by_default, self))
+    auto_devops_config = first_auto_devops_config
+
+    auto_devops_config[:scope] != :project && auto_devops_config[:status]
   end
 
   def has_auto_devops_implicitly_disabled?
-    auto_devops&.enabled.nil? && !(Gitlab::CurrentSettings.auto_devops_enabled? || Feature.enabled?(:force_autodevops_on_by_default, self))
+    auto_devops_config = first_auto_devops_config
+
+    auto_devops_config[:scope] != :project && !auto_devops_config[:status]
+  end
+
+  def first_auto_devops_config
+    return namespace.first_auto_devops_config if auto_devops&.enabled.nil?
+
+    { scope: :project, status: auto_devops&.enabled || Feature.enabled?(:force_autodevops_on_by_default, self) }
+  end
+
+  def multiple_mr_assignees_enabled?
+    Feature.enabled?(:multiple_merge_request_assignees, self)
   end
 
   def daily_statistics_enabled?
@@ -844,7 +857,7 @@ class Project < ActiveRecord::Base
   def mark_stuck_remote_mirrors_as_failed!
     remote_mirrors.stuck.update_all(
       update_status: :failed,
-      last_error: 'The remote mirror took to long to complete.',
+      last_error: _('The remote mirror took to long to complete.'),
       last_update_at: Time.now
     )
   end
@@ -881,14 +894,14 @@ class Project < ActiveRecord::Base
 
     level_name = Gitlab::VisibilityLevel.level_name(self.visibility_level).downcase
     group_level_name = Gitlab::VisibilityLevel.level_name(self.group.visibility_level).downcase
-    self.errors.add(:visibility_level, "#{level_name} is not allowed in a #{group_level_name} group.")
+    self.errors.add(:visibility_level, _("%{level_name} is not allowed in a %{group_level_name} group.") % { level_name: level_name, group_level_name: group_level_name })
   end
 
   def visibility_level_allowed_as_fork
     return if visibility_level_allowed_as_fork?
 
     level_name = Gitlab::VisibilityLevel.level_name(self.visibility_level).downcase
-    self.errors.add(:visibility_level, "#{level_name} is not allowed since the fork source project has lower visibility.")
+    self.errors.add(:visibility_level, _("%{level_name} is not allowed since the fork source project has lower visibility.") % { level_name: level_name })
   end
 
   def check_wiki_path_conflict
@@ -897,7 +910,7 @@ class Project < ActiveRecord::Base
     path_to_check = path.ends_with?('.wiki') ? path.chomp('.wiki') : "#{path}.wiki"
 
     if Project.where(namespace_id: namespace_id, path: path_to_check).exists?
-      errors.add(:name, 'has already been taken')
+      errors.add(:name, _('has already been taken'))
     end
   end
 
@@ -917,7 +930,7 @@ class Project < ActiveRecord::Base
     return unless pages_https_only?
 
     unless pages_domains.all?(&:https?)
-      errors.add(:pages_https_only, "cannot be enabled unless all domains have TLS certificates")
+      errors.add(:pages_https_only, _("cannot be enabled unless all domains have TLS certificates"))
     end
   end
 
@@ -1197,7 +1210,7 @@ class Project < ActiveRecord::Base
   def valid_repo?
     repository.exists?
   rescue
-    errors.add(:path, 'Invalid repository path')
+    errors.add(:path, _('Invalid repository path'))
     false
   end
 
@@ -1207,11 +1220,9 @@ class Project < ActiveRecord::Base
 
   def repo_exists?
     strong_memoize(:repo_exists) do
-      begin
-        repository.exists?
-      rescue
-        false
-      end
+      repository.exists?
+    rescue
+      false
     end
   end
 
@@ -1237,7 +1248,7 @@ class Project < ActiveRecord::Base
   end
 
   def fork_source
-    return nil unless forked?
+    return unless forked?
 
     forked_from_project || fork_network&.root_project
   end
@@ -1294,7 +1305,7 @@ class Project < ActiveRecord::Base
     # Check if repository with same path already exists on disk we can
     # skip this for the hashed storage because the path does not change
     if legacy_storage? && repository_with_same_path_already_exists?
-      errors.add(:base, 'There is already a repository with that name on disk')
+      errors.add(:base, _('There is already a repository with that name on disk'))
       return false
     end
 
@@ -1316,7 +1327,7 @@ class Project < ActiveRecord::Base
       repository.after_create
       true
     else
-      errors.add(:base, 'Failed to create repository via gitlab-shell')
+      errors.add(:base, _('Failed to create repository via gitlab-shell'))
       false
     end
   end
@@ -1389,9 +1400,10 @@ class Project < ActiveRecord::Base
       repository.raw_repository.write_ref('HEAD', "refs/heads/#{branch}")
       repository.copy_gitattributes(branch)
       repository.after_change_head
+      ProjectCacheWorker.perform_async(self.id, [], [:commit_count])
       reload_default_branch
     else
-      errors.add(:base, "Could not change HEAD: branch '#{branch}' does not exist")
+      errors.add(:base, _("Could not change HEAD: branch '%{branch}' does not exist") % { branch: branch })
       false
     end
   end
@@ -1443,7 +1455,7 @@ class Project < ActiveRecord::Base
     ProjectWiki.new(self, self.owner).wiki
     true
   rescue ProjectWiki::CouldNotCreateWikiError
-    errors.add(:base, 'Failed create wiki')
+    errors.add(:base, _('Failed create wiki'))
     false
   end
 
@@ -1690,7 +1702,7 @@ class Project < ActiveRecord::Base
   end
 
   def export_path
-    return nil unless namespace.present? || hashed_storage?(:repository)
+    return unless namespace.present? || hashed_storage?(:repository)
 
     import_export_shared.archive_path
   end
@@ -1932,7 +1944,7 @@ class Project < ActiveRecord::Base
   #
   # @param [Symbol] feature that needs to be rolled out for the project (:repository, :attachments)
   def hashed_storage?(feature)
-    raise ArgumentError, "Invalid feature" unless HASHED_STORAGE_FEATURES.include?(feature)
+    raise ArgumentError, _("Invalid feature") unless HASHED_STORAGE_FEATURES.include?(feature)
 
     self.storage_version && self.storage_version >= HASHED_STORAGE_FEATURES[feature]
   end
@@ -2007,12 +2019,8 @@ class Project < ActiveRecord::Base
     @storage = nil if storage_version_changed?
   end
 
-  def gl_repository(is_wiki:)
-    Gitlab::GlRepository.gl_repository(self, is_wiki)
-  end
-
-  def reference_counter(wiki: false)
-    Gitlab::ReferenceCounter.new(gl_repository(is_wiki: wiki))
+  def reference_counter(type: Gitlab::GlRepository::PROJECT)
+    Gitlab::ReferenceCounter.new(type.identifier_for_subject(self))
   end
 
   def badges
@@ -2041,6 +2049,11 @@ class Project < ActiveRecord::Base
 
   def branch_allows_collaboration?(user, branch_name)
     fetch_branch_allows_collaboration(user, branch_name)
+  end
+
+  def external_authorization_classification_label
+    super || ::Gitlab::CurrentSettings.current_application_settings
+               .external_authorization_service_default_label
   end
 
   def licensed_features
@@ -2109,7 +2122,7 @@ class Project < ActiveRecord::Base
   end
 
   def leave_pool_repository
-    pool_repository&.unlink_repository(repository) && update_column(:pool_repository_id, nil)
+    pool_repository&.mark_obsolete_if_last(repository) && update_column(:pool_repository_id, nil)
   end
 
   def link_pool_repository
@@ -2129,13 +2142,11 @@ class Project < ActiveRecord::Base
   end
 
   def create_new_pool_repository
-    pool = begin
-             create_pool_repository!(shard: Shard.by_name(repository_storage), source_project: self)
-           rescue ActiveRecord::RecordNotUnique
-             pool_repository(true)
-           end
+    pool = PoolRepository.safe_find_or_create_by!(shard: Shard.by_name(repository_storage), source_project: self)
+    update!(pool_repository: pool)
 
     pool.schedule unless pool.scheduled?
+
     pool
   end
 
@@ -2156,14 +2167,14 @@ class Project < ActiveRecord::Base
   end
 
   def wiki_reference_count
-    reference_counter(wiki: true).value
+    reference_counter(type: Gitlab::GlRepository::WIKI).value
   end
 
   def check_repository_absence!
     return if skip_disk_validation
 
     if repository_storage.blank? || repository_with_same_path_already_exists?
-      errors.add(:base, 'There is already a repository with that name on disk')
+      errors.add(:base, _('There is already a repository with that name on disk'))
       throw :abort
     end
   end
@@ -2196,17 +2207,6 @@ class Project < ActiveRecord::Base
     "projects/#{id}/pushes_since_gc"
   end
 
-  # Similar to the normal callbacks that hook into the life cycle of an
-  # Active Record object, you can also define callbacks that get triggered
-  # when you add an object to an association collection. If any of these
-  # callbacks throw an exception, the object will not be added to the
-  # collection. Before you add a new board to the boards collection if you
-  # already have 1, 2, or n it will fail, but it if you have 0 that is lower
-  # than the number of permitted boards per project it won't fail.
-  def validate_board_limit(board)
-    raise BoardLimitExceeded, 'Number of permitted boards exceeded' if boards.size >= NUMBER_OF_PERMITTED_BOARDS
-  end
-
   def update_project_statistics
     stats = statistics || build_statistics
     stats.update(namespace_id: namespace_id)
@@ -2220,7 +2220,7 @@ class Project < ActiveRecord::Base
       errors.delete(error)
     end
 
-    errors.add(:base, "The project is still being deleted. Please try again later.")
+    errors.add(:base, _("The project is still being deleted. Please try again later."))
   end
 
   def pending_delete_twin
