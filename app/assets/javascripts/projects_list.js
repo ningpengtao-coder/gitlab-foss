@@ -1,6 +1,6 @@
 import Vue from 'vue';
+import VueProjectsList from '~/vue_shared/components/projects_list/index.vue';
 import FilterableList from './filterable_list';
-import VueProjectsList from './projects/components/projects_list.vue';
 
 /**
  * Makes search request for projects when user types a value in the search input.
