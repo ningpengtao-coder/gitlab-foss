@@ -4,7 +4,6 @@ class Projects::ClustersController < Clusters::ClustersController
   include ProjectUnauthorized
 
   prepend_before_action :project
-  before_action :repository
 
   layout 'project'
 
