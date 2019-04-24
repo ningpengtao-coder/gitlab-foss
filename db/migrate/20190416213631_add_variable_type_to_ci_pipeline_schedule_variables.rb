@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddVariableTypeToCiPipelineSchedulleVariables < ActiveRecord::Migration[5.0]
+class AddVariableTypeToCiPipelineScheduleVariables < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
   disable_ddl_transaction!
 
