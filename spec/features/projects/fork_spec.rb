@@ -33,7 +33,7 @@ describe 'Project fork' do
     end
 
     context 'forking is enabled' do
-      let(:forking_access_level) { Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY }
+      let(:forking_access_level) { Gitlab::ForkingAccessLevel::ENABLED }
 
       it 'enables fork button' do
         visit project_path(project)
@@ -51,7 +51,7 @@ describe 'Project fork' do
     end
 
     context 'forking is disabled' do
-      let(:forking_access_level) { Gitlab::ForkingAccessLevel::NO_FORKS }
+      let(:forking_access_level) { Gitlab::ForkingAccessLevel::DISABLED }
 
       it 'does not render fork button' do
         visit project_path(project)

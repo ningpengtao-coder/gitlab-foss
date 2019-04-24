@@ -173,33 +173,18 @@ describe Projects::ForkService do
       end
 
       context 'forking access level' do
-        context 'when forking is not limited' do
+        context 'when forking is enabled' do
           before do
-            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+            @from_project.update(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
             create(:project_setting,
                    { project: @from_project,
-                     forking_access_level: Gitlab::ForkingAccessLevel::ALLOW_FORKS })
+                     forking_access_level: Gitlab::ForkingAccessLevel::ENABLED })
           end
 
-          it 'creates fork with public visibility levels' do
+          it 'creates fork matching parent visibility levels' do
             to_project = fork_project(@from_project, @to_user, namespace: @to_user.namespace)
 
-            expect(to_project.visibility_level).to eq(Gitlab::VisibilityLevel::PUBLIC)
-          end
-        end
-
-        context 'when forking is limited to private forks' do
-          before do
-            @from_project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-            create(:project_setting,
-                   { project: @from_project,
-                     forking_access_level: Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY })
-          end
-
-          it 'creates fork with private visibility levels' do
-            to_project = fork_project(@from_project, @to_user, namespace: @to_user.namespace)
-
-            expect(to_project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+            expect(to_project.visibility_level).to eq(Gitlab::VisibilityLevel::INTERNAL)
           end
         end
 
@@ -207,7 +192,7 @@ describe Projects::ForkService do
           before do
             create(:project_setting,
                    { project: @from_project,
-                     forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS })
+                     forking_access_level: Gitlab::ForkingAccessLevel::DISABLED })
           end
 
           it 'fails' do

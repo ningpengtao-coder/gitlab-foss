@@ -45,10 +45,6 @@ module Projects
         raise ValidationError.new(s_('UpdateProject|New visibility level not allowed!'))
       end
 
-      unless allowed_visibility_level_change?(project, params[:visibility_level])
-        raise ValidationError.new('New visibility level not allowed by the forking policy of the parent project!')
-      end
-
       if renaming_project_with_container_registry_tags?
         raise ValidationError.new(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
       end
@@ -137,15 +133,6 @@ module Projects
 
     def changing_pages_https_only?
       project.previous_changes.include?(:pages_https_only)
-    end
-
-    def allowed_visibility_level_change?(project, new_visibility)
-      if project.fork_source &&
-          project.fork_source.forking_access_level == Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY
-        return new_visibility == Gitlab::VisibilityLevel
-      end
-
-      true
     end
   end
 end

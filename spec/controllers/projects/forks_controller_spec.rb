@@ -19,7 +19,7 @@ describe Projects::ForksController do
 
         create(:project_setting,
                { project: project,
-                 forking_access_level: Gitlab::ForkingAccessLevel::NO_FORKS })
+                 forking_access_level: Gitlab::ForkingAccessLevel::DISABLED })
       end
 
       it 'renders 403' do

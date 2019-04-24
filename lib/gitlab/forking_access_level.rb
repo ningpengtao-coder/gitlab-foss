@@ -2,8 +2,7 @@
 
 module Gitlab
   module ForkingAccessLevel
-    NO_FORKS = 10
-    PRIVATE_FORKS_ONLY = 20
-    ALLOW_FORKS = 30
+    DISABLED = 0
+    ENABLED  = 10
   end
 end

@@ -312,6 +312,7 @@ class Project < ApplicationRecord
   delegate :root_ancestor, to: :namespace, allow_nil: true
   delegate :last_pipeline, to: :commit, allow_nil: true
   delegate :forking_access_level, to: :project_setting, allow_nil: true
+  delegate :fork_visibility_level, to: :project_setting, allow_nil: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -1256,7 +1257,7 @@ class Project < ApplicationRecord
   end
 
   def forking_allowed?
-    forking_access_level > Gitlab::ForkingAccessLevel::NO_FORKS
+    forking_access_level > Gitlab::ForkingAccessLevel::DISABLED
   end
 
   def lfs_storage_project

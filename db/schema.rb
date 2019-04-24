@@ -1708,7 +1708,8 @@ ActiveRecord::Schema.define(version: 20190426180107) do
 
   create_table "project_settings", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.integer "forking_access_level", limit: 2, default: 30, null: false
+    t.integer "forking_access_level", limit: 2, default: 10, null: false
+    t.integer "fork_visibility_level", limit: 2, default: 0, null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.index ["project_id"], name: "index_project_settings_on_project_id", unique: true, using: :btree

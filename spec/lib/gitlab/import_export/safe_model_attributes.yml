@@ -517,6 +517,7 @@ ProjectSetting:
 - id
 - project_id
 - forking_access_level
+- fork_visibility_level
 - created_at
 - updated_at
 ProtectedBranch::MergeAccessLevel:

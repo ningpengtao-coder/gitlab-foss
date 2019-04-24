@@ -107,13 +107,7 @@ module Projects
     end
 
     def allowed_visibility_level
-      candidate_levels = [@project.visibility_level, target_namespace.visibility_level]
-
-      if @project.forking_access_level == Gitlab::ForkingAccessLevel::PRIVATE_FORKS_ONLY
-        candidate_levels << Gitlab::VisibilityLevel::PRIVATE
-      end
-
-      target_level = candidate_levels.min
+      target_level = [@project.visibility_level, target_namespace.visibility_level].min
 
       Gitlab::VisibilityLevel.closest_allowed_level(target_level)
     end
