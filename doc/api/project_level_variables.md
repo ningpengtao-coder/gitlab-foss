@@ -98,7 +98,7 @@ PUT /projects/:id/variables/:key
 | `id`            | integer/string | yes      | The ID of a project or [urlencoded NAMESPACE/PROJECT_NAME of the project](README.md#namespaced-path-encoding) owned by the authenticated user     |
 | `key`           | string  | yes      | The `key` of a variable   |
 | `value`         | string  | yes      | The `value` of a variable |
-| `variable_type` | string  | no       | The type of variable, must be one of env_var or file |
+| `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 | `protected`     | boolean | no       | Whether the variable is protected |
 
 ```
