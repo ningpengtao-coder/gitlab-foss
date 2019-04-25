@@ -27,7 +27,7 @@ xml.entry do
     issue.assignees.each do |assignee|
       xml.contributor do
         xml.name assignee.name
-        xml.email assignee.public_email if assignee.public_email and !assignlee.public_email.empty?
+        xml.email assignee.public_email if assignee.public_email and !assignee.public_email.empty?
       end
     end
   end
