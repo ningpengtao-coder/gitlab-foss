@@ -7,7 +7,7 @@ xml.entry do
 
   xml.author do
     xml.name issue.author_name
-    xml.email issue.author_public_email if issue.author_public_email
+    xml.email issue.author_public_email if issue.author_public_email and !issue.author_public_email.empty?
   end
 
   xml.summary issue.title
@@ -27,7 +27,7 @@ xml.entry do
     issue.assignees.each do |assignee|
       xml.contributor do
         xml.name assignee.name
-        xml.email assignee.public_email if assignee.public_email
+        xml.email assignee.public_email if assignee.public_email and !assignlee.public_email.empty?
       end
     end
   end
