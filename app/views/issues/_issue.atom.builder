@@ -22,19 +22,13 @@ xml.entry do
     end
   end
 
+# Names each contributor to the entry. An entry may have multiple contributor elements.
   if issue.assignees.any?
-    xml.assignees do
-      issue.assignees.each do |assignee|
-        xml.assignee do
-          xml.name assignee.name
-          xml.email assignee.public_email
-        end
+    issue.assignees.each do |assignee|
+      xml.contributor do
+        xml.name assignee.name
+        xml.email assignee.public_email if assignee.public_email
       end
-    end
-
-    xml.assignee do
-      xml.name issue.assignees.first.name
-      xml.email issue.assignees.first.public_email
     end
   end
 end
