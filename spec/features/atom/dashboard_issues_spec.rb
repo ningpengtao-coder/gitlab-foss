@@ -58,11 +58,12 @@ describe "Dashboard Issues Feed" do
           entry = find(:xpath, "//feed/entry[contains(summary/text(),'#{issue2.title}')]")
 
           expect(entry).to be_present
-          expect(entry).to have_selector('author email', text: issue2.author_public_email)
-          expect(entry).to have_selector('assignees email', text: assignee.public_email)
-          expect(entry).not_to have_selector('labels')
+          # The Atom spec says email is an optional field
+          # expect(entry).to have_selector('author email', text: issue2.author_public_email)
+          # expect(entry).to have_selector('assignees email', text: assignee.public_email)
+          expect(entry).not_to have_selector('category')
           expect(entry).not_to have_selector('milestone')
-          expect(entry).to have_selector('description', text: issue2.description)
+          expect(entry).to have_selector('content', text: issue2.description)
         end
       end
 
@@ -81,11 +82,12 @@ describe "Dashboard Issues Feed" do
           entry = find(:xpath, "//feed/entry[contains(summary/text(),'#{issue1.title}')]")
 
           expect(entry).to be_present
-          expect(entry).to have_selector('author email', text: issue1.author_public_email)
-          expect(entry).to have_selector('assignees email', text: assignee.public_email)
-          expect(entry).to have_selector('labels label', text: label1.title)
+          # The Atom spec says email is an optional field
+          # expect(entry).to have_selector('author email', text: issue1.author_public_email)
+          # expect(entry).to have_selector('assignees email', text: assignee.public_email)
+          expect(entry).to have_selector('category', text: label1.title)
           expect(entry).to have_selector('milestone', text: milestone1.title)
-          expect(entry).not_to have_selector('description')
+          expect(entry).not_to have_selector('content')
         end
       end
     end
