@@ -15,11 +15,10 @@ xml.entry do
   xml.milestone issue.milestone.title if issue.milestone
   xml.due_date issue.due_date if issue.due_date
 
+  # Specifies a category that the entry belongs to. A entry may have multiple category elements.
   unless issue.labels.empty?
-    xml.labels do
-      issue.labels.each do |label|
-        xml.label label.name
-      end
+    issue.labels.each do |label|
+      xml.category term: label.name, label: label.name
     end
   end
 
