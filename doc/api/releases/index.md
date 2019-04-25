@@ -27,6 +27,7 @@ Example response:
 ```json
 [
    {
+      "id": 42,
       "tag_name":"v0.2",
       "description":"## CHANGELOG\r\n\r\n- Escape label and milestone titles to prevent XSS in GFM autocomplete. !2740\r\n- Prevent private snippets from being embeddable.\r\n- Add subresources removal to member destroy service.",
       "name":"Awesome app v0.2 beta",
@@ -93,6 +94,7 @@ Example response:
       }
    },
    {
+      "id": 43,
       "tag_name":"v0.1",
       "description":"## CHANGELOG\r\n\r\n-Remove limit of 100 when searching repository code. !8671\r\n- Show error message when attempting to reopen an MR and there is an open MR for the same branch. !16447 (Akos Gyimesi)\r\n- Fix a bug where internal email pattern wasn't respected. !22516",
       "name":"Awesome app v0.1 alpha",
@@ -154,6 +156,9 @@ Example response:
 
 Get a Release for the given tag.
 
+CAUTION: **Warning:**
+This endpoint has been deprecated in Gitlab 11.11 and will be removed in 12.0. Switch to using `GET /projects/:id/releases/:release_id` instead.
+
 ```
 GET /projects/:id/releases/:tag_name
 ```
@@ -173,6 +178,87 @@ Example response:
 
 ```json
 {
+   "id": 42,
+   "tag_name":"v0.1",
+   "description":"## CHANGELOG\r\n\r\n- Remove limit of 100 when searching repository code. !8671\r\n- Show error message when attempting to reopen an MR and there is an open MR for the same branch. !16447 (Akos Gyimesi)\r\n- Fix a bug where internal email pattern wasn't respected. !22516",
+   "name":"Awesome app v0.1 alpha",
+   "description_html":"\u003ch2 dir=\"auto\"\u003e\n\u003ca id=\"user-content-changelog\" class=\"anchor\" href=\"#changelog\" aria-hidden=\"true\"\u003e\u003c/a\u003eCHANGELOG\u003c/h2\u003e\n\u003cul dir=\"auto\"\u003e\n\u003cli\u003eRemove limit of 100 when searching repository code. !8671\u003c/li\u003e\n\u003cli\u003eShow error message when attempting to reopen an MR and there is an open MR for the same branch. !16447 (Akos Gyimesi)\u003c/li\u003e\n\u003cli\u003eFix a bug where internal email pattern wasn't respected. !22516\u003c/li\u003e\n\u003c/ul\u003e",
+   "created_at":"2019-01-03T01:55:18.203Z",
+   "author":{
+      "id":1,
+      "name":"Administrator",
+      "username":"root",
+      "state":"active",
+      "avatar_url":"https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+      "web_url":"http://localhost:3000/root"
+   },
+   "commit":{
+      "id":"f8d3d94cbd347e924aa7b715845e439d00e80ca4",
+      "short_id":"f8d3d94c",
+      "title":"Initial commit",
+      "created_at":"2019-01-03T01:53:28.000Z",
+      "parent_ids":[
+
+      ],
+      "message":"Initial commit",
+      "author_name":"Administrator",
+      "author_email":"admin@example.com",
+      "authored_date":"2019-01-03T01:53:28.000Z",
+      "committer_name":"Administrator",
+      "committer_email":"admin@example.com",
+      "committed_date":"2019-01-03T01:53:28.000Z"
+   },
+   "assets":{
+      "count":4,
+      "sources":[
+         {
+            "format":"zip",
+            "url":"http://localhost:3000/root/awesome-app/-/archive/v0.1/awesome-app-v0.1.zip"
+         },
+         {
+            "format":"tar.gz",
+            "url":"http://localhost:3000/root/awesome-app/-/archive/v0.1/awesome-app-v0.1.tar.gz"
+         },
+         {
+            "format":"tar.bz2",
+            "url":"http://localhost:3000/root/awesome-app/-/archive/v0.1/awesome-app-v0.1.tar.bz2"
+         },
+         {
+            "format":"tar",
+            "url":"http://localhost:3000/root/awesome-app/-/archive/v0.1/awesome-app-v0.1.tar"
+         }
+      ],
+      "links":[
+
+      ]
+   }
+}
+```
+
+## Get single release
+
+Get a specific release for given id.
+
+```
+GET /projects/:id/releases/:release_id
+```
+
+| Attribute     | Type           | Required | Description                             |
+| ------------- | -------------- | -------- | --------------------------------------- |
+| `id`          | integer/string | yes      | The ID or [URL-encoded path of the project](../README.md#namespaced-path-encoding). |
+| `release_id`  | integer/string | yes      | The release id. |
+
+Example request:
+
+```sh
+curl --header "PRIVATE-TOKEN: gDybLx3yrUK_HLp3qPjS" "http://localhost:3000/api/v4/projects/24/releases/123"
+```
+
+Example response:
+
+```json
+{
+   "id": 42,
    "tag_name":"v0.1",
    "description":"## CHANGELOG\r\n\r\n- Remove limit of 100 when searching repository code. !8671\r\n- Show error message when attempting to reopen an MR and there is an open MR for the same branch. !16447 (Akos Gyimesi)\r\n- Fix a bug where internal email pattern wasn't respected. !22516",
    "name":"Awesome app v0.1 alpha",
@@ -260,6 +346,7 @@ Example response:
 
 ```json
 {
+   "id": 42,
    "tag_name":"v0.3",
    "description":"Super nice release",
    "name":"New release",
@@ -346,6 +433,7 @@ Example response:
 
 ```json
 {
+   "id": 42,
    "tag_name":"v0.1",
    "description":"## CHANGELOG\r\n\r\n- Remove limit of 100 when searching repository code. !8671\r\n- Show error message when attempting to reopen an MR and there is an open MR for the same branch. !16447 (Akos Gyimesi)\r\n- Fix a bug where internal email pattern wasn't respected. !22516",
    "name":"new name",
@@ -425,6 +513,7 @@ Example response:
 
 ```json
 {
+   "id": 42,
    "tag_name":"v0.1",
    "description":"## CHANGELOG\r\n\r\n- Remove limit of 100 when searching repository code. !8671\r\n- Show error message when attempting to reopen an MR and there is an open MR for the same branch. !16447 (Akos Gyimesi)\r\n- Fix a bug where internal email pattern wasn't respected. !22516",
    "name":"new name",

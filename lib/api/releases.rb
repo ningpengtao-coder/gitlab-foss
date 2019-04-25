@@ -27,16 +27,28 @@ module API
       end
 
       desc 'Get a single project release' do
-        detail 'This feature was introduced in GitLab 11.7.'
+        detail 'Finding release by tag name  has been deprecated in Gitlab 11.11 and will be removed in 12.0. Switch to using `GET /projects/:id/releases/:release_id` instead.'
         success Entities::Release
       end
       params do
         requires :tag_name, type: String, desc: 'The name of the tag', as: :tag
       end
       get ':id/releases/:tag_name', requirements: RELEASE_ENDPOINT_REQUIREMETS do
-        authorize_download_code!
-
-        present release, with: Entities::Release, current_user: current_user
+        # Deprecate `:id/releases/:tag_name` in GitLab 11.11.
+        # We want to introduce `:id/releases/:release_id` which is basicaly the same route,
+        # so for the time being we need to make this endpoint support both.
+        # If release with such tag exists behave like the old endpoint,
+        # otherwise act like looking up release by id.
+        # Cleanup once we remove `:id/releases/:tag_name` in GitLab 12.0.
+        if release_by_tag
+          authorize! :download_code, release_by_tag
+          present release_by_tag, with: Entities::Release, current_user: current_user
+        elsif release_by_id
+          authorize! :read_release, release_by_id
+          present release_by_id, with: Entities::Release, current_user: current_user
+        else
+          forbidden!
+        end
       end
 
       desc 'Create a new release' do
@@ -123,10 +135,6 @@ module API
         authorize! :read_release, user_project
       end
 
-      def authorize_read_release!
-        authorize! :read_release, release
-      end
-
       def authorize_update_release!
         authorize! :update_release, release
       end
@@ -135,12 +143,16 @@ module API
         authorize! :destroy_release, release
       end
 
-      def authorize_download_code!
-        authorize! :download_code, release
-      end
-
       def release
         @release ||= user_project.releases.find_by_tag(params[:tag])
+      end
+
+      def release_by_tag
+        release
+      end
+
+      def release_by_id
+        @release_by_id ||= user_project.releases.find_by_id(params[:tag])
       end
     end
   end

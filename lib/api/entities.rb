@@ -1130,6 +1130,7 @@ module API
 
     # deprecated old Release representation
     class TagRelease < Grape::Entity
+      expose :id
       expose :tag, as: :tag_name
       expose :description
     end
@@ -1149,6 +1150,7 @@ module API
     end
 
     class Release < Grape::Entity
+      expose :id
       expose :name
       expose :tag, as: :tag_name, if: -> (release, _) { can_download_code?(release.project) }
       expose :description

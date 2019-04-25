@@ -41,6 +41,7 @@ Parameters:
       "committed_date": "2012-05-28T04:42:42-07:00"
     },
     "release": {
+      "id": 42,
       "tag_name": "1.0.0",
       "description": "Amazing release. Wow"
     },
@@ -133,6 +134,7 @@ Parameters:
     "committed_date": "2012-05-28T04:42:42-07:00"
   },
   "release": {
+    "id": 42,
     "tag_name": "1.0.0",
     "description": "Amazing release. Wow"
   },
@@ -191,6 +193,7 @@ Response:
 
 ```json
 {
+  "id": 42,
   "tag_name": "1.0.0",
   "description": "Amazing release. Wow"
 }
@@ -223,6 +226,7 @@ Response:
 
 ```json
 {
+  "id": 42,
   "tag_name": "1.0.0",
   "description": "Amazing release. Wow"
 }

@@ -1,7 +1,8 @@
 {
   "type": "object",
-  "required": ["name"],
+  "required": ["id", "name"],
   "properties": {
+    "id": { "type": "integer" },
     "name": { "type": "string" },
     "description": { "type": "string" },
     "description_html": { "type": "string" },

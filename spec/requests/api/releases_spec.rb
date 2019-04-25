@@ -291,6 +291,169 @@ describe API::Releases do
     end
   end
 
+  describe 'GET /projects/:id/releases/:id' do
+    context 'when there is a release' do
+      let!(:release) do
+        create(:release,
+               project: project,
+               tag: 'v0.1',
+               sha: commit.id,
+               author: maintainer,
+               description: 'This is v0.1')
+      end
+
+      it 'returns 200 HTTP status' do
+        get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'returns a release entry' do
+        get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+        expect(json_response['tag_name']).to eq(release.tag)
+        expect(json_response['description']).to eq('This is v0.1')
+        expect(json_response['author']['name']).to eq(maintainer.name)
+        expect(json_response['commit']['id']).to eq(commit.id)
+        expect(json_response['assets']['count']).to eq(4)
+      end
+
+      it 'matches response schema' do
+        get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+        expect(response).to match_response_schema('public_api/v4/release')
+      end
+
+      it 'contains source information as assets' do
+        get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+        expect(json_response['assets']['sources'].map { |h| h['format'] })
+          .to match_array(release.sources.map(&:format))
+        expect(json_response['assets']['sources'].map { |h| h['url'] })
+          .to match_array(release.sources.map(&:url))
+      end
+
+      context "when release description contains confidential issue's link" do
+        let(:confidential_issue) do
+          create(:issue,
+                 :confidential,
+                 project: project,
+                 title: 'A vulnerability')
+        end
+
+        let!(:release) do
+          create(:release,
+                 project: project,
+                 tag: 'v0.1',
+                 sha: commit.id,
+                 author: maintainer,
+                 description: "This is confidential #{confidential_issue.to_reference}")
+        end
+
+        it "does not expose confidential issue's title" do
+          get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+          expect(json_response['description_html']).to include(confidential_issue.to_reference)
+          expect(json_response['description_html']).not_to include('A vulnerability')
+        end
+      end
+
+      context 'when release has link asset' do
+        let!(:link) do
+          create(:release_link,
+                 release: release,
+                 name: 'release-18.04.dmg',
+                 url: url)
+        end
+
+        let(:url) { 'https://my-external-hosting.example.com/scrambled-url/app.zip' }
+
+        it 'contains link information as assets' do
+          get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+          expect(json_response['assets']['links'].count).to eq(1)
+          expect(json_response['assets']['links'].first['id']).to eq(link.id)
+          expect(json_response['assets']['links'].first['name'])
+            .to eq('release-18.04.dmg')
+          expect(json_response['assets']['links'].first['url'])
+            .to eq('https://my-external-hosting.example.com/scrambled-url/app.zip')
+          expect(json_response['assets']['links'].first['external'])
+            .to be_truthy
+        end
+
+        context 'when link is internal' do
+          let(:url) do
+            "#{project.web_url}/-/jobs/artifacts/v11.6.0-rc4/download?" \
+            "job=rspec-mysql+41%2F50"
+          end
+
+          it 'has external false' do
+            get api("/projects/#{project.id}/releases/#{release.id}", maintainer)
+
+            expect(json_response['assets']['links'].first['external'])
+              .to be_falsy
+          end
+        end
+      end
+
+      context 'when user is a guest' do
+        it 'responds 200 OK' do
+          get api("/projects/#{project.id}/releases/#{release.id}", guest)
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+
+        it "does not expose tag, commit and source code" do
+          get api("/projects/#{project.id}/releases/#{release.id}", guest)
+
+          expect(response).to match_response_schema('public_api/v4/release/release_for_guest')
+          expect(json_response['assets']['count']).to eq(release.links.count)
+        end
+
+        context 'when project is public' do
+          let(:project) { create(:project, :repository, :public) }
+
+          it 'responds 200 OK' do
+            get api("/projects/#{project.id}/releases/#{release.id}", guest)
+
+            expect(response).to have_gitlab_http_status(:ok)
+          end
+
+          it "exposes tag and commit" do
+            create(:release,
+                   project: project,
+                   tag: 'v0.1',
+                   author: maintainer,
+                   created_at: 2.days.ago)
+            get api("/projects/#{project.id}/releases/#{release.id}", guest)
+
+            expect(response).to match_response_schema('public_api/v4/release')
+          end
+        end
+      end
+    end
+
+    context 'when user is not a project member' do
+      let!(:release) { create(:release, tag: 'v0.1', project: project) }
+
+      it 'cannot find the project' do
+        get api("/projects/#{project.id}/releases/#{release.id}", non_project_member)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+
+      context 'when project is public' do
+        let(:project) { create(:project, :repository, :public) }
+
+        it 'allows the request' do
+          get api("/projects/#{project.id}/releases/#{release.id}", non_project_member)
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+      end
+    end
+  end
+
   describe 'POST /projects/:id/releases' do
     let(:params) do
       {

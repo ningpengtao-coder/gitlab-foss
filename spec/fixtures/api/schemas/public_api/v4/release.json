@@ -1,7 +1,8 @@
 {
   "type": "object",
-  "required": ["name", "tag_name", "commit"],
+  "required": ["id", "name", "tag_name", "commit"],
   "properties": {
+    "id": { "type": "integer" },
     "name": { "type": "string" },
     "tag_name": { "type": "string" },
     "description": { "type": "string" },
