@@ -60,6 +60,7 @@ function groupQueriesByChartInfo(metrics) {
 }
 
 function normalizeMetrics(metrics) {
+  console.log(metrics)
   const groupedMetrics = groupQueriesByChartInfo(metrics);
 
   return groupedMetrics.map(metric => {
@@ -88,6 +89,12 @@ export default class MonitoringStore {
     this.groups = [];
     this.deploymentData = [];
     this.environmentsData = [];
+
+    this.dashboard = {
+      dashboard: '',
+      priority: 0,
+      panelGroups: []
+    };
   }
 
   storeMetrics(groups = []) {
@@ -95,6 +102,23 @@ export default class MonitoringStore {
       ...group,
       metrics: normalizeMetrics(sortMetrics(group.metrics)),
     }));
+  }
+
+  storeDashboard(groups = []) {
+    this.groups = groups.reduce((acc, group) => {
+      const metrics = normalizeMetrics(sortMetrics(group.panels.filter(panel => {
+        return panel.queries[0].result;
+      })));
+
+      if (metrics.length) {
+        return acc.concat({
+          ...group,
+          metrics,
+        });
+      }
+
+      return acc;
+    }, []);
   }
 
   storeDeploymentData(deploymentData = []) {

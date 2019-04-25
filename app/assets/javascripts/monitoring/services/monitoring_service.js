@@ -10,7 +10,7 @@ function backOffRequest(makeRequestCallback) {
   return backOff((next, stop) => {
     makeRequestCallback()
       .then(resp => {
-        if (resp.status === statusCodes.NO_CONTENT) {
+        if (resp.status === statusCodes.NO_CONTENT || resp.data.status === 'processing') {
           requestCounter += 1;
           if (requestCounter < MAX_REQUESTS) {
             next();
@@ -26,10 +26,66 @@ function backOffRequest(makeRequestCallback) {
 }
 
 export default class MonitoringService {
-  constructor({ metricsEndpoint, deploymentEndpoint, environmentsEndpoint }) {
+  constructor({ metricsEndpoint, dashboardEndpoint, deploymentEndpoint, environmentsEndpoint }) {
     this.metricsEndpoint = metricsEndpoint;
     this.deploymentEndpoint = deploymentEndpoint;
     this.environmentsEndpoint = environmentsEndpoint;
+    this.dashboardEndpoint = dashboardEndpoint;
+  }
+
+  getDashboardData(params = {}) {
+    return axios.get(this.dashboardEndpoint, { params })
+      .then(resp => resp.data)
+      .then(response => {
+        if (!response || response.status !== 'success') {
+          throw new Error(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
+        }
+        return response.dashboard;
+      })
+  }
+s
+  getPrometheusMetrics(metric) {
+    // const panelGroups = response.dashboard.panel_groups;
+
+    // panelGroups.forEach(panelGroup => {
+    //   panelGroup.panels.forEach(panel => {
+    //     panel.metrics.forEach(metric => {
+    const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
+    const query = metric[queryType];
+    // TODO don't hardcode
+    const prometheusEndpoint = `/root/metrics/environments/37/prometheus/api/v1/${queryType}`;
+
+    // todo use timewindow
+    const timeDiff = (8 * 60 * 60); // 8hours in seconnds
+    const end = Math.floor(Date.now() / 1000);
+    const start = end - timeDiff;
+
+    const minStep = 60;
+    const queryDataPoints = 600;
+    const step = Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
+
+    const params = {
+      query,
+      start,
+      end,
+      step,
+    }
+
+    return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
+      .then(res => res.data)
+      .then(response => {
+        if (response.status === 'error') {
+          // {"status":"error","errorType":"bad_data","error":"exceeded maximum resolution of 11,000 points per timeseries. Try decreasing the query resolution (?step=XX)"}
+        }
+
+        if (response.data) {
+          // {"status":"success",
+          // "data":{"resultType":"matrix","result":[]}}
+          return response.data;
+        }
+        // metrics for a single panel
+        return response.data;
+      });
   }
 
   getGraphsData(params = {}) {
