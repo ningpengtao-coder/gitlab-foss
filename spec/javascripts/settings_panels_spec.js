@@ -26,6 +26,46 @@ describe('Settings Panels', () => {
 
       expect(panel.classList.contains('expanded')).toBe(true);
     });
+
+    it('defaults trigger text to `Collapse` / `Expand` when no custom text is provided', () => {
+      const panel = document.querySelector('#js-general-settings');
+      const trigger = panel.querySelector('button.js-settings-toggle');
+      const collapsedPanelText = 'Expand';
+      const expandedPanelText = 'Collapse';
+
+      initSettingsPanels({
+        collapsedPanelText,
+        expandedPanelText,
+      });
+
+      expect(panel.classList.contains('expanded')).toBe(true);
+      expect(trigger.textContent).toEqual(expandedPanelText);
+
+      $(trigger).click();
+
+      expect(panel.classList.contains('expanded')).toBe(false);
+      expect(trigger.textContent).toEqual(collapsedPanelText);
+    });
+
+    it('takes custom text content for the triggers', () => {
+      const panel = document.querySelector('#js-general-settings');
+      const trigger = panel.querySelector('button.js-settings-toggle');
+      const collapsedPanelText = 'Expand the panel';
+      const expandedPanelText = 'Collapse the panel';
+
+      initSettingsPanels({
+        collapsedPanelText,
+        expandedPanelText,
+      });
+
+      expect(panel.classList.contains('expanded')).toBe(true);
+      expect(trigger.textContent).toEqual(expandedPanelText);
+
+      $(trigger).click();
+
+      expect(panel.classList.contains('expanded')).toBe(false);
+      expect(trigger.textContent).toEqual(collapsedPanelText);
+    });
   });
 
   it('does not change the text content of triggers', () => {
@@ -41,45 +81,5 @@ describe('Settings Panels', () => {
 
     expect(panel.classList.contains('expanded')).toBe(false);
     expect(trigger.textContent).toEqual(originalText);
-  });
-
-  it('should default text to Collapse and Expand when no custom text is provided', () => {
-    const panel = document.querySelector('#js-general-settings');
-    const trigger = panel.querySelector('button.js-settings-toggle');
-    const collapsedPanelText = 'Expand';
-    const expandedPanelText = 'Collapse';
-
-    initSettingsPanels({
-      collapsedPanelText,
-      expandedPanelText,
-    });
-
-    expect(panel.classList.contains('expanded')).toBe(true);
-    expect(trigger.textContent).toEqual(expandedPanelText);
-
-    $(trigger).click();
-
-    expect(panel.classList.contains('expanded')).toBe(false);
-    expect(trigger.textContent).toEqual(collapsedPanelText);
-  });
-
-  it('should take optional text content for the triggers', () => {
-    const panel = document.querySelector('#js-general-settings');
-    const trigger = panel.querySelector('button.js-settings-toggle');
-    const collapsedPanelText = 'Expand the panel';
-    const expandedPanelText = 'Collapse the panel';
-
-    initSettingsPanels({
-      collapsedPanelText,
-      expandedPanelText,
-    });
-
-    expect(panel.classList.contains('expanded')).toBe(true);
-    expect(trigger.textContent).toEqual(expandedPanelText);
-
-    $(trigger).click();
-
-    expect(panel.classList.contains('expanded')).toBe(false);
-    expect(trigger.textContent).toEqual(collapsedPanelText);
   });
 });

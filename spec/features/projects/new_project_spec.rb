@@ -47,6 +47,44 @@ describe 'New project' do
     end
   end
 
+  def has_basic_fields
+    [
+      { text: 'Project description (optional)', sel: 'label' },
+      { text: 'Project name', sel: 'label' },
+      { text: 'Project URL', sel: 'label' },
+      { text: 'Project slug', sel: 'label' },
+      { text: 'Visibility Level', sel: 'label' },
+      { text: 'Initialize repository with a README', sel: 'label .option-title' }
+    ].each do |field|
+      expect(page).to have_css(field[:sel], visible: true, text: field[:text])
+    end
+
+    [
+      { text: 'Project avatar', sel: 'label' },
+      { text: 'License', sel: 'label' },
+      { text: 'Features', sel: 'label' },
+      { text: 'Issues', sel: 'label' },
+      { text: 'Repository', sel: 'label' },
+      { text: 'Wiki', sel: 'label' }
+    ].each do |field|
+      expect(page).not_to have_content(field[:text])
+    end
+  end
+
+  context 'without new_project_advanced_fields feature' do
+    before do
+      stub_feature_flags(new_project_advanced_fields: false)
+
+      visit new_project_path
+    end
+
+    it 'only displays basic fields', :js do
+      has_basic_fields
+
+      expect(page).not_to have_css('.settings.expanded')
+    end
+  end
+
   it 'shows "New project" page', :js do
     visit new_project_path
 

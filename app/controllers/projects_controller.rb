@@ -28,6 +28,9 @@ class ProjectsController < Projects::ApplicationController
   # Authorize
   before_action :authorize_admin_project!, only: [:edit, :update, :housekeeping, :download_export, :export, :remove_export, :generate_new_export]
   before_action :event_filter, only: [:show, :activity]
+  before_action only: [:new] do
+    push_frontend_feature_flag(:new_project_advanced_fields)
+  end
 
   layout :determine_layout
 

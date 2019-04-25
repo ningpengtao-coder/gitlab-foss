@@ -99,17 +99,8 @@
   margin-bottom: 16px;
 }
 
-.new_project {
-  .project-feature-settings {
-    background: transparent;
-    border: 0;
-    padding: 0;
-  }
-
-  .dropdown-menu-toggle {
-    max-width: $dropdown-width;
-    width: 100%;
-  }
+.new_project .dropdown-menu-toggle {
+  max-width: $dropdown-width;
 }
 
 .project-repo-select {

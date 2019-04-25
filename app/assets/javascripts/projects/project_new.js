@@ -122,8 +122,6 @@ const bindEvents = () => {
   const $pushNewProjectTipTrigger = $('.push-new-project-tip');
   const $projectTemplateButtons = $('.project-templates-buttons');
   const $projectName = $('.tab-pane.active #project_name');
-  const $projectVisibilityLevel = $('.visibility-level-setting [name="project[visibility_level]"]');
-  const $projectFeatures = document.querySelectorAll('.project-feature-row');
 
   if ($newProjectForm.length !== 1) {
     return;
@@ -303,22 +301,28 @@ const bindEvents = () => {
     hasUserDefinedProjectPath = $projectPath.val().trim().length > 0;
   });
 
-  $projectVisibilityLevel.on('change', () => onProjectVisitbilityChange($projectFeatures));
+  if (window.gon.features.newProjectAdvancedFields) {
+    const $projectVisibilityLevel = $(
+      '.visibility-level-setting [name="project[visibility_level]"]',
+    );
+    const $projectFeatures = document.querySelectorAll('.project-feature-row');
+    $projectVisibilityLevel.on('change', () => onProjectVisitbilityChange($projectFeatures));
 
-  initSettingsPanels({
-    expandedPanelText: __('Hide avatar, license and features settings'),
-    collapsedPanelText: __('Show avatar, license and features settings'),
-  });
+    initSettingsPanels({
+      expandedPanelText: __('Hide avatar, license and features settings'),
+      collapsedPanelText: __('Show avatar, license and features settings'),
+    });
 
-  const $toggleContainer = document.querySelector('.project-feature-settings');
-  setupToggleButtons($toggleContainer, onToggleFeatureSetting);
+    const $toggleContainer = document.querySelector('.project-feature-settings');
+    setupToggleButtons($toggleContainer, onToggleFeatureSetting);
 
-  // init the license template selector
-  const $licenseField = document.querySelector('.js-project-license');
-  initLicenseField($licenseField);
+    // init the license template selector
+    const $licenseField = document.querySelector('.js-project-license');
+    initLicenseField($licenseField);
 
-  // setup avatar file uploader
-  fileUpload('.js-choose-project-avatar-button', '.js-project-avatar-input');
+    // setup avatar file uploader
+    fileUpload('.js-choose-project-avatar-button', '.js-project-avatar-input');
+  }
 };
 
 export default {
