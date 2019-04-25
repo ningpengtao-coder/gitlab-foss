@@ -6,6 +6,7 @@ import SmartInterval from '~/smart_interval';
 import MRWidgetStore from 'ee_else_ce/vue_merge_request_widget/stores/mr_widget_store';
 import MRWidgetService from 'ee_else_ce/vue_merge_request_widget/services/mr_widget_service';
 import stateMaps from 'ee_else_ce/vue_merge_request_widget/stores/state_maps';
+import mrWidgetsOptionsMixin from 'ee_else_ce/vue_merge_request_widget/mixins/mr_widget_options';
 import createFlash from '../flash';
 import WidgetHeader from './components/mr_widget_header.vue';
 import WidgetMergeHelp from './components/mr_widget_merge_help.vue';
@@ -41,6 +42,7 @@ import { setFaviconOverlay } from '../lib/utils/common_utils';
 export default {
   el: '#js-vue-mr-widget',
   name: 'MRWidget',
+  mixins: [mrWidgetsOptionsMixin],
   components: {
     'mr-widget-header': WidgetHeader,
     'mr-widget-merge-help': WidgetMergeHelp,
@@ -156,19 +158,6 @@ export default {
     }
   },
   methods: {
-    getServiceEndpoints(store) {
-      return {
-        mergePath: store.mergePath,
-        mergeCheckPath: store.mergeCheckPath,
-        cancelAutoMergePath: store.cancelAutoMergePath,
-        removeWIPPath: store.removeWIPPath,
-        sourceBranchPath: store.sourceBranchPath,
-        ciEnvironmentsStatusPath: store.ciEnvironmentsStatusPath,
-        statusPath: store.statusPath,
-        mergeActionsContentPath: store.mergeActionsContentPath,
-        rebasePath: store.rebasePath,
-      };
-    },
     createService(store) {
       return new MRWidgetService(this.getServiceEndpoints(store));
     },
