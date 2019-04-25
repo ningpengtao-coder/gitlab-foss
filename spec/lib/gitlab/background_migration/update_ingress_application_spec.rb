@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::BackgroundMigration::UpdateIngressApplication, :migration, schema: 20190325093036 do
+describe Gitlab::BackgroundMigration::UpdateIngressApplication, :migration, schema: 20190423143911 do
   let(:background_migration) { described_class.new }
 
   let(:projects) { table(:projects) }
