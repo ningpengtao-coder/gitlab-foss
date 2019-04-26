@@ -34,16 +34,17 @@ export default class MonitoringService {
   }
 
   getDashboardData(params = {}) {
-    return axios.get(this.dashboardEndpoint, { params })
+    return axios
+      .get(this.dashboardEndpoint, { params })
       .then(resp => resp.data)
       .then(response => {
         if (!response || response.status !== 'success') {
           throw new Error(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
         }
         return response.dashboard;
-      })
+      });
   }
-s
+  s;
   getPrometheusMetrics(metric) {
     const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
     const query = metric[queryType];
@@ -51,7 +52,7 @@ s
     const prometheusEndpoint = `/root/metrics/environments/37/prometheus/api/v1/${queryType}`;
 
     // todo use timewindow
-    const timeDiff = (8 * 60 * 60); // 8hours in seconnds
+    const timeDiff = 8 * 60 * 60; // 8hours in seconnds
     const end = Math.floor(Date.now() / 1000);
     const start = end - timeDiff;
 
@@ -64,7 +65,7 @@ s
       start,
       end,
       step,
-    }
+    };
 
     return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
       .then(res => res.data)

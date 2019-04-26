@@ -153,17 +153,19 @@ export default {
               group.panels.forEach((panel, j) => {
                 panel.queries = panel.metrics;
                 panel.queries.forEach(metric => {
-                  promises.push(this.service.getPrometheusMetrics(metric).then(res => {
-                    if (res.resultType === 'matrix') {
-                      if (res.result.length > 0) {
-                        panel.queries[0].result = res.result;
-                        panel.queries[0].metricId = panel.queries[0].metric_id;
+                  promises.push(
+                    this.service.getPrometheusMetrics(metric).then(res => {
+                      if (res.resultType === 'matrix') {
+                        if (res.result.length > 0) {
+                          panel.queries[0].result = res.result;
+                          panel.queries[0].metricId = panel.queries[0].metric_id;
+                        }
                       }
-                    }
-                  }));
-                })
-              })
-            })
+                    }),
+                  );
+                });
+              });
+            });
 
             return Promise.all(promises);
           })
