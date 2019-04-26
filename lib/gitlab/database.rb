@@ -84,6 +84,11 @@ module Gitlab
       postgresql? && version.to_f >= 9.6
     end
 
+    # Support for FOR UPDATE SKIP LOCKED
+    def self.skip_locked_supported?
+      postgresql? && version.to_f >= 9.5
+    end
+
     # map some of the function names that changed between PostgreSQL 9 and 10
     # https://wiki.postgresql.org/wiki/New_in_postgres_10
     def self.pg_wal_lsn_diff

@@ -45,10 +45,44 @@ class InternalId < ApplicationRecord
   private
 
   def update_and_save(&block)
-    lock!
+    lock_record!
     yield
     save!
     last_value
+  end
+
+  def lock_record!
+    return lock! unless Feature.enabled?(:internal_id_nonblocking_lock_acquire)
+
+    begin
+      transaction(requires_new: true) do
+        lock!('FOR UPDATE NOWAIT')
+      end
+    rescue ActiveRecord::StatementInvalid => e
+      raise unless e.cause.is_a?(PG::LockNotAvailable)
+
+      # We know the record exists but we did not succeed in getting the lock on it.
+      #
+      # This happens when another transaction holds the lock. Instead of blocking
+      # here, we immediately return, wait and retry until we get the lock. We call
+      # this "non-blocking lock acquire".
+      #
+      # The benefit is that we don't risk running into a statement timeout while
+      # waiting for the lock.
+      #
+      # The drawback is a decrease in fairness: Each lock acquire request goes into a queue
+      # which guarantees a level of fairness (FIFO). Since we immediately return and re-queue
+      # our request here, we land at the end of the queue again. This may cause
+      # 'starvation' of a transaction in case other transactions manage to schedule their lock
+      # acquire first and further block our transaction. "starvation" is not systematic however
+      # and would only happen randomly (expect average wait times to be similar to just
+      # calling #lock!).
+      sleep(0.1)
+
+      # We can safely retry here since the nested transaction
+      # has been rolled back at this point.
+      retry
+    end
   end
 
   class << self
