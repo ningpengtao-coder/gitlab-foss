@@ -48,7 +48,7 @@
 
         .selectbox.hide-collapsed
           = f.hidden_field 'milestone_id', value: milestone[:id], id: nil
-          = dropdown_tag('Milestone', options: { title: _('Assign milestone'), toggle_class: 'js-milestone-select js-extra-options', filter: true, dropdown_class: 'dropdown-menu-selectable', placeholder: _('Search milestones'), data: { show_no: true, field_name: "#{issuable_type}[milestone_id]", project_id: issuable_sidebar[:project_id], issuable_id: issuable_sidebar[:id], milestones: issuable_sidebar[:project_milestones_path], ability_name: issuable_type, issue_update: issuable_sidebar[:issuable_json_path], use_id: true, default_no: true, selected: milestone[:title], null_default: true, display: 'static' }})
+          = dropdown_tag('Milestone', options: { title: _('Assign milestone'), toggle_class: 'js-milestone-select js-extra-options ', filter: true, dropdown_class: 'dropdown-menu-selectable dropdown-menu-right', placeholder: _('Search milestones'), data: { show_no: true, field_name: "#{issuable_type}[milestone_id]", project_id: issuable_sidebar[:project_id], issuable_id: issuable_sidebar[:id], milestones: issuable_sidebar[:project_milestones_path], ability_name: issuable_type, issue_update: issuable_sidebar[:issuable_json_path], use_id: true, default_no: true, selected: milestone[:title], null_default: true, display: 'static' }})
 
       #issuable-time-tracker.block
         // Fallback while content is loading
@@ -87,7 +87,7 @@
                   %span.dropdown-toggle-text
                     = _('Due date')
                   = icon('chevron-down', 'aria-hidden': 'true')
-                .dropdown-menu.dropdown-menu-due-date
+                .dropdown-menu.dropdown-menu-due-date.dropdown-menu-right
                   = dropdown_title(_('Due date'))
                   = dropdown_content do
                     .js-due-date-calendar
