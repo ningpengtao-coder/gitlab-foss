@@ -5,6 +5,7 @@ import ProjectAvatar from './project_avatar.vue';
 import ProjectCounts from './project_counts.vue';
 import ProjectAccess from './project_access.vue';
 import ProjectTitle from './project_title.vue';
+import ProjectVisibility from './project_visibility.vue';
 
 /**
  * Renders a project list item
@@ -17,6 +18,7 @@ export default {
     ProjectCounts,
     ProjectAccess,
     ProjectTitle,
+    ProjectVisibility,
   },
   props: {
     isExploreProjectsTab: {
@@ -198,10 +200,11 @@ export default {
       <div class="flex-wrapper">
         <div class="d-flex align-items-center flex-wrap project-title">
           <project-title
-            :project-name="project.name"
-            :project-path="project_path"
-            :project-namespace="projectNamespace"
+            :name="project.name"
+            :path-with-namespace="project_path"
+            :namespace="projectNamespace"
           />
+          <project-visibility/>
           <project-access
             :is-explore-projects-tab="isExploreProjectsTab"
             :access-level="accessLevel"

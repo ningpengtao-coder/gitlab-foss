@@ -70,21 +70,43 @@ describe('ProjectListItem', () => {
   });
 
   describe('template', () => {
-    describe('User is project owner', () => {
-      let ownedVm;
-
+    describe('User owns project', () => {
       beforeEach(() => {
-        ownedVm = createComponent({ project: ownedProject });
+        vm = createComponent({ project: ownedProject });
       });
 
       afterEach(() => {
-        ownedVm.$destroy();
+        vm.$destroy();
       });
 
-      it('renders the owner name for the project namespace', () => {
-        const { owner } = ownedProject;
+      it(`renders the owner name for the namespace`, () => {
+        expect(vm.$el.querySelector('.namespace-name').innerText).toEqual(
+          `${ownedProject.owner.name} /`,
+        );
+      });
 
-        expect(ownedVm.$el.querySelector('.namespace-name').innerText).toBe(`${owner.name} /`);
+      it(`renders the project name`, () => {
+        expect(vm.$el.querySelector('.project-name').innerText).toEqual(`${ownedProject.name}`);
+      });
+    });
+
+    describe('User does not own the project', () => {
+      beforeEach(() => {
+        vm = createComponent({ project: selectedProject });
+      });
+
+      afterEach(() => {
+        vm.$destroy();
+      });
+
+      it(`renders the project name for the namespace`, () => {
+        expect(vm.$el.querySelector('.namespace-name').innerText).toEqual(
+          `${selectedProject.namespace.name} /`,
+        );
+      });
+
+      it(`renders the project name`, () => {
+        expect(vm.$el.querySelector('.project-name').innerText).toEqual(`${selectedProject.name}`);
       });
     });
 

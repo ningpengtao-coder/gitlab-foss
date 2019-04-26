@@ -38,13 +38,19 @@ export default {
     return {
       projects: [],
       size: 48,
+      hideArchived: {
+        type: Boolean,
+        default: false,
+      },
     };
   },
   computed: {
     isExploreProjectsTab,
   },
   created() {
-    fetchProjects().then(res => {
+    fetchProjects({
+      // archived: false,
+    }).then(res => {
       this.projects = res;
     });
   },
@@ -56,7 +62,12 @@ export default {
     <!-- TODO: empty project state -->
     <ul class="projects-list">
       <template v-for="project in projects">
-        <project-list-item :key="project.id" :project="project" :is-explore="isExploreProjectsTab"/>
+        <project-list-item
+          :key="project.id"
+          :project="project"
+          :is-explore="isExploreProjectsTab"
+          :hide-archived="hideArchived"
+        />
       </template>
     </ul>
   </div>
