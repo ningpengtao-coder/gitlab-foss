@@ -25,7 +25,7 @@ export default {
     <participants
       :loading="store.isFetching.participants"
       :participants="store.participants"
-      :number-of-less-participants="7"
+      :number-of-less-participants="5"
     />
   </div>
 </template>

@@ -26,7 +26,7 @@ export default {
     numberOfLessParticipants: {
       type: Number,
       required: false,
-      default: 7,
+      default: 5,
     },
   },
   data() {
