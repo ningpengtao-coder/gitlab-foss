@@ -206,18 +206,13 @@ export default {
           const { seriesName, color } = seriesData;
           // seriesData.value contains the chart's [x, y] value pair
           // seriesData.value[1] is threfore the chart y value
-          try {
-            const value = seriesData.value[1].toFixed(3);
+          const value = seriesData.value[1].toFixed(3);
 
-            this.tooltip.content.push({
-              name: seriesName,
-              value,
-              color,
-            });
-          } catch (e) {
-            console.log(seriesData)
-            debugger
-          }
+          this.tooltip.content.push({
+            name: seriesName,
+            value,
+            color,
+          });
         }
       });
     },

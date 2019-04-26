@@ -10,7 +10,7 @@ function backOffRequest(makeRequestCallback) {
   return backOff((next, stop) => {
     makeRequestCallback()
       .then(resp => {
-        if (resp.status === statusCodes.NO_CONTENT || resp.data.status === 'processing') {
+        if (resp.status === statusCodes.NO_CONTENT) {
           requestCounter += 1;
           if (requestCounter < MAX_REQUESTS) {
             next();
@@ -45,11 +45,6 @@ export default class MonitoringService {
   }
 s
   getPrometheusMetrics(metric) {
-    // const panelGroups = response.dashboard.panel_groups;
-
-    // panelGroups.forEach(panelGroup => {
-    //   panelGroup.panels.forEach(panel => {
-    //     panel.metrics.forEach(metric => {
     const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
     const query = metric[queryType];
     // TODO don't hardcode

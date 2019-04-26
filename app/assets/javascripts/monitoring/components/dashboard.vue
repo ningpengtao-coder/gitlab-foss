@@ -144,7 +144,6 @@ export default {
         this.service
           .getDashboardData()
           .then(data => {
-            // this.store.storeDashboard(data.panel_groups)
             panelGroups = data.panel_groups;
           })
           .then(() => {
