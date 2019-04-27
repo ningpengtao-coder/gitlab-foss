@@ -7,7 +7,7 @@ xml.entry do
 
   xml.author do
     xml.name issue.author_name
-    xml.email issue.author_public_email if issue.author_public_email and !issue.author_public_email.empty?
+    xml.email issue.author_public_email if issue.author_public_email && !issue.author_public_email.empty?
   end
 
   xml.summary issue.title
@@ -22,12 +22,12 @@ xml.entry do
     end
   end
 
-# Names each contributor to the entry. An entry may have multiple contributor elements.
+  # Names each contributor to the entry. An entry may have multiple contributor elements.
   if issue.assignees.any?
     issue.assignees.each do |assignee|
       xml.contributor do
         xml.name assignee.name
-        xml.email assignee.public_email if assignee.public_email and !assignee.public_email.empty?
+        xml.email assignee.public_email if assignee.public_email && !assignee.public_email.empty?
       end
     end
   end
