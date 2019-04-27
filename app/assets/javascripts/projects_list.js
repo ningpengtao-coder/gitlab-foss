@@ -7,17 +7,19 @@ import FilterableList from './filterable_list';
  * Updates the html content of the page with the received one.
  */
 
+function fetchData(mountPoint) {
+  const { projects = [] } = mountPoint.dataset;
+  console.log('fetchData::projects', JSON.parse(projects));
+  return JSON.parse(projects);
+}
+
 export function initProjectsList() {
   const mountPoint = document.querySelector('.vjs-projects-list');
-  const { projects = [] } = mountPoint.dataset;
-
   return new Vue({
     el: mountPoint,
     render: createElement =>
       createElement(VueProjectsList, {
-        props: {
-          projects,
-        },
+        props: { projects: fetchData(mountPoint) },
       }),
   });
 }

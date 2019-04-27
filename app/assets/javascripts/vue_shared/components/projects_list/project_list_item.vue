@@ -147,6 +147,9 @@ export default {
       },
     },
   },
+  created() {
+    console.log('ProjectListItem::created', this.props, this.data);
+  },
   computed: {
     project_path() {
       return `/${this.project.path_with_namespace}`;

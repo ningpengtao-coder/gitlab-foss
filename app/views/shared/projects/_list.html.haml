@@ -29,9 +29,10 @@
 .js-projects-list-holder
   - if any_projects?(projects)
     - load_pipeline_status(projects)
+    -# maybe load merge request count here
     - if Feature.enabled?(:vue_projects_list)
       -# Mount vue app
-      %ul.vjs-projects-list{ class: css_classes, data: { projects: projects.to_json } }
+      %ul.vjs-projects-list{ class: css_classes, data: { projects: projects_data_json(projects) } }
     - else
       %ul.projects-list{ class: css_classes }
         - projects.each_with_index do |project, i|

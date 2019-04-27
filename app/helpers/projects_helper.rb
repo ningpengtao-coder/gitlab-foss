@@ -631,4 +631,8 @@ module ProjectsHelper
       project.builds_enabled? &&
       !project.repository.gitlab_ci_yml
   end
+
+  def projects_data_json(projects)
+    projects.to_json.html_safe
+  end
 end
