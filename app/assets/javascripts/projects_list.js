@@ -9,10 +9,16 @@ import FilterableList from './filterable_list';
 
 export function initProjectsList() {
   const mountPoint = document.querySelector('.vjs-projects-list');
+  const { projects = [] } = mountPoint.dataset;
 
   return new Vue({
     el: mountPoint,
-    render: createElement => createElement(VueProjectsList, { props: {} }),
+    render: createElement =>
+      createElement(VueProjectsList, {
+        props: {
+          projects,
+        },
+      }),
   });
 }
 export default class ProjectsList {

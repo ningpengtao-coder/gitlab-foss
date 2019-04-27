@@ -24,6 +24,7 @@ const currentTab = () => {
   return PROJECT_TABS[tab] || PROJECT_TABS.default;
 };
 
+// TODO: not sure if theres a better way
 const isExploreProjectsTab = () => {
   return currentTab() === PROJECT_TABS.EXPLORE;
 };
@@ -32,27 +33,19 @@ export default {
   components: {
     ProjectListItem,
   },
-  props: {},
-  data() {
-    // TODO: add type definitions
-    return {
-      projects: [],
-      size: 48,
-      hideArchived: {
-        type: Boolean,
-        default: false,
-      },
-    };
+  props: {
+    projects: {
+      type: Array,
+      default: [],
+    },
+    size: 48, // size of what?
+    hideArchived: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     isExploreProjectsTab,
-  },
-  created() {
-    fetchProjects({
-      // archived: false,
-    }).then(res => {
-      this.projects = res;
-    });
   },
 };
 </script>
