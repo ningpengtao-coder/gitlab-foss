@@ -1263,6 +1263,7 @@ class Project < ApplicationRecord
   def forking_access_level_change_allowed?
     !public?
   end
+  alias_method :fork_visibility_level_change_allowed?, :forking_access_level_change_allowed?
 
   def lfs_storage_project
     @lfs_storage_project ||= begin

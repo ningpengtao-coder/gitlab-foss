@@ -163,6 +163,46 @@ describe Projects::UpdateService do
       end
     end
 
+    context 'when updating fork visibility level' do
+      let(:fork_visibility_level) { Gitlab::ForkVisibilityLevel::PUBLIC }
+
+      subject do
+        update_project(project, user,
+                       project_setting_attributes: { fork_visibility_level: fork_visibility_level } )
+      end
+
+      shared_examples 'valid fork_visibility_level change' do
+        it 'succeeds' do
+          expect(subject).to eq({ status: :success })
+        end
+
+        it 'updates the project' do
+          expect { subject }.to change(project, :fork_visibility_level).to(fork_visibility_level)
+        end
+      end
+
+      context 'when visibility_level is PUBLIC' do
+        let(:project_visibility_level) { Gitlab::VisibilityLevel::PUBLIC }
+
+        it 'does not allow fork_visibility_level changes' do
+          expect(subject).to eq({ status: :error,
+                                  message: 'Cannot set fork visibility level for public project!' })
+        end
+      end
+
+      context 'when visibility_level is INTERNAL' do
+        let(:project_visibility_level) { Gitlab::VisibilityLevel::INTERNAL }
+
+        it_behaves_like 'valid fork_visibility_level change'
+      end
+
+      context 'when visibility_level is PRIVATE' do
+        let(:project_visibility_level) { Gitlab::VisibilityLevel::PRIVATE }
+
+        it_behaves_like 'valid fork_visibility_level change'
+      end
+    end
+
     describe 'when updating project that has forks' do
       let(:project) { create(:project, :internal) }
       let(:forked_project) { fork_project(project) }

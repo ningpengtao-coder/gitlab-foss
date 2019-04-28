@@ -50,6 +50,11 @@ module Projects
         raise ValidationError.new(s_('UpdateProject|Cannot set forking access level for public project!'))
       end
 
+      fork_visibility_level = params.dig(:project_setting_attributes, :fork_visibility_level)
+      if fork_visibility_level.present? && !project.fork_visibility_level_change_allowed?
+        raise ValidationError.new(s_('UpdateProject|Cannot set fork visibility level for public project!'))
+      end
+
       if renaming_project_with_container_registry_tags?
         raise ValidationError.new(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
       end

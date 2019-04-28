@@ -9907,6 +9907,9 @@ msgstr ""
 msgid "UpdateProject|Cannot rename project because it contains container registry tags!"
 msgstr ""
 
+msgid "UpdateProject|Cannot set fork visibility level for public project!"
+msgstr ""
+
 msgid "UpdateProject|Cannot set forking access level for public project!"
 msgstr ""
 
