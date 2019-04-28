@@ -323,6 +323,7 @@ project:
 - pool_repository
 - kubernetes_namespaces
 - error_tracking_setting
+- metrics_setting
 award_emoji:
 - awardable
 - user
@@ -361,3 +362,5 @@ error_tracking_setting:
 - project
 suggestions:
 - note
+metrics_setting:
+- project
