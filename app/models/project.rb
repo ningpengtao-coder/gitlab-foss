@@ -1257,6 +1257,8 @@ class Project < ApplicationRecord
   end
 
   def forking_allowed?
+    return true if public?
+
     forking_access_level > Gitlab::ForkingAccessLevel::DISABLED
   end
 

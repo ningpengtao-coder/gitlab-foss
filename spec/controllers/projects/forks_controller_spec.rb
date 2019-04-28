@@ -13,19 +13,33 @@ describe Projects::ForksController do
   end
 
   shared_examples 'forking disabled' do
-    context 'when forking is disabled' do
-      before do
-        sign_in(user)
+    before do
+      create(:project_setting,
+             { project: project,
+               forking_access_level: Gitlab::ForkingAccessLevel::DISABLED })
 
-        create(:project_setting,
-               { project: project,
-                 forking_access_level: Gitlab::ForkingAccessLevel::DISABLED })
+      sign_in(user)
+    end
+
+    context 'private project' do
+      let(:project) { create(:project, :private, :repository) }
+
+      before do
+        project.add_developer(user)
       end
 
-      it 'renders 403' do
+      it 'returns with 403' do
         subject
 
         expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'public project' do
+      it 'returns with non-error status' do
+        subject
+
+        expect(response.status).to be < 400
       end
     end
   end
