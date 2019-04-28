@@ -1260,6 +1260,10 @@ class Project < ApplicationRecord
     forking_access_level > Gitlab::ForkingAccessLevel::DISABLED
   end
 
+  def forking_access_level_change_allowed?
+    !public?
+  end
+
   def lfs_storage_project
     @lfs_storage_project ||= begin
       result = self

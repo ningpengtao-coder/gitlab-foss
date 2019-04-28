@@ -7,8 +7,11 @@ describe Projects::UpdateService do
   include ProjectForksHelper
 
   let(:user) { create(:user) }
+  let(:project_visibility_level) { Gitlab::VisibilityLevel::PRIVATE }
   let(:project) do
-    create(:project, creator: user, namespace: user.namespace)
+    create(:project, { creator: user,
+                       namespace: user.namespace,
+                       visibility_level: project_visibility_level })
   end
 
   describe '#execute' do
@@ -102,38 +105,61 @@ describe Projects::UpdateService do
       end
     end
 
-    context 'when changing forking access level' do
+    context 'when updating forking access level' do
+      let(:forking_access_level) { Gitlab::ForkingAccessLevel::DISABLED}
+
+      subject do
+        update_project(project, user,
+                       project_setting_attributes: { forking_access_level: forking_access_level } )
+      end
+
       shared_examples 'valid forking_access_level change' do
-        subject do
-          update_project(project, user,
-                         project_setting_attributes: { forking_access_level: forking_access_level } )
+        it 'succeeds' do
+          expect(subject).to eq({ status: :success })
         end
 
-        context 'updating forking_access_level' do
-          it 'succeeds' do
-            expect(subject).to eq({ status: :success })
-          end
-
-          it 'updates the project' do
-            expect { subject }.to change(project, :forking_access_level).to(forking_access_level)
-          end
+        it 'updates the project' do
+          expect { subject }.to change(project, :forking_access_level).to(forking_access_level)
         end
       end
 
-      context 'to enable forking' do
-        let(:forking_access_level) { Gitlab::ForkingAccessLevel::ENABLED }
+      shared_examples 'allowed forking_access_level changes' do
+        context 'enables forking' do
+          let(:forking_access_level) { Gitlab::ForkingAccessLevel::ENABLED }
 
-        before do
-          create(:project_setting, project: project, forking_access_level: Gitlab::ForkingAccessLevel::DISABLED)
+          before do
+            create(:project_setting, project: project, forking_access_level: Gitlab::ForkingAccessLevel::DISABLED)
+          end
+
+          it_behaves_like 'valid forking_access_level change'
         end
 
-        it_behaves_like 'valid forking_access_level change'
+        context 'disables forking' do
+          let(:forking_access_level) { Gitlab::ForkingAccessLevel::DISABLED}
+
+          it_behaves_like 'valid forking_access_level change'
+        end
       end
 
-      context 'to disable forking' do
-        let(:forking_access_level) { Gitlab::ForkingAccessLevel::DISABLED}
+      context 'when visibility_level is PUBLIC' do
+        let(:project_visibility_level) { Gitlab::VisibilityLevel::PUBLIC }
 
-        it_behaves_like 'valid forking_access_level change'
+        it 'does not allow forking_access_level changes' do
+          expect(subject).to eq({ status: :error,
+                                  message: 'Cannot set forking access level for public project!' })
+        end
+      end
+
+      context 'when visibility_level is INTERNAL' do
+        let(:project_visibility_level) { Gitlab::VisibilityLevel::INTERNAL }
+
+        it_behaves_like 'allowed forking_access_level changes'
+      end
+
+      context 'when visibility_level is PRIVATE' do
+        let(:project_visibility_level) { Gitlab::VisibilityLevel::PRIVATE }
+
+        it_behaves_like 'allowed forking_access_level changes'
       end
     end
 
