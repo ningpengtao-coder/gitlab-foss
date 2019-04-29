@@ -1,5 +1,5 @@
 - if current_user
-  .block.subscriptions
+  .block.subscriptions.block-small
     %subscriptions{ ":loading" => "issue.isFetching && issue.isFetching.subscriptions",
       ":subscribed" => "issue.subscribed",
       ":id" => "issue.id" }

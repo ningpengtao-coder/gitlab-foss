@@ -10,7 +10,7 @@ module BoardHelpers
   def wait_for_sidebar
     # loop until the CSS transition is complete
     Timeout.timeout(0.5) do
-      loop until evaluate_script('$(".right-sidebar").outerWidth()') == 290
+      loop until evaluate_script('$(".right-sidebar").outerWidth()') == 272
     end
   end
 end

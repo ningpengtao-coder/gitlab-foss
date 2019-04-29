@@ -147,21 +147,20 @@
   }
 
   .issuable-header-text {
-    margin-top: 7px;
+    margin-top: 4px;
   }
 
   .block {
     @include clearfix;
     padding: $gl-padding 0;
-    border-bottom: 1px solid $border-gray-normal;
+    border-bottom: 1px solid $gray-100;
     // This prevents the mess when resizing the sidebar
     // of elements repositioning themselves..
     width: $gutter-inner-width;
     // --
 
-    &.issuable-sidebar-header {
-      padding-top: 0;
-      padding-bottom: 10px;
+    &.block-small {
+      padding: 10px 0;
     }
 
     &:last-child {
@@ -205,6 +204,10 @@
         }
       }
     }
+
+    .toggle-wrapper {
+      margin: 2px 0;
+    }
   }
 
   .block-first {
@@ -225,9 +228,11 @@
     }
 
     .lock-edit, // uses same style, different js behaviour
-    .edit-link {
+    .edit-link,
+    confidential-edit {
       @extend .btn-blank;
       color: $gl-text-color;
+      font-size: $gl-font-size-small;
 
       &:hover {
         text-decoration: underline;
@@ -243,7 +248,6 @@
       white-space: nowrap;
       width: 85%;
       overflow: hidden;
-      position: relative;
       display: inline-block;
       text-overflow: ellipsis;
     }
@@ -254,8 +258,7 @@
 
     button {
       float: right;
-      padding: 1px 5px;
-      background-color: $gray-light;
+      padding: 4px 5px 0;
     }
   }
 
@@ -299,10 +302,6 @@
       padding: 0 20px;
     }
 
-    .issuable-sidebar-header {
-      padding-top: 10px;
-    }
-
     &:not(.issue-boards-sidebar):not([data-signed-in]):not([data-always-show-toggle]) {
       .issuable-sidebar-header {
         display: none;
@@ -332,7 +331,7 @@
     }
 
     .gutter-toggle {
-      margin-top: 7px;
+      margin-top: 4px;
       border-left: 1px solid $border-gray-normal;
       text-align: center;
     }

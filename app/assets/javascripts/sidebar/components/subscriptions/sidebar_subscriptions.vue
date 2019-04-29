@@ -30,7 +30,7 @@ export default {
 </script>
 
 <template>
-  <div class="block subscriptions">
+  <div class="block subscriptions block-small">
     <subscriptions
       :loading="store.isFetching.subscriptions"
       :subscribed="store.subscribed"

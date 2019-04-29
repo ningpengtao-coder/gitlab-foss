@@ -44,7 +44,7 @@ export default {
       <p>{{ __('Quick actions can be used in the issues description and comment boxes.') }}</p>
       <p v-html="estimateText"></p>
       <p v-html="spendText"></p>
-      <a :href="href" class="btn btn-default learn-more-button"> {{ __('Learn more') }} </a>
+      <a :href="href" class="btn btn-sm learn-more-button"> {{ __('Learn more') }} </a>
     </div>
   </div>
 </template>

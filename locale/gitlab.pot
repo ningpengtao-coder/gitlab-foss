@@ -7390,9 +7390,6 @@ msgstr ""
 msgid "Recent searches"
 msgstr ""
 
-msgid "Reference:"
-msgstr ""
-
 msgid "Refreshing in a second to show the updated status..."
 msgid_plural "Refreshing in %d seconds to show the updated status..."
 msgstr[0] ""

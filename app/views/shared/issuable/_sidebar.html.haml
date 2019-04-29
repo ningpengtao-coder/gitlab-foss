@@ -7,7 +7,7 @@
 
 %aside.right-sidebar.js-right-sidebar.js-issuable-sidebar{ data: { signed: { in: signed_in } }, class: sidebar_gutter_collapsed_class, 'aria-live' => 'polite' }
   .issuable-sidebar
-    .block.issuable-sidebar-header
+    .block.issuable-sidebar-header.block-small
       - if signed_in
         %span.issuable-header-text.hide-collapsed.float-left
           = _('Todo')
