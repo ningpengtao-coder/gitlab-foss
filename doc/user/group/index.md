@@ -68,7 +68,7 @@ together in a single list view.
 
 You can create a group in GitLab from:
 
-1. The Groups page: expand the left menu, click **Groups**, and click the green button **New group**:
+1. The Groups page: from the top menu, click **Groups**, and click the green button **New group**:
 
     ![new group from groups page](img/new_group_from_groups.png)
 
@@ -80,14 +80,21 @@ Add the following information:
 
 ![new group info](img/create_new_group_info.png)
 
-1. Set the **Group path** which will be the **namespace** under which your projects
-   will be hosted (path can contain only letters, digits, underscores, dashes
-   and dots; it cannot start with dashes or end in dot).
-1. The **Group name** will populate with the path. Optionally, you can change
-   it. This is the name that will display in the group views.
-1. Optionally, you can add a description so that others can briefly understand
+1. The **Group name** will populate the URL automatically. Optionally, you can change it.
+   This is the name that is displayed in the group views.
+   The name can contain only:
+     - Alphanumeric characters.
+     - Underscores.
+     - Dashes and dots.
+     - Spaces.
+1. The **Group URL**, which will be the namespace under which your projects will be hosted.
+   The URL can contain only:
+     - Alphanumeric characters.
+     - Underscores.
+     - Dashes and dots. It cannot start with dashes or end in dot.
+1. Optionally, you can add a brief description to tell others
    what this group is about.
-1. Optionally, choose an avatar for your project.
+1. Optionally, choose an avatar for your group.
 1. Choose the [visibility level](../../public_access/public_access.md).
 
 ## Add users to a group
@@ -156,7 +163,7 @@ There are two different ways to add a new project to a group:
 Group owners or administrators can allow users with the
 Developer role to create projects under groups.
 
-By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under agroup, but this can be changed either within the group settings for a group, or
+By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group, but this can be changed either within the group settings for a group, or
 be set globally by a GitLab administrator in the Admin area
 at **Settings > General > Visibility and access controls**.
 

@@ -210,6 +210,10 @@ module Ci
       where(source: branch_pipeline_sources).where(ref: ref, tag: false)
     end
 
+    scope :with_reports, -> (reports_scope) do
+      where('EXISTS (?)', ::Ci::Build.latest.with_reports(reports_scope).where('ci_pipelines.id=ci_builds.commit_id').select(1))
+    end
+
     # Returns the pipelines in descending order (= newest first), optionally
     # limited to a number of references.
     #
@@ -638,6 +642,7 @@ module Ci
         variables.append(key: 'CI_COMMIT_MESSAGE', value: git_commit_message.to_s)
         variables.append(key: 'CI_COMMIT_TITLE', value: git_commit_full_title.to_s)
         variables.append(key: 'CI_COMMIT_DESCRIPTION', value: git_commit_description.to_s)
+        variables.append(key: 'CI_COMMIT_REF_PROTECTED', value: (!!protected_ref?).to_s)
 
         if merge_request_event? && merge_request
           variables.append(key: 'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA', value: source_sha.to_s)
@@ -686,16 +691,16 @@ module Ci
       # We purposely cast the builds to an Array here. Because we always use the
       # rows if there are more than 0 this prevents us from having to run two
       # queries: one to get the count and one to get the rows.
-      @latest_builds_with_artifacts ||= builds.latest.with_artifacts_archive.to_a
+      @latest_builds_with_artifacts ||= builds.latest.with_artifacts_not_expired.to_a
     end
 
-    def has_test_reports?
-      complete? && builds.latest.with_test_reports.any?
+    def has_reports?(reports_scope)
+      complete? && builds.latest.with_reports(reports_scope).exists?
     end
 
     def test_reports
       Gitlab::Ci::Reports::TestReports.new.tap do |test_reports|
-        builds.latest.with_test_reports.each do |build|
+        builds.latest.with_reports(Ci::JobArtifact.test_reports).each do |build|
           build.collect_test_reports!(test_reports)
         end
       end

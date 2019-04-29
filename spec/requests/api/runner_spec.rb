@@ -68,7 +68,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
             post api('/runners'), params: { token: group.runners_token }
 
             expect(response).to have_http_status 201
-            expect(group.runners.size).to eq(1)
+            expect(group.runners.reload.size).to eq(1)
             runner = Ci::Runner.first
             expect(runner.token).not_to eq(registration_token)
             expect(runner.token).not_to eq(group.runners_token)
@@ -164,6 +164,32 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
 
             expect(response).to have_gitlab_http_status 201
             expect(Ci::Runner.first.active).to be false
+          end
+        end
+      end
+
+      context 'when access_level is provided for Runner' do
+        context 'when access_level is set to ref_protected' do
+          it 'creates runner' do
+            post api('/runners'), params: {
+                                    token: registration_token,
+                                    access_level: 'ref_protected'
+                                  }
+
+            expect(response).to have_gitlab_http_status 201
+            expect(Ci::Runner.first.ref_protected?).to be true
+          end
+        end
+
+        context 'when access_level is set to not_protected' do
+          it 'creates runner' do
+            post api('/runners'), params: {
+                                    token: registration_token,
+                                    access_level: 'not_protected'
+                                  }
+
+            expect(response).to have_gitlab_http_status 201
+            expect(Ci::Runner.first.ref_protected?).to be false
           end
         end
       end

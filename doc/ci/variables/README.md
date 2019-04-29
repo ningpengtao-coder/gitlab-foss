@@ -136,12 +136,23 @@ The output will be:
 
 ![Output custom variable](img/custom_variable_output.png)
 
-CAUTION: **Important:**
-Be aware that variables are not masked, and their values can be shown
-in the job logs if explicitly asked to do so. If your project is public or
-internal, you can set the pipelines private from your [project's Pipelines
-settings](../../user/project/pipelines/settings.md#visibility-of-pipelines).
-Follow the discussion in issue [#13784][ce-13784] for masking the variables.
+### Masked Variables
+
+By default, variables will be created as masked variables.
+This means that the value of the variable will be hidden in job logs,
+though it must match certain requirements to do so:
+
+- The value must be in a single line.
+- The value must contain only letters, numbers, or underscores.
+- The value must not have escape characters, such as `\"`
+- The value must not use variables.
+- The value must not have any whitespace.
+- The value must be at least 8 characters long.
+
+The above rules are validated using the regex `/\A\w{8,}\z/`. If the value
+does not meet the requirements above, then the CI variable will fail to save.
+In order to save, either alter the value to meet the masking requirements or
+disable `Masked` for the variable.
 
 ### Syntax of environment variables in job scripts
 
@@ -425,8 +436,9 @@ Below you can find supported syntax reference:
 1. Equality matching using a string
 
     > Example: `$VARIABLE == "some value"`
+    > Example: `$VARIABLE != "some value"` _(added in 11.11)_
 
-    You can use equality operator `==` to compare a variable content to a
+    You can use equality operator `==` or `!=` to compare a variable content to a
     string. We support both, double quotes and single quotes to define a string
     value, so both `$VARIABLE == "some value"` and `$VARIABLE == 'some value'`
     are supported. `"some value" == $VARIABLE` is correct too.
@@ -434,22 +446,26 @@ Below you can find supported syntax reference:
 1. Checking for an undefined value
 
     > Example: `$VARIABLE == null`
+    > Example: `$VARIABLE != null` _(added in 11.11)_
 
     It sometimes happens that you want to check whether a variable is defined
     or not. To do that, you can compare a variable to `null` keyword, like
     `$VARIABLE == null`. This expression is going to evaluate to truth if
-    variable is not defined.
+    variable is not defined when `==` is used, or to falsey if `!=` is used.
 
 1. Checking for an empty variable
 
     > Example: `$VARIABLE == ""`
+    > Example: `$VARIABLE != ""` _(added in 11.11)_
 
     If you want to check whether a variable is defined, but is empty, you can
-    simply compare it against an empty string, like `$VAR == ''`.
+    simply compare it against an empty string, like `$VAR == ''` or non-empty
+    string `$VARIABLE != ""`.
 
 1. Comparing two variables
 
     > Example: `$VARIABLE_1 == $VARIABLE_2`
+    > Example: `$VARIABLE_1 != $VARIABLE_2` _(added in 11.11)_
 
     It is possible to compare two variables. This is going to compare values
     of these variables.
@@ -468,9 +484,11 @@ Below you can find supported syntax reference:
 1. Pattern matching  _(added in 11.0)_
 
     > Example: `$VARIABLE =~ /^content.*/`
+    > Example: `$VARIABLE_1 !~ /^content.*/` _(added in 11.11)_
 
     It is possible perform pattern matching against a variable and regular
-    expression. Expression like this evaluates to truth if matches are found.
+    expression. Expression like this evaluates to truth if matches are found
+    when using `=~`. It evaluates to truth if matches are not found when `!~` is used.
 
     Pattern matching is case-sensitive by default. Use `i` flag modifier, like
     `/pattern/i` to make a pattern case-insensitive.

@@ -231,12 +231,12 @@ module Gitlab
         end
       end
 
-      def archive_metadata(ref, storage_path, project_path, format = "tar.gz", append_sha:)
+      def archive_metadata(ref, storage_path, project_path, format = "tar.gz", append_sha:, path: nil)
         ref ||= root_ref
         commit = Gitlab::Git::Commit.find(self, ref)
         return {} if commit.nil?
 
-        prefix = archive_prefix(ref, commit.id, project_path, append_sha: append_sha)
+        prefix = archive_prefix(ref, commit.id, project_path, append_sha: append_sha, path: path)
 
         {
           'ArchivePrefix' => prefix,
@@ -248,13 +248,14 @@ module Gitlab
 
       # This is both the filename of the archive (missing the extension) and the
       # name of the top-level member of the archive under which all files go
-      def archive_prefix(ref, sha, project_path, append_sha:)
+      def archive_prefix(ref, sha, project_path, append_sha:, path:)
         append_sha = (ref != sha) if append_sha.nil?
 
         formatted_ref = ref.tr('/', '-')
 
         prefix_segments = [project_path, formatted_ref]
         prefix_segments << sha if append_sha
+        prefix_segments << path.tr('/', '-').gsub(%r{^/|/$}, '') if path
 
         prefix_segments.join('-')
       end
@@ -731,18 +732,29 @@ module Gitlab
       end
 
       def compare_source_branch(target_branch_name, source_repository, source_branch_name, straight:)
+        reachable_ref =
+          if source_repository == self
+            source_branch_name
+          else
+            # If a tmp ref was created before for a separate repo comparison (forks),
+            # we're able to short-circuit the tmp ref re-creation:
+            # 1. Take the SHA from the source repo
+            # 2. Read that in the current "target" repo
+            # 3. If that SHA is still known (readable), it means GC hasn't
+            # cleaned it up yet, so we can use it instead re-writing the tmp ref.
+            source_commit_id = source_repository.commit(source_branch_name)&.sha
+            commit(source_commit_id)&.sha if source_commit_id
+          end
+
+        return compare(target_branch_name, reachable_ref, straight: straight) if reachable_ref
+
         tmp_ref = "refs/tmp/#{SecureRandom.hex}"
 
         return unless fetch_source_branch!(source_repository, source_branch_name, tmp_ref)
 
-        Gitlab::Git::Compare.new(
-          self,
-          target_branch_name,
-          tmp_ref,
-          straight: straight
-        )
+        compare(target_branch_name, tmp_ref, straight: straight)
       ensure
-        delete_refs(tmp_ref)
+        delete_refs(tmp_ref) if tmp_ref
       end
 
       def write_ref(ref_path, ref, old_ref: nil)
@@ -997,6 +1009,13 @@ module Gitlab
       end
 
       private
+
+      def compare(base_ref, head_ref, straight:)
+        Gitlab::Git::Compare.new(self,
+                                 base_ref,
+                                 head_ref,
+                                 straight: straight)
+      end
 
       def empty_diff_stats
         Gitlab::Git::DiffStatsCollection.new([])

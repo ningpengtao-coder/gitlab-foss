@@ -90,7 +90,7 @@ class Project < ApplicationRecord
 
   before_save :ensure_runners_token
 
-  after_save :update_project_statistics, if: :namespace_id_changed?
+  after_save :update_project_statistics, if: :saved_change_to_namespace_id?
 
   after_save :create_import_state, if: ->(project) { project.import? && project.import_state.nil? }
 
@@ -116,7 +116,7 @@ class Project < ApplicationRecord
   after_initialize :use_hashed_storage
   after_create :check_repository_absence!
   after_create :ensure_storage_path_exists
-  after_save :ensure_storage_path_exists, if: :namespace_id_changed?
+  after_save :ensure_storage_path_exists, if: :saved_change_to_namespace_id?
 
   acts_as_ordered_taggable
 
@@ -188,6 +188,7 @@ class Project < ApplicationRecord
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
   has_one :project_repository, inverse_of: :project
   has_one :error_tracking_setting, inverse_of: :project, class_name: 'ErrorTracking::ProjectErrorTrackingSetting'
+  has_one :metrics_setting, inverse_of: :project, class_name: 'ProjectMetricsSetting'
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
@@ -297,6 +298,7 @@ class Project < ApplicationRecord
                                 reject_if: ->(attrs) { attrs[:id].blank? && attrs[:url].blank? }
 
   accepts_nested_attributes_for :error_tracking_setting, update_only: true
+  accepts_nested_attributes_for :metrics_setting, update_only: true, allow_destroy: true
 
   delegate :name, to: :owner, allow_nil: true, prefix: true
   delegate :members, to: :team, prefix: true
@@ -1430,7 +1432,7 @@ class Project < ApplicationRecord
 
   # update visibility_level of forks
   def update_forks_visibility_level
-    return unless visibility_level < visibility_level_was
+    return unless visibility_level < visibility_level_before_last_save
 
     forks.each do |forked_project|
       if forked_project.visibility_level > visibility_level
@@ -2131,13 +2133,11 @@ class Project < ApplicationRecord
   end
 
   def create_new_pool_repository
-    pool = begin
-             create_pool_repository!(shard: Shard.by_name(repository_storage), source_project: self)
-           rescue ActiveRecord::RecordNotUnique
-             pool_repository(true)
-           end
+    pool = PoolRepository.safe_find_or_create_by!(shard: Shard.by_name(repository_storage), source_project: self)
+    update!(pool_repository: pool)
 
     pool.schedule unless pool.scheduled?
+
     pool
   end
 

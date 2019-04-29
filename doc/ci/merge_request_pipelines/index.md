@@ -1,5 +1,11 @@
 # Pipelines for merge requests
 
+NOTE: **Note**:
+As of GitLab 11.10, pipelines for merge requests require GitLab Runner 11.9
+or higher due to the [recent refspecs
+changes](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/25504).
+Anything lower will cause the pipeline to fail.
+
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/15310) in GitLab 11.6.
 
 Usually, when you create a new merge request, a pipeline runs with the
@@ -61,14 +67,14 @@ when a merge request was created or updated. For example:
 
 ![Merge request page](img/merge_request.png)
 
-## Combined ref pipelines **[PREMIUM]**
+## Pipelines for Merged Results **[PREMIUM]**
 
-> [GitLab Premium](https://about.gitlab.com/pricing/) 11.10.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7380) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.10.
 
 It's possible for your source and target branches to diverge, which can result
 in the scenario that source branch's pipeline was green, the target's pipeline was green,
 but the combined output fails. By having your merge request pipeline automatically
-create a new ref that contains the merge result of the source and target branch 
+create a new ref that contains the merge result of the source and target branch
 (then running a pipeline on that ref), we can better test that the combined result
 is also valid.
 
@@ -87,7 +93,7 @@ The detached state serves to warn you that you are working in a situation
 subjected to merge problems, and helps to highlight that you should
 get out of WIP status or resolve merge conflicts as soon as possible.
 
-### Enabling combined ref pipelines
+### Enabling Pipelines for Merged Results
 
 This feature disabled by default until we resolve issues with [contention handling](https://gitlab.com/gitlab-org/gitlab-ee/issues/9186). It can be enabled at the project level:
 
@@ -97,7 +103,7 @@ This feature disabled by default until we resolve issues with [contention handli
 
 ![Merge request pipeline config](img/merge_request_pipeline_config.png)
 
-### Combined ref pipeline's limitations
+### Pipelines for Merged Result's limitations
 
 - This feature requires [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner) 11.9 or newer.
 - This feature requires [Gitaly](https://gitlab.com/gitlab-org/gitaly) 1.21.0 or newer.

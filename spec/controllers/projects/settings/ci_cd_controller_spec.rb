@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require('spec_helper')
 
 describe Projects::Settings::CiCdController do
@@ -187,6 +189,15 @@ describe Projects::Settings::CiCdController do
 
           project.reload
           expect(project.build_timeout).to eq(5400)
+        end
+      end
+
+      context 'when build_timeout_human_readable is invalid' do
+        let(:params) { { build_timeout_human_readable: '5m' } }
+
+        it 'set specified timeout' do
+          expect(subject).to set_flash[:alert]
+          expect(response).to redirect_to(namespace_project_settings_ci_cd_path)
         end
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe SearchController do
@@ -7,6 +9,30 @@ describe SearchController do
 
   before do
     sign_in(user)
+  end
+
+  context 'uses the right partials depending on scope' do
+    using RSpec::Parameterized::TableSyntax
+    render_views
+
+    set(:project) { create(:project, :public, :repository, :wiki_repo) }
+
+    subject { get(:show, params: { project_id: project.id, scope: scope, search: 'merge' }) }
+
+    where(:partial, :scope) do
+      '_blob'        | :blobs
+      '_wiki_blob'   | :wiki_blobs
+      '_commit'      | :commits
+    end
+
+    with_them do
+      it do
+        project_wiki = create(:project_wiki, project: project, user: user)
+        create(:wiki_page, wiki: project_wiki, attrs: { title: 'merge', content: 'merge' })
+
+        expect(subject).to render_template("search/results/#{partial}")
+      end
+    end
   end
 
   it 'finds issue comments' do
