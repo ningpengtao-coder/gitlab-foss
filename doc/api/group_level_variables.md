@@ -100,7 +100,7 @@ PUT /groups/:id/variables/:key
 | `id`            | integer/string | yes      | The ID of a group or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user     |
 | `key`           | string  | yes      | The `key` of a variable   |
 | `value`         | string  | yes      | The `value` of a variable |
-| `variable_type` | string  | no       | The type of variable, must be one of env_var or file |
+| `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 | `protected`     | boolean | no       | Whether the variable is protected |
 
 ```

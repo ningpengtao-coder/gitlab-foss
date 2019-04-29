@@ -69,7 +69,7 @@ POST /projects/:id/variables
 | `id`            | integer/string | yes      | The ID of a project or [urlencoded NAMESPACE/PROJECT_NAME of the project](README.md#namespaced-path-encoding) owned by the authenticated user   |
 | `key`           | string  | yes      | The `key` of a variable; must have no more than 255 characters; only `A-Z`, `a-z`, `0-9`, and `_` are allowed |
 | `value`         | string  | yes      | The `value` of a variable |
-| `variable_type` | string  | no       | The type of variable, must be one of env_var or file (default: `env_var`) |
+| `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 | `protected`     | boolean | no       | Whether the variable is protected |
 
 ```

@@ -325,7 +325,7 @@ PUT /projects/:id/pipeline_schedules/:pipeline_schedule_id/variables/:key
 | `pipeline_schedule_id` | integer        | yes      | The pipeline schedule id |
 | `key`                  | string         | yes      | The `key` of a variable   |
 | `value`                | string         | yes      | The `value` of a variable |
-| `variable_type`        | string         | no       | The type of variable, must be one of env_var or file |
+| `variable_type`        | string         | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 
 ```sh
 curl --request PUT --header "PRIVATE-TOKEN: k5ESFgWY2Qf5xEvDcFxZ" --form "value=updated value" "https://gitlab.example.com/api/v4/projects/29/pipeline_schedules/13/variables/NEW_VARIABLE"
