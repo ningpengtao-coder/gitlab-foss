@@ -438,6 +438,9 @@ msgstr ""
 msgid "Access Tokens"
 msgstr ""
 
+msgid "Access control for the project's static website"
+msgstr ""
+
 msgid "Access denied for your LDAP account."
 msgstr ""
 
@@ -744,6 +747,9 @@ msgstr ""
 msgid "Allow public access to pipelines and job details, including output logs and artifacts"
 msgstr ""
 
+msgid "Allow public forks"
+msgstr ""
+
 msgid "Allow rendering of PlantUML diagrams in Asciidoc documents."
 msgstr ""
 
@@ -751,6 +757,9 @@ msgid "Allow requests to the local network from hooks and services."
 msgstr ""
 
 msgid "Allow this key to push to repository as well? (Default only allows pull access.)"
+msgstr ""
+
+msgid "Allow users to make copies of your repository to a new project"
 msgstr ""
 
 msgid "Allow users to register any application to use GitLab as an OAuth provider"
@@ -763,6 +772,9 @@ msgid "Allow users to request access if visibility is public or internal."
 msgstr ""
 
 msgid "Allowed to fail"
+msgstr ""
+
+msgid "Allowing only private forks will force the visibility of new forks to Private. Existing forks will not be affected."
 msgstr ""
 
 msgid "Allows you to add and manage Kubernetes clusters."
@@ -1495,6 +1507,9 @@ msgid "Browse Files"
 msgstr ""
 
 msgid "Browse files"
+msgstr ""
+
+msgid "Build, test, and deploy your changes"
 msgstr ""
 
 msgid "Business metrics (Custom)"
@@ -2565,6 +2580,9 @@ msgid "Connect repositories from GitHub"
 msgstr ""
 
 msgid "Container Registry"
+msgstr ""
+
+msgid "Container registry"
 msgstr ""
 
 msgid "Container registry images"
@@ -3832,10 +3850,16 @@ msgstr ""
 msgid "Every month (on the 1st at 4:00am)"
 msgstr ""
 
+msgid "Every project can have its own space to store its Docker images"
+msgstr ""
+
 msgid "Every week (Sundays at 4:00am)"
 msgstr ""
 
 msgid "Everyone"
+msgstr ""
+
+msgid "Everyone With Access"
 msgstr ""
 
 msgid "Everyone can contribute"
@@ -4264,6 +4288,9 @@ msgid "Git"
 msgstr ""
 
 msgid "Git LFS is not enabled on this GitLab server, contact your admin."
+msgstr ""
+
+msgid "Git Large File Storage"
 msgstr ""
 
 msgid "Git global setup"
@@ -5335,6 +5362,9 @@ msgstr ""
 msgid "Let's Encrypt does not accept emails on example.com"
 msgstr ""
 
+msgid "Lightweight issue tracking system for this project"
+msgstr ""
+
 msgid "Limited to showing %d event at most"
 msgid_plural "Limited to showing %d events at most"
 msgstr[0] ""
@@ -5452,6 +5482,9 @@ msgid "Manage project labels"
 msgstr ""
 
 msgid "Manage two-factor authentication"
+msgstr ""
+
+msgid "Manages large files such as audio, video, and graphics files"
 msgstr ""
 
 msgid "Manifest"
@@ -6220,7 +6253,13 @@ msgstr ""
 msgid "One or more of your Google Code projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
 msgstr ""
 
+msgid "Only Project Members"
+msgstr ""
+
 msgid "Only admins"
+msgstr ""
+
+msgid "Only allow private forks"
 msgstr ""
 
 msgid "Only mirror protected branches"
@@ -6317,6 +6356,12 @@ msgid "Pages Domain"
 msgstr ""
 
 msgid "Pages Domains"
+msgstr ""
+
+msgid "Pages access control"
+msgstr ""
+
+msgid "Pages for project documentation"
 msgstr ""
 
 msgid "Pages getting started guide"
@@ -7061,6 +7106,9 @@ msgid "Project slug"
 msgstr ""
 
 msgid "Project uploads"
+msgstr ""
+
+msgid "Project visibility"
 msgstr ""
 
 msgid "Project visibility level will be changed to match namespace rules when transferring to a group."
@@ -8204,6 +8252,9 @@ msgstr ""
 msgid "Share"
 msgstr ""
 
+msgid "Share code pastes with others out of Git repository"
+msgstr ""
+
 msgid "Shared Runners"
 msgstr ""
 
@@ -8644,6 +8695,9 @@ msgstr ""
 msgid "Submit as spam"
 msgstr ""
 
+msgid "Submit changes to be merged upstream"
+msgstr ""
+
 msgid "Submit feedback"
 msgstr ""
 
@@ -9015,7 +9069,16 @@ msgstr ""
 msgid "The project can be accessed by any logged in user."
 msgstr ""
 
+msgid "The project can be accessed by any user who is logged in."
+msgstr ""
+
+msgid "The project can be accessed by anyone, regardless of authentication."
+msgstr ""
+
 msgid "The project can be accessed without any authentication."
+msgstr ""
+
+msgid "The project is accessible only by members of the project. Access must be granted explicitly to each user."
 msgstr ""
 
 msgid "The project is still being deleted. Please try again later."
@@ -10148,6 +10211,9 @@ msgid "Verified"
 msgstr ""
 
 msgid "Version"
+msgstr ""
+
+msgid "View and edit files in this project"
 msgstr ""
 
 msgid "View app"
