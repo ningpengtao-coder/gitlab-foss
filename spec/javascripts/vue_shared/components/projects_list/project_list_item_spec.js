@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import ProjectListItem from '~/vue_shared/components/projects_list/project_list_item.vue';
-import ProjectAccess from '~/vue_shared/components/projects_list/project_access.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 // TODO: move to shallow mount / vue test utils ??
@@ -119,13 +118,7 @@ describe('ProjectListItem', () => {
         vm.$destroy();
       });
 
-      it('does not render project visibility', () => {
-        // - if !explore_projects_tab ? && access &.nonzero ?
-        //   -# haml - lint: disable UnnecessaryStringOutput
-        //     = ' ' # prevent haml from eating the space between elements
-        //       .metadata - info.prepend - top - 8
-        //       % span.user - access - role.d - block= Gitlab:: Access.human_access(access)
-      });
+      it('does not render project access', () => {});
     });
 
     describe('Project meta', () => {
@@ -149,20 +142,6 @@ describe('ProjectListItem', () => {
           expect(noDescVm.$el.querySelector('.description')).toBeNull();
           expect(noDescVm.$el.classList).toContain('no-description');
         });
-      });
-    });
-
-    fdescribe('Project visibility', () => {
-      beforeEach(() => {
-        vm = createComponent({ project: selectedProject });
-      });
-
-      afterEach(() => {
-        vm.$destroy();
-      });
-
-      describe('template', () => {
-        it('renders the correct access level for the user', () => {});
       });
     });
   });
