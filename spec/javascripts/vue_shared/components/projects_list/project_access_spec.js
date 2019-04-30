@@ -1,15 +1,11 @@
 import Vue from 'vue';
-import ProjectListItem from '~/vue_shared/components/projects_list/project_list_item.vue';
 import ProjectAccess from '~/vue_shared/components/projects_list/project_access.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
-// TODO: move to shallow mount / vue test utils ??
-
 loadJSONFixtures('projects.json');
-const projects = getJSONFixture('projects.json');
 let vm;
 
-const createComponent = (props, defaultComponent = ProjectListItem) => {
+const createComponent = (props, defaultComponent = ProjectAccess) => {
   const Component = Vue.extend(defaultComponent);
 
   return mountComponent(Component, props);
