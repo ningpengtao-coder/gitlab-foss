@@ -1,6 +1,7 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import _ from 'underscore';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
@@ -101,6 +102,9 @@ export default {
       required: true,
     },
   },
+  computed: {
+    ...mapState(['groups']),
+  },
   data() {
     return {
       store: new MonitoringStore(),
@@ -111,6 +115,9 @@ export default {
     };
   },
   created() {
+    this.setMetricsEndpoint(this.metricsEndpoint);
+
+    // TODO: Move all of this to the monitoring vuex store/state
     this.service = new MonitoringService({
       metricsEndpoint: this.metricsEndpoint,
       deploymentEndpoint: this.deploymentEndpoint,
@@ -149,6 +156,12 @@ export default {
             ),
         );
       }
+      // TODO: Use this instead of the monitoring_service methods
+      this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours))
+      .then((resp) => {
+        console.log('groups from vuex: ', this.groups);
+      }).catch((err) => {
+      });
       this.getGraphsData();
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
@@ -159,6 +172,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['fetchMetricsData', 'setMetricsEndpoint']),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
