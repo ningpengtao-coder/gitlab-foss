@@ -632,7 +632,19 @@ module ProjectsHelper
       !project.repository.gitlab_ci_yml
   end
 
+  def project_additional_fields(project)
+    additional_fields = {
+      namespace: project.namespace,
+      open_merge_requests_count: project.open_merge_requests_count,
+      open_issues_count: project.open_issues_count
+      # owner: project.owner
+    }
+    project.as_json.merge(additional_fields)
+  end
+
   def projects_data_json(projects)
+    projects = projects.to_a.map { |project| project_additional_fields(project) }
+
     projects.to_json.html_safe
   end
 end

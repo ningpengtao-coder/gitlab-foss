@@ -110,6 +110,24 @@ describe('ProjectListItem', () => {
       });
     });
 
+    fdescribe('Viewing explore projects', () => {
+      beforeEach(() => {
+        vm = createComponent({ project: selectedProject, isExploreTab: true });
+      });
+
+      afterEach(() => {
+        vm.$destroy();
+      });
+
+      it('does not render project visibility', () => {
+        // - if !explore_projects_tab ? && access &.nonzero ?
+        //   -# haml - lint: disable UnnecessaryStringOutput
+        //     = ' ' # prevent haml from eating the space between elements
+        //       .metadata - info.prepend - top - 8
+        //       % span.user - access - role.d - block= Gitlab:: Access.human_access(access)
+      });
+    });
+
     describe('Project meta', () => {
       it('renders the correct project name', () => {
         expect(vm.$el.querySelector('.project-name').innerText).toBe(selectedProject.name);
@@ -131,6 +149,20 @@ describe('ProjectListItem', () => {
           expect(noDescVm.$el.querySelector('.description')).toBeNull();
           expect(noDescVm.$el.classList).toContain('no-description');
         });
+      });
+    });
+
+    fdescribe('Project visibility', () => {
+      beforeEach(() => {
+        vm = createComponent({ project: selectedProject });
+      });
+
+      afterEach(() => {
+        vm.$destroy();
+      });
+
+      describe('template', () => {
+        it('renders the correct access level for the user', () => {});
       });
     });
   });
