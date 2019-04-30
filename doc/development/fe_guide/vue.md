@@ -100,6 +100,11 @@ document.addEventListener('DOMContentLoaded', () => new Vue({
 }));
 ```
 
+Props guidelines for boolean props
+optional props
+if required is false, include a default
+
+
 ### A folder for Components
 
 This folder holds all components that are specific of this new feature.

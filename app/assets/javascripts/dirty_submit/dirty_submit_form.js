@@ -1,6 +1,13 @@
 import _ from 'underscore';
 import $ from 'jquery';
 
+/**
+ * Prevent submitting forms with no changes.
+ * Currently handles `input`, `textarea` and `select` elements.
+ *
+ * @param {form} a NodeList (e.g. document.querySelector('form'))
+ */
+
 class DirtySubmitForm {
   constructor(form) {
     this.form = form;
