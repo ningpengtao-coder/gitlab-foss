@@ -170,7 +170,7 @@ export default {
             return Promise.all(promises);
           })
           .then(() => {
-            this.store.storeDashboard(panelGroups);
+            this.store.storeDashboard({ panelGroups });
           })
           .catch(console.error),
       );

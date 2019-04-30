@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 function sortMetrics(metrics) {
   return _.chain(metrics)
@@ -88,6 +89,8 @@ export default class MonitoringStore {
     this.groups = [];
     this.deploymentData = [];
     this.environmentsData = [];
+
+    this.panelGroups = [];
   }
 
   storeMetrics(groups = []) {
@@ -97,8 +100,14 @@ export default class MonitoringStore {
     }));
   }
 
-  storeDashboard(groups = []) {
+  storeDashboard(dashboard = {}) {
+    // this.groups = convertObjectPropsToCamelCase(dashboard.panelGroups, { deep: true });
+    // console.log(dashboard.panelGroups)
+    // return;
+    const groups = dashboard.panelGroups;
+
     this.groups = groups.reduce((acc, group) => {
+    
       const panelsWithResults = group.panels.filter(panel => {
         return panel.queries[0].result;
       });
@@ -114,6 +123,12 @@ export default class MonitoringStore {
         metrics,
       });
     }, []);
+  }
+
+  storeDashboardMetrics(metrics) {
+    console.log('metrics)')
+    console.log(metrics)
+    
   }
 
   storeDeploymentData(deploymentData = []) {
