@@ -5,7 +5,7 @@ import ProjectAvatar from './project_avatar.vue';
 import ProjectCounts from './project_counts.vue';
 import ProjectAccess from './project_access.vue';
 import ProjectTitle from './project_title.vue';
-import ProjectVisibility from './project_visibility.vue';
+import ProjectVisibilityLevel from './project_visibility_level.vue';
 
 /**
  * Renders a project list item
@@ -18,7 +18,7 @@ export default {
     ProjectCounts,
     ProjectAccess,
     ProjectTitle,
-    ProjectVisibility,
+    ProjectVisibilityLevel,
   },
   props: {
     isExploreProjectsTab: {
@@ -145,10 +145,17 @@ export default {
           required: true,
         },
       },
+      visibility: {
+        level: {
+          type: Number,
+          required: true,
+        },
+        description: {
+          type: String,
+          required: true,
+        },
+      },
     },
-  },
-  created() {
-    console.log('ProjectListItem::created', this.props, this.data);
   },
   computed: {
     project_path() {
@@ -173,7 +180,6 @@ export default {
       return this.project && this.project.description;
     },
     projectNamespace() {
-      // console.log('projectList::projectNamespace::project', this.project);
       const {
         namespace: { name: nameSpaceName = '' },
         owner: { name: ownerName = null } = {},
@@ -192,6 +198,12 @@ export default {
         mergeRequestsCount: this.project.merge_requests_count || 0,
       };
     },
+    visibilityLevel() {
+      return this.project.visibility.level || null;
+    },
+    visibilityDescription() {
+      return this.project.visibility.description || null;
+    },
   },
 };
 </script>
@@ -207,7 +219,7 @@ export default {
             :path-with-namespace="project_path"
             :namespace="projectNamespace"
           />
-          <project-visibility/>
+          <project-visibility-level :level="visibilityLevel" :description="visibilityDescription"/>
           <project-access
             :is-explore-projects-tab="isExploreProjectsTab"
             :access-level="accessLevel"

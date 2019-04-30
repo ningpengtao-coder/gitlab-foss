@@ -109,7 +109,7 @@ describe('ProjectListItem', () => {
       });
     });
 
-    fdescribe('Viewing explore projects', () => {
+    describe('Viewing explore projects', () => {
       beforeEach(() => {
         vm = createComponent({ project: selectedProject, isExploreTab: true });
       });

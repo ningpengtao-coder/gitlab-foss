@@ -634,9 +634,15 @@ module ProjectsHelper
 
   def project_additional_fields(project)
     additional_fields = {
-      namespace: project.namespace,
+      # TODO: namespace is not always correct
+      # for cases where we are the owner we should have the 'owner' object available
+      namespace: project.namespace, 
       open_merge_requests_count: project.open_merge_requests_count,
-      open_issues_count: project.open_issues_count
+      open_issues_count: project.open_issues_count,
+      visibility: {
+        level: project.visibility_level,
+        description: visibility_icon_description(project)
+      }
       # owner: project.owner
     }
     project.as_json.merge(additional_fields)
