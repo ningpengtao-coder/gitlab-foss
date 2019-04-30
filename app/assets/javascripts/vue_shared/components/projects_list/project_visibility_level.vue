@@ -1,6 +1,12 @@
 <script>
 import { visibilityOptions } from '~/pages/projects/shared/permissions/constants';
 
+export const visibilityIconClass = (level = -1) => {
+  if (level < visibilityOptions.INTERNAL) return 'fa-lock';
+  else if (level < visibilityOptions.PUBLIC) return 'fa-shield';
+  else return 'fa-globe';
+};
+
 export default {
   props: {
     level: {
@@ -14,15 +20,12 @@ export default {
     },
   },
   computed: {
-    tooltipData: function() {},
     title: function() {
       return this.$props.description;
     },
     iconClass: function() {
-      const { level } = this.$props;
-      if (level >= visibilityOptions.PUBLIC) return 'fa fa-globe fa-fw';
-      else if (level >= visibilityOptions.INTERNAL) return 'fa fa-shield fa-fw';
-      else return 'fa fa-lock fa-fw';
+      const { level = null } = this.$props;
+      return `fa ${visibilityIconClass(level)} fa-fw`;
     },
   },
 };

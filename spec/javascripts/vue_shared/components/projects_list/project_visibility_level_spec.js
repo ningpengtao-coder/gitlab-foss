@@ -1,30 +1,44 @@
 import Vue from 'vue';
-import ProjectVisibilityLevel from '~/vue_shared/components/projects_list/project_visibility_level.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { visibilityOptions } from '~/pages/projects/shared/permissions/constants';
+import ProjectVisibilityLevel, {
+  visibilityIconClass,
+} from '~/vue_shared/components/projects_list/project_visibility_level.vue';
 
 const createComponent = (props, defaultComponent = ProjectVisibilityLevel) => {
   const Component = Vue.extend(defaultComponent);
-  console.log('props', props);
 
   return mountComponent(Component, props);
 };
 
 function expectIconAndDescription(dom, { icon, description }) {
-  // console.log('dom', dom);
-  // console.log('dom.$el', dom.$el);
-  expect(dom.$el.getAttribute('class')).toContain(icon);
-  expect(dom.$el.querySelector('i').getAttribute('title')).toBe(description);
+  expect(dom.$el.querySelector('i').getAttribute('class')).toContain(icon);
+  expect(dom.$el.getAttribute('title')).toBe(description);
 }
 
 let vm = '';
-let icon = '';
-let description = '';
 
 describe('ProjectVisibilityLevel', () => {
+  describe('visibilityIconClass', () => {
+    it(`returns 'fa-lock' for level '${visibilityOptions.PRIVATE}'`, () => {
+      expect(visibilityIconClass(visibilityOptions.PRIVATE)).toBe('fa-lock');
+    });
+
+    it(`returns 'fa-shield' for level '${visibilityOptions.INTERNAL}'`, () => {
+      expect(visibilityIconClass(visibilityOptions.INTERNAL)).toBe('fa-shield');
+    });
+
+    it(`returns 'fa-globe' for level '${visibilityOptions.PUBLIC}'`, () => {
+      expect(visibilityIconClass(visibilityOptions.PUBLIC)).toBe('fa-globe');
+    });
+  });
+
+  describe('computed', () => {});
+
   describe('template', () => {
-    fdescribe('renders a lock', () => {
-      icon = 'fa-lock';
-      description = 'This is private';
+    describe('renders a lock', () => {
+      const privateIcon = 'fa-lock';
+      const privateDescription = 'This is private';
 
       beforeEach(() => {
         vm = null;
@@ -37,31 +51,31 @@ describe('ProjectVisibilityLevel', () => {
       it(`with level -1`, () => {
         vm = createComponent({
           level: -1,
-          description,
+          description: privateDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: privateIcon, description: privateDescription });
       });
 
       it(`with level 0`, () => {
         vm = createComponent({
           level: 0,
-          description,
+          description: privateDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: privateIcon, description: privateDescription });
       });
 
       it(`with level 5`, () => {
         vm = createComponent({
           level: 5,
-          description,
+          description: privateDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: privateIcon, description: privateDescription });
       });
     });
 
-    describe('renders a lock', () => {
-      icon = 'fa-shield';
-      description = 'This is internal';
+    describe('renders a shield', () => {
+      const internalIcon = 'fa-shield';
+      const internalDescription = 'This is internal';
 
       beforeEach(() => {
         vm = null;
@@ -74,23 +88,23 @@ describe('ProjectVisibilityLevel', () => {
       it(`with level 10`, () => {
         vm = createComponent({
           level: 10,
-          description,
+          description: internalDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: internalIcon, description: internalDescription });
       });
 
       it(`with level 15`, () => {
         vm = createComponent({
           level: 15,
-          description,
+          description: internalDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: internalIcon, description: internalDescription });
       });
     });
 
     describe('renders a globe', () => {
-      icon = 'fa-globe';
-      description = 'This is public 🚀⚡️';
+      const publicIcon = 'fa-globe';
+      const publicDescription = 'This is public 🚀⚡️';
 
       beforeEach(() => {
         vm = null;
@@ -103,17 +117,17 @@ describe('ProjectVisibilityLevel', () => {
       it(`with level 20`, () => {
         vm = createComponent({
           level: 20,
-          description,
+          description: publicDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: publicIcon, description: publicDescription });
       });
 
       it(`with level 25`, () => {
         vm = createComponent({
           level: 25,
-          description,
+          description: publicDescription,
         });
-        expectIconAndDescription(vm, { icon, description });
+        expectIconAndDescription(vm, { icon: publicIcon, description: publicDescription });
       });
     });
   });
