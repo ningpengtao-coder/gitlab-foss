@@ -20,6 +20,7 @@ const propsData = {
   emptyUnableToConnectSvgPath: '/path/to/unable-to-connect.svg',
   environmentsEndpoint: '/root/hello-prometheus/environments/35',
   currentEnvironmentName: 'production',
+  usePrometheusEndpoint: false,
 };
 
 export default propsData;
