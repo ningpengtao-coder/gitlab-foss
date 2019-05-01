@@ -135,13 +135,13 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 
   def metrics
-    # Currently, this acts as a hint to load the metrics details into the cache
-    # if they aren't there already
-    @metrics = environment.metrics || {}
-
     respond_to do |format|
       format.html
       format.json do
+        # Currently, this acts as a hint to load the metrics details into the cache
+        # if they aren't there already
+        @metrics = environment.metrics || {}
+
         render json: @metrics, status: @metrics.any? ? :ok : :no_content
       end
     end
@@ -160,7 +160,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   def metrics_dashboard
     return render_403 unless Feature.enabled?(:environment_metrics_use_prometheus_endpoint, @project)
 
-    result = Gitlab::MetricsDashboard::Service.new(@project, @current_user, environment: environment).get_dashboard
+    result = Gitlab::Metrics::Dashboard::Service.new(@project, @current_user, environment: environment).get_dashboard
 
     respond_to do |format|
       if result[:status] == :success

@@ -642,6 +642,7 @@ module Ci
         variables.append(key: 'CI_COMMIT_MESSAGE', value: git_commit_message.to_s)
         variables.append(key: 'CI_COMMIT_TITLE', value: git_commit_full_title.to_s)
         variables.append(key: 'CI_COMMIT_DESCRIPTION', value: git_commit_description.to_s)
+        variables.append(key: 'CI_COMMIT_REF_PROTECTED', value: (!!protected_ref?).to_s)
 
         if merge_request_event? && merge_request
           variables.append(key: 'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA', value: source_sha.to_s)
@@ -756,6 +757,18 @@ module Ci
 
     def triggered_by?(current_user)
       user == current_user
+    end
+
+    def source_ref
+      if triggered_by_merge_request?
+        merge_request.source_branch
+      else
+        ref
+      end
+    end
+
+    def source_ref_slug
+      Gitlab::Utils.slugify(source_ref.to_s)
     end
 
     private

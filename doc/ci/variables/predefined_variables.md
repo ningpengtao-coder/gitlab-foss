@@ -84,6 +84,7 @@ future GitLab releases.**
 | `CI_PROJECT_PATH_SLUG`                  | 9.3    | all    | `$CI_PROJECT_PATH` lowercased and with everything except `0-9` and `a-z` replaced with `-`. Use in URLs and domain names. |
 | `CI_PROJECT_URL`                        | 8.10   | 0.5    | The HTTP(S) address to access project |
 | `CI_PROJECT_VISIBILITY`                 | 10.3   | all    | The project visibility (internal, private, public) |
+| `CI_COMMIT_REF_PROTECTED`                      | 11.11  | all    | If the job is running on a protected branch |
 | `CI_REGISTRY`                           | 8.10   | 0.5    | If the Container Registry is enabled it returns the address of GitLab's Container Registry |
 | `CI_REGISTRY_IMAGE`                     | 8.10   | 0.5    | If the Container Registry is enabled for the project it returns the address of the registry tied to the specific project |
 | `CI_REGISTRY_PASSWORD`                  | 9.0    | all    | The password to use to push containers to the GitLab Container Registry |
@@ -111,3 +112,7 @@ future GitLab releases.**
 | `GITLAB_USER_NAME`                      | 10.0   | all    | The real name of the user who started the job |
 | `RESTORE_CACHE_ATTEMPTS`                | 8.15   | 1.9    | Number of attempts to restore the cache running a job |
 | `GITLAB_FEATURES`                       | 10.6   | all    | The comma separated list of licensed features available for your instance and plan |
+
+[gitlab-deploy-token]: ../../user/project/deploy_tokens/index.md#gitlab-deploy-token
+[registry]: ../../user/project/container_registry.md
+[dependent-repositories]: ../../user/project/new_ci_build_permissions_model.md#dependent-repositories

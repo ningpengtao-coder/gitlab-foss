@@ -138,6 +138,9 @@ msgstr ""
 msgid "%{label_for_message} unavailable"
 msgstr ""
 
+msgid "%{lets_encrypt_link_start}Let's Encrypt%{lets_encrypt_link_end} is a free, automated, and open certificate authority (CA), that give digital certificates in order to enable HTTPS (SSL/TLS) for websites."
+msgstr ""
+
 msgid "%{level_name} is not allowed in a %{group_level_name} group."
 msgstr ""
 
@@ -243,6 +246,9 @@ msgid "- Runner is paused and will not receive any new jobs"
 msgstr ""
 
 msgid "- show less"
+msgstr ""
+
+msgid "0 for unlimited"
 msgstr ""
 
 msgid "1 %{type} addition"
@@ -366,10 +372,16 @@ msgstr ""
 msgid "A Jekyll site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
 msgstr ""
 
+msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
+msgstr ""
+
 msgid "A default branch cannot be chosen for an empty project."
 msgstr ""
 
 msgid "A deleted user"
+msgstr ""
+
+msgid "A fork is a copy of a project.<br />Forking a repository allows you to make changes without affecting the original project."
 msgstr ""
 
 msgid "A member of GitLab's abuse team will review your report as soon as possible."
@@ -930,6 +942,9 @@ msgstr ""
 msgid "Application settings saved successfully"
 msgstr ""
 
+msgid "Application uninstalled but failed to destroy: %{error_message}"
+msgstr ""
+
 msgid "Application was successfully destroyed."
 msgstr ""
 
@@ -1281,6 +1296,9 @@ msgstr ""
 msgid "Badges|e.g. %{exampleUrl}"
 msgstr ""
 
+msgid "Balsamiq file could not be loaded."
+msgstr ""
+
 msgid "BambooService|A continuous integration and build server"
 msgstr ""
 
@@ -1599,6 +1617,9 @@ msgstr ""
 msgid "Cannot render the image. Maximum character count (%{charLimit}) has been exceeded."
 msgstr ""
 
+msgid "Cannot show preview. For previews on sketch files, they must have the file format introduced by Sketch version 43 and above."
+msgstr ""
+
 msgid "Cannot skip two factor authentication setup"
 msgstr ""
 
@@ -1885,6 +1906,9 @@ msgid "Close"
 msgstr ""
 
 msgid "Close milestone"
+msgstr ""
+
+msgid "Close sidebar"
 msgstr ""
 
 msgid "Closed"
@@ -2519,6 +2543,9 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
+msgid "Configure Let's Encrypt"
+msgstr ""
+
 msgid "Configure automatic git checks and housekeeping on repositories."
 msgstr ""
 
@@ -2691,6 +2718,9 @@ msgid "Copy reference to clipboard"
 msgstr ""
 
 msgid "Copy secret to clipboard"
+msgstr ""
+
+msgid "Copy source to clipboard"
 msgstr ""
 
 msgid "Copy to clipboard"
@@ -3256,6 +3286,9 @@ msgstr ""
 msgid "Discuss a specific suggestion or question that needs to be resolved"
 msgstr ""
 
+msgid "Discussion"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -3268,7 +3301,13 @@ msgstr ""
 msgid "Do you want to customize how Google Code email addresses and usernames are imported into GitLab?"
 msgstr ""
 
+msgid "Dockerfile"
+msgstr ""
+
 msgid "Domain"
+msgstr ""
+
+msgid "Domain verification is an essential security measure for public GitLab sites. Users are required to demonstrate they control a domain before it is enabled"
 msgstr ""
 
 msgid "Don't show again"
@@ -3682,6 +3721,9 @@ msgstr ""
 msgid "Error loading branches."
 msgstr ""
 
+msgid "Error loading file viewer."
+msgstr ""
+
 msgid "Error loading last commit."
 msgstr ""
 
@@ -3698,6 +3740,9 @@ msgid "Error loading template types."
 msgstr ""
 
 msgid "Error loading template."
+msgstr ""
+
+msgid "Error loading viewer"
 msgstr ""
 
 msgid "Error occurred when toggling the notification subscription"
@@ -3733,7 +3778,13 @@ msgstr ""
 msgid "Error uploading file"
 msgstr ""
 
+msgid "Error uploading file: %{stripped}"
+msgstr ""
+
 msgid "Error while loading the merge request. Please try again."
+msgstr ""
+
+msgid "Error while loading the project data. Please try again."
 msgstr ""
 
 msgid "Error while migrating %{upload_id}: %{error_message}"
@@ -3934,6 +3985,9 @@ msgstr ""
 msgid "Failed to check related branches."
 msgstr ""
 
+msgid "Failed to connect to the prometheus server"
+msgstr ""
+
 msgid "Failed to create repository via gitlab-shell"
 msgstr ""
 
@@ -3980,6 +4034,9 @@ msgid "Failed to save preferences."
 msgstr ""
 
 msgid "Failed to update issues, please try again."
+msgstr ""
+
+msgid "Failed to update tag!"
 msgstr ""
 
 msgid "Failed to update."
@@ -4140,6 +4197,15 @@ msgstr ""
 msgid "For public projects, anyone can view pipelines and access job details (output logs and artifacts)"
 msgstr ""
 
+msgid "Fork"
+msgstr ""
+
+msgid "Fork Error!"
+msgstr ""
+
+msgid "Fork project"
+msgstr ""
+
 msgid "ForkedFromProjectPath|Forked from"
 msgstr ""
 
@@ -4147,6 +4213,9 @@ msgid "ForkedFromProjectPath|Forked from %{project_name} (deleted)"
 msgstr ""
 
 msgid "Forking in progress"
+msgstr ""
+
+msgid "Forking repository"
 msgstr ""
 
 msgid "Forks"
@@ -4309,6 +4378,9 @@ msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
 msgid "Go to project"
+msgstr ""
+
+msgid "Go to your fork"
 msgstr ""
 
 msgid "Google Code import"
@@ -4596,6 +4668,9 @@ msgid "I accept the %{terms_link}"
 msgstr ""
 
 msgid "I accept the|Terms of Service and Privacy Policy"
+msgstr ""
+
+msgid "I have read and agree to the Let's Encrypt Terms of Service"
 msgstr ""
 
 msgid "ID"
@@ -5147,6 +5222,9 @@ msgstr ""
 msgid "LFSStatus|Enabled"
 msgstr ""
 
+msgid "LICENSE"
+msgstr ""
+
 msgid "Label"
 msgstr ""
 
@@ -5285,6 +5363,9 @@ msgid "Leave project"
 msgstr ""
 
 msgid "Leave the \"File type\" and \"Delivery method\" options on their default values."
+msgstr ""
+
+msgid "Let's Encrypt does not accept emails on example.com"
 msgstr ""
 
 msgid "Limited to showing %d event at most"
@@ -5775,6 +5856,9 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
+msgid "Name has already been taken"
+msgstr ""
+
 msgid "Name new label"
 msgstr ""
 
@@ -5915,6 +5999,9 @@ msgstr ""
 msgid "Newly registered users will by default be external"
 msgstr ""
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
@@ -5925,6 +6012,9 @@ msgid "No Tag"
 msgstr ""
 
 msgid "No activities found"
+msgstr ""
+
+msgid "No available namespaces to fork the project."
 msgstr ""
 
 msgid "No branches found"
@@ -5982,6 +6072,9 @@ msgid "No milestones to show"
 msgstr ""
 
 msgid "No other labels with such name or description"
+msgstr ""
+
+msgid "No parent group"
 msgstr ""
 
 msgid "No preview for this file type"
@@ -6212,6 +6305,12 @@ msgid "OpenedNDaysAgo|Opened"
 msgstr ""
 
 msgid "Opens in a new window"
+msgstr ""
+
+msgid "Operation failed. Check pod logs for %{pod_name} for more details."
+msgstr ""
+
+msgid "Operation timed out. Check pod logs for %{pod_name} for more details."
 msgstr ""
 
 msgid "Operations"
@@ -6589,6 +6688,9 @@ msgstr ""
 msgid "Please note that this application is not provided by GitLab and you should verify its authenticity before allowing access."
 msgstr ""
 
+msgid "Please select a file"
+msgstr ""
+
 msgid "Please select a group."
 msgstr ""
 
@@ -6629,6 +6731,9 @@ msgid "Press Enter or click to search"
 msgstr ""
 
 msgid "Preview"
+msgstr ""
+
+msgid "Preview Markdown"
 msgstr ""
 
 msgid "Preview changes"
@@ -7126,6 +7231,57 @@ msgstr ""
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
 msgstr ""
 
+msgid "ProjectTemplates|.NET Core"
+msgstr ""
+
+msgid "ProjectTemplates|Android"
+msgstr ""
+
+msgid "ProjectTemplates|Go Micro"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/GitBook"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Hexo"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Hugo"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Jekyll"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Plain HTML"
+msgstr ""
+
+msgid "ProjectTemplates|NodeJS Express"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/GitBook"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Hexo"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Hugo"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Jekyll"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Plain HTML"
+msgstr ""
+
+msgid "ProjectTemplates|Ruby on Rails"
+msgstr ""
+
+msgid "ProjectTemplates|Spring"
+msgstr ""
+
+msgid "ProjectTemplates|iOS (Swift)"
+msgstr ""
+
 msgid "Projects"
 msgstr ""
 
@@ -7247,6 +7403,9 @@ msgid "Prompt users to upload SSH keys"
 msgstr ""
 
 msgid "Protected"
+msgstr ""
+
+msgid "Protected Tag"
 msgstr ""
 
 msgid "Protip:"
@@ -7593,6 +7752,9 @@ msgstr ""
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
 msgstr ""
 
+msgid "Require users to prove ownership of custom domains"
+msgstr ""
+
 msgid "Resend invite"
 msgstr ""
 
@@ -7769,6 +7931,9 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
+msgid "Save anyway"
+msgstr ""
+
 msgid "Save application"
 msgstr ""
 
@@ -7833,6 +7998,9 @@ msgid "Search files"
 msgstr ""
 
 msgid "Search for projects, issues, etc."
+msgstr ""
+
+msgid "Search forks"
 msgstr ""
 
 msgid "Search groups"
@@ -8644,6 +8812,12 @@ msgstr ""
 msgid "Switch branch/tag"
 msgstr ""
 
+msgid "Switch to GitLab Next"
+msgstr ""
+
+msgid "Switch to the source to copy it to the clipboard"
+msgstr ""
+
 msgid "System Hooks"
 msgstr ""
 
@@ -8789,6 +8963,9 @@ msgid "Test coverage parsing"
 msgstr ""
 
 msgid "Test failed."
+msgstr ""
+
+msgid "Test settings and save changes"
 msgstr ""
 
 msgid "TestHooks|Ensure one of your projects has merge requests."
@@ -9066,6 +9243,9 @@ msgstr ""
 msgid "There is already a repository with that name on disk"
 msgstr ""
 
+msgid "There was a problem communicating with your device."
+msgstr ""
+
 msgid "There was an error loading users activity calendar."
 msgstr ""
 
@@ -9088,6 +9268,9 @@ msgid "There was an error when subscribing to this label."
 msgstr ""
 
 msgid "There was an error when unsubscribing from this label."
+msgstr ""
+
+msgid "There was an error while fetching cycle analytics data."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
@@ -9139,6 +9322,12 @@ msgid "This commit was signed with an <strong>unverified</strong> signature."
 msgstr ""
 
 msgid "This container registry has been scheduled for deletion."
+msgstr ""
+
+msgid "This device has already been registered with us."
+msgstr ""
+
+msgid "This device has not been registered with us."
 msgstr ""
 
 msgid "This diff is collapsed."
@@ -9709,6 +9898,9 @@ msgstr ""
 msgid "Try again?"
 msgstr ""
 
+msgid "Try to fork again"
+msgstr ""
+
 msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
 msgstr ""
 
@@ -9724,10 +9916,16 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "U2F only works with HTTPS-enabled websites. Contact your administrator for more details."
+msgstr ""
+
 msgid "Unable to connect to server: %{error}"
 msgstr ""
 
 msgid "Unable to load the diff. %{button_try_again}"
+msgstr ""
+
+msgid "Unable to regenerate public ssh key."
 msgstr ""
 
 msgid "Unable to schedule a pipeline to run immediately"
@@ -10150,6 +10348,9 @@ msgstr ""
 msgid "VisibilityLevel|Unknown"
 msgstr ""
 
+msgid "Wait for the source to load to copy it to the clipboard"
+msgstr ""
+
 msgid "Want to see the data? Please ask an administrator for access."
 msgstr ""
 
@@ -10533,6 +10734,9 @@ msgstr ""
 msgid "You must have maintainer access to force delete a lock"
 msgstr ""
 
+msgid "You must have permission to create a project in a namespace before forking."
+msgstr ""
+
 msgid "You need permission."
 msgstr ""
 
@@ -10546,6 +10750,9 @@ msgid "You need to upload a GitLab project export archive (ending in .gz)."
 msgstr ""
 
 msgid "You need to upload a Google Takeout archive."
+msgstr ""
+
+msgid "You tried to fork %{link_to_the_project} but it failed for the following reason:"
 msgstr ""
 
 msgid "You will lose all changes you've made to this file. This action cannot be undone."
@@ -11197,6 +11404,9 @@ msgid "show less"
 msgstr ""
 
 msgid "sign in"
+msgstr ""
+
+msgid "sort:"
 msgstr ""
 
 msgid "source"
