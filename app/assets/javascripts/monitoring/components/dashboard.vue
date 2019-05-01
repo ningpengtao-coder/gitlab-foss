@@ -112,7 +112,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['groups']),
+    ...mapGetters(['groups']),
   },
   data() {
     return {
@@ -147,43 +147,9 @@ export default {
         .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
     ];
 
-    let panelGroups = [];
-
     if (this.usePrometheusEndpoint) {
-      this.servicePromises.push(
-        this.service
-          .getDashboardData()
-          .then(data => {
-            panelGroups = data.panel_groups;
-          })
-          .then(() => {
-            let promises = [];
-
-            panelGroups.forEach((group, i) => {
-              group.panels.forEach((panel, j) => {
-                panel.queries = panel.metrics;
-                panel.queries.forEach(metric => {
-                  promises.push(
-                    this.service.getPrometheusMetrics(metric).then(res => {
-                      if (res.resultType === 'matrix') {
-                        if (res.result.length > 0) {
-                          panel.queries[0].result = res.result;
-                          panel.queries[0].metricId = panel.queries[0].metric_id;
-                        }
-                      }
-                    }),
-                  );
-                });
-              });
-            });
-
-            return Promise.all(promises);
-          })
-          .then(() => {
-            this.store.storeDashboard({ panelGroups });
-          })
-          .catch(console.error),
-      );
+      this.setDashboardEndpoint(this.dashboardEndpoint);
+      this.servicePromises.push(this.fetchDashboard());
     } else {
       this.setMetricsEndpoint(this.metricsEndpoint);
       this.servicePromises.push(this.fetchMetricsData());
@@ -212,7 +178,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchMetricsData', 'setMetricsEndpoint']),
+    ...mapActions(['fetchDashboard', 'fetchMetricsData', 'setDashboardEndpoint', 'setMetricsEndpoint']),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);

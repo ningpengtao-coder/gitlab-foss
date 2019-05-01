@@ -6,6 +6,7 @@ export default () => ({
   clustersPath: null,
   tagsPath: null,
   projectPath: null,
+  dashboardEndpoint: '',
   metricsEndpoint: null,
   deploymentEndpoint: null,
   emptyGettingStartedSvgPath: null,
@@ -18,4 +19,5 @@ export default () => ({
   emptyState: 'loading',
   selectedTimeWindow: null, // finish data section
   groups: [], // NEW
+  queryResults: {},
 });

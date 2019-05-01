@@ -27,6 +27,10 @@ function backOffRequest(makeRequestCallback) {
   });
 }
 
+export const setDashboardEndpoint = ({ commit }, endpoint) => {
+  commit(types.SET_DASHBOARD_ENDPOINT, endpoint);
+}
+
 export const setMetricsEndpoint = ({ commit }, metricsEndpoint) => {
   commit(types.SET_METRICS_ENDPOINT, metricsEndpoint);
 }
@@ -55,16 +59,33 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
     });
 };
 
-export const fetchDashboard = ({ state, dispatch }, params) => {
+
+export const fetchDashboard = ({ state, commit, dispatch }, params) => {
   return axios
-    .get(this.dashboardEndpoint, { params })
+    .get(state.dashboardEndpoint, { params })
     .then(resp => resp.data)
     .then(response => {
       if (!response || response.status !== 'success') {
         throw new Error(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
       }
-      return response.dashboard;
+
+      commit(types.SET_GROUPS, response.dashboard.panel_groups);
+      dispatch('fetchPrometheusMetrics');
+    })
+    .catch((e) => {
+      throw e;
     });
+}
+
+export const fetchPrometheusMetrics = ({ state, dispatch }) => {
+  state.groups.forEach(group => {
+    group.panels.forEach(panel => {
+      panel.queries = panel.metrics;
+      panel.queries.forEach(metric => {
+        dispatch('fetchPrometheusMetric', metric);
+      });
+    });
+  })
 }
 
 /**
@@ -73,36 +94,48 @@ export const fetchDashboard = ({ state, dispatch }, params) => {
    * 
    * @param {metric} metric 
    */
-export const getPrometheusMetric = (metric) => {
-    const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
-    const query = metric[queryType];
-    // TODO don't hardcode
-    const prometheusEndpoint = `/root/metrics/environments/37/prometheus/api/v1/${queryType}`;
+export const fetchPrometheusMetric = ({ commit }, metric) => {
+  const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
+  const query = metric[queryType];
+  // TODO don't hardcode
+  const prometheusEndpoint = `/root/metrics/environments/37/prometheus/api/v1/${queryType}`;
 
-    // todo use timewindow
-    const timeDiff = 8 * 60 * 60; // 8hours in seconnds
-    const end = Math.floor(Date.now() / 1000);
-    const start = end - timeDiff;
+  // todo use timewindow
+  const timeDiff = 8 * 60 * 60; // 8hours in seconnds
+  const end = Math.floor(Date.now() / 1000);
+  const start = end - timeDiff;
 
-    const minStep = 60;
-    const queryDataPoints = 600;
-    const step = Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
+  const minStep = 60;
+  const queryDataPoints = 600;
+  const step = Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
 
-    const params = {
-      query,
-      start,
-      end,
-      step,
-    };
+  const params = {
+    query,
+    start,
+    end,
+    step,
+  };
+  
+  return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
+    .then(res => res.data)
+    .then(response => {
+      if (response.status === 'error') {
+        // {"status":"error","errorType":"bad_data","error":"exceeded maximum resolution of 11,000 points per timeseries. Try decreasing the query resolution (?step=XX)"}
+      }
 
-    return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
-      .then(res => res.data)
-      .then(response => {
-        if (response.status === 'error') {
-          // {"status":"error","errorType":"bad_data","error":"exceeded maximum resolution of 11,000 points per timeseries. Try decreasing the query resolution (?step=XX)"}
+      const { resultType, result } = response.data;
+
+      if (resultType === 'matrix') {
+        if (result.length > 0) {
+          // TODO: maybe use Object.freeze here since results don't need to be reactive
+          commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
         }
+      }
+    // .then(res => {
+    // if (res.resultType === 'matrix') {
+    //   if (res.result.length > 0) {
+    //     panel.queries[0].result = res.result;
+    //     panel.queries[0].metricId = panel.queries[0].metric_id;
 
-        // metrics for a single panel
-        return response.data;
-      });
-  }
+  });
+}

@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import _ from 'underscore';
 import * as types from './mutation_types';
 
@@ -102,7 +103,19 @@ export default {
     state.emptyState = error ? 'unableToConnect' : 'noData'; // TODO: use error to deterine the appropiately determine which empty state to use
     state.showEmptyState = true;
   },
+  [types.SET_DASHBOARD_ENDPOINT](state, endpoint) {
+    state.dashboardEndpoint = endpoint;
+  },
   [types.SET_METRICS_ENDPOINT](state, endpoint) {
     state.metricsEndpoint = endpoint;
   },
+  [types.SET_QUERY_RESULT](state, { metricId, result }) {
+    Vue.set(state.queryResults, metricId, result)
+  },
+  [types.SET_GROUPS](state, groups) {
+    state.groups = groups.map(group => ({
+      ...group,
+      // metrics: normalizeMetrics(sortMetrics(group.metrics)),
+    }));
+  }
 };

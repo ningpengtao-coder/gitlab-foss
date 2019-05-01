@@ -45,33 +45,6 @@ export default class MonitoringService {
       });
   }
 
-  getPrometheusMetricas(panelGroups) {
-    const promises = panelGroups.reduce((groups, group) => {
-      return group.panels.reduce((panels, panel) => {
-        // todo: move this to store. This is needed because the template
-        // refers to `queries`
-        panel.queries = panel.metrics;
-        // return an array of Promises (Prometheus fetch requests)
-        return panel.queries.reduce((queries, metric) => {
-          return queries.concat(
-            this.getPrometheusMetrics(metric).then(res => {
-              // can be matrix for ranges, or vector for single value
-              if (res.resultType === 'matrix') {
-                if (res.result.length > 0) {
-                  panel.queries[0].result = res.result;
-                  console.log('metriedId', panel.queries[0].metricId)
-                  panel.queries[0].metricId = panel.queries[0].metric_id;
-                }
-              }
-            }),
-          );
-        }, []);
-      }, []);
-    }, []);
-
-    return Promise.all(promises);
-  }
-
   /**
    * Returns list of metrics in data.result
    * {"status":"success", "data":{"resultType":"matrix","result":[]}}
