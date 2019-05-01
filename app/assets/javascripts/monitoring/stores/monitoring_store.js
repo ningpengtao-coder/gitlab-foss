@@ -60,30 +60,6 @@ function groupQueriesByChartInfo(metrics) {
   return Object.values(metricsByChart);
 }
 
-function normalizeMetrics(metrics) {
-  const groupedMetrics = groupQueriesByChartInfo(metrics);
-
-  return groupedMetrics.map(metric => {
-    const queries = metric.queries.map(query => ({
-      ...query,
-      // custom metrics do not require a label, so we should ensure this attribute is defined
-      label: query.label || metric.y_label,
-      result: query.result.map(result => ({
-        ...result,
-        values: result.values.map(([timestamp, value]) => [
-          new Date(timestamp * 1000).toISOString(),
-          Number(value),
-        ]),
-      })),
-    }));
-
-    return {
-      ...metric,
-      queries: removeTimeSeriesNoData(queries),
-    };
-  });
-}
-
 export default class MonitoringStore {
   constructor() {
     this.groups = [];

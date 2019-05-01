@@ -1,6 +1,7 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import _ from 'underscore';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
@@ -110,6 +111,9 @@ export default {
       default: '',
     },
   },
+  computed: {
+    ...mapState(['groups']),
+  },
   data() {
     return {
       store: new MonitoringStore(),
@@ -181,12 +185,8 @@ export default {
           .catch(console.error),
       );
     } else {
-      this.servicePromises.push(
-        this.service
-          .getGraphsData()
-          .then(data => this.store.storeMetrics(data))
-          .catch(() => Flash(s__('Metrics|There was an error while retrieving metrics'))),
-      );
+      this.setMetricsEndpoint(this.metricsEndpoint);
+      this.servicePromises.push(this.fetchMetricsData());
     }
 
     if (!this.hasMetrics) {
@@ -212,6 +212,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['fetchMetricsData', 'setMetricsEndpoint']),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
@@ -224,7 +225,7 @@ export default {
       this.state = 'loading';
       Promise.all(this.servicePromises)
         .then(() => {
-          if (this.store.groups.length < 1) {
+          if (this.groups.length < 1) {
             this.state = 'noData';
             return;
           }
@@ -305,7 +306,7 @@ export default {
       </div>
     </div>
     <graph-group
-      v-for="(groupData, index) in store.groups"
+      v-for="(groupData, index) in groups"
       :key="index"
       :name="groupData.group"
       :show-panels="showPanels"

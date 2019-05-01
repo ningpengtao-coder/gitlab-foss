@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from './stores';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import Dashboard from 'ee_else_ce/monitoring/components/dashboard.vue';
 
@@ -20,6 +21,7 @@ export default (props = {}) => {
           },
         });
       },
+      store,
     });
   }
 };
