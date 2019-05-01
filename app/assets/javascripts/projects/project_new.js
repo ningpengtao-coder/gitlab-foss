@@ -6,13 +6,12 @@ import initSettingsPanels from '~/settings_panels';
 import LicenseSelector from '~/blob/template_selectors/license_selector';
 import fileUpload from '~/lib/utils/file_upload';
 import setupToggleButtons from '~/toggle_buttons';
-import { __ } from '../locale';
 
 let hasUserDefinedProjectPath = false;
-const ACCESS_LEVEL_OPTIONS_PRIVATE = [[0, __('Enable feature to choose access level')]];
+const ACCESS_LEVEL_OPTIONS_PRIVATE = [[0, s__('Enable feature to choose access level')]];
 const ACCESS_LEVEL_OPTIONS_PUBLIC = [
-  [10, __('Only Project Members')],
-  [20, __('Everyone With Access')],
+  [10, s__('Only Project Members')],
+  [20, s__('Everyone With Access')],
 ];
 
 const deriveProjectPathFromUrl = $projectImportUrl => {
@@ -95,7 +94,10 @@ function onToggleFeatureSetting(featureEnabled, toggle) {
   const toggleContext = $(toggle).closest('.project-feature-controls');
   const visibilitySelector = $('.select-control', toggleContext);
   updateFeatureVisibilityOptions(visibilitySelector, projectVisibilityLevel, featureEnabled);
-  $(toggle).attr('aria-label', featureEnabled ? 'Toggle Status: ON' : 'Toggle Status: OFF');
+  $(toggle).attr(
+    'aria-label',
+    featureEnabled ? s__('Toggle Status: ON') : s__('Toggle Status: OFF'),
+  );
 }
 
 function onProjectVisitbilityChange(featureSelectors) {
@@ -309,8 +311,8 @@ const bindEvents = () => {
     $projectVisibilityLevel.on('change', () => onProjectVisitbilityChange($projectFeatures));
 
     initSettingsPanels({
-      expandedPanelText: __('Hide avatar, license and features settings'),
-      collapsedPanelText: __('Show avatar, license and features settings'),
+      expandedPanelText: s__('Hide avatar, license and features settings'),
+      collapsedPanelText: s__('Show avatar, license and features settings'),
     });
 
     const $toggleContainer = document.querySelector('.project-feature-settings');
