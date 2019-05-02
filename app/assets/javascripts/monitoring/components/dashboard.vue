@@ -198,7 +198,8 @@ export default {
 
           this.showEmptyState = false;
         })
-        .catch(() => {
+        .catch((e) => {
+          console.error(e)
           this.state = 'unableToConnect';
         });
     },
@@ -279,7 +280,6 @@ export default {
     >
       <template v-for="(graphData, graphIndex) in groupData.metrics">
         <monitor-area-chart
-          v-if="graphData.type === undefined || graphData.type === 'area'"
           :key="`area-${graphIndex}`"
           :graph-data="graphData"
           :deployment-data="store.deploymentData"
@@ -295,24 +295,6 @@ export default {
             @setAlerts="setAlerts"
           />
         </monitor-area-chart>
-        <single-stat-chart
-          v-else-if="graphData.type === 'single_stat'"
-          :key="`single-stat-${graphIndex}`"
-          value="100"
-          unit="ms"
-          title="latency"
-        />
-        <line-chart
-          v-else-if="graphData.type === 'line_chart'"
-          :key="`line-${graphIndex}`"
-          :graph-data="graphData"
-          :container-width="elWidth"
-        />
-        <heatmap-chart
-          v-else-if="graphData.type === 'heatmap_chart'"
-          :key="`heatmap-${graphIndex}`"
-          :graph-data="graphData"
-        />
       </template>
     </graph-group>
   </div>

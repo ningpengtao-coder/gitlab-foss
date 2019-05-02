@@ -94,7 +94,7 @@ export const fetchPrometheusMetrics = ({ state, dispatch }) => {
    * 
    * @param {metric} metric 
    */
-export const fetchPrometheusMetric = ({ commit }, metric) => {
+export const fetchPrometheusMetric = ({ commit, getters }, metric) => {
   const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
   const query = metric[queryType];
   // TODO don't hardcode
@@ -116,6 +116,12 @@ export const fetchPrometheusMetric = ({ commit }, metric) => {
     step,
   };
   
+  prom(prometheusEndpoint, params).then(result => {
+    commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
+  })
+}
+
+function prom(prometheusEndpoint, params) {
   return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
     .then(res => res.data)
     .then(response => {
@@ -124,18 +130,11 @@ export const fetchPrometheusMetric = ({ commit }, metric) => {
       }
 
       const { resultType, result } = response.data;
-
+      
       if (resultType === 'matrix') {
         if (result.length > 0) {
-          // TODO: maybe use Object.freeze here since results don't need to be reactive
-          commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
+          return result
         }
       }
-    // .then(res => {
-    // if (res.resultType === 'matrix') {
-    //   if (res.result.length > 0) {
-    //     panel.queries[0].result = res.result;
-    //     panel.queries[0].metricId = panel.queries[0].metric_id;
-
   });
 }

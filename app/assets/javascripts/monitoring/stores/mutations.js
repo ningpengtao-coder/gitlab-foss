@@ -110,12 +110,12 @@ export default {
     state.metricsEndpoint = endpoint;
   },
   [types.SET_QUERY_RESULT](state, { metricId, result }) {
-    Vue.set(state.queryResults, metricId, result)
+    if (!metricId || !result) {
+      return;
+    }
+    Vue.set(state.queryResults, metricId, Object.freeze(result));
   },
   [types.SET_GROUPS](state, groups) {
-    state.groups = groups.map(group => ({
-      ...group,
-      // metrics: normalizeMetrics(sortMetrics(group.metrics)),
-    }));
+    state.groups = groups;
   }
 };
