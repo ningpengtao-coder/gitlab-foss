@@ -109,7 +109,7 @@ describe InternalId do
         allow(Rails.env).to receive(:test?).and_return(false)
         val = rand(1..100)
         generator = double(generate: val)
-        expect(InternalId::InternalIdGenerator).to receive(:new).and_return(generator)
+        expect(InternalIdGenerator).to receive(:new).and_return(generator)
 
         expect(subject).to eq(val)
       end
