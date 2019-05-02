@@ -505,7 +505,9 @@ module ProjectsHelper
       snippetsAccessLevel: feature.snippets_access_level,
       pagesAccessLevel: feature.pages_access_level,
       containerRegistryEnabled: !!project.container_registry_enabled,
-      lfsEnabled: !!project.lfs_enabled
+      lfsEnabled: !!project.lfs_enabled,
+      forkingAccessLevel: project.forking_access_level,
+      forkingVisibilityLevel: project.fork_visibility_level
     }
   end
 
