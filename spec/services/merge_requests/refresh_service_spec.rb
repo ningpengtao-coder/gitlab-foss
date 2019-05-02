@@ -240,18 +240,6 @@ describe MergeRequests::RefreshService do
             expect(@merge_request.all_pipelines.second).to be_push
           end
         end
-
-        context "when MergeRequestUpdateWorker is retried by an exception" do
-          it 'does not re-create a duplicate detached merge request pipeline' do
-            expect do
-              service.new(@project, @user).execute(@oldrev, @newrev, 'refs/heads/master')
-            end.to change { @merge_request.merge_request_pipelines.count }.by(1)
-
-            expect do
-              service.new(@project, @user).execute(@oldrev, @newrev, 'refs/heads/master')
-            end.not_to change { @merge_request.merge_request_pipelines.count }
-          end
-        end
       end
 
       context "when .gitlab-ci.yml does not have merge_requests keywords" do

@@ -78,10 +78,6 @@ module MergeRequests
     end
 
     def can_create_pipeline_for?(merge_request)
-      ##
-      # UpdateMergeRequestsWorker could be retried by an exception.
-      # pipelines for merge request should not be recreated in such case.
-      return false if merge_request.merge_request_pipeline_exists?
       return false if merge_request.has_no_commits?
 
       true
