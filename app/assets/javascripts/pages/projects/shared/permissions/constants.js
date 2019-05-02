@@ -22,6 +22,12 @@ export const forkingAccessLevelOptions = {
 };
 
 export const forkingAccessLevelDescriptions = {
-  [forkingAccessLevelOptions.PRIVATE_FORKS_ONLY]: __('Allow public forks'),
-  [forkingAccessLevelOptions.ALLOW_FORKS]: __('Only allow private forks'),
+  [visibilityOptions.INTERNAL]: {
+    [forkingAccessLevelOptions.PRIVATE_FORKS_ONLY]: __('Allow public forks'),
+    [forkingAccessLevelOptions.ALLOW_FORKS]: __('Only allow internal or private forks'),
+  },
+  [visibilityOptions.PRIVATE]: {
+    [forkingAccessLevelOptions.PRIVATE_FORKS_ONLY]: __('Allow public forks'),
+    [forkingAccessLevelOptions.ALLOW_FORKS]: __('Only allow private forks'),
+  }
 };
