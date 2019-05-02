@@ -21,7 +21,6 @@ describe 'Toolbar', :js do
     it 'loads the login screen' do
       visit root_path
       find('body')
-      evaluate_script("document.body.innerHTML = 'hi winnie and sarah, but for real'")
       evaluate_script(add_script)
       evaluate_script(load_script)
       expect(find('#gitlab-review-container')).to exist
