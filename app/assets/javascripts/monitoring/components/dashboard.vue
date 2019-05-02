@@ -103,19 +103,20 @@ export default {
     },
   },
   computed: {
-    ...mapState(['groups']),
+    ...mapState(['groups', 'emptyState', 'showEmptyState']),
   },
   data() {
     return {
       store: new MonitoringStore(),
       state: 'gettingStarted',
-      showEmptyState: true,
       elWidth: 0,
       selectedTimeWindow: '',
     };
   },
   created() {
     this.setMetricsEndpoint(this.metricsEndpoint);
+    this.setDeploymentsEndpoint(this.deploymentEndpoint);
+    this.setEnvironmentsEndpoint(this.environmentsEndpoint);
 
     // TODO: Move all of this to the monitoring vuex store/state
     this.service = new MonitoringService({
@@ -144,7 +145,8 @@ export default {
         .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
     ];
     if (!this.hasMetrics) {
-      this.state = 'gettingStarted';
+      // TODO: This should be coming from a mutation/computedGetter
+      // this.state = 'gettingStarted';
     } else {
       if (this.environmentsEndpoint) {
         this.servicePromises.push(
@@ -157,12 +159,8 @@ export default {
         );
       }
       // TODO: Use this instead of the monitoring_service methods
-      this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours))
-      .then((resp) => {
-        console.log('groups from vuex: ', this.groups);
-      }).catch((err) => {
-      });
-      this.getGraphsData();
+      this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours));
+      // this.getGraphsData();
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
         attributes: true,
@@ -172,7 +170,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchMetricsData', 'setMetricsEndpoint']),
+    ...mapActions([
+      'fetchMetricsData',
+      'setMetricsEndpoint',
+      'setDeploymentsEndpoint',
+      'setEnvironmentsEndpoint',
+    ]),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
@@ -182,23 +185,23 @@ export default {
       return Object.values(this.getGraphAlerts(queries));
     },
     getGraphsData() {
-      this.state = 'loading';
+      // this.state = 'loading';
       Promise.all(this.servicePromises)
         .then(() => {
           if (this.store.groups.length < 1) {
-            this.state = 'noData';
+            // this.state = 'noData';
             return;
           }
 
-          this.showEmptyState = false;
+          // this.showEmptyState = false; TODO: Delete me
         })
         .catch(() => {
-          this.state = 'unableToConnect';
+          // this.state = 'unableToConnect';
         });
     },
     getGraphsDataWithTime(timeFrame) {
-      this.state = 'loading';
-      this.showEmptyState = true;
+      // this.state = 'loading';
+      // this.showEmptyState = true; TODO: Delete me!
       this.service
         .getGraphsData(getTimeDiff(this.timeWindows[timeFrame]))
         .then(data => {
@@ -209,7 +212,7 @@ export default {
           Flash(s__('Metrics|Not enough data to display'));
         })
         .finally(() => {
-          this.showEmptyState = false;
+          // this.showEmptyState = false; TODO: Delete me!
         });
     },
     onSidebarMutation() {
@@ -226,7 +229,7 @@ export default {
 
 <template>
   <div v-if="!showEmptyState" class="prometheus-graphs prepend-top-default">
-    <div
+    <!-- <div
       v-if="environmentsEndpoint"
       class="dropdowns d-flex align-items-center justify-content-between"
     >
@@ -308,11 +311,12 @@ export default {
           :graph-data="graphData"
         />
       </template>
-    </graph-group>
+    </graph-group> TODO: Uncomment this once the action that requests all data is in place--> 
+    <div><h1>Finished loading...</h1></div>
   </div>
   <empty-state
     v-else
-    :selected-state="state"
+    :selected-state="emptyState"
     :documentation-path="documentationPath"
     :settings-path="settingsPath"
     :clusters-path="clustersPath"
