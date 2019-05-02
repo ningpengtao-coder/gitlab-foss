@@ -113,6 +113,32 @@ export default {
   },
   computed: {
     ...mapGetters(['groups']),
+    groupsWithData() {
+      function hasQueryResult(acc, panel) {
+        const metrics = panel.metrics.filter(query => query.result.length > 0);
+
+        if (metrics.length > 0) {
+          acc.push({
+            ...panel,
+            metrics,
+          });
+        }
+
+        return acc;
+      }
+
+      return this.groups.reduce((acc, group) => {
+        const panels = group.panels.reduce(hasQueryResult, []);
+
+        if (panels.length > 0) {
+          acc.push({
+            ...group,
+            panels,
+          });
+        }
+        return acc;
+      }, []);
+    }
   },
   data() {
     return {
@@ -273,7 +299,7 @@ export default {
       </div>
     </div>
     <graph-group
-      v-for="(groupData, index) in groups"
+      v-for="(groupData, index) in groupsWithData"
       :key="index"
       :name="groupData.group"
       :show-panels="showPanels"

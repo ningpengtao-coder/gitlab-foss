@@ -84,6 +84,10 @@ function normalizeMetrics(metrics) {
 }
 
 export const groups = state => {
+  if (!gon.features.environmentMetricsUsePrometheusEndpoint) {
+    return state.groups;
+  }
+
   return state.groups.reduce((acc, group) => {
     group.panels.forEach(panel => {
       panel.queries = panel.metrics;
@@ -101,4 +105,35 @@ export const groups = state => {
       metrics,
     });
   }, []);
-} 
+}
+
+function hasQueryResult(acc, panel) {
+  const metrics = panel.metrics.filter(query => query.result.length > 0);
+
+  if (metrics.length > 0) {
+    acc.push({
+      ...panel,
+      metrics,
+    });
+  }
+
+  return acc;
+}
+
+export function groupsWithData(state) {
+  if (!gon.features.environmentMetricsUsePrometheusEndpoint) {
+    return state.groups;
+  }
+
+  return state.groups.reduce((acc, group) => {
+    const panels = group.panels.reduce(hasQueryResult, []);
+
+    if (panels.length > 0) {
+      acc.push({
+        ...group,
+        panels,
+      });
+    }
+    return acc;
+  }, []);
+}
