@@ -122,11 +122,15 @@ export default {
       return [
         [
           forkingAccessLevelOptions.ALLOW_FORKS,
-          forkingAccessLevelDescriptions[this.visibilityLevel][forkingAccessLevelOptions.ALLOW_FORKS],
+          forkingAccessLevelDescriptions[this.visibilityLevel][
+            forkingAccessLevelOptions.ALLOW_FORKS
+          ],
         ],
         [
           forkingAccessLevelOptions.PRIVATE_FORKS_ONLY,
-          forkingAccessLevelDescriptions[this.visibilityLevel][forkingAccessLevelOptions.PRIVATE_FORKS_ONLY],
+          forkingAccessLevelDescriptions[this.visibilityLevel][
+            forkingAccessLevelOptions.PRIVATE_FORKS_ONLY
+          ],
         ],
       ];
     },

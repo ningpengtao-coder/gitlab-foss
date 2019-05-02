@@ -29,5 +29,5 @@ export const forkingAccessLevelDescriptions = {
   [visibilityOptions.PRIVATE]: {
     [forkingAccessLevelOptions.PRIVATE_FORKS_ONLY]: __('Allow public forks'),
     [forkingAccessLevelOptions.ALLOW_FORKS]: __('Only allow private forks'),
-  }
+  },
 };
