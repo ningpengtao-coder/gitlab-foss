@@ -6259,6 +6259,9 @@ msgstr ""
 msgid "Only admins"
 msgstr ""
 
+msgid "Only allow internal or private forks"
+msgstr ""
+
 msgid "Only allow private forks"
 msgstr ""
 
