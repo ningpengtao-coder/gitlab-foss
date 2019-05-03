@@ -2,13 +2,18 @@ import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import store from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
-import { resetStore } from '../helpers';
-import { deploymentData, environmentData } from '../mock_data';
 import {
   fetchDeploymentsData,
   fetchEnvironmentsData,
   requestMetricsData,
+  setMetricsEndpoint,
+  setEnvironmentsEndpoint,
+  setDeploymentsEndpoint,
 } from '~/monitoring/stores/actions';
+import storeState from '~/monitoring/stores/state';
+import testAction from 'spec/helpers/vuex_action_helper';
+import { resetStore } from '../helpers';
+import { deploymentData, environmentData } from '../mock_data';
 
 describe('Monitoring store actions', () => {
   let mock;
@@ -104,6 +109,47 @@ describe('Monitoring store actions', () => {
           done();
         })
         .catch(done.fail);
+    });
+  });
+
+  describe('Set endpoints', () => {
+    let mockedState;
+
+    beforeEach(() => {
+      mockedState = storeState();
+    });
+
+    it('should commit SET_METRICS_ENDPOINT mutation', done => {
+      testAction(
+        setMetricsEndpoint,
+        'additional_metrics.json',
+        mockedState,
+        [{ type: types.SET_METRICS_ENDPOINT, payload: 'additional_metrics.json' }],
+        [],
+        done,
+      );
+    });
+
+    it('should commit SET_ENVIRONMENTS_ENDPOINT mutation', done => {
+      testAction(
+        setEnvironmentsEndpoint,
+        'environments.json',
+        mockedState,
+        [{ type: types.SET_ENVIRONMENTS_ENDPOINT, payload: 'environments.json' }],
+        [],
+        done,
+      );
+    });
+
+    it('should commit SET_DEPLOYMENTS_ENDPOINT mutation', done => {
+      testAction(
+        setDeploymentsEndpoint,
+        'deployments.json',
+        mockedState,
+        [{ type: types.SET_DEPLOYMENTS_ENDPOINT, payload: 'deployments.json' }],
+        [],
+        done,
+      );
     });
   });
 });
