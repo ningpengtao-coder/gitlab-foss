@@ -35,21 +35,28 @@ export const setMetricsEndpoint = ({ commit }, metricsEndpoint) => {
   commit(types.SET_METRICS_ENDPOINT, metricsEndpoint);
 }
 
-// requestSomething should commit the mutations
-export const requestMetricsData = () => ({ commit }) => commit(types.REQUEST_METRICS_DATA);
-// receiveSuccess and receiveError as callbacks for the fetchSomething function
+export const setDeploymentsEndpoint = ({ commit }, deploymentsEndpoint) => {
+  commit(types.SET_DEPLOYMENTS_ENDPOINT, deploymentsEndpoint);
+};
+
+export const setEnvironmentsEndpoint = ({ commit }, environmentsEndpoint) => {
+  commit(types.SET_ENVIRONMENTS_ENDPOINT, environmentsEndpoint);
+};
+
+export const requestMetricsData = ({ commit }) => commit(types.REQUEST_METRICS_DATA);
 export const receiveMetricsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);
 export const receiveMetricsDataFailure = ({ commit }, error) =>
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
 
-// fetchSomething are the actions that need to be exposed to the user
 export const fetchMetricsData = ({ state, dispatch }, params) => {
-  return backOffRequest(() => axios.get(state.metricsEndpoint, { params })) // TODO: Check if passing params is defined as a state or part of the exposed function
+  dispatch('requestMetricsData');
+
+  return backOffRequest(() => axios.get(state.metricsEndpoint, { params }))
     .then(resp => resp.data)
     .then(response => {
       if (!response || !response.data || !response.success) {
-        dispatch('receiveMetricsDataFailure', {}); // TODO: Do we send and error?
+        dispatch('receiveMetricsDataFailure', null);
         createFlash(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
       }
       dispatch('receiveMetricsDataSuccess', response.data);
@@ -58,7 +65,6 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
       dispatch('receiveMetricsDataFailure', error); // TODO: Do we send and error?
     });
 };
-
 
 export const fetchDashboard = ({ state, commit, dispatch }, params) => {
   return axios
@@ -91,8 +97,8 @@ export const fetchPrometheusMetrics = ({ state, dispatch }) => {
 /**
    * Returns list of metrics in data.result
    * {"status":"success", "data":{"resultType":"matrix","result":[]}}
-   * 
-   * @param {metric} metric 
+   *
+   * @param {metric} metric
    */
 export const fetchPrometheusMetric = ({ commit, getters }, metric) => {
   const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
@@ -115,7 +121,7 @@ export const fetchPrometheusMetric = ({ commit, getters }, metric) => {
     end,
     step,
   };
-  
+
   prom(prometheusEndpoint, params).then(result => {
     commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
   })
@@ -130,7 +136,7 @@ function prom(prometheusEndpoint, params) {
       }
 
       const { resultType, result } = response.data;
-      
+
       if (resultType === 'matrix') {
         if (result.length > 0) {
           return result
@@ -138,3 +144,46 @@ function prom(prometheusEndpoint, params) {
       }
   });
 }
+
+export const fetchDeploymentsData = ({ state, commit }) => {
+  if (!state.deploymentEndpoint) {
+    return Promise.resolve([]);
+  }
+  return backOffRequest(() => axios.get(state.deploymentEndpoint))
+    .then(resp => resp.data)
+    .then(response => {
+      if (!response || !response.deployments) {
+        createFlash(s__('Metrics|Unexpected deployment data response from prometheus endpoint'));
+      }
+
+      commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, response.deployments);
+    })
+    .catch(() => {
+      commit(types.RECEIVE_DEPLOYMENTS_DATA_FAILURE);
+      createFlash(s__('Metrics|There was an error getting deployment information.'));
+    });
+};
+
+export const fetchEnvironmentsData = ({ state, commit }) => {
+  if (!state.environmentsEndpoint) {
+    return Promise.resolve([]);
+  }
+  return axios
+    .get(state.environmentsEndpoint)
+    .then(resp => resp.data)
+    .then(response => {
+      if (!response || !response.environments) {
+        createFlash(
+          s__('Metrics|There was an error fetching the environments data, please try again'),
+        );
+      }
+      commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, response.environments);
+    })
+    .catch(() => {
+      commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
+      createFlash(s__('Metrics|There was an error getting environments information.'));
+    });
+};
+
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
+export default () => {};

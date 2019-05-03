@@ -1,19 +1,15 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import _ from 'underscore';
-import { mapActions, mapGetters, mapState } from 'vuex';
-import { s__ } from '~/locale';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
-import Flash from '../../flash';
-import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
 import HeatmapChart from './charts/heatmap.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import MonitoringStore from '../stores/monitoring_store';
 import { timeWindows } from '../constants';
 import { getTimeDiff } from '../utils';
 
@@ -111,9 +107,21 @@ export default {
       default: '',
     },
   },
+  data() {
+    return {
+      state: 'gettingStarted',
+      elWidth: 0,
+      selectedTimeWindow: '',
+    };
+  },
   computed: {
     ...mapGetters(['groups']),
+    ...mapState(['emptyState', 'showEmptyState', 'environments', 'deploymentData']),
     groupsWithData() {
+      if (!this.usePrometheusEndpoint) {
+        return this.groups;
+      }
+
       function hasQueryResult(acc, panel) {
         const metrics = panel.metrics.filter(query => query.result.length > 0);
 
@@ -140,22 +148,14 @@ export default {
       }, []);
     }
   },
-  data() {
-    return {
-      store: new MonitoringStore(),
-      state: 'gettingStarted',
-      showEmptyState: true,
-      elWidth: 0,
-      selectedTimeWindow: '',
-    };
-  },
   created() {
-    this.service = new MonitoringService({
-      dashboardEndpoint: this.dashboardEndpoint,
-      metricsEndpoint: this.metricsEndpoint,
-      deploymentEndpoint: this.deploymentEndpoint,
-      environmentsEndpoint: this.environmentsEndpoint,
-    });
+    if (this.usePrometheusEndpoint) {
+      this.setDashboardEndpoint(this.dashboardEndpoint);
+    } else {
+      this.setMetricsEndpoint(this.metricsEndpoint);
+    }
+    this.setDeploymentsEndpoint(this.deploymentEndpoint);
+    this.setEnvironmentsEndpoint(this.environmentsEndpoint);
 
     this.timeWindows = timeWindows;
     this.selectedTimeWindow = this.timeWindows.eightHours;
@@ -166,35 +166,18 @@ export default {
     }
   },
   mounted() {
-    this.servicePromises = [
-      this.service
-        .getDeploymentData()
-        .then(data => this.store.storeDeploymentData(data))
-        .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
-    ];
-
-    if (this.usePrometheusEndpoint) {
-      this.setDashboardEndpoint(this.dashboardEndpoint);
-      this.servicePromises.push(this.fetchDashboard());
-    } else {
-      this.setMetricsEndpoint(this.metricsEndpoint);
-      this.servicePromises.push(this.fetchMetricsData());
-    }
-
     if (!this.hasMetrics) {
-      this.state = 'gettingStarted';
+      // TODO: This should be coming from a mutation/computedGetter
+      // this.state = 'gettingStarted';
     } else {
-      if (this.environmentsEndpoint) {
-        this.servicePromises.push(
-          this.service
-            .getEnvironmentsData()
-            .then(data => this.store.storeEnvironmentsData(data))
-            .catch(() =>
-              Flash(s__('Metrics|There was an error getting environments information.')),
-            ),
-        );
+      if (this.usePrometheusEndpoint) {
+        this.fetchDashboard();
+      } else {
+        this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours));
       }
-      this.getGraphsData();
+      this.fetchDeploymentsData();
+      this.fetchEnvironmentsData();
+
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
         attributes: true,
@@ -204,7 +187,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchDashboard', 'fetchMetricsData', 'setDashboardEndpoint', 'setMetricsEndpoint']),
+    ...mapActions([
+      'fetchDashboard',
+      'fetchDeploymentsData',
+      'fetchEnvironmentsData',
+      'fetchMetricsData',
+      'setMetricsEndpoint',
+      'setDeploymentsEndpoint',
+      'setEnvironmentsEndpoint',
+    ]),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
@@ -212,38 +203,6 @@ export default {
     },
     getGraphAlertValues(queries) {
       return Object.values(this.getGraphAlerts(queries));
-    },
-    getGraphsData() {
-      this.state = 'loading';
-      Promise.all(this.servicePromises)
-        .then(() => {
-          if (this.groups.length < 1) {
-            this.state = 'noData';
-            return;
-          }
-
-          this.showEmptyState = false;
-        })
-        .catch((e) => {
-          console.error(e)
-          this.state = 'unableToConnect';
-        });
-    },
-    getGraphsDataWithTime(timeFrame) {
-      this.state = 'loading';
-      this.showEmptyState = true;
-      this.service
-        .getGraphsData(getTimeDiff(this.timeWindows[timeFrame]))
-        .then(data => {
-          this.store.storeMetrics(data);
-          this.selectedTimeWindow = this.timeWindows[timeFrame];
-        })
-        .catch(() => {
-          Flash(s__('Metrics|Not enough data to display'));
-        })
-        .finally(() => {
-          this.showEmptyState = false;
-        });
     },
     onSidebarMutation() {
       setTimeout(() => {
@@ -269,10 +228,9 @@ export default {
           class="prepend-left-10 js-environments-dropdown"
           toggle-class="dropdown-menu-toggle"
           :text="currentEnvironmentName"
-          :disabled="store.environmentsData.length === 0"
         >
           <gl-dropdown-item
-            v-for="environment in store.environmentsData"
+            v-for="environment in environments"
             :key="environment.id"
             :href="environment.metrics_path"
             :active="environment.name === currentEnvironmentName"
@@ -306,9 +264,10 @@ export default {
     >
       <template v-for="(graphData, graphIndex) in groupData.metrics">
         <monitor-area-chart
+          v-if="graphData.type === undefined || graphData.type === 'area'"
           :key="`area-${graphIndex}`"
           :graph-data="graphData"
-          :deployment-data="store.deploymentData"
+          :deployment-data="deploymentData"
           :thresholds="getGraphAlertValues(graphData.queries)"
           :container-width="elWidth"
           group-id="monitor-area-chart"
@@ -321,12 +280,30 @@ export default {
             @setAlerts="setAlerts"
           />
         </monitor-area-chart>
+        <single-stat-chart
+          v-else-if="graphData.type === 'single_stat'"
+          :key="`single-stat-${graphIndex}`"
+          value="100"
+          unit="ms"
+          title="latency"
+        />
+        <line-chart
+          v-else-if="graphData.type === 'line_chart'"
+          :key="`line-${graphIndex}`"
+          :graph-data="graphData"
+          :container-width="elWidth"
+        />
+        <heatmap-chart
+          v-else-if="graphData.type === 'heatmap_chart'"
+          :key="`heatmap-${graphIndex}`"
+          :graph-data="graphData"
+        />
       </template>
     </graph-group>
   </div>
   <empty-state
     v-else
-    :selected-state="state"
+    :selected-state="emptyState"
     :documentation-path="documentationPath"
     :settings-path="settingsPath"
     :clusters-path="clustersPath"
