@@ -13,5 +13,5 @@ export default () => ({
   selectedTimeWindow: null,
   groups: [],// From the monitoring store
   deploymentData: [],
-  environmentsData: [],
+  environments: [],
 });

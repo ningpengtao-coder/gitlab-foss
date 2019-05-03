@@ -21,6 +21,18 @@ export default {
     state.emptyState = error ? 'unableToConnect' : 'noData'; // TODO: use error to deterine the appropiately determine which empty state to use
     state.showEmptyState = true;
   },
+  [types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS](state, deployments) {
+    state.deployments = deployments;
+  },
+  [types.RECEIVE_DEPLOYMENTS_DATA_FAILURE](state) {
+    state.deployments = [];
+  },
+  [types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS](state, environments) {
+    state.environments = environments;
+  },
+  [types.RECEIVE_ENVIRONMENTS_DATA_FAILURE](state) {
+    state.environments = [];
+  },
   [types.SET_METRICS_ENDPOINT](state, endpoint) {
     state.metricsEndpoint = endpoint;
   },
