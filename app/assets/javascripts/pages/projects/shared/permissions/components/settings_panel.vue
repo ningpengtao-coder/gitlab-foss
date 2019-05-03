@@ -1,4 +1,5 @@
 <script>
+import settingPanelMixings from 'ee_else_ce/pages/projects/shared/permissions/mixins/settings_panel';
 import projectFeatureSetting from './project_feature_setting.vue';
 import projectFeatureToggle from '../../../../../vue_shared/components/toggle_button.vue';
 import projectSettingRow from './project_setting_row.vue';
@@ -11,7 +12,7 @@ export default {
     projectFeatureToggle,
     projectSettingRow,
   },
-
+  mixins: [settingPanelMixings],
   props: {
     currentSettings: {
       type: Object,
@@ -157,12 +158,20 @@ export default {
         if (value === 0) {
           this.containerRegistryEnabled = false;
           this.lfsEnabled = false;
+
+          if (this.isEE) {
+            this.packagesEnabled = false;
+          }
         }
       } else if (oldValue === 0) {
         this.mergeRequestsAccessLevel = value;
         this.buildsAccessLevel = value;
         this.containerRegistryEnabled = true;
         this.lfsEnabled = true;
+
+        if (this.isEE) {
+          this.packagesEnabled = false;
+        }
       }
     },
 
@@ -302,6 +311,18 @@ export default {
             v-model="lfsEnabled"
             :disabled-input="!repositoryEnabled"
             name="project[lfs_enabled]"
+          />
+        </project-setting-row>
+        <project-setting-row
+          v-if="packagesAvailable && isEE"
+          :help-path="packagesHelpPath"
+          label="Packages"
+          help-text="Every project can have its own space to store its packages"
+        >
+          <project-feature-toggle
+            v-model="packagesEnabled"
+            :disabled-input="!repositoryEnabled"
+            name="project[packages_enabled]"
           />
         </project-setting-row>
       </div>
