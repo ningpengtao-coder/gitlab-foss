@@ -14,4 +14,5 @@ export default () => ({
   groups: [], // From the monitoring store
   deploymentData: [],
   environments: [],
+  queryResults: {},
 });

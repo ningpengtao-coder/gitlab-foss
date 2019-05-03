@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import * as types from './mutation_types';
 import { normalizeMetrics, sortMetrics } from './utils';
 
@@ -50,6 +51,7 @@ export default {
       return;
     }
     Vue.set(state.queryResults, metricId, Object.freeze(result));
+    state.showEmptyState = false;
   },
   [types.SET_GROUPS](state, groups) {
     state.groups = groups;
