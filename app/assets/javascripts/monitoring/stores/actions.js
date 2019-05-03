@@ -94,7 +94,6 @@ export const fetchEnvironmentsData = ({ state, commit }) => {
           s__('Metrics|There was an error fetching the environments data, please try again'),
         );
       }
-      console.log(response)
       commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, response.environments);
     })
     .catch(() => {
