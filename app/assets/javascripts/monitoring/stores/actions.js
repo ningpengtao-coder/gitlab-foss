@@ -63,7 +63,7 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
     });
 };
 
-export const fetchDeploymentsData = ({ state }) => {
+export const fetchDeploymentsData = ({ state, commit }) => {
   if (!state.deploymentEndpoint) {
     return Promise.resolve([]);
   }
@@ -75,14 +75,16 @@ export const fetchDeploymentsData = ({ state }) => {
           s__('Metrics|Unexpected deployment data response from prometheus endpoint'),
         );
       }
-      return response.deployments;
+
+      commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, response.deployments);
     })
     .catch(() => {
+      commit(types.RECEIVE_DEPLOYMENTS_DATA_FAILURE);
       createFlash(s__('Metrics|There was an error getting deployment information.'));
     });
 };
 
-export const fetchEnvironmentsData = ({ state }) => {
+export const fetchEnvironmentsData = ({ state, commit }) => {
   return axios
     .get(state.environmentsEndpoint)
     .then(resp => resp.data)
@@ -92,9 +94,11 @@ export const fetchEnvironmentsData = ({ state }) => {
           s__('Metrics|There was an error fetching the environments data, please try again'),
         );
       }
-      return response.environments;
+      console.log(response)
+      commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, response.environments);
     })
     .catch(() => {
+      commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS);
       createFlash(s__('Metrics|There was an error getting environments information.'));
     });
 };
