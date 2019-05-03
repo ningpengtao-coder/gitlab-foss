@@ -52,12 +52,10 @@ function groupQueriesByChartInfo(metrics) {
   return Object.values(metricsByChart);
 }
 
-export const sortMetrics = (metrics) => {
-  return _.chain(metrics)
+export const sortMetrics = metrics => _.chain(metrics)
     .sortBy('title')
     .sortBy('weight')
     .value();
-}
 
 export const normalizeMetrics = metrics => {
   const groupedMetrics = groupQueriesByChartInfo(metrics);
@@ -81,4 +79,4 @@ export const normalizeMetrics = metrics => {
       queries: removeTimeSeriesNoData(queries),
     };
   });
-}
+};
