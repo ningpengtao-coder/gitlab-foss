@@ -7,7 +7,6 @@ import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
 import { getParameterValues } from '~/lib/utils/url_utility';
 import Flash from '../../flash';
-import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
@@ -105,11 +104,10 @@ export default {
     },
   },
   computed: {
-    ...mapState(['groups', 'emptyState', 'showEmptyState']),
+    ...mapState(['groups', 'emptyState', 'showEmptyState', 'environments', 'deploymentData']),
   },
   data() {
     return {
-      store: new MonitoringStore(),
       state: 'gettingStarted',
       elWidth: 0,
       selectedTimeWindow: '',
@@ -121,12 +119,6 @@ export default {
     this.setDeploymentsEndpoint(this.deploymentEndpoint);
     this.setEnvironmentsEndpoint(this.environmentsEndpoint);
 
-    // TODO: Move all of this to the monitoring vuex store/state
-    this.service = new MonitoringService({
-      metricsEndpoint: this.metricsEndpoint,
-      deploymentEndpoint: this.deploymentEndpoint,
-      environmentsEndpoint: this.environmentsEndpoint,
-    });
     this.timeWindows = timeWindows;
     this.selectedTimeWindowKey =
       _.escape(getParameterValues('time_window')[0]) || timeWindowsKeyNames.eightHours;
@@ -144,34 +136,14 @@ export default {
     }
   },
   mounted() {
-    const startEndWindow = getTimeDiff(this.timeWindows[this.selectedTimeWindowKey]);
-    this.servicePromises = [
-      this.service
-        .getGraphsData(startEndWindow)
-        .then(data => this.store.storeMetrics(data))
-        .catch(() => Flash(s__('Metrics|There was an error while retrieving metrics'))),
-      this.service
-        .getDeploymentData()
-        .then(data => this.store.storeDeploymentData(data))
-        .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
-    ];
     if (!this.hasMetrics) {
       // TODO: This should be coming from a mutation/computedGetter
       // this.state = 'gettingStarted';
     } else {
-      if (this.environmentsEndpoint) {
-        this.servicePromises.push(
-          this.service
-            .getEnvironmentsData()
-            .then(data => this.store.storeEnvironmentsData(data))
-            .catch(() =>
-              Flash(s__('Metrics|There was an error getting environments information.')),
-            ),
-        );
-      }
-      // TODO: Use this instead of the monitoring_service methods
       this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours));
-      // this.getGraphsData();
+      this.fetchDeploymentsData();
+      this.fetchEnvironmentsData();
+
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
         attributes: true,
@@ -182,6 +154,8 @@ export default {
   },
   methods: {
     ...mapActions([
+      'fetchDeploymentsData',
+      'fetchEnvironmentsData',
       'fetchMetricsData',
       'setMetricsEndpoint',
       'setDeploymentsEndpoint',
@@ -194,21 +168,6 @@ export default {
     },
     getGraphAlertValues(queries) {
       return Object.values(this.getGraphAlerts(queries));
-    },
-    getGraphsData() {
-      // this.state = 'loading';
-      Promise.all(this.servicePromises)
-        .then(() => {
-          if (this.groups.length < 1) {
-            this.state = 'noData';
-            return;
-          }
-
-          // this.showEmptyState = false; TODO: Delete me
-        })
-        .catch(() => {
-          // this.state = 'unableToConnect';
-        });
     },
     onSidebarMutation() {
       setTimeout(() => {
@@ -227,7 +186,7 @@ export default {
 
 <template>
   <div v-if="!showEmptyState" class="prometheus-graphs prepend-top-default">
-    <!-- <div
+    <div
       v-if="environmentsEndpoint"
       class="dropdowns d-flex align-items-center justify-content-between"
     >
@@ -237,10 +196,9 @@ export default {
           class="prepend-left-10 js-environments-dropdown"
           toggle-class="dropdown-menu-toggle"
           :text="currentEnvironmentName"
-          :disabled="store.environmentsData.length === 0"
         >
           <gl-dropdown-item
-            v-for="environment in store.environmentsData"
+            v-for="environment in environments"
             :key="environment.id"
             :href="environment.metrics_path"
             :active="environment.name === currentEnvironmentName"
@@ -264,9 +222,9 @@ export default {
           >
         </gl-dropdown>
       </div>
-    </div> TODO: Uncomment this once the action that requests all data is in place -->
+    </div>
     <graph-group
-      v-for="(groupData, index) in store.groups"
+      v-for="(groupData, index) in groups"
       :key="index"
       :name="groupData.group"
       :show-panels="showPanels"
@@ -276,7 +234,7 @@ export default {
           v-if="graphData.type === undefined || graphData.type === 'area'"
           :key="`area-${graphIndex}`"
           :graph-data="graphData"
-          :deployment-data="store.deploymentData"
+          :deployment-data="deploymentData"
           :thresholds="getGraphAlertValues(graphData.queries)"
           :container-width="elWidth"
           group-id="monitor-area-chart"
