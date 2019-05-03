@@ -4,7 +4,7 @@ import { normalizeMetrics, sortMetrics } from './utils';
 export default {
   [types.REQUEST_METRICS_DATA](state) {
     state.emptyState = 'loading';
-    // state.showEmptyState = true;
+    state.showEmptyState = true;
   },
   [types.RECEIVE_METRICS_DATA_SUCCESS](state, groupData) {
     state.groups = groupData.map(group => ({

@@ -39,7 +39,7 @@ export const setEnvironmentsEndpoint = ({ commit }, environmentsEndpoint ) => {
   commit(types.SET_ENVIRONMENTS_ENDPOINT, environmentsEndpoint);
 };
 
-export const requestMetricsData = () => ({ commit }) => commit(types.REQUEST_METRICS_DATA);
+export const requestMetricsData = ({ commit }) => commit(types.REQUEST_METRICS_DATA);
 export const receiveMetricsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);
 export const receiveMetricsDataFailure = ({ commit }, error) =>
@@ -85,6 +85,9 @@ export const fetchDeploymentsData = ({ state, commit }) => {
 };
 
 export const fetchEnvironmentsData = ({ state, commit }) => {
+  if (!state.environmentsEndpoint) {
+    return Promise.resolve([]);
+  }
   return axios
     .get(state.environmentsEndpoint)
     .then(resp => resp.data)
@@ -97,7 +100,7 @@ export const fetchEnvironmentsData = ({ state, commit }) => {
       commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, response.environments);
     })
     .catch(() => {
-      commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS);
+      commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
       createFlash(s__('Metrics|There was an error getting environments information.'));
     });
 };
