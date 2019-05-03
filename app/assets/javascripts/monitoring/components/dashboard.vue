@@ -9,6 +9,7 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import { mapActions, mapState } from 'vuex';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
 import { getParameterValues } from '~/lib/utils/url_utility';
@@ -18,7 +19,6 @@ import SingleStatChart from './charts/single_stat.vue';
 import HeatmapChart from './charts/heatmap.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import MonitoringStore from '../stores/monitoring_store';
 import { timeWindows, timeWindowsKeyNames } from '../constants';
 import { getTimeDiff } from '../utils';
 
