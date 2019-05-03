@@ -8,12 +8,10 @@ import {
   GlLink,
 } from '@gitlab/ui';
 import _ from 'underscore';
-import { mapActions, mapGetters, mapState } from 'vuex';
-import { s__ } from '~/locale';
+import { mapActions, mapState } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
 import { getParameterValues } from '~/lib/utils/url_utility';
-import Flash from '../../flash';
 import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
@@ -132,9 +130,6 @@ export default {
       required: true,
     },
   },
-  computed: {
-    ...mapState(['groups', 'emptyState', 'showEmptyState', 'environments', 'deploymentData']),
-  },
   data() {
     return {
       state: 'gettingStarted',
@@ -148,6 +143,7 @@ export default {
     canAddMetrics() {
       return this.customMetricsAvailable && this.customMetricsPath.length;
     },
+    ...mapState(['groups', 'emptyState', 'showEmptyState', 'environments', 'deploymentData']),
   },
   created() {
     this.setMetricsEndpoint(this.metricsEndpoint);

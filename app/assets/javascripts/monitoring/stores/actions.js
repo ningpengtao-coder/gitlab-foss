@@ -35,7 +35,7 @@ export const setDeploymentsEndpoint = ({ commit }, deploymentsEndpoint) => {
   commit(types.SET_DEPLOYMENTS_ENDPOINT, deploymentsEndpoint);
 };
 
-export const setEnvironmentsEndpoint = ({ commit }, environmentsEndpoint ) => {
+export const setEnvironmentsEndpoint = ({ commit }, environmentsEndpoint) => {
   commit(types.SET_ENVIRONMENTS_ENDPOINT, environmentsEndpoint);
 };
 
@@ -71,9 +71,7 @@ export const fetchDeploymentsData = ({ state, commit }) => {
     .then(resp => resp.data)
     .then(response => {
       if (!response || !response.deployments) {
-        createFlash(
-          s__('Metrics|Unexpected deployment data response from prometheus endpoint'),
-        );
+        createFlash(s__('Metrics|Unexpected deployment data response from prometheus endpoint'));
       }
 
       commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, response.deployments);
