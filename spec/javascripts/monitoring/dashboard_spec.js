@@ -78,7 +78,7 @@ describe('Dashboard', () => {
       });
 
       Vue.nextTick(() => {
-        expect(store.state.emptyState).toEqual('loading');
+        expect(component.emptyState).toEqual('loading');
         done();
       });
     });
