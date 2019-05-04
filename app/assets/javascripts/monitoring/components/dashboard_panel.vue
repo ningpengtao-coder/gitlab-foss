@@ -1,5 +1,4 @@
 <script>
-import _ from 'underscore';
 import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
@@ -20,36 +19,20 @@ export default {
       type: Object,
       required: true,
     },
-    deploymentData: {
-      type: Array,
-      required: false,
-    },
-    elWidth: {
-      type: Number,
-      required: true,
-    }
   },
-  methods: {
-    getGraphAlerts(queries) {
-      if (!this.allAlerts) return {};
-      const metricIdsForChart = queries.map(q => q.metricId);
-      return _.pick(this.allAlerts, alert => metricIdsForChart.includes(alert.metricId));
-    },
-    getGraphAlertValues(queries) {
-      return Object.values(this.getGraphAlerts(queries));
-    },
-    getComponentType() {
-      return MonitorAreaChart;
-    }
-  }
 };
 </script>
-
 <template>
-  <component
-    :is="getComponentType"
+  <single-stat-chart v-if="panelType === 'single_stat'" value="100" unit="ms" title="latency" />
+  <line-chart
+    v-else-if="panelType === 'line_chart'"
     :graph-data="graphData"
-    :deployment-data="deploymentData"
+    :container-width="elWidth"
+  />
+  <monitor-area-chart
+    v-else
+    :graph-data="graphData"
+    :deployment-data="store.deploymentData"
     :thresholds="getGraphAlertValues(graphData.queries)"
     :container-width="elWidth"
     group-id="monitor-area-chart"
@@ -61,22 +44,5 @@ export default {
       :alerts-to-manage="getGraphAlerts(graphData.queries)"
       @setAlerts="setAlerts"
     />
-  </component>
-  <!--
-  <single-stat-chart
-    v-else-if="graphData.type === 'single_stat'"
-    value="100"
-    unit="ms"
-    title="latency"
-  />
-  <line-chart
-    v-else-if="graphData.type === 'line_chart'"
-    :graph-data="graphData"
-    :container-width="elWidth"
-  />
-  <heatmap-chart
-    v-else-if="graphData.type === 'heatmap_chart'"
-    :graph-data="graphData"
-  />
-   -->
+  </monitor-area-chart>
 </template>
