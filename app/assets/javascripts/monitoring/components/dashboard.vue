@@ -1,16 +1,19 @@
 <script>
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlLink } from '@gitlab/ui';
 import _ from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
+import { getParameterValues } from '~/lib/utils/url_utility';
+import Flash from '../../flash';
+import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
 import HeatmapChart from './charts/heatmap.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import { timeWindows } from '../constants';
+import { timeWindows, timeWindowsKeyNames } from '../constants';
 import { getTimeDiff } from '../utils';
 
 const sidebarAnimationDuration = 150;
@@ -27,6 +30,7 @@ export default {
     LineChart,
     SingleStatChart,
     HeatmapChart,
+    GlLink,
   },
 
   props: {
@@ -112,6 +116,7 @@ export default {
       state: 'gettingStarted',
       elWidth: 0,
       selectedTimeWindow: '',
+      selectedTimeWindowKey: '',
     };
   },
   computed: {
@@ -158,7 +163,15 @@ export default {
     this.setEnvironmentsEndpoint(this.environmentsEndpoint);
 
     this.timeWindows = timeWindows;
-    this.selectedTimeWindow = this.timeWindows.eightHours;
+    this.selectedTimeWindowKey =
+      _.escape(getParameterValues('time_window')[0]) || timeWindowsKeyNames.eightHours;
+
+    // Set default time window if the selectedTimeWindowKey is bogus
+    if (!Object.keys(this.timeWindows).includes(this.selectedTimeWindowKey)) {
+      this.selectedTimeWindowKey = timeWindowsKeyNames.eightHours;
+    }
+
+    this.selectedTimeWindow = this.timeWindows[this.selectedTimeWindowKey];
   },
   beforeDestroy() {
     if (sidebarMutationObserver) {
@@ -170,10 +183,12 @@ export default {
       // TODO: This should be coming from a mutation/computedGetter
       // this.state = 'gettingStarted';
     } else {
+      const startEndWindow = getTimeDiff(this.timeWindows[this.selectedTimeWindowKey]);
       if (this.usePrometheusEndpoint) {
-        this.fetchDashboard();
+        // TODO: is this implemented?
+        this.fetchDashboard(startEndWindow);
       } else {
-        this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours));
+        this.fetchMetricsData(startEndWindow);
       }
       this.fetchDeploymentsData();
       this.fetchEnvironmentsData();
@@ -213,6 +228,9 @@ export default {
     activeTimeWindow(key) {
       return this.timeWindows[key] === this.selectedTimeWindow;
     },
+    setTimeWindowParameter(key) {
+      return `?time_window=${key}`;
+    },
   },
 };
 </script>
@@ -251,8 +269,7 @@ export default {
             v-for="(value, key) in timeWindows"
             :key="key"
             :active="activeTimeWindow(key)"
-            @click="getGraphsDataWithTime(key)"
-            >{{ value }}</gl-dropdown-item
+            ><gl-link :href="setTimeWindowParameter(key)">{{ value }}</gl-link></gl-dropdown-item
           >
         </gl-dropdown>
       </div>
