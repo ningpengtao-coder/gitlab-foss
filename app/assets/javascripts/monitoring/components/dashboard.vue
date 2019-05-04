@@ -193,6 +193,7 @@ export default {
       'fetchEnvironmentsData',
       'fetchMetricsData',
       'setMetricsEndpoint',
+      'setDashboardEndpoint',
       'setDeploymentsEndpoint',
       'setEnvironmentsEndpoint',
     ]),
@@ -262,26 +263,9 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <template v-for="(graphData, graphIndex) in groupData.metrics">
-        <monitor-area-chart
-          v-if="graphData.type === undefined || graphData.type === 'area'"
-          :key="`area-${graphIndex}`"
-          :graph-data="graphData"
-          :deployment-data="deploymentData"
-          :thresholds="getGraphAlertValues(graphData.queries)"
-          :container-width="elWidth"
-          group-id="monitor-area-chart"
-        >
-          <alert-widget
-            v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData"
-            :alerts-endpoint="alertsEndpoint"
-            :relevant-queries="graphData.queries"
-            :alerts-to-manage="getGraphAlerts(graphData.queries)"
-            @setAlerts="setAlerts"
-          />
-        </monitor-area-chart>
+      <template v-for="(graphData, graphIndex) in groupData.metrics.filter(m => m.queries && m.queries.length > 0 && m.queries[0].result && m.queries[0].result.length > 0)">
         <single-stat-chart
-          v-else-if="graphData.type === 'single_stat'"
+          v-if="graphData.type === 'single_stat'"
           :key="`single-stat-${graphIndex}`"
           value="100"
           unit="ms"
@@ -298,6 +282,23 @@ export default {
           :key="`heatmap-${graphIndex}`"
           :graph-data="graphData"
         />
+        <monitor-area-chart
+          v-else
+          :key="`area-${graphIndex}`"
+          :graph-data="graphData"
+          :deployment-data="deploymentData"
+          :thresholds="getGraphAlertValues(graphData.queries)"
+          :container-width="elWidth"
+          group-id="monitor-area-chart"
+        >
+          <alert-widget
+            v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData"
+            :alerts-endpoint="alertsEndpoint"
+            :relevant-queries="graphData.queries"
+            :alerts-to-manage="getGraphAlerts(graphData.queries)"
+            @setAlerts="setAlerts"
+          />
+        </monitor-area-chart>
       </template>
     </graph-group>
   </div>

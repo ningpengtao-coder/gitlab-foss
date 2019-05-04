@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import * as types from './mutation_types';
 import { normalizeMetrics, sortMetrics } from './utils';
 
@@ -46,6 +47,7 @@ export default {
     state.deploymentsEndpoint = endpoint;
   },
   [types.SET_QUERY_RESULT](state, { metricId, result }) {
+    state.showEmptyState = false;
     if (!metricId || !result) {
       return;
     }
