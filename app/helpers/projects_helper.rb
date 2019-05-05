@@ -631,4 +631,26 @@ module ProjectsHelper
       project.builds_enabled? &&
       !project.repository.gitlab_ci_yml
   end
+
+  def project_additional_fields(project)
+    additional_fields = {
+      # TODO: namespace is not always correct
+      # for cases where we are the owner we should have the 'owner' object available
+      namespace: project.namespace, 
+      open_merge_requests_count: project.open_merge_requests_count,
+      open_issues_count: project.open_issues_count,
+      visibility: {
+        level: project.visibility_level,
+        description: visibility_icon_description(project)
+      }
+      # owner: project.owner
+    }
+    project.as_json.merge(additional_fields)
+  end
+
+  def projects_data_json(projects)
+    projects = projects.to_a.map { |project| project_additional_fields(project) }
+
+    projects.to_json.html_safe
+  end
 end
