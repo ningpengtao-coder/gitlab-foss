@@ -62,7 +62,8 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
       dispatch('receiveMetricsDataSuccess', response.data);
     })
     .catch(error => {
-      dispatch('receiveMetricsDataFailure', error); // TODO: Do we send and error?
+      dispatch('receiveMetricsDataFailure', error);
+      createFlash(s__('Metrics|There was an error while retrieving metrics'));
     });
 };
 

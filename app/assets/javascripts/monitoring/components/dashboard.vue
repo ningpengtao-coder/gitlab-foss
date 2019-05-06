@@ -29,6 +29,9 @@ export default {
     SingleStatChart,
     HeatmapChart,
     GlLink,
+    LineChart,
+    SingleStatChart,
+    HeatmapChart,
   },
 
   props: {
