@@ -47,8 +47,11 @@
 
 build-qa-image:
   <<: *review-docker
+  extends: .dedicated-pull-cache-job
   stage: test
   script:
+    - mkdir -p ./qa/vendor
+    - mv "${CI_PROJECT_DIR}/vendor/ruby" "${CI_PROJECT_DIR}/qa/vendor/ruby"
     - time docker build --cache-from ${LATEST_QA_IMAGE} --tag ${QA_IMAGE} ./qa/
     - echo "${CI_JOB_TOKEN}" | docker login --username gitlab-ci-token --password-stdin ${CI_REGISTRY}
     - time docker push ${QA_IMAGE}

@@ -1,3 +1,26 @@
+.qa-internal: &qa-internal
+  stage: test
+  services: []
+  before_script:
+    - mkdir -p ./qa/vendor
+    - mv "${CI_PROJECT_DIR}/vendor/ruby" "${CI_PROJECT_DIR}/qa/vendor/ruby"
+    - cd qa/
+    - bundle install --jobs=$(nproc) --path=vendor --retry=3
+  dependencies:
+    - setup-test-env
+
+qa:internal:
+  extends: .dedicated-no-docs-no-db-pull-cache-job
+  <<: *qa-internal
+  script:
+    - bundle exec rspec
+
+qa:selectors:
+  extends: .dedicated-no-docs-no-db-pull-cache-job
+  <<: *qa-internal
+  script:
+    - bundle exec bin/qa Test::Sanity::Selectors
+
 package-and-qa:
   image: ruby:2.6-alpine
   stage: review  # So even if review-deploy failed we can still run this

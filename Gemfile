@@ -349,7 +349,7 @@ group :development, :test do
   gem 'minitest', '~> 5.11.0'
 
   # Generate Fake data
-  gem 'ffaker', '~> 2.10'
+  gem 'ffaker', '~> 2.11'
 
   gem 'capybara', '~> 3.22.0'
   gem 'capybara-screenshot', '~> 1.0.22'

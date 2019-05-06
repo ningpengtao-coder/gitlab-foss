@@ -49,7 +49,8 @@ RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
 
 WORKDIR /home/qa
 COPY ./Gemfile* ./
-RUN bundle install
+COPY ./vendor/ruby/ ./vendor/ruby/
+RUN bundle install --jobs=$(nproc) --path=vendor --retry=3
 COPY ./ ./
 
 ENTRYPOINT ["bin/test"]

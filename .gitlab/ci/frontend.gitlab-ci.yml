@@ -197,26 +197,6 @@ jest:
       - tmp/jest/jest/
     policy: pull-push
 
-qa:internal:
-  extends: .dedicated-no-docs-no-db-pull-cache-job
-  services: []
-  script:
-    - cd qa/
-    - bundle install
-    - bundle exec rspec
-  dependencies:
-    - setup-test-env
-
-qa:selectors:
-  extends: .dedicated-no-docs-no-db-pull-cache-job
-  services: []
-  script:
-    - cd qa/
-    - bundle install
-    - bundle exec bin/qa Test::Sanity::Selectors
-  dependencies:
-    - setup-test-env
-
 .qa-frontend-node: &qa-frontend-node
   extends: .dedicated-no-docs-no-db-pull-cache-job
   stage: test
