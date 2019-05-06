@@ -152,7 +152,7 @@ export default {
         }
         return acc;
       }, []);
-    }
+    },
   },
   created() {
     if (this.usePrometheusEndpoint) {
@@ -281,7 +281,15 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <template v-for="(graphData, graphIndex) in groupData.metrics.filter(m => m.queries && m.queries.length > 0 && m.queries[0].result && m.queries[0].result.length > 0)">
+      <template
+        v-for="(graphData, graphIndex) in groupData.metrics.filter(
+          m =>
+            m.queries &&
+            m.queries.length > 0 &&
+            m.queries[0].result &&
+            m.queries[0].result.length > 0,
+        )"
+      >
         <single-stat-chart
           v-if="graphData.type === 'single_stat'"
           :key="`single-stat-${graphIndex}`"

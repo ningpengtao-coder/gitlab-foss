@@ -83,7 +83,6 @@ export default class MonitoringStore {
     const groups = dashboard.panelGroups;
 
     this.groups = groups.reduce((acc, group) => {
-    
       const panelsWithResults = group.panels.filter(panel => {
         return panel.queries[0].result;
       });
@@ -102,9 +101,8 @@ export default class MonitoringStore {
   }
 
   storeDashboardMetrics(metrics) {
-    console.log('metrics)')
-    console.log(metrics)
-    
+    console.log('metrics)');
+    console.log(metrics);
   }
 
   storeDeploymentData(deploymentData = []) {

@@ -29,11 +29,11 @@ function backOffRequest(makeRequestCallback) {
 
 export const setDashboardEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_DASHBOARD_ENDPOINT, endpoint);
-}
+};
 
 export const setMetricsEndpoint = ({ commit }, metricsEndpoint) => {
   commit(types.SET_METRICS_ENDPOINT, metricsEndpoint);
-}
+};
 
 export const setDeploymentsEndpoint = ({ commit }, deploymentsEndpoint) => {
   commit(types.SET_DEPLOYMENTS_ENDPOINT, deploymentsEndpoint);
@@ -79,10 +79,10 @@ export const fetchDashboard = ({ state, commit, dispatch }, params) => {
       commit(types.SET_GROUPS, response.dashboard.panel_groups);
       dispatch('fetchPrometheusMetrics', params);
     })
-    .catch((e) => {
+    .catch(e => {
       throw e;
     });
-}
+};
 
 export const fetchPrometheusMetrics = ({ state, dispatch }, params) => {
   state.groups.forEach(group => {
@@ -92,15 +92,15 @@ export const fetchPrometheusMetrics = ({ state, dispatch }, params) => {
         dispatch('fetchPrometheusMetric', { metric, startEnd: params });
       });
     });
-  })
-}
+  });
+};
 
 /**
-   * Returns list of metrics in data.result
-   * {"status":"success", "data":{"resultType":"matrix","result":[]}}
-   *
-   * @param {metric} metric
-   */
+ * Returns list of metrics in data.result
+ * {"status":"success", "data":{"resultType":"matrix","result":[]}}
+ *
+ * @param {metric} metric
+ */
 export const fetchPrometheusMetric = ({ commit, getters }, { metric, startEnd }) => {
   const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
   const query = metric[queryType];
@@ -125,8 +125,8 @@ export const fetchPrometheusMetric = ({ commit, getters }, { metric, startEnd })
 
   prom(prometheusEndpoint, params).then(result => {
     commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
-  })
-}
+  });
+};
 
 function prom(prometheusEndpoint, params) {
   return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
@@ -140,10 +140,10 @@ function prom(prometheusEndpoint, params) {
 
       if (resultType === 'matrix') {
         if (result.length > 0) {
-          return result
+          return result;
         }
       }
-  });
+    });
 }
 
 export const fetchDeploymentsData = ({ state, commit }) => {
