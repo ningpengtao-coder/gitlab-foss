@@ -5,8 +5,6 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
 import { getParameterValues } from '~/lib/utils/url_utility';
-import Flash from '../../flash';
-import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
