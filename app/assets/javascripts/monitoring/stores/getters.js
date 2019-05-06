@@ -1,5 +1,8 @@
 import _ from 'underscore';
 
+export const getMetricsCount = state =>
+  state.groups.reduce((count, group) => count + group.metrics.length, 0);
+
 function sortMetrics(metrics) {
   return _.chain(metrics)
     .sortBy('title')

@@ -52,7 +52,8 @@ function groupQueriesByChartInfo(metrics) {
   return Object.values(metricsByChart);
 }
 
-export const sortMetrics = metrics => _.chain(metrics)
+export const sortMetrics = metrics =>
+  _.chain(metrics)
     .sortBy('title')
     .sortBy('weight')
     .value();
