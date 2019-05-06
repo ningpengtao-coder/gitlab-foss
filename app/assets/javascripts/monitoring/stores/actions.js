@@ -95,6 +95,24 @@ export const fetchPrometheusMetrics = ({ state, dispatch }, params) => {
   });
 };
 
+function fetchPrometheusResult(prometheusEndpoint, params) {
+  return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
+    .then(res => res.data)
+    .then(response => {
+      if (response.status === 'error') {
+        // {"status":"error","errorType":"bad_data","error":"exceeded maximum resolution of 11,000 points per timeseries. Try decreasing the query resolution (?step=XX)"}
+      }
+
+      const { resultType, result } = response.data;
+
+      if (resultType === 'matrix') {
+        if (result.length > 0) {
+          return result;
+        }
+      }
+    });
+}
+
 /**
  * Returns list of metrics in data.result
  * {"status":"success", "data":{"resultType":"matrix","result":[]}}
@@ -123,28 +141,10 @@ export const fetchPrometheusMetric = ({ commit, getters }, { metric, startEnd })
     step,
   };
 
-  prom(prometheusEndpoint, params).then(result => {
+  fetchPrometheusResult(prometheusEndpoint, params).then(result => {
     commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
   });
 };
-
-function prom(prometheusEndpoint, params) {
-  return backOffRequest(() => axios.get(prometheusEndpoint, { params }))
-    .then(res => res.data)
-    .then(response => {
-      if (response.status === 'error') {
-        // {"status":"error","errorType":"bad_data","error":"exceeded maximum resolution of 11,000 points per timeseries. Try decreasing the query resolution (?step=XX)"}
-      }
-
-      const { resultType, result } = response.data;
-
-      if (resultType === 'matrix') {
-        if (result.length > 0) {
-          return result;
-        }
-      }
-    });
-}
 
 export const fetchDeploymentsData = ({ state, commit }) => {
   if (!state.deploymentEndpoint) {
