@@ -918,6 +918,7 @@ GET /users/:id/emails
 Parameters:
 
 - `id` (required) - id of specified user
+- `types` (optional) - the email types: `primary` or `secondary` (default)
 
 ## Single email
 

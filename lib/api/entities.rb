@@ -99,7 +99,8 @@ module API
     end
 
     class Email < Grape::Entity
-      expose :id, :email
+      expose :id, unless: ->(email) { email.id.nil? }
+      expose :email
     end
 
     class Hook < Grape::Entity

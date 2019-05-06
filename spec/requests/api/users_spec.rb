@@ -1146,16 +1146,37 @@ describe API::Users do
         expect(json_response['message']).to eq('404 User Not Found')
       end
 
-      it 'returns array of emails' do
-        user.emails << email
-        user.save
+      it 'returns array of secondary emails' do
+        email
 
         get api("/users/#{user.id}/emails", admin)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers
         expect(json_response).to be_an Array
+        expect(json_response.length).to eq(1)
         expect(json_response.first['email']).to eq(email.email)
+      end
+
+      it 'returns only the primary email when types[]=primary' do
+        email
+
+        get api("/users/#{user.id}/emails", admin), params: { types: ['primary'] }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.length).to eq(1)
+        expect(json_response.first).to eq({ 'email' => user.email })
+      end
+
+      it 'returns both primary and secondary emails when types[]=primary,secondary' do
+        email
+
+        get api("/users/#{user.id}/emails", admin), params: { types: %w[primary secondary] }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.length).to eq(2)
+        expect(json_response.first).to  eq({ 'email' => user.email })
+        expect(json_response.second).to eq({ 'id' => email.id, 'email' => email.email })
       end
 
       it "returns a 404 for invalid ID" do

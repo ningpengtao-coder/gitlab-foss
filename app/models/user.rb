@@ -11,6 +11,7 @@ class User < ApplicationRecord
   include Avatarable
   include Referable
   include Sortable
+  include NullSorting
   include CaseSensitivity
   include TokenAuthenticatable
   include IgnorableColumn

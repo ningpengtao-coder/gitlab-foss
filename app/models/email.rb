@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 class Email < ApplicationRecord
+  EMAIL_TYPES = %w[primary secondary].freeze
+
   include Sortable
+  include NullSorting
   include Gitlab::SQL::Pattern
+  include FromUnion
 
   belongs_to :user
 

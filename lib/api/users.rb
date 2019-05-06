@@ -418,17 +418,18 @@ module API
       end
       params do
         requires :id, type: Integer, desc: 'The ID of the user'
+        optional :types, type: Array, values: Email::EMAIL_TYPES, desc: "Type of the email: #{Email::EMAIL_TYPES.join(',')}", default: 'secondary'
         use :pagination
       end
-      # rubocop: disable CodeReuse/ActiveRecord
       get ':id/emails' do
         authenticated_as_admin!
-        user = User.find_by(id: params[:id])
+        user = User.find_by(id: params[:id]) # rubocop: disable CodeReuse/ActiveRecord
         not_found!('User') unless user
 
-        present paginate(user.emails), with: Entities::Email
+        emails = UserEmailsFinder.new(user, types: params[:types]).execute
+
+        present paginate(emails), with: Entities::Email
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       desc 'Delete an email address of a specified user. Available only for admins.' do
         success Entities::Email

@@ -1,0 +1,5 @@
+---
+title: Adds email types for api/users/:id/emails
+merge_request: 27904
+author: Jacopo Beschi @jacopo-beschi
+type: changed
