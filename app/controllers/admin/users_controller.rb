@@ -221,6 +221,7 @@ class Admin::UsersController < Admin::ApplicationController
       :remember_me,
       :skype,
       :theme_id,
+      :dashboard,
       :twitter,
       :username,
       :website_url

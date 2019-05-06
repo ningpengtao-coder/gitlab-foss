@@ -50,6 +50,7 @@ module API
           optional :external, type: Boolean, desc: 'Flag indicating the user is an external user'
           optional :avatar, type: File, desc: 'Avatar image for user'
           optional :private_profile, type: Boolean, desc: 'Flag indicating the user has a private profile'
+          optional :dashboard, type: String, desc: 'Default dashboard for user'
           all_or_none_of :extern_uid, :provider
 
           if Gitlab.ee?
