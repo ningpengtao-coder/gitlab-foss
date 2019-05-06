@@ -76,19 +76,19 @@ export const fetchDashboard = ({ state, commit, dispatch }, params) => {
       }
 
       commit(types.SET_GROUPS, response.dashboard.panel_groups);
-      dispatch('fetchPrometheusMetrics');
+      dispatch('fetchPrometheusMetrics', params);
     })
     .catch((e) => {
       throw e;
     });
 }
 
-export const fetchPrometheusMetrics = ({ state, dispatch }) => {
+export const fetchPrometheusMetrics = ({ state, dispatch }, params) => {
   state.groups.forEach(group => {
     group.panels.forEach(panel => {
       panel.queries = panel.metrics;
       panel.queries.forEach(metric => {
-        dispatch('fetchPrometheusMetric', metric);
+        dispatch('fetchPrometheusMetric', { metric, startEnd: params });
       });
     });
   })
@@ -100,7 +100,7 @@ export const fetchPrometheusMetrics = ({ state, dispatch }) => {
    *
    * @param {metric} metric
    */
-export const fetchPrometheusMetric = ({ commit, getters }, metric) => {
+export const fetchPrometheusMetric = ({ commit, getters }, { metric, startEnd }) => {
   const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
   const query = metric[queryType];
   // TODO don't hardcode
@@ -108,8 +108,8 @@ export const fetchPrometheusMetric = ({ commit, getters }, metric) => {
 
   // todo use timewindow
   const timeDiff = 8 * 60 * 60; // 8hours in seconnds
-  const end = Math.floor(Date.now() / 1000);
-  const start = end - timeDiff;
+  const end = startEnd.end || Math.floor(Date.now() / 1000);
+  const start = startEnd.start || end - timeDiff;
 
   const minStep = 60;
   const queryDataPoints = 600;
