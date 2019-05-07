@@ -159,6 +159,8 @@ review-stop:
   before_script:
     - export CI_ENVIRONMENT_URL="$(cat review_app_url.txt)"
     - echo "${CI_ENVIRONMENT_URL}"
+    # Fallback to the nightly image if no custom image were built
+    - 'docker pull "${QA_IMAGE}" > /dev/null || export QA_IMAGE="${LATEST_QA_IMAGE}"'
     - echo "${QA_IMAGE}"
     - source scripts/utils.sh
     - install_api_client_dependencies_with_apk
