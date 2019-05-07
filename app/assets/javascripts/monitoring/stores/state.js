@@ -11,6 +11,7 @@ export default () => ({
   emptyState: 'gettingStarted',
   showEmptyState: true,
   selectedTimeWindow: null,
+  useDashboardEndpoint: false,
   groups: [], // From the monitoring store
   deploymentData: [],
   environments: [],

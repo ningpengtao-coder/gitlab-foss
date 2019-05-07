@@ -121,45 +121,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['groups']),
+    ...mapGetters(['groups', 'groupsWithData']),
     ...mapState(['emptyState', 'showEmptyState', 'environments', 'deploymentData']),
-    groupsWithData() {
-      if (!this.usePrometheusEndpoint) {
-        return this.groups;
-      }
-
-      function hasQueryResult(acc, panel) {
-        const metrics = panel.metrics.filter(query => query.result.length > 0);
-
-        if (metrics.length > 0) {
-          acc.push({
-            ...panel,
-            metrics,
-          });
-        }
-
-        return acc;
-      }
-
-      return this.groups.reduce((acc, group) => {
-        const panels = group.panels.reduce(hasQueryResult, []);
-
-        if (panels.length > 0) {
-          acc.push({
-            ...group,
-            panels,
-          });
-        }
-        return acc;
-      }, []);
-    },
   },
   created() {
-    if (this.usePrometheusEndpoint) {
-      this.setDashboardEndpoint(this.dashboardEndpoint);
-    } else {
-      this.setMetricsEndpoint(this.metricsEndpoint);
-    }
+    this.setDashboardEnabled(this.usePrometheusEndpoint);
+    this.setDashboardEndpoint(this.dashboardEndpoint);
+    this.setMetricsEndpoint(this.metricsEndpoint);
     this.setDeploymentsEndpoint(this.deploymentEndpoint);
     this.setEnvironmentsEndpoint(this.environmentsEndpoint);
 
@@ -185,11 +153,8 @@ export default {
       // this.state = 'gettingStarted';
     } else {
       const startEndWindow = getTimeDiff(this.timeWindows[this.selectedTimeWindowKey]);
-      if (this.usePrometheusEndpoint) {
-        this.fetchDashboard(startEndWindow);
-      } else {
-        this.fetchMetricsData(startEndWindow);
-      }
+
+      this.fetchMetricsData(startEndWindow);
       this.fetchDeploymentsData();
       this.fetchEnvironmentsData();
 
@@ -211,6 +176,7 @@ export default {
       'setDashboardEndpoint',
       'setDeploymentsEndpoint',
       'setEnvironmentsEndpoint',
+      'setDashboardEnabled',
     ]),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
@@ -231,6 +197,15 @@ export default {
     setTimeWindowParameter(key) {
       return `?time_window=${key}`;
     },
+    metricsWithResults(metrics) {
+      return metrics.filter(
+        m =>
+          m.queries &&
+          m.queries.length > 0 &&
+          m.queries[0].result &&
+          m.queries[0].result.length > 0,
+      );
+    }
   },
 };
 </script>
@@ -280,15 +255,7 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <template
-        v-for="(graphData, graphIndex) in groupData.metrics.filter(
-          m =>
-            m.queries &&
-            m.queries.length > 0 &&
-            m.queries[0].result &&
-            m.queries[0].result.length > 0,
-        )"
-      >
+      <template v-for="(graphData, graphIndex) in metricsWithResults(groupData.metrics)">
         <single-stat-chart
           v-if="graphData.type === 'single_stat'"
           :key="`single-stat-${graphIndex}`"

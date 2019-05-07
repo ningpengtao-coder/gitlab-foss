@@ -27,6 +27,10 @@ function backOffRequest(makeRequestCallback) {
   });
 }
 
+export const setDashboardEnabled = ({ commit }, enabled) => {
+  commit(types.SET_DASHBOARD_ENABLED, enabled);
+};
+
 export const setDashboardEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_DASHBOARD_ENDPOINT, endpoint);
 };
@@ -50,6 +54,10 @@ export const receiveMetricsDataFailure = ({ commit }, error) =>
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
 
 export const fetchMetricsData = ({ state, dispatch }, params) => {
+  if (state.useDashboardEndpoint) {
+    return dispatch('fetchDashboard', params);
+  }
+
   dispatch('requestMetricsData');
 
   return backOffRequest(() => axios.get(state.metricsEndpoint, { params }))

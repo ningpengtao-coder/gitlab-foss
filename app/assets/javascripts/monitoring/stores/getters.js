@@ -46,7 +46,7 @@ export function groupsWithData(state) {
     return state.groups;
   }
 
-  return state.groups.reduce((acc, group) => {
+  return groups(state).reduce((acc, group) => {
     const panels = group.panels.reduce(hasQueryResult, []);
 
     if (panels.length > 0) {

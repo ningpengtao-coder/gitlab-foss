@@ -56,4 +56,7 @@ export default {
   [types.SET_GROUPS](state, groups) {
     state.groups = groups;
   },
+  [types.SET_DASHBOARD_ENABLED](state, enabled) {
+    state.useDashboardEndpoint = enabled;
+  },
 };
