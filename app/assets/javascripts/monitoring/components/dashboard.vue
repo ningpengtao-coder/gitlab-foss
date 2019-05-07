@@ -186,7 +186,6 @@ export default {
     } else {
       const startEndWindow = getTimeDiff(this.timeWindows[this.selectedTimeWindowKey]);
       if (this.usePrometheusEndpoint) {
-        // TODO: is this implemented?
         this.fetchDashboard(startEndWindow);
       } else {
         this.fetchMetricsData(startEndWindow);
