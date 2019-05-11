@@ -4,7 +4,7 @@ Thank you for becoming a ~database reviewer! Please work on the list
 below to complete your setup. For any question, reach out to #database
 an mention `@abrandl`.
 
-Note this is specifically targeted towards GitLab team members and some
+Note that this is specifically targeted towards GitLab team members and some
 parts are only available internally to GitLab.
 
 - [ ] Change issue title to include your name: `Database Reviewer Checklist: Your Name`
