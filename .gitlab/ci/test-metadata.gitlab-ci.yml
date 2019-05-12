@@ -71,8 +71,9 @@ flaky-examples-check:
   except:
     refs:
       - master
-      - /(^docs[\/-].*|.*-docs$)/
       - /(^qa[\/-].*|.*-qa$)/
+    changes:
+      - "doc/**/*.md"
   artifacts:
     expire_in: 30d
     paths:

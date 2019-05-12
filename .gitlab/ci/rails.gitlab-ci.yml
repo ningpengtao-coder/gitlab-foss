@@ -207,8 +207,9 @@ downtime_check:
       - master
       - tags
       - /^[\d-]+-stable(-ee)?$/
-      - /(^docs[\/-].*|.*-docs$)/
       - /(^qa[\/-].*|.*-qa$)/
+    changes:
+      - "doc/**/*.md"
   dependencies:
     - setup-test-env
 
