@@ -161,7 +161,7 @@ Rails/ApplicationRecord:
     - ee/lib/ee/gitlab/background_migration/**/*.rb
     - ee/spec/**/*.rb
 
-# GitLab ###################################################################
+# GitLab ##################################################################
 
 Gitlab/ModuleWithInstanceVariables:
   Enable: true
