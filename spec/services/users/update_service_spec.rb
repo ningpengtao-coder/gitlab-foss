@@ -14,10 +14,10 @@ describe Users::UpdateService do
     end
 
     it 'updates time preferences' do
-      result = update_user(user, timezone: 'Europe/Warsaw', time_display_relative: true, time_format_in_24h: false)
+      result = update_user(user, timezone: 'Warsaw', time_display_relative: true, time_format_in_24h: false)
 
       expect(result).to eq(status: :success)
-      expect(user.reload.timezone).to eq('Europe/Warsaw')
+      expect(user.reload.timezone).to eq('Warsaw')
       expect(user.time_display_relative).to eq(true)
       expect(user.time_format_in_24h).to eq(false)
     end

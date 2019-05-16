@@ -341,17 +341,19 @@ describe 'User edit profile' do
       end
 
       it 'allows the user to select a time zone from a dropdown list of options' do
+        selected_tz = "Nuku'alofa"
+
         expect(page.find('.user-time-preferences .dropdown')).not_to have_css('.show')
 
         page.find('.user-time-preferences .js-timezone-dropdown').click
 
         expect(page.find('.user-time-preferences .dropdown')).to have_css('.show')
 
-        page.find("a", text: "Nuku'alofa").click
+        page.find("a", text: selected_tz).click
 
         tz = page.find('.user-time-preferences #user_timezone', visible: false)
 
-        expect(tz.value).to eq('Pacific/Tongatapu')
+        expect(tz.value).to eq(selected_tz)
       end
 
       it 'timezone defaults to servers default' do
