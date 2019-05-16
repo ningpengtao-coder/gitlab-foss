@@ -45,7 +45,7 @@ module Gitlab
       end
 
       def private_key
-        @private_key ||= OpenSSL::PKey.read(Gitlab::Application.secrets.lets_encrypt_private_key)
+        @private_key ||= OpenSSL::PKey.read(Gitlab::CurrentSettings.lets_encrypt_private_key || generate_private_key)
       end
 
       def admin_email
@@ -67,6 +67,17 @@ module Gitlab
           PRODUCTION_DIRECTORY_URL
         else
           STAGING_DIRECTORY_URL
+        end
+      end
+
+      def generate_private_key
+        application_settings = Gitlab::CurrentSettings.current_application_settings
+        application_settings.with_lock do
+          unless application_settings.lets_encrypt_private_key
+            application_settings.update(lets_encrypt_private_key: OpenSSL::PKey::RSA.new(4096).to_pem)
+          end
+
+          application_settings.lets_encrypt_private_key
         end
       end
     end

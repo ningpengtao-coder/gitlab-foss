@@ -26,6 +26,33 @@ describe ::Gitlab::LetsEncrypt::Client do
       )
     end
 
+    it 'generates and stores private key and initialize acme client with it' do
+      expect(Gitlab::CurrentSettings.lets_encrypt_private_key).to eq(nil)
+
+      subject
+
+      saved_private_key = Gitlab::CurrentSettings.lets_encrypt_private_key
+
+      expect(saved_private_key).to be
+      expect(Acme::Client).to have_received(:new).with(
+        hash_including(private_key: eq_pem(saved_private_key))
+      )
+    end
+
+    context 'when private key is saved in settings' do
+      let!(:saved_private_key) do
+        key = OpenSSL::PKey::RSA.new(4096)
+        Gitlab::CurrentSettings.current_application_settings.update(lets_encrypt_private_key: key.to_pem)
+        key
+      end
+
+      it 'uses current value of private key' do
+        subject
+
+        expect(Gitlab::CurrentSettings.lets_encrypt_private_key).to eq(saved_private_key.to_pem)
+      end
+    end
+
     context 'when acme integration is disabled' do
       before do
         stub_application_setting(lets_encrypt_terms_of_service_accepted: false)
