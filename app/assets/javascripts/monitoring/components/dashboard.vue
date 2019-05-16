@@ -17,6 +17,7 @@ import MonitorAreaChart from './charts/area.vue';
 import LineChart from './charts/line.vue';
 import SingleStatChart from './charts/single_stat.vue';
 import HeatmapChart from './charts/heatmap.vue';
+import ColumnChart from './charts/column.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import { timeWindows, timeWindowsKeyNames } from '../constants';
@@ -39,6 +40,7 @@ export default {
     LineChart,
     SingleStatChart,
     HeatmapChart,
+    ColumnChart,
   },
   directives: {
     GlModalDirective,
@@ -238,10 +240,10 @@ export default {
             class="prepend-left-10 js-environments-dropdown"
             toggle-class="dropdown-menu-toggle"
             :text="currentEnvironmentName"
-            :disabled="store.environmentsData.length === 0"
+            :disabled="environments.length === 0"
           >
             <gl-dropdown-item
-              v-for="environment in store.environmentsData"
+              v-for="environment in environments"
               :key="environment.id"
               :active="environment.name === currentEnvironmentName"
               active-class="is-active"

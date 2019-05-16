@@ -30,9 +30,7 @@ export default {
 <template>
   <div class="prometheus-graph col-12 col-lg-6">
     <div class="prometheus-graph-header">
-      <h5 ref="graphTitle" class="prometheus-graph-title">{{ graphData.title }}</h5>
-      <!-- Do we need widgets for this graph type? -->
-      <!-- <div ref="graphWidgets" class="prometheus-graph-widgets"><slot></slot></div> -->
+      <h5 ref="graphTitle" class="prometheus-graph-title">{{ title }}</h5>
     </div>
     <gl-single-stat :value="valueWithUnit" :title="title" variant="success" />
   </div>
