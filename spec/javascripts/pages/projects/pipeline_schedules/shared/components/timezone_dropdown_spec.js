@@ -3,7 +3,7 @@ import GLDropdown from '~/gl_dropdown'; // eslint-disable-line no-unused-vars
 import TimezoneDropdown, {
   formatUtcOffset,
   formatTimezone,
-  findTimezoneByIdentifier,
+  findTimezoneByName,
 } from '~/pages/projects/pipeline_schedules/shared/components/timezone_dropdown';
 
 describe('Timezone Dropdown', function() {
@@ -32,7 +32,7 @@ describe('Timezone Dropdown', function() {
 
       it('can take an $inputEl in the constructor', () => {
         const tzStr = '[UTC + 5.5] Sri Jayawardenepura';
-        const tzValue = 'Asia/Colombo';
+        const tzValue = 'Sri Jayawardenepura';
 
         expect($inputEl.val()).toBe('UTC');
 
@@ -97,8 +97,8 @@ describe('Timezone Dropdown', function() {
         expect(onSelectTimezone).toHaveBeenCalled();
       });
 
-      it('will correctly set the dropdown label if a timezone identifier is set on the inputEl', () => {
-        $inputEl.val('America/St_Johns');
+      it('will correctly set the dropdown label if a timezone name is set on the inputEl', () => {
+        $inputEl.val('Newfoundland');
 
         // eslint-disable-next-line no-new
         new TimezoneDropdown({
@@ -108,6 +108,23 @@ describe('Timezone Dropdown', function() {
         });
 
         expect($wrapper.find(tzDropdownToggleText).html()).toEqual('[UTC - 2.5] Newfoundland');
+      });
+
+      it('will correctly set the dropdown label by name when the identifiers are the same', () => {
+        $inputEl.val('Midway Island');
+
+        // eslint-disable-next-line no-new
+        new TimezoneDropdown({
+          $inputEl,
+          $dropdownEl,
+          displayFormat: selectedItem => formatTimezone(selectedItem),
+        });
+
+        // Both timezones use Pacific/Midway as their identifier,
+        expect($wrapper.find(tzDropdownToggleText).html()).toEqual('[UTC - 11] Midway Island');
+        expect($wrapper.find(tzDropdownToggleText).html()).not.toEqual(
+          '[UTC - 11] International Date Line',
+        );
       });
 
       it('will call a provided `displayFormat` handler to format the dropdown value', () => {
@@ -197,7 +214,7 @@ describe('Timezone Dropdown', function() {
     });
   });
 
-  describe('findTimezoneByIdentifier', () => {
+  describe('findTimezoneByName', () => {
     const tzList = [
       {
         identifier: 'Asia/Tokyo',
@@ -216,29 +233,29 @@ describe('Timezone Dropdown', function() {
       },
     ];
 
-    const identifier = 'Asia/Dhaka';
+    const name = 'Dhaka';
     it('returns the correct object if the identifier exists', () => {
-      const res = findTimezoneByIdentifier(tzList, identifier);
+      const res = findTimezoneByName(tzList, name);
 
       expect(res).toBeTruthy();
       expect(res).toBe(tzList[2]);
     });
 
-    it('returns null if it doesnt find the identifier', () => {
-      const res = findTimezoneByIdentifier(tzList, 'Australia/Melbourne');
+    it('returns null if it doesnt find the name', () => {
+      const res = findTimezoneByName(tzList, 'Melbourne');
 
       expect(res).toBeNull();
     });
 
-    it('returns null if there is no identifier given', () => {
-      expect(findTimezoneByIdentifier(tzList)).toBeNull();
-      expect(findTimezoneByIdentifier(tzList, '')).toBeNull();
+    it('returns null if there is no name given', () => {
+      expect(findTimezoneByName(tzList)).toBeNull();
+      expect(findTimezoneByName(tzList, '')).toBeNull();
     });
 
     it('returns null if there is an empty or invalid array given', () => {
-      expect(findTimezoneByIdentifier([], identifier)).toBeNull();
-      expect(findTimezoneByIdentifier(null, identifier)).toBeNull();
-      expect(findTimezoneByIdentifier(undefined, identifier)).toBeNull();
+      expect(findTimezoneByName([], name)).toBeNull();
+      expect(findTimezoneByName(null, name)).toBeNull();
+      expect(findTimezoneByName(undefined, name)).toBeNull();
     });
   });
 });

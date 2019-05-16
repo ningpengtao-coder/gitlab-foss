@@ -17,9 +17,12 @@ export const formatUtcOffset = offset => {
 
 export const formatTimezone = item => `[UTC ${formatUtcOffset(item.offset)}] ${item.name}`;
 
-export const findTimezoneByIdentifier = (tzList = [], identifier = null) => {
-  if (tzList && tzList.length && identifier && identifier.length) {
-    return tzList.find(tz => tz.identifier === identifier) || null;
+const normalizeString = str => str.toLowerCase().trim();
+
+export const findTimezoneByName = (tzList = [], name = null) => {
+  if (tzList && tzList.length && name && name.length) {
+    const n = normalizeString(name);
+    return tzList.find(tz => normalizeString(tz.name) === n) || null;
   }
   return null;
 };
@@ -35,7 +38,7 @@ export default class TimezoneDropdown {
     this.displayFormat = displayFormat || defaults.displayFormat;
 
     this.initialTimezone =
-      findTimezoneByIdentifier(this.timezoneData, this.$input.val()) || defaultTimezone;
+      findTimezoneByName(this.timezoneData, this.$input.val()) || defaultTimezone;
 
     this.initDefaultTimezone();
     this.initDropdown();
@@ -69,7 +72,7 @@ export default class TimezoneDropdown {
 
   updateInputValue({ selectedObj, e }) {
     e.preventDefault();
-    this.$input.val(selectedObj.identifier);
+    this.$input.val(selectedObj.name);
     if (this.onSelectTimezone) {
       this.onSelectTimezone({ selectedObj, e });
     }
