@@ -19,4 +19,9 @@ describe('ProjectCiPipelineStatus', () => {
   afterEach(() => {
     vm.$destroy();
   });
+
+  it('renders  without a path specified', () => {});
+
+  // TODO: project list item should check the path is derived correctly
+  it('renders  with a path specified', () => {});
 });
