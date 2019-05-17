@@ -14,7 +14,7 @@ module Gitlab
 
         def initialize(name:, classname:, execution_time:, status:, file: nil, system_output: nil, stack_trace: nil)
           @name = name
-          @classname = classname
+          @classname = classname.present? ? classname : file
           @file = file
           @execution_time = execution_time.to_f
           @status = status
