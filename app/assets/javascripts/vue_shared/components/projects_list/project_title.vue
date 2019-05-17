@@ -15,12 +15,12 @@ export default {
     },
   },
   computed: {
-    namespaceName: function() {
+    namespaceName() {
       return `${this.namespace} /`;
     },
-    path: function() {
+    path() {
       const { pathWithNamespace } = this;
-      return pathWithNamespace.charAt(0) == '/' ? pathWithNamespace : `/${pathWithNamespace}`;
+      return pathWithNamespace.charAt(0) === '/' ? pathWithNamespace : `/${pathWithNamespace}`;
     },
   },
 };
