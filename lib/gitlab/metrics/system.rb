@@ -33,10 +33,11 @@ module Gitlab
         end
 
         def self.process_start_time
-          start_time_in_jiffies = Sys::ProcTable.ps(pid: Process.pid).starttime
-          return 0 unless start_time_in_jiffies
+          stat_string = File.read('/proc/self/stat')
+          match = stat_string.scan(/\S*/).reject { |match| match.empty? }
+          return 0 unless match && match[21]
 
-          start_time_in_jiffies / 100
+          match[21].to_i / 100
         end
       else
         def self.memory_usage
