@@ -116,30 +116,6 @@ describe Gitlab::Ci::Parsers::Test::Junit do
         end
       end
 
-      context 'when there are two test cases without classname' do
-        let(:junit) do
-          <<-EOF.strip_heredoc
-            <testsuite>
-              <testcase name='sumTest1' time='0.01' file='./path/to/file1'></testcase>
-              <testcase name='sumTest2' time='0.02' file='./path/to/file2'></testcase>
-            </testsuite>
-          EOF
-        end
-
-        it 'parses XML and adds test cases to a suite defaulting classname to file attribute' do
-          expect { subject }.not_to raise_error
-
-          expect(test_cases[0].classname).to eq('./path/to/file1')
-          expect(test_cases[0].file).to eq('./path/to/file1')
-          expect(test_cases[0].name).to eq('sumTest1')
-          expect(test_cases[0].execution_time).to eq(0.01)
-          expect(test_cases[1].classname).to eq('./path/to/file2')
-          expect(test_cases[1].file).to eq('./path/to/file2')
-          expect(test_cases[1].name).to eq('sumTest2')
-          expect(test_cases[1].execution_time).to eq(0.02)
-        end
-      end
-
       context 'when there are two test suites' do
         let(:junit) do
           <<-EOF.strip_heredoc
