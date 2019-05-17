@@ -73,8 +73,8 @@ To display the Deploy Boards for a specific [environment] you should:
 1. Configure the [Kubernetes service][kube-service] in your project for the
    cluster. The Kubernetes namespace is of particular note as you will need it
    for your deployment scripts (exposed by the `KUBE_NAMESPACE` env variable).
-1. Ensure Kubernetes annotations of `app.gitlab.com/env: $CI_ENVIRONMENT_SLUG`
-   and `app.gitlab.com/app: $CI_PROJECT_PATH_SLUG` are applied to the
+1. Ensure Kubernetes annotations of `app.example.com/env: $CI_ENVIRONMENT_SLUG`
+   and `app.example.com/app: $CI_PROJECT_PATH_SLUG` are applied to the
    deployments, replica sets, and pods, where `$CI_ENVIRONMENT_SLUG` and
    `$CI_PROJECT_PATH_SLUG` are the values of the CI variables. This is so we can
    lookup the proper environment in a cluster/namespace which may have more
