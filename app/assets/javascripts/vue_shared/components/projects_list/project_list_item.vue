@@ -6,6 +6,7 @@ import ProjectCounts from './project_counts.vue';
 import ProjectAccess from './project_access.vue';
 import ProjectTitle from './project_title.vue';
 import ProjectVisibilityLevel from './project_visibility_level.vue';
+import ProjectCiPipelineStatus from './project_ci_pipeline_status.vue';
 
 /**
  * Renders a project list item
@@ -19,6 +20,7 @@ export default {
     ProjectAccess,
     ProjectTitle,
     ProjectVisibilityLevel,
+    ProjectCiPipelineStatus,
   },
   props: {
     isExploreProjectsTab: {
@@ -204,6 +206,11 @@ export default {
     visibilityDescription() {
       return this.project.visibility.description || null;
     },
+    hasPipelineAccess() {
+      // TODO: need to check this condition
+      // There should be prop for pipeline status access
+      return this.project.status && true;
+    },
   },
 };
 </script>
@@ -242,6 +249,7 @@ export default {
           :forks-count="totals.forksCount"
           :merge-requests-count="totals.mergeRequestsCount"
         />
+        <project-ci-pipeline-status v-if="hasPipelineAccess"/>
         <div class="updated-note">
           <span>
             Updated

@@ -1,6 +1,6 @@
 <script>
 import { s__, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
+import CIIcon from '~/vue_shared/components/ci_icon.vue';
 // TODO: should this poll for latest status?
 
 // - status            = local_assigns.fetch(:status)
@@ -11,7 +11,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
-    Icon,
+    CIIcon,
   },
   props: {
     status: {
@@ -65,8 +65,8 @@ export default {
 </script>
 <template>
   <div class="icon-wrapper pipeline-status">
-    <span class="{{cssClasses}}" :title="title" data-placement="{{tooltipPlacement}}">
-      <icon :name="iconName" :size="size" css-classes="append-right-4"/>
+    <span :class="cssClasses" :title="title" data-placement="tooltipPlacement">
+      <ci-icon :status="iconName" :borderless="true" :size="size" css-classes="append-right-4"/>
     </span>
   </div>
 </template>

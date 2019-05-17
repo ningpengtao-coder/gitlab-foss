@@ -32,7 +32,7 @@
     -# maybe load merge request count here
     - if Feature.enabled?(:vue_projects_list)
       -# Mount vue app
-      %ul.vjs-projects-list{ class: css_classes, data: { projects: projects_data_json(projects) } }
+      %ul.vjs-projects-list{ class: css_classes, data: { projects: projects_data_json(projects, current_user) } }
       = paginate_collection(projects, remote: remote) unless skip_pagination
     - else
       %ul.projects-list{ class: css_classes }

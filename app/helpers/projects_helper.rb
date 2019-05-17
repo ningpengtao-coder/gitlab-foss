@@ -632,24 +632,26 @@ module ProjectsHelper
       !project.repository.gitlab_ci_yml
   end
 
-  def project_additional_fields(project)
+  def project_additional_fields(project, current_user)
+    # has_pipeline_status_access = pipeline_status && can?(current_user, :read_cross_project) && project.pipeline_status.has_status? && can?(current_user, :read_build, project),
     additional_fields = {
       # TODO: namespace is not always correct
       # for cases where we are the owner we should have the 'owner' object available
-      namespace: project.namespace, 
+      namespace: project.namespace,
       open_merge_requests_count: project.open_merge_requests_count,
       open_issues_count: project.open_issues_count,
+      # status: project.commit.last_pipeline.detailed_status(current_user),
+      # owner: project.owner,
       visibility: {
         level: project.visibility_level,
         description: visibility_icon_description(project)
       }
-      # owner: project.owner
     }
     project.as_json.merge(additional_fields)
   end
 
-  def projects_data_json(projects)
-    projects = projects.to_a.map { |project| project_additional_fields(project) }
+  def projects_data_json(projects, current_user)
+    projects = projects.to_a.map { |project| project_additional_fields(project, current_user) }
 
     projects.to_json.html_safe
   end
