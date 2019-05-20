@@ -23,6 +23,7 @@ module Gitlab
         def self.file_descriptor_count
           Dir.glob('/proc/self/fd/*').length
         end
+<<<<<<< HEAD
 
         def self.max_open_file_descriptors
           match = File.read('/proc/self/limits').match(/Max open files\s*(\d+)/)
@@ -37,20 +38,14 @@ module Gitlab
 
           ( fields[21].to_i || 0 ) / clk_tck
         end
+=======
+>>>>>>> master
       else
         def self.memory_usage
           0.0
         end
 
         def self.file_descriptor_count
-          0
-        end
-
-        def self.max_open_file_descriptors
-          0
-        end
-
-        def self.process_start_time
           0
         end
       end

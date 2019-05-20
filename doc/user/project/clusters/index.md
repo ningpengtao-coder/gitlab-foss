@@ -19,8 +19,10 @@ or provide the credentials to an [existing Kubernetes cluster](#adding-an-existi
 
 NOTE: **Note:**
 From [GitLab 11.6](https://gitlab.com/gitlab-org/gitlab-ce/issues/34758) you
-can also associate a Kubernetes cluster to your groups. Learn more about
-[group Kubernetes clusters](../../group/clusters/index.md).
+can also associate a Kubernetes cluster to your groups and from
+[GitLab 11.11](https://gitlab.com/gitlab-org/gitlab-ce/issues/39840),
+to the GitLab instance. Learn more about [group-level](../../group/clusters/index.md)
+and [instance-level](../../instance/clusters/index.md) Kubernetes clusters.
 
 ## Adding and creating a new GKE cluster via GitLab
 
@@ -674,11 +676,6 @@ To remove the Kubernetes cluster integration from your project, simply click the
 **Remove integration** button. You will then be able to follow the procedure
 and add a Kubernetes cluster again.
 
-## View Kubernetes pod logs from GitLab **[ULTIMATE]**
-
-Learn how to easily
-[view the logs of running pods in connected Kubernetes clusters](kubernetes_pod_logs.md).
-
 ## What you can get with the Kubernetes integration
 
 Here's what you can do with GitLab if you enable the Kubernetes integration.
@@ -700,6 +697,12 @@ and visualize your canary deployments right inside the Deploy Board, without
 the need to leave GitLab.
 
 [Read more about Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html)
+
+### Pod logs **[ULTIMATE]**
+
+GitLab makes it easy to view the logs of running pods in connected Kubernetes clusters. By displaying the logs directly in GitLab, developers can avoid having to manage console tools or jump to a different interface.
+
+[Read more about Kubernetes pod logs](kubernetes_pod_logs.md)
 
 ### Kubernetes monitoring
 
