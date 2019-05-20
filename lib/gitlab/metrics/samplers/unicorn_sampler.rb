@@ -58,7 +58,7 @@ module Gitlab
         end
 
         def unicorn_workers_count
-          Sys::ProcTable.ps(smaps: false).select {|p| p.cmdline.match(/unicorn_rails worker.+ #{Rails.root.to_s}/)}.count
+          `pgrep -f '[u]nicorn_rails worker.+ #{Rails.root.to_s}'`.split.count
         end
       end
     end
