@@ -3301,6 +3301,7 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.string "timezone"
     t.boolean "time_display_relative"
     t.boolean "time_format_in_24h"
+    t.string "timezone_name"
     t.integer "epic_notes_filter", limit: 2, default: 0, null: false
     t.string "epics_sort"
     t.integer "roadmap_epics_state"

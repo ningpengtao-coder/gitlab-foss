@@ -79,4 +79,10 @@ describe UserPreference do
       expect(user_preference.timezone).to eq(Time.zone.tzinfo.name)
     end
   end
+
+  describe '#timezone_name' do
+    it 'returns server time as default' do
+      expect(user_preference.timezone_name).to eq(Time.zone.name)
+    end
+  end
 end
