@@ -69,7 +69,7 @@ module Gitlab
           Grpc::Health::V1::Health::Stub
         else
           # TODO use pages namespace
-          Gitaly.const_get(name.to_s.camelcase.to_sym).const_get(:Stub)
+          Gitaly.const_get(name.to_s.camelcase.to_sym, false).const_get(:Stub, false)
         end
       end
 
