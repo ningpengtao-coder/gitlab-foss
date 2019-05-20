@@ -29,8 +29,11 @@ class Commit
   DIFF_SAFE_LINES = Gitlab::Git::DiffCollection::DEFAULT_LIMITS[:max_lines]
 
   # Commits above this size will not be rendered in HTML
-  DIFF_HARD_LIMIT_FILES = 1000
-  DIFF_HARD_LIMIT_LINES = 50000
+  DIFF_HARD_LIMIT_FILES = 1_000
+  DIFF_HARD_LIMIT_LINES = 50_000
+
+  INITIAL_FILES_BATCH = 200
+  FILES_PER_BATCH = 25
 
   MIN_SHA_LENGTH = Gitlab::Git::Commit::MIN_SHA_LENGTH
   COMMIT_SHA_PATTERN = /\h{#{MIN_SHA_LENGTH},40}/.freeze
@@ -442,6 +445,10 @@ class Commit
 
   def diffs(diff_options = {})
     Gitlab::Diff::FileCollection::Commit.new(self, diff_options: diff_options)
+  end
+
+  def diffs_per_batch(diff_options = {})
+    Gitlab::Diff::FileCollection::Batch.new(self, diff_options: diff_options)
   end
 
   def persisted?

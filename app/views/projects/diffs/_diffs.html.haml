@@ -26,3 +26,5 @@
 
 .files{ data: { can_create_note: can_create_note } }
   = render partial: 'projects/diffs/file', collection: diff_files, as: :diff_file, locals: { project: diffs.project, environment: environment, diff_page_context: diff_page_context }
+
+  .next-batch-section{ data: { next_batch: 1 } }

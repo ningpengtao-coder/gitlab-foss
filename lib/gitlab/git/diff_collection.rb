@@ -52,7 +52,6 @@ module Gitlab
         end
 
         @populated = true
-
         # Allow iterator to be garbage-collected. It cannot be reused anyway.
         @iterator = nil
       end
@@ -85,6 +84,15 @@ module Gitlab
         collection = each_with_index do |element, i|
           @array[i] = yield(element)
         end
+        collection
+      end
+
+      def decorate_batch!(start_diff, end_diff)
+        collection = each_with_index do |element, i|
+          @array[i] = yield(element)
+        end
+
+        @array = @array[start_diff..end_diff]
         collection
       end
 

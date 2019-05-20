@@ -17,6 +17,7 @@ class Projects::CommitController < Projects::ApplicationController
   before_action :define_commit_vars, only: [:show, :diff_for_path, :pipelines, :merge_requests]
   before_action :define_note_vars, only: [:show, :diff_for_path]
   before_action :authorize_edit_tree!, only: [:revert, :cherry_pick]
+  before_action :define_gon_variables, only: [:show]
 
   BRANCH_SEARCH_LIMIT = 1000
 
@@ -38,6 +39,13 @@ class Projects::CommitController < Projects::ApplicationController
 
   def diff_for_path
     render_diff_for_path(@commit.diffs(diff_options))
+  end
+
+  def diff_for_paths
+    batch_number = params[:batch_number].to_i
+
+    render_diff_for_paths(
+      commit, project, environment_for_batch_diff, batch_number)
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -147,7 +155,7 @@ class Projects::CommitController < Projects::ApplicationController
     opts = diff_options
     opts[:ignore_whitespace_change] = true if params[:format] == 'diff'
 
-    @diffs = commit.diffs(opts)
+    @diffs = commit.diffs_per_batch(opts)
     @notes_count = commit.notes.count
 
     @environment = EnvironmentsFinder.new(@project, current_user, commit: @commit).execute.last
@@ -191,5 +199,22 @@ class Projects::CommitController < Projects::ApplicationController
   def assign_change_commit_vars
     @start_branch = params[:start_branch]
     @commit_params = { commit: @commit }
+  end
+
+  def environment_for_batch_diff
+    @environment ||= EnvironmentsFinder.new(@project, current_user, commit: @commit).execute.last
+  end
+
+  def define_gon_variables
+    gon.push(commit_gon_variables)
+  end
+
+  def commit_gon_variables
+    return {} unless commit.deltas.size > ::Commit::INITIAL_FILES_BATCH
+
+    {
+      project_full_path: project.full_path,
+      commit_sha: params[:id]
+    }
   end
 end

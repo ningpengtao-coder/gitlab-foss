@@ -178,6 +178,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :cherry_pick
           get :diff_for_path
           get :merge_requests
+          get :diff_for_paths
         end
       end
 
