@@ -70,7 +70,7 @@ are very appreciative of the work done by translators and proofreaders!
   - Filip Mech - [GitLab](https://gitlab.com/mehenz), [Crowdin](https://crowdin.com/profile/mehenz)
   - Maksymilian Roman - [GitLab](https://gitlab.com/villaincandle), [Crowdin](https://crowdin.com/profile/villaincandle)
 - Portuguese
-  - Proofreaders needed.
+  - Filipa Lacerda - [GitLab](https://gitlab.com/filipa), [Crowdin](https://crowdin.com/profile/filipalacerda)
 - Portuguese, Brazilian
   - Paulo George Gomes Bezerra - [GitLab](https://gitlab.com/paulobezerra), [Crowdin](https://crowdin.com/profile/paulogomes.rep)
   - André Gama - [GitLab](https://gitlab.com/andregamma), [Crowdin](https://crowdin.com/profile/ToeOficial)
