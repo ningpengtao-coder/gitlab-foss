@@ -18,6 +18,8 @@ sast:
   variables:
     SAST_CONFIDENCE_LEVEL: 2
     DOCKER_DRIVER: overlay2
+    SAST_DEFAULT_ANALYZERS: bandit,brakeman,gosec,spotbugs,flawfinder,phpcs-security-audit,security-code-scan,nodejs-scan,eslint,tslint,sobelow
+    SAST_ANALYZER_IMAGES: registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:60879-add-logging-for-timeout-test
   allow_failure: true
   tags: []
   before_script: []
