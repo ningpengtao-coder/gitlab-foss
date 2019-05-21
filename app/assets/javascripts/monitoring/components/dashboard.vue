@@ -16,7 +16,6 @@ import { getParameterValues } from '~/lib/utils/url_utility';
 import MonitorAreaChart from './charts/area.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
-import MonitoringStore from '../stores/monitoring_store';
 import { timeWindows, timeWindowsKeyNames } from '../constants';
 import { getTimeDiff } from '../utils';
 
@@ -127,7 +126,6 @@ export default {
   },
   data() {
     return {
-      store: new MonitoringStore(),
       state: 'gettingStarted',
       elWidth: 0,
       selectedTimeWindow: '',

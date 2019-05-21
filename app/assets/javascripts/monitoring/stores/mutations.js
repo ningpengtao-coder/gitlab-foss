@@ -22,10 +22,10 @@ export default {
     state.showEmptyState = true;
   },
   [types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS](state, deployments) {
-    state.deployments = deployments;
+    state.deploymentData = deployments;
   },
   [types.RECEIVE_DEPLOYMENTS_DATA_FAILURE](state) {
-    state.deployments = [];
+    state.deploymentData = [];
   },
   [types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS](state, environments) {
     state.environments = environments;
