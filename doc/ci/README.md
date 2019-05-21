@@ -142,6 +142,7 @@ See also:
 
 - [How to enable or disable GitLab CI/CD](enable_or_disable_ci.md).
 - Other [CI administration settings](../administration/index.md#continuous-integration-settings).
+- [The life of a GitLab CI/CD job](life_of_a_job.md)
 
 ## References
 
