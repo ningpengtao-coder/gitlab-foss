@@ -25,7 +25,7 @@ sast:
   dependencies: []
   services:
     - name: docker:stable-dind
-      command: ["dockerd-entrypoint.sh", "--debug"]
+      command: ['sh', '-c', 'dockerd-entrypoint.sh --debug --log-level debug > /var/log/docker.log']
   script:
     - | # this is required to avoid undesirable reset of Docker image ENV variables being set on build stage
       function propagate_env_vars() {
@@ -54,6 +54,8 @@ sast:
         --volume /var/run/docker.sock:/var/run/docker.sock \
         "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
   artifacts:
+    paths:
+      - /var/log/docker.log
     reports:
       sast: gl-sast-report.json
 
