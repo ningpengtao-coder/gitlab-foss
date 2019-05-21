@@ -6646,3 +6646,112 @@ export const environmentData = [
     updated_at: '2018-07-04T18:44:54.010Z',
   },
 ];
+
+export const prometheusResponse = {
+  status: 'success',
+  data: {
+    resultType: 'matrix',
+    result: [
+      {
+        metric: {},
+        values: [
+          [1557216349.469, '0.0013940700438235603'],
+          [1557216409.469, '0.0013866308214816488'],
+          [1557216469.469, '0.0014076908114401257'],
+          [1557216529.469, '0.0014070431059819062'],
+          [1557216589.469, '0.0014194252032786762'],
+          [1557216649.469, '0.0014284368192734728'],
+          [1557216709.469, '0.0014179851582671135'],
+          [1557216769.469, '0.0014142393670518944'],
+          [1557216829.469, '0.0014172577980771798'],
+          [1557216889.469, '0.001405881992538854'],
+          [1557216949.469, '0.001412888878418782'],
+          [1557217009.469, '0.00140951717399134'],
+          [1557217069.469, '0.0014173608243869776'],
+          [1557217129.469, '0.0014198574603643387'],
+          [1557217189.469, '0.001420787889700752'],
+          [1557217249.469, '0.0014301384268234354'],
+          [1557217309.469, '0.0014256178407230317'],
+          [1557217369.469, '0.0014296477428718938'],
+          [1557217429.469, '0.0014266392798753637'],
+          [1557217489.469, '0.0014266524150040227'],
+          [1557217549.469, '0.001428644714068666'],
+          [1557217609.469, '0.00142206374505186'],
+          [1557217669.469, '0.0014308234494760817'],
+          [1557217729.469, '0.001431052704857817'],
+          [1557217789.469, '0.0014273940893436486'],
+          [1557217849.469, '0.0014255524681403853'],
+          [1557217909.469, '0.0014121438656018127'],
+          [1557217969.469, '0.0014209374212083297'],
+          [1557218029.469, '0.0014256111867912457'],
+          [1557218089.469, '0.0014383075668145547'],
+          [1557218149.469, '0.001409471231682243'],
+        ],
+      },
+    ],
+  },
+};
+
+export const metricsDashboardResponse = {
+  dashboard: {
+    dashboard: 'Environment metrics',
+    priority: 1,
+    panel_groups: [
+      {
+        group: 'System metrics (Kubernetes)',
+        priority: 5,
+        panels: [
+          {
+            title: 'Memory Usage (Total)',
+            type: 'area-chart',
+            y_label: 'Total Memory Used',
+            weight: 4,
+            metrics: [
+              {
+                id: 'system_metrics_kubernetes_container_memory_total',
+                query_range:
+                  'avg(sum(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-(.*)",namespace="%{kube_namespace}"}) by (job)) without (job)  /1024/1024/1024',
+                label: 'Total',
+                unit: 'GB',
+                metric_id: 12,
+              },
+            ],
+          },
+          {
+            title: 'Core Usage (Total)',
+            type: 'area-chart',
+            y_label: 'Total Cores',
+            weight: 3,
+            metrics: [
+              {
+                id: 'system_metrics_kubernetes_container_cores_total',
+                query_range:
+                  'avg(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",pod_name=~"^%{ci_environment_slug}-(.*)",namespace="%{kube_namespace}"}[15m])) by (job)) without (job)',
+                label: 'Total',
+                unit: 'cores',
+                metric_id: 13,
+              },
+            ],
+          },
+          {
+            title: 'Memory Usage (Pod average)',
+            type: 'area-chart',
+            y_label: 'Memory Used per Pod',
+            weight: 2,
+            metrics: [
+              {
+                id: 'system_metrics_kubernetes_container_memory_average',
+                query_range:
+                  'avg(sum(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-(.*)",namespace="%{kube_namespace}"}) by (job)) without (job) / count(avg(container_memory_usage_bytes{container_name!="POD",pod_name=~"^%{ci_environment_slug}-(.*)",namespace="%{kube_namespace}"}) without (job)) /1024/1024',
+                label: 'Pod average',
+                unit: 'MB',
+                metric_id: 14,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  status: 'success',
+};
