@@ -80,10 +80,6 @@ $note-form-margin-left: 72px;
     }
   }
 
-  li.note {
-    border-bottom: 1px solid $border-color;
-  }
-
   .replies-toggle {
     background-color: $gray-light;
     padding: $gl-padding-8 $gl-padding;
@@ -93,7 +89,6 @@ $note-form-margin-left: 72px;
     }
 
     &.expanded {
-      border-bottom: 1px solid $border-color;
 
       span {
         cursor: pointer;
