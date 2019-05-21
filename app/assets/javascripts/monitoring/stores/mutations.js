@@ -42,4 +42,7 @@ export default {
   [types.SET_DEPLOYMENTS_ENDPOINT](state, endpoint) {
     state.deploymentsEndpoint = endpoint;
   },
+  [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
+    state.emptyState = 'gettingStarted';
+  },
 };

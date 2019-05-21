@@ -162,7 +162,7 @@ export default {
   },
   mounted() {
     if (!this.hasMetrics) {
-      // this.state = 'gettingStarted'; TODO: Do this via Vuex
+      this.setGettingStartedEmptyState();
     } else {
       this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours));
       this.fetchDeploymentsData();
@@ -184,6 +184,7 @@ export default {
       'setMetricsEndpoint',
       'setDeploymentsEndpoint',
       'setEnvironmentsEndpoint',
+      'setGettingStartedEmptyState',
     ]),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};

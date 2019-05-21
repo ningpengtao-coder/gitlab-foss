@@ -39,6 +39,10 @@ export const setEnvironmentsEndpoint = ({ commit }, environmentsEndpoint) => {
   commit(types.SET_ENVIRONMENTS_ENDPOINT, environmentsEndpoint);
 };
 
+export const setGettingStartedEmptyState = ({ commit }) => {
+  commit(types.SET_GETTING_STARTED_EMPTY_STATE);
+};
+
 export const requestMetricsData = ({ commit }) => commit(types.REQUEST_METRICS_DATA);
 export const receiveMetricsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);

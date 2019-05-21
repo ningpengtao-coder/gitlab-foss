@@ -9,6 +9,7 @@ import {
   setMetricsEndpoint,
   setEnvironmentsEndpoint,
   setDeploymentsEndpoint,
+  setGettingStartedEmptyState,
 } from '~/monitoring/stores/actions';
 import storeState from '~/monitoring/stores/state';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -147,6 +148,25 @@ describe('Monitoring store actions', () => {
         'deployments.json',
         mockedState,
         [{ type: types.SET_DEPLOYMENTS_ENDPOINT, payload: 'deployments.json' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('Set empty states', () => {
+    let mockedState;
+
+    beforeEach(() => {
+      mockedState = storeState();
+    });
+
+    it('should commit SET_METRICS_ENDPOINT mutation', done => {
+      testAction(
+        setGettingStartedEmptyState,
+        null,
+        mockedState,
+        [{ type: types.SET_GETTING_STARTED_EMPTY_STATE }],
         [],
         done,
       );
