@@ -24,7 +24,8 @@ sast:
   cache: {}
   dependencies: []
   services:
-    - docker:stable-dind
+    - name: docker:stable-dind
+      command: ["dockerd-entrypoint.sh", "--debug"]
   script:
     - | # this is required to avoid undesirable reset of Docker image ENV variables being set on build stage
       function propagate_env_vars() {
