@@ -258,8 +258,14 @@ ul.related-merge-requests > li {
   }
 }
 
-.discussion-reply-holder .note-edit-form {
-  display: block;
+.discussion-reply-holder {
+  .note-edit-form {
+    display: block;
+  }
+
+  .avatar-note-form-holder .note-edit-form {
+    margin-left: 55px;
+  }
 }
 
 .issue-sort-dropdown {
