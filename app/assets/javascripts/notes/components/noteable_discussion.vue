@@ -419,7 +419,7 @@ Please check your network connection and try again.`;
                       @cancelForm="cancelReplyForm"
                     />
                   </div>
-                  <note-signed-out-widget v-if="!userCanReply"/>
+                  <note-signed-out-widget v-if="!userCanReply" />
                 </div>
               </template>
             </discussion-notes>

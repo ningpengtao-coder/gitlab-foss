@@ -43,7 +43,13 @@ export default {
       diffViewType: state => state.diffs.diffViewType,
     }),
     ...mapGetters('diffs', ['getDiffFileByHash']),
-    ...mapGetters(['isLoggedIn', 'noteableType', 'getNoteableData', 'getNotesDataByProp', 'getUserData']),
+    ...mapGetters([
+      'isLoggedIn',
+      'noteableType',
+      'getNoteableData',
+      'getNotesDataByProp',
+      'getUserData',
+    ]),
     currentUser() {
       return this.getUserData;
     },
