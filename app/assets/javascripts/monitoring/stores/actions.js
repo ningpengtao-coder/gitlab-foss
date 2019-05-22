@@ -27,20 +27,12 @@ function backOffRequest(makeRequestCallback) {
   });
 }
 
-export const setMetricsEndpoint = ({ commit }, metricsEndpoint) => {
-  commit(types.SET_METRICS_ENDPOINT, metricsEndpoint);
-};
-
-export const setDeploymentsEndpoint = ({ commit }, deploymentsEndpoint) => {
-  commit(types.SET_DEPLOYMENTS_ENDPOINT, deploymentsEndpoint);
-};
-
-export const setEnvironmentsEndpoint = ({ commit }, environmentsEndpoint) => {
-  commit(types.SET_ENVIRONMENTS_ENDPOINT, environmentsEndpoint);
-};
-
 export const setGettingStartedEmptyState = ({ commit }) => {
   commit(types.SET_GETTING_STARTED_EMPTY_STATE);
+};
+
+export const setEndpoints = ({ commit }, endpoints) => {
+  commit(types.SET_ENDPOINTS, endpoints);
 };
 
 export const requestMetricsData = ({ commit }) => commit(types.REQUEST_METRICS_DATA);
@@ -48,6 +40,20 @@ export const receiveMetricsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);
 export const receiveMetricsDataFailure = ({ commit }, error) =>
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
+export const receiveDeploymentsDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, data);
+export const receiveDeploymentsDataFailure = ({ commit }) =>
+  commit(types.RECEIVE_DEPLOYMENTS_DATA_FAILURE);
+export const receiveEnvironmentsDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, data);
+export const receiveEnvironmentsDataFailure = ({ commit }) =>
+  commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
+
+export const fetchData = ({ dispatch }, params) => {
+  dispatch('fetchMetricsData', params);
+  dispatch('fetchDeploymentsData');
+  dispatch('fetchEnvironmentsData');
+};
 
 export const fetchMetricsData = ({ state, dispatch }, params) => {
   dispatch('requestMetricsData');
@@ -67,7 +73,7 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
     });
 };
 
-export const fetchDeploymentsData = ({ state, commit }) => {
+export const fetchDeploymentsData = ({ state, dispatch }) => {
   if (!state.deploymentEndpoint) {
     return Promise.resolve([]);
   }
@@ -78,15 +84,15 @@ export const fetchDeploymentsData = ({ state, commit }) => {
         createFlash(s__('Metrics|Unexpected deployment data response from prometheus endpoint'));
       }
 
-      commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, response.deployments);
+      dispatch('receiveDeploymentsDataSuccess', response.deployments);
     })
     .catch(() => {
-      commit(types.RECEIVE_DEPLOYMENTS_DATA_FAILURE);
+      dispatch('receiveDeploymentsDataFailure');
       createFlash(s__('Metrics|There was an error getting deployment information.'));
     });
 };
 
-export const fetchEnvironmentsData = ({ state, commit }) => {
+export const fetchEnvironmentsData = ({ state, dispatch }) => {
   if (!state.environmentsEndpoint) {
     return Promise.resolve([]);
   }
@@ -99,10 +105,10 @@ export const fetchEnvironmentsData = ({ state, commit }) => {
           s__('Metrics|There was an error fetching the environments data, please try again'),
         );
       }
-      commit(types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS, response.environments);
+      dispatch('receiveEnvironmentsDataSuccess', response.environments);
     })
     .catch(() => {
-      commit(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
+      dispatch('receiveEnvironmentsDataFailure');
       createFlash(s__('Metrics|There was an error getting environments information.'));
     });
 };

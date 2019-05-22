@@ -11,7 +11,8 @@ export default {
       ...group,
       metrics: normalizeMetrics(sortMetrics(group.metrics)),
     }));
-    if (state.groups.length < 1) {
+
+    if (!state.groups.length) {
       state.emptyState = 'noData';
     } else {
       state.showEmptyState = false;
@@ -33,14 +34,10 @@ export default {
   [types.RECEIVE_ENVIRONMENTS_DATA_FAILURE](state) {
     state.environments = [];
   },
-  [types.SET_METRICS_ENDPOINT](state, endpoint) {
-    state.metricsEndpoint = endpoint;
-  },
-  [types.SET_ENVIRONMENTS_ENDPOINT](state, endpoint) {
-    state.environmentsEndpoint = endpoint;
-  },
-  [types.SET_DEPLOYMENTS_ENDPOINT](state, endpoint) {
-    state.deploymentsEndpoint = endpoint;
+  [types.SET_ENDPOINTS](state, endpoints) {
+    state.metricsEndpoint = endpoints.metricsEndpoint;
+    state.environmentsEndpoint = endpoints.environmentsEndpoint;
+    state.deploymentsEndpoint = endpoints.deploymentsEndpoint;
   },
   [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
     state.emptyState = 'gettingStarted';

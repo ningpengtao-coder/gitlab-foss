@@ -76,22 +76,16 @@ describe('Monitoring mutations', () => {
     });
   });
 
-  describe('SET_X_ENDPOINT', () => {
-    it('should set the metrics endpoint', () => {
-      mutations[types.SET_METRICS_ENDPOINT](stateCopy, 'additional_metrics.json');
+  describe('SET_ENDPOINTS', () => {
+    it('should set all the endpoints', () => {
+      mutations[types.SET_ENDPOINTS](stateCopy, {
+        metricsEndpoint: 'additional_metrics.json',
+        environmentsEndpoint: 'environments.json',
+        deploymentsEndpoint: 'deployments.json',
+      });
 
       expect(stateCopy.metricsEndpoint).toEqual('additional_metrics.json');
-    });
-
-    it('should set the environments endpoint', () => {
-      mutations[types.SET_ENVIRONMENTS_ENDPOINT](stateCopy, 'environments.json');
-
       expect(stateCopy.environmentsEndpoint).toEqual('environments.json');
-    });
-
-    it('should set the deployments endpoint', () => {
-      mutations[types.SET_DEPLOYMENTS_ENDPOINT](stateCopy, 'deployments.json');
-
       expect(stateCopy.deploymentsEndpoint).toEqual('deployments.json');
     });
   });

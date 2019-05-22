@@ -15,16 +15,17 @@ describe('Area component', () => {
 
   beforeEach(() => {
     const store = createStore();
-    store.commit(types.RECEIVE_METRICS_DATA_SUCCESS, MonitoringMock.data);
-    store.commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, deploymentData);
 
-    [mockGraphData] = store.state.groups[0].metrics;
+    store.commit(`monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`, MonitoringMock.data);
+    store.commit(`monitoringDashboard/${types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS}`, deploymentData);
+
+    [mockGraphData] = store.state.monitoringDashboard.groups[0].metrics;
 
     areaChart = shallowMount(Area, {
       propsData: {
         graphData: mockGraphData,
         containerWidth: 0,
-        deploymentData: store.state.deployments,
+        deploymentData: store.state.monitoringDashboard.deploymentData,
       },
       slots: {
         default: mockWidgets,

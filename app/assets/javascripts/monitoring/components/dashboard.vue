@@ -137,12 +137,20 @@ export default {
     canAddMetrics() {
       return this.customMetricsAvailable && this.customMetricsPath.length;
     },
-    ...mapState(['groups', 'emptyState', 'showEmptyState', 'environments', 'deploymentData']),
+    ...mapState('monitoringDashboard', [
+      'groups',
+      'emptyState',
+      'showEmptyState',
+      'environments',
+      'deploymentData',
+    ]),
   },
   created() {
-    this.setMetricsEndpoint(this.metricsEndpoint);
-    this.setDeploymentsEndpoint(this.deploymentEndpoint);
-    this.setEnvironmentsEndpoint(this.environmentsEndpoint);
+    this.setEndpoints({
+      metricsEndpoint: this.metricsEndpoint,
+      environmentsEndpoint: this.environmentsEndpoint,
+      deploymentsEndpoint: this.deploymentEndpoint,
+    });
 
     this.timeWindows = timeWindows;
     this.selectedTimeWindowKey =
@@ -164,9 +172,7 @@ export default {
     if (!this.hasMetrics) {
       this.setGettingStartedEmptyState();
     } else {
-      this.fetchMetricsData(getTimeDiff(this.timeWindows.eightHours));
-      this.fetchDeploymentsData();
-      this.fetchEnvironmentsData();
+      this.fetchData(getTimeDiff(this.timeWindows.eightHours));
 
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
@@ -177,14 +183,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
-      'fetchDeploymentsData',
-      'fetchEnvironmentsData',
-      'fetchMetricsData',
-      'setMetricsEndpoint',
-      'setDeploymentsEndpoint',
-      'setEnvironmentsEndpoint',
+    ...mapActions('monitoringDashboard', [
+      'fetchData',
       'setGettingStartedEmptyState',
+      'setEndpoints',
     ]),
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
