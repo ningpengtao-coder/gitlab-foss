@@ -168,6 +168,16 @@
 
 .discussion-form {
   background-color: $white-light;
+
+  @media (max-width: map-get($grid-breakpoints, sm)-1) {
+    .user-avatar-link {
+      display: none;
+    }
+
+    .note-edit-form {
+      margin-left: 0;
+    }
+  }
 }
 
 table {
@@ -240,6 +250,12 @@ table {
 
     &.is-replying {
       padding-bottom: $gl-padding;
+    }
+
+    @media (max-width: map-get($grid-breakpoints, sm)-1) {
+      .user-avatar-link {
+        display: none;
+      }
     }
   }
 }

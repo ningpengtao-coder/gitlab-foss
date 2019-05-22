@@ -265,6 +265,10 @@ ul.related-merge-requests > li {
 
   .avatar-note-form-holder .note-edit-form {
     margin-left: 55px;
+
+    @media (max-width: map-get($grid-breakpoints, sm)-1) {
+      margin-left: 0;
+    }
   }
 }
 
