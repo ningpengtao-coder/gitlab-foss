@@ -13,8 +13,16 @@ You are strongly encouraged to get your code **reviewed** by a
 [reviewer](https://about.gitlab.com/handbook/engineering/workflow/code-review/#reviewer) as soon as
 there is any code to review, to get a second opinion on the chosen solution and
 implementation, and an extra pair of eyes looking for bugs, logic problems, or
-uncovered edge cases. The reviewer can be from a different team, but it is
-recommended to pick someone who knows the domain well. You can read more about the
+uncovered edge cases.
+
+Usually, the reviewer should be someone who knows the domain well,
+which is one of the team members corresponding to the feature label. For example,
+if the merge request is labled ~Release, then you should pick one of [the team members](https://about.gitlab.com/handbook/engineering/ops/release/),
+since they know about the functionalities better than the other team members, you'd be able to get more thoughtful opinions.
+If you cannot find a relevant person or the merge request doesn't warrant a team label, you can ask one of the code owners for the review.
+If you still cannot find a relevant person, please choose someone from [our dedicated reviewers](https://about.gitlab.com/handbook/engineering/projects/)
+
+You can read more about the
 importance of involving reviewer(s) in the section on the responsibility of the author below.
 
 If you need some guidance (e.g. it's your first merge request), feel free to ask
