@@ -87,7 +87,7 @@ export default {
       'unresolvedDiscussionsCount',
       'hasUnresolvedDiscussions',
       'showJumpToNextDiscussion',
-      'getUserData'
+      'getUserData',
     ]),
     currentUser() {
       return this.getUserData;
@@ -399,10 +399,7 @@ Please check your network connection and try again.`;
                     @resolve="resolveHandler"
                     @jumpToNextDiscussion="jumpToNextDiscussion"
                   />
-                  <div
-                    v-if="isReplying"
-                    class="avatar-note-form-holder"
-                  >
+                  <div v-if="isReplying" class="avatar-note-form-holder">
                     <user-avatar-link
                       v-if="currentUser"
                       :link-href="currentUser.path"
