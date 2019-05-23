@@ -219,3 +219,4 @@ Style/SymbolProc:
   Enabled: true
   IgnoredMethods:
     - tap # see: https://github.com/rubocop-hq/rubocop/issues/5098
+    - respond_to

@@ -193,7 +193,7 @@ module CacheMarkdownField
       # The HTML becomes invalid if any dependent fields change. For now, assume
       # author and project invalidate the cache in all circumstances.
       define_method(invalidation_method) do
-        changed_fields = changed_attributes.keys
+        changed_fields = saved_changes.keys
         invalidations  = changed_fields & [markdown_field.to_s, *INVALIDATED_BY]
         invalidations.delete(markdown_field.to_s) if changed_fields.include?("#{markdown_field}_html")
 
