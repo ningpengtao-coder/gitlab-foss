@@ -829,13 +829,6 @@ Style/StderrPuts:
 Style/StringLiteralsInInterpolation:
   Enabled: false
 
-# Offense count: 187
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoredMethods.
-# IgnoredMethods: respond_to, define_method
-Style/SymbolProc:
-  Enabled: false
-
 # Offense count: 7
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, AllowSafeAssignment.

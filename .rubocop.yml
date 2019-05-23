@@ -211,3 +211,9 @@ ActiveRecordAssociationReload:
   Exclude:
     - 'spec/**/*'
     - 'ee/spec/**/*'
+
+# Cop supports --auto-correct.
+# Configuration parameters: IgnoredMethods.
+# IgnoredMethods: respond_to, define_method
+Style/SymbolProc:
+  Enabled: true
