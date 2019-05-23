@@ -8,7 +8,6 @@ import {
   requestMetricsData,
   setEndpoints,
   setGettingStartedEmptyState,
-  fetchData,
 } from '~/monitoring/stores/actions';
 import storeState from '~/monitoring/stores/state';
 import testAction from 'spec/helpers/vuex_action_helper';
