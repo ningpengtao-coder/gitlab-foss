@@ -68,7 +68,7 @@ module API
       end
 
       def redis_ping
-        result = Gitlab::Redis::SharedState.with(&:ping)
+        result = Gitlab::Redis::SharedState.with(&:ping) # rubocop:disable CodeReuse/ActiveRecord (SharedState is not an AR model)
 
         result == 'PONG'
       rescue => e

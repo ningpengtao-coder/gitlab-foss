@@ -217,3 +217,5 @@ ActiveRecordAssociationReload:
 # IgnoredMethods: respond_to, define_method
 Style/SymbolProc:
   Enabled: true
+  IgnoredMethods:
+    - tap # see: https://github.com/rubocop-hq/rubocop/issues/5098
