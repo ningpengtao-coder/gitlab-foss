@@ -252,8 +252,12 @@ table {
       padding-bottom: $gl-padding;
     }
 
-    @media (max-width: map-get($grid-breakpoints, sm)-1) {
-      .user-avatar-link {
+    .user-avatar-link {
+      img {
+        margin-top: -3px;
+      }
+
+      @media (max-width: map-get($grid-breakpoints, sm)-1) {
         display: none;
       }
     }
