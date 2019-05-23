@@ -226,27 +226,6 @@ module MilestonesHelper
     end
   end
 
-  def group_milestone_route(milestone, params = {})
-    params = nil if params.empty?
-
-    if milestone.legacy_group_milestone?
-      group_milestone_path(@group, milestone.safe_title, title: milestone.title, milestone: params)
-    else
-      group_milestone_path(@group, milestone.iid, milestone: params)
-    end
-  end
-
-  def group_or_project_milestone_path(milestone)
-    params =
-      if milestone.group_milestone?
-        { milestone: { title: milestone.title } }
-      else
-        { title: milestone.title }
-      end
-
-    milestone_path(milestone.milestone, params)
-  end
-
   def can_admin_project_milestones?
     strong_memoize(:can_admin_project_milestones) do
       can?(current_user, :admin_milestone, @project)

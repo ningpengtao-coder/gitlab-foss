@@ -1,4 +1,5 @@
-- issues_accessible = milestone.is_a?(GlobalMilestone) || can?(current_user, :read_issue, @project)
+- issues_accessible = can?(current_user, :read_issue, @project)
+- mr_active_css_class = 'active' unless issues_accessible
 
 .scrolling-tabs-container.inner-page-scroll-tabs.is-smaller
   .fade-left= icon('angle-left')
@@ -9,15 +10,10 @@
         = link_to '#tab-issues', class: 'nav-link active', 'data-toggle' => 'tab', 'data-show' => '.tab-issues-buttons' do
           Issues
           %span.badge.badge-pill= milestone.issues_visible_to_user(current_user).size
-      %li.nav-item
-        = link_to '#tab-merge-requests', class: 'nav-link', 'data-toggle' => 'tab', 'data-endpoint': milestone_merge_request_tab_path(milestone) do
-          Merge Requests
-          %span.badge.badge-pill= milestone.merge_requests_visible_to_user(current_user).size
-    - else
-      %li.nav-item
-        = link_to '#tab-merge-requests', class: 'nav-link active', 'data-toggle' => 'tab', 'data-endpoint': milestone_merge_request_tab_path(milestone) do
-          Merge Requests
-          %span.badge.badge-pill= milestone.merge_requests.size
+    %li.nav-item
+      = link_to '#tab-merge-requests', class: "nav-link #{mr_active_css_class}", 'data-toggle' => 'tab', 'data-endpoint': milestone_merge_request_tab_path(milestone) do
+        Merge Requests
+        %span.badge.badge-pill= milestone.merge_requests.size
     %li.nav-item
       = link_to '#tab-participants', class: 'nav-link', 'data-toggle' => 'tab', 'data-endpoint': milestone_participants_tab_path(milestone) do
         Participants

@@ -1,8 +1,7 @@
 - page_title milestone.title
-- @breadcrumb_link = dashboard_milestone_path(milestone.safe_title, title: milestone.title)
+- @breadcrumb_link = milestone_path(milestone)
 
 - group = local_assigns[:group]
-- is_dynamic_milestone = milestone.legacy_group_milestone? || milestone.dashboard_milestone?
 
 .detail-page-header.milestone-page-header
   .status-box{ class: "status-box-#{milestone.closed? ? 'closed' : 'open'}" }
@@ -28,17 +27,13 @@
           = link_to edit_group_milestone_path(group, milestone), class: "btn btn btn-grouped" do
             Edit
         - if milestone.active?
-          = link_to 'Close Milestone', group_milestone_route(milestone, {state_event: :close }), method: :put, class: "btn btn-grouped btn-close"
+          = link_to 'Close Milestone', milestone_path(milestone, milestone: {state_event: :close }), method: :put, class: "btn btn-grouped btn-close"
         - else
-          = link_to 'Reopen Milestone', group_milestone_route(milestone, {state_event: :activate }), method: :put, class: "btn btn-grouped btn-reopen"
-
-        - unless is_dynamic_milestone
-          = render 'shared/milestones/delete_button'
+          = link_to 'Reopen Milestone', milestone_path(milestone, milestone: {state_event: :activate }), method: :put, class: "btn btn-grouped btn-reopen"
+        = render 'shared/milestones/delete_button'
 
     %a.btn.btn-default.btn-grouped.float-right.d-block.d-sm-none.js-sidebar-toggle{ href: "#" }
       = icon('angle-double-left')
-
-= render 'shared/milestones/deprecation_message' if is_dynamic_milestone
 
 .detail-page-description.milestone-detail
   %h2.title
@@ -55,29 +50,7 @@
 
 = render_if_exists 'shared/milestones/burndown', milestone: @milestone, project: @project
 
-- if is_dynamic_milestone
-  .table-holder
-    %table.table
-      %thead
-        %tr
-          %th Project
-          %th Open issues
-          %th State
-          %th Due date
-        %tr
-          %td
-            - project_name = group ? milestone.project.name : milestone.project.full_name
-            = link_to project_name, milestone_path(milestone.milestone)
-          %td
-            = milestone.milestone.issues_visible_to_user(current_user).opened.count
-          %td
-            - if milestone.closed?
-              Closed
-            - else
-              Open
-          %td
-            = milestone.expires_at
-- elsif milestone.group_milestone?
+- if milestone.group_milestone?
   %br
   View
   = link_to 'Issues', issues_group_path(@group, milestone_title: milestone.title)

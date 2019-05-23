@@ -6,27 +6,21 @@
   .row
     .col-sm-6
       .append-bottom-5
-        %strong= link_to truncate(milestone.title, length: 100), milestone_path
+        %strong= link_to truncate(milestone.title, length: 100), milestone_path(milestone)
         - if @group
           = " - #{milestone_type}"
 
-      - if @project || milestone.is_a?(GlobalMilestone) || milestone.group_milestone?
-        - if milestone.due_date || milestone.start_date
-          .milestone-range.append-bottom-5
-            = milestone_date_range(milestone)
-        %div
-          = render('shared/milestone_expired', milestone: milestone)
-          - if milestone.group_milestone?
-            .label-badge.label-badge-blue.d-inline-block
-              = milestone.group.full_name
-          - if milestone.legacy_group_milestone?
-            .projects
-              - link_to milestone_path(milestone.milestone) do
-                %span.label-badge.label-badge-blue.d-inline-block.append-bottom-5
-                  = dashboard ? milestone.project.full_name : milestone.project.name
-          - if milestone.project
-            .label-badge.label-badge-gray.d-inline-block
-              = milestone.project.full_name
+      - if milestone.due_date || milestone.start_date
+        .milestone-range.append-bottom-5
+          = milestone_date_range(milestone)
+      %div
+        = render('shared/milestone_expired', milestone: milestone)
+        - if milestone.group_milestone?
+          .label-badge.label-badge-blue.d-inline-block
+            = milestone.group.full_name
+        - if milestone.project
+          .label-badge.label-badge-gray.d-inline-block
+            = milestone.project.full_name
 
     .col-sm-4.milestone-progress
       = milestone_progress_bar(milestone)
@@ -49,16 +43,12 @@
                         container: 'body',
                         toggle: 'modal' } }
                 = sprite_icon('level-up', size: 14)
-
-            = link_to 'Close Milestone', project_milestone_path(@project, milestone, milestone: {state_event: :close }), method: :put, remote: true, class: "btn btn-sm btn-close btn-grouped"
-          - unless milestone.active?
-            = link_to 'Reopen Milestone', project_milestone_path(@project, milestone, milestone: {state_event: :activate }), method: :put, class: "btn btn-grouped btn-reopen"
-        - if @group
-          - if can?(current_user, :admin_milestone, @group)
-            - if milestone.closed?
-              = link_to 'Reopen Milestone', group_milestone_route(milestone, {state_event: :activate }), method: :put, class: "btn btn-sm btn-grouped btn-reopen"
-            - else
-              = link_to 'Close Milestone', group_milestone_route(milestone, {state_event: :close }), method: :put, class: "btn btn-sm btn-grouped btn-close"
         - if dashboard
           .label-badge.label-badge-gray
             = milestone_type
+        - else
+          - if can?(current_user, :admin_milestone, milestone.parent)
+            - if milestone.closed?
+              = link_to 'Reopen Milestone', milestone_path(milestone, milestone: {state_event: :activate }), method: :put, class: "btn btn-sm btn-grouped btn-reopen"
+            - else
+              = link_to 'Close Milestone', milestone_path(milestone, milestone: {state_event: :close }), method: :put, class: "btn btn-sm btn-grouped btn-close"

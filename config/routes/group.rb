@@ -45,13 +45,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       post :toggle_subscription, on: :member
     end
 
-    resources :milestones, constraints: { id: %r{[^/]+} } do
-      member do
-        get :merge_requests
-        get :participants
-        get :labels
-      end
-    end
+    resources :milestones, constraints: { id: %r{[^/]+} }
 
     resource :avatar, only: [:destroy]
 
