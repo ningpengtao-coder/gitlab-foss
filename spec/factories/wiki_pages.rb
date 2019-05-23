@@ -20,8 +20,6 @@ FactoryBot.define do
       page.attributes = evaluator.attrs
     end
 
-    to_create do |page|
-      page.create
-    end
+    to_create(&:create)
   end
 end

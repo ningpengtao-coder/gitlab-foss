@@ -9,9 +9,7 @@ module Emails
     private
 
     def update_secondary_emails!
-      result = ::Users::UpdateService.new(@current_user, user: @user).execute do |user|
-        user.update_secondary_emails!
-      end
+      result = ::Users::UpdateService.new(@current_user, user: @user).execute(&:update_secondary_emails!)
 
       result[:status] == 'success'
     end

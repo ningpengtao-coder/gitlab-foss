@@ -14,9 +14,7 @@ class EnsureForeignKeysOnClustersApplications < ActiveRecord::Migration[4.2]
       .joins(:application_ingress)
       .where('clusters.id = clusters_applications_ingress.cluster_id')
 
-    Clusters::Applications::Ingress.where('NOT EXISTS (?)', existing).in_batches do |batch|
-      batch.delete_all
-    end
+    Clusters::Applications::Ingress.where('NOT EXISTS (?)', existing).in_batches(&:delete_all)
 
     unless foreign_keys_for(:clusters_applications_ingress, :cluster_id).any?
       add_concurrent_foreign_key :clusters_applications_ingress, :clusters,
@@ -28,9 +26,7 @@ class EnsureForeignKeysOnClustersApplications < ActiveRecord::Migration[4.2]
       .joins(:application_prometheus)
       .where('clusters.id = clusters_applications_prometheus.cluster_id')
 
-    Clusters::Applications::Ingress.where('NOT EXISTS (?)', existing).in_batches do |batch|
-      batch.delete_all
-    end
+    Clusters::Applications::Ingress.where('NOT EXISTS (?)', existing).in_batches(&:delete_all)
 
     unless foreign_keys_for(:clusters_applications_prometheus, :cluster_id).any?
       add_concurrent_foreign_key :clusters_applications_prometheus, :clusters,

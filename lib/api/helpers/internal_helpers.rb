@@ -68,7 +68,7 @@ module API
       end
 
       def redis_ping
-        result = Gitlab::Redis::SharedState.with { |redis| redis.ping }
+        result = Gitlab::Redis::SharedState.with(&:ping)
 
         result == 'PONG'
       rescue => e

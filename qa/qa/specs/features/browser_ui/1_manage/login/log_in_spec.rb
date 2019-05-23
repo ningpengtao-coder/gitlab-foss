@@ -11,9 +11,7 @@ module QA
           expect(menu).to have_personal_area
         end
 
-        Page::Main::Menu.perform do |menu|
-          menu.sign_out
-        end
+        Page::Main::Menu.perform(&:sign_out)
 
         Page::Main::Login.perform do |form|
           expect(form.sign_in_tab?).to be(true)

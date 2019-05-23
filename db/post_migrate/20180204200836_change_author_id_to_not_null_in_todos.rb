@@ -13,9 +13,7 @@ class ChangeAuthorIdToNotNullInTodos < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def up
-    Todo.where(author_id: nil).each_batch(of: BATCH_SIZE) do |batch|
-      batch.delete_all
-    end
+    Todo.where(author_id: nil).each_batch(of: BATCH_SIZE, &:delete_all)
 
     change_column_null :todos, :author_id, false
   end

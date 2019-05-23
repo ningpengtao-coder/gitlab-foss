@@ -28,9 +28,7 @@ describe QA::Resource::Base do
       expect(resource).to receive(:something!).ordered
       expect(resource).to receive(fabrication_method_used).ordered.and_return(location)
 
-      subject.public_send(fabrication_method_called, resource: resource) do |resource|
-        resource.something!
-      end
+      subject.public_send(fabrication_method_called, resource: resource, &:something!)
     end
 
     it 'does not log the resource and build method when QA_DEBUG=false' do

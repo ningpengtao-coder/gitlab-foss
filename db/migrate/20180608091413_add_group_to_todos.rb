@@ -24,7 +24,7 @@ class AddGroupToTodos < ActiveRecord::Migration[4.2]
     remove_concurrent_index(:todos, :group_id)
     remove_column(:todos, :group_id) if group_id_exists?
 
-    Todo.where(project_id: nil).each_batch { |batch| batch.delete_all }
+    Todo.where(project_id: nil).each_batch(&:delete_all)
     change_column_null :todos, :project_id, false
   end
 

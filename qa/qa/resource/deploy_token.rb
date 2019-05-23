@@ -7,17 +7,13 @@ module QA
 
       attribute :username do
         Page::Project::Settings::Repository.perform do |page|
-          page.expand_deploy_tokens do |token|
-            token.token_username
-          end
+          page.expand_deploy_tokens(&:token_username)
         end
       end
 
       attribute :password do
         Page::Project::Settings::Repository.perform do |page|
-          page.expand_deploy_tokens do |token|
-            token.token_password
-          end
+          page.expand_deploy_tokens(&:token_password)
         end
       end
 

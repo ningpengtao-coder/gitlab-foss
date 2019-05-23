@@ -21,9 +21,7 @@ class DiscussionEntity < Grape::Entity
   end
 
   expose :individual_note?, as: :individual_note
-  expose :resolvable do |discussion|
-    discussion.resolvable?
-  end
+  expose :resolvable, &:resolvable?
 
   expose :resolved?, as: :resolved
   expose :resolved_by_push?, as: :resolved_by_push

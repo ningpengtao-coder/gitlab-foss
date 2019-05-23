@@ -3,9 +3,7 @@
 module Notes
   class DestroyService < ::Notes::BaseService
     def execute(note)
-      TodoService.new.destroy_target(note) do |note|
-        note.destroy
-      end
+      TodoService.new.destroy_target(note, &:destroy)
 
       clear_noteable_diffs_cache(note)
     end

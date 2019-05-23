@@ -9,9 +9,7 @@ class MigrateOldArtifacts < ActiveRecord::Migration[4.2]
   # Read more about this here: https://gitlab.com/gitlab-org/gitlab-ce/issues/32036#note_30422345
 
   def up
-    builds_with_artifacts.find_each do |build|
-      build.migrate_artifacts!
-    end
+    builds_with_artifacts.find_each(&:migrate_artifacts!)
   end
 
   def down

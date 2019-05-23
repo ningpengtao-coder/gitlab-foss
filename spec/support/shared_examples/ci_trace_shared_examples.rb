@@ -466,7 +466,7 @@ shared_examples_for 'trace with disabled live trace feature' do
     context 'when job does not have trace artifact' do
       context 'when trace file stored in default path' do
         let!(:build) { create(:ci_build, :success, :trace_live) }
-        let!(:src_path) { trace.read { |s| s.path } }
+        let!(:src_path) { trace.read(&:path) }
         let!(:src_checksum) { Digest::SHA256.file(src_path).hexdigest }
 
         it_behaves_like 'archive trace file'

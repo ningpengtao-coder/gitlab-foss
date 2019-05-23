@@ -35,9 +35,7 @@ class RemoveOrphanedRoutes < ActiveRecord::Migration[4.2]
         Route.orphaned_project_routes,
         Route.orphaned_namespace_routes
       ].each do |relation|
-        relation.each_batch(of: 1_000) do |batch|
-          batch.delete_all
-        end
+        relation.each_batch(of: 1_000, &:delete_all)
       end
     end
   end

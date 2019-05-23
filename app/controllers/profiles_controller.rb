@@ -27,9 +27,7 @@ class ProfilesController < Profiles::ApplicationController
   end
 
   def reset_incoming_email_token
-    Users::UpdateService.new(current_user, user: @user).execute! do |user|
-      user.reset_incoming_email_token!
-    end
+    Users::UpdateService.new(current_user, user: @user).execute!(&:reset_incoming_email_token!)
 
     flash[:notice] = s_("Profiles|Incoming email token was successfully reset")
 
@@ -37,9 +35,7 @@ class ProfilesController < Profiles::ApplicationController
   end
 
   def reset_feed_token
-    Users::UpdateService.new(current_user, user: @user).execute! do |user|
-      user.reset_feed_token!
-    end
+    Users::UpdateService.new(current_user, user: @user).execute!(&:reset_feed_token!)
 
     flash[:notice] = s_('Profiles|Feed token was successfully reset')
 

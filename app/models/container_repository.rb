@@ -67,7 +67,7 @@ class ContainerRepository < ApplicationRecord
   def delete_tags!
     return unless has_tags?
 
-    digests = tags.map { |tag| tag.digest }.to_set
+    digests = tags.map(&:digest).to_set
 
     digests.all? do |digest|
       client.delete_repository_tag(self.path, digest)

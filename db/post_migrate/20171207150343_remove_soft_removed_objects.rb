@@ -150,9 +150,7 @@ class RemoveSoftRemovedObjects < ActiveRecord::Migration[4.2]
     # Some personal namespaces are left behind in case of GitLab.com. In these
     # cases the associated data such as the projects and users has already been
     # removed.
-    Namespace.soft_removed_personal.each_batch do |batch|
-      batch.delete_all
-    end
+    Namespace.soft_removed_personal.each_batch(&:delete_all)
   end
 
   def remove_group_namespaces
@@ -193,9 +191,7 @@ class RemoveSoftRemovedObjects < ActiveRecord::Migration[4.2]
       .where('routes.source_type = ?', 'Namespace')
       .where('routes.source_id = namespaces.id')
 
-    Route.where('EXISTS (?)', namespaces).each_batch do |batch|
-      batch.delete_all
-    end
+    Route.where('EXISTS (?)', namespaces).each_batch(&:delete_all)
   end
 
   def id_for_admin_user

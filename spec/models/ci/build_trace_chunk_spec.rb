@@ -601,9 +601,7 @@ describe Ci::BuildTraceChunk, :clean_gitlab_redis_shared_state do
 
     context 'when traces are archived' do
       let(:subject) do
-        project.builds.each do |build|
-          build.success!
-        end
+        project.builds.each(&:success!)
       end
 
       it_behaves_like 'deletes all build_trace_chunk and data in redis'

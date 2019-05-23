@@ -52,7 +52,7 @@ describe OmniAuth::Strategies::Jwt do
                 .to_pem
             elsif private_key_class == OpenSSL::PKey::EC
               private_key_class.new(ECDSA_NAMED_CURVES[algorithm])
-                .tap { |key| key.generate_key! }
+                .tap(&:generate_key!)
                 .to_pem
             else
               private_key_class.new(jwt_config.strategy.secret)

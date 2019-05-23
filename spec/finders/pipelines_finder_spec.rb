@@ -191,7 +191,7 @@ describe PipelinesFinder do
         let!(:pipelines) { create_list(:ci_pipeline, 2, project: project) }
 
         it 'sorts as id: :asc' do
-          is_expected.to eq(pipelines.sort_by { |p| p.id })
+          is_expected.to eq(pipelines.sort_by(&:id))
         end
       end
 

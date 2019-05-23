@@ -11,9 +11,7 @@ class RemoveEmptyExternUidAuth0Identities < ActiveRecord::Migration[4.2]
   end
 
   def up
-    broken_auth0_identities.each_batch do |identity|
-      identity.delete_all
-    end
+    broken_auth0_identities.each_batch(&:delete_all)
   end
 
   def broken_auth0_identities

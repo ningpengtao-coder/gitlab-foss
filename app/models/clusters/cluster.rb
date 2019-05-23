@@ -194,9 +194,7 @@ module Clusters
       attributes = { project: project }
       attributes[:cluster_project] = cluster_project if project_type?
 
-      kubernetes_namespaces.find_or_initialize_by(attributes).tap do |namespace|
-        namespace.set_defaults
-      end
+      kubernetes_namespaces.find_or_initialize_by(attributes).tap(&:set_defaults)
     end
 
     def allow_user_defined_namespace?

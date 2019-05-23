@@ -59,7 +59,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def block
-    if update_user { |user| user.block }
+    if update_user(&:block)
       redirect_back_or_admin_user(notice: _("Successfully blocked"))
     else
       redirect_back_or_admin_user(alert: _("Error occurred. User was not blocked"))
@@ -69,7 +69,7 @@ class Admin::UsersController < Admin::ApplicationController
   def unblock
     if user.ldap_blocked?
       redirect_back_or_admin_user(alert: _("This user cannot be unlocked manually from GitLab"))
-    elsif update_user { |user| user.activate }
+    elsif update_user(&:activate)
       redirect_back_or_admin_user(notice: _("Successfully unblocked"))
     else
       redirect_back_or_admin_user(alert: _("Error occurred. User was not unblocked"))
@@ -77,7 +77,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def unlock
-    if update_user { |user| user.unlock_access! }
+    if update_user(&:unlock_access!)
       redirect_back_or_admin_user(alert: _("Successfully unlocked"))
     else
       redirect_back_or_admin_user(alert: _("Error occurred. User was not unlocked"))
@@ -85,7 +85,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def confirm
-    if update_user { |user| user.confirm }
+    if update_user(&:confirm)
       redirect_back_or_admin_user(notice: _("Successfully confirmed"))
     else
       redirect_back_or_admin_user(alert: _("Error occurred. User was not confirmed"))
@@ -93,7 +93,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def disable_two_factor
-    update_user { |user| user.disable_two_factor! }
+    update_user(&:disable_two_factor!)
 
     redirect_to admin_user_path(user),
       notice: _('Two-factor Authentication has been disabled for this user')
@@ -133,9 +133,7 @@ class Admin::UsersController < Admin::ApplicationController
     end
 
     respond_to do |format|
-      result = Users::UpdateService.new(current_user, user_params_with_pass.merge(user: user)).execute do |user|
-        user.skip_reconfirmation!
-      end
+      result = Users::UpdateService.new(current_user, user_params_with_pass.merge(user: user)).execute(&:skip_reconfirmation!)
 
       if result[:status] == :success
         format.html { redirect_to [:admin, user], notice: _('User was successfully updated.') }

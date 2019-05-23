@@ -20,15 +20,11 @@ module QA
       end
 
       attribute :repository_ssh_location do
-        Page::Project::Show.perform do |page|
-          page.repository_clone_ssh_location
-        end
+        Page::Project::Show.perform(&:repository_clone_ssh_location)
       end
 
       attribute :repository_http_location do
-        Page::Project::Show.perform do |page|
-          page.repository_clone_http_location
-        end
+        Page::Project::Show.perform(&:repository_clone_http_location)
       end
 
       def initialize

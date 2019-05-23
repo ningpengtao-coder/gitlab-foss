@@ -119,9 +119,7 @@ describe 'Prioritize labels' do
       visit project_labels_path(project)
 
       page.within('.other-labels') do
-        all('.js-toggle-priority').each do |el|
-          el.click
-        end
+        all('.js-toggle-priority').each(&:click)
         wait_for_requests
       end
 

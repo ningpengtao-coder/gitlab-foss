@@ -18,12 +18,12 @@ describe InstanceConfigurationHelper do
 
       it 'returns the result of the block' do
         expect(helper.instance_configuration_cell_html('gitlab', &upcase_block)).to eq('GITLAB')
-        expect(helper.instance_configuration_cell_html('gitlab') { |v| v.upcase }).to eq('GITLAB')
+        expect(helper.instance_configuration_cell_html('gitlab', &:upcase)).to eq('GITLAB')
       end
 
       it 'returns "-" if the parameter is blank' do
         expect(helper.instance_configuration_cell_html(nil, &upcase_block)).to eq('-')
-        expect(helper.instance_configuration_cell_html(nil) { |v| v.upcase }).to eq('-')
+        expect(helper.instance_configuration_cell_html(nil, &:upcase)).to eq('-')
         expect(helper.instance_configuration_cell_html('', &upcase_block)).to eq('-')
       end
     end

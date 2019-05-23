@@ -125,7 +125,7 @@ describe Member do
       @requested_member = project.requesters.find_by(user_id: requested_user.id)
 
       accepted_request_user = create(:user).tap { |u| project.request_access(u) }
-      @accepted_request_member = project.requesters.find_by(user_id: accepted_request_user.id).tap { |m| m.accept_request }
+      @accepted_request_member = project.requesters.find_by(user_id: accepted_request_user.id).tap(&:accept_request)
     end
 
     describe '.access_for_user_ids' do

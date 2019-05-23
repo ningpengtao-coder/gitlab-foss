@@ -23,9 +23,7 @@ FactoryBot.define do
     trait :ready do
       state :ready
 
-      after(:create) do |pool|
-        pool.create_object_pool
-      end
+      after(:create, &:create_object_pool)
     end
   end
 end

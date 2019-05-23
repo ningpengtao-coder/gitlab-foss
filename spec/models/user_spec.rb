@@ -558,9 +558,7 @@ describe User do
   describe 'after commit hook' do
     describe '#update_emails_with_primary_email' do
       before do
-        @user = create(:user, email: 'primary@example.com').tap do |user|
-          user.skip_reconfirmation!
-        end
+        @user = create(:user, email: 'primary@example.com').tap(&:skip_reconfirmation!)
         @secondary = create :email, email: 'secondary@example.com', user: @user
         @user.reload
       end
@@ -650,9 +648,7 @@ describe User do
 
     describe '#update_invalid_gpg_signatures' do
       let(:user) do
-        create(:user, email: 'tula.torphy@abshire.ca').tap do |user|
-          user.skip_reconfirmation!
-        end
+        create(:user, email: 'tula.torphy@abshire.ca').tap(&:skip_reconfirmation!)
       end
 
       it 'does nothing when the name is updated' do

@@ -372,7 +372,7 @@ ActiveRecord::Schema.define(version: 20190516011213) do
     t.string "token_encrypted"
     t.index ["artifacts_expire_at"], name: "index_ci_builds_on_artifacts_expire_at", where: "(artifacts_file <> ''::text)", using: :btree
     t.index ["auto_canceled_by_id"], name: "index_ci_builds_on_auto_canceled_by_id", using: :btree
-    t.index ["commit_id", "artifacts_expire_at", "id"], name: "index_ci_builds_on_commit_id_and_artifacts_expireatandidpartial", where: "(((type)::text = 'Ci::Build'::text) AND ((retried = false) OR (retried IS NULL)) AND ((name)::text = ANY (ARRAY[('sast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('sast:container'::character varying)::text, ('container_scanning'::character varying)::text, ('dast'::character varying)::text])))", using: :btree
+    t.index ["commit_id", "artifacts_expire_at", "id"], name: "index_ci_builds_on_commit_id_and_artifacts_expireatandidpartial", where: "((((type)::text = 'Ci::Build'::text) AND ((retried = false) OR (retried IS NULL))) AND ((name)::text = ANY (ARRAY[('sast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('sast:container'::character varying)::text, ('container_scanning'::character varying)::text, ('dast'::character varying)::text])))", using: :btree
     t.index ["commit_id", "stage_idx", "created_at"], name: "index_ci_builds_on_commit_id_and_stage_idx_and_created_at", using: :btree
     t.index ["commit_id", "status", "type"], name: "index_ci_builds_on_commit_id_and_status_and_type", using: :btree
     t.index ["commit_id", "type", "name", "ref"], name: "index_ci_builds_on_commit_id_and_type_and_name_and_ref", using: :btree
@@ -382,7 +382,7 @@ ActiveRecord::Schema.define(version: 20190516011213) do
     t.index ["protected"], name: "index_ci_builds_on_protected", using: :btree
     t.index ["queued_at"], name: "index_ci_builds_on_queued_at", using: :btree
     t.index ["runner_id"], name: "index_ci_builds_on_runner_id", using: :btree
-    t.index ["scheduled_at"], name: "partial_index_ci_builds_on_scheduled_at_with_scheduled_jobs", where: "((scheduled_at IS NOT NULL) AND ((type)::text = 'Ci::Build'::text) AND ((status)::text = 'scheduled'::text))", using: :btree
+    t.index ["scheduled_at"], name: "partial_index_ci_builds_on_scheduled_at_with_scheduled_jobs", where: "(((scheduled_at IS NOT NULL) AND ((type)::text = 'Ci::Build'::text)) AND ((status)::text = 'scheduled'::text))", using: :btree
     t.index ["stage_id", "stage_idx"], name: "tmp_build_stage_position_index", where: "(stage_idx IS NOT NULL)", using: :btree
     t.index ["stage_id"], name: "index_ci_builds_on_stage_id", using: :btree
     t.index ["status", "type", "runner_id"], name: "index_ci_builds_on_status_and_type_and_runner_id", using: :btree
@@ -1907,6 +1907,7 @@ ActiveRecord::Schema.define(version: 20190516011213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_redirect_routes_on_path", unique: true, using: :btree
+    t.index ["path"], name: "index_redirect_routes_on_path_text_pattern_ops", using: :btree, opclasses: {"path"=>"varchar_pattern_ops"}
     t.index ["source_type", "source_id"], name: "index_redirect_routes_on_source_type_and_source_id", using: :btree
   end
 

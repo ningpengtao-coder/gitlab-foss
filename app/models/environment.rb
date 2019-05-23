@@ -73,9 +73,7 @@ class Environment < ApplicationRecord
     state :available
     state :stopped
 
-    after_transition do |environment|
-      environment.expire_etag_cache
-    end
+    after_transition(&:expire_etag_cache)
   end
 
   def self.pluck_names

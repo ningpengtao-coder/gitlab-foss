@@ -21,9 +21,7 @@ describe Gitlab::QuickActions::Dsl do
         "A dynamic description for #{noteable.upcase}"
       end
       params 'The first argument', 'The second argument'
-      command :dynamic_description do |args|
-        args.split
-      end
+      command :dynamic_description, &:split
 
       command :cc
 
@@ -37,9 +35,7 @@ describe Gitlab::QuickActions::Dsl do
         arg
       end
 
-      parse_params do |raw_arg|
-        raw_arg.strip
-      end
+      parse_params(&:strip)
       command :with_params_parsing do |parsed|
         parsed
       end

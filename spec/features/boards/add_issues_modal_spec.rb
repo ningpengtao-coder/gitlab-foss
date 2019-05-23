@@ -160,9 +160,7 @@ describe 'Issue Boards add issue modal', :js do
 
       it 'changes button text with plural' do
         page.within('.add-issues-modal') do
-          all('.board-card .js-board-card-number-container').each do |el|
-            el.click
-          end
+          all('.board-card .js-board-card-number-container').each(&:click)
 
           expect(first('.add-issues-footer .btn')).to have_content('Add 2 issues')
         end

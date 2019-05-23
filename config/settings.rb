@@ -64,7 +64,7 @@ class Settings < Settingslogic
         current.each do |constant|
           values.push(verify_constant(modul, constant, nil))
         end
-        values.delete_if { |value| value.nil? }
+        values.delete_if(&:nil?)
       end
 
       values

@@ -23,7 +23,7 @@ class Import::BitbucketController < Import::BaseController
     bitbucket_client = Bitbucket::Client.new(credentials)
     repos = bitbucket_client.repos
 
-    @repos, @incompatible_repos = repos.partition { |repo| repo.valid? }
+    @repos, @incompatible_repos = repos.partition(&:valid?)
 
     @already_added_projects = find_already_added_projects('bitbucket')
     already_added_projects_names = @already_added_projects.pluck(:import_source)

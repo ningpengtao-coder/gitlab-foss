@@ -31,13 +31,9 @@ class BuildDetailsEntity < JobEntity
       keep_project_job_artifacts_path(project, build)
     end
 
-    expose :expire_at, if: -> (*) { build.artifacts_expire_at.present? } do |build|
-      build.artifacts_expire_at
-    end
+    expose :expire_at, if: -> (*) { build.artifacts_expire_at.present? }, &:artifacts_expire_at
 
-    expose :expired, if: -> (*) { build.artifacts_expire_at.present? } do |build|
-      build.artifacts_expired?
-    end
+    expose :expired, if: -> (*) { build.artifacts_expire_at.present? }, &:artifacts_expired?
   end
 
   expose :erased_by, if: -> (*) { build.erased? }, using: UserEntity
@@ -77,9 +73,7 @@ class BuildDetailsEntity < JobEntity
   end
 
   expose :runners do
-    expose :online do |build|
-      build.any_runners_online?
-    end
+    expose :online, &:any_runners_online?
 
     expose :available do |build|
       project.any_runners?

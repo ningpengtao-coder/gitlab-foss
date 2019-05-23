@@ -87,7 +87,7 @@ describe 'Merge request > User sees pipelines', :js do
           @pipeline = Ci::CreatePipelineService.new(project, user, build_push_data).execute(:push)
         end
 
-        threads.each { |thr| thr.join }
+        threads.each(&:join)
       end
 
       it 'user sees pipeline in merge request widget' do

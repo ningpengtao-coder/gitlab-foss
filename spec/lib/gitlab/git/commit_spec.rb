@@ -206,7 +206,7 @@ describe Gitlab::Git::Commit, :seed_helper do
           limit: 10
         )
 
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 10 elements' do
@@ -224,7 +224,7 @@ describe Gitlab::Git::Commit, :seed_helper do
           limit: 10
         )
 
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 10 elements' do
@@ -243,7 +243,7 @@ describe Gitlab::Git::Commit, :seed_helper do
           offset: 1
         )
 
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 3 elements' do
@@ -263,7 +263,7 @@ describe Gitlab::Git::Commit, :seed_helper do
           offset: 1
         )
 
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 3 elements' do
@@ -283,7 +283,7 @@ describe Gitlab::Git::Commit, :seed_helper do
           offset: 1
         )
 
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 3 elements' do
@@ -296,7 +296,7 @@ describe Gitlab::Git::Commit, :seed_helper do
     describe '.between' do
       subject do
         commits = described_class.between(repository, SeedRepo::Commit::PARENT_ID, SeedRepo::Commit::ID)
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 1 element' do

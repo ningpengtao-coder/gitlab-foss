@@ -598,8 +598,8 @@ describe Gitlab::Database::MigrationHelpers do
 
         # Since MySQL and PostgreSQL use different quoting styles we'll just
         # stub the methods used for this to make testing easier.
-        allow(model).to receive(:quote_column_name) { |name| name.to_s }
-        allow(model).to receive(:quote_table_name) { |name| name.to_s }
+        allow(model).to receive(:quote_column_name, &:to_s)
+        allow(model).to receive(:quote_table_name, &:to_s)
       end
 
       context 'using MySQL' do

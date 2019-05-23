@@ -1343,7 +1343,7 @@ describe Gitlab::Git::Repository, :seed_helper do
       end
 
       it "has the same content in info/attributes as .gitattributes" do
-        contents = File.open(attributes_path, "rb") { |f| f.read }
+        contents = File.open(attributes_path, "rb", &:read)
         expect(contents).to eq("*.md binary\n")
       end
     end

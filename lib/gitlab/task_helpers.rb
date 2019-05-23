@@ -149,7 +149,7 @@ module Gitlab
 
     def repository_storage_paths_args
       Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-        Gitlab.config.repositories.storages.values.map { |rs| rs.legacy_disk_path }
+        Gitlab.config.repositories.storages.values.map(&:legacy_disk_path)
       end
     end
 

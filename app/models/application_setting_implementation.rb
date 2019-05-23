@@ -139,14 +139,14 @@ module ApplicationSettingImplementation
   def domain_whitelist_raw=(values)
     self.domain_whitelist = []
     self.domain_whitelist = values.split(DOMAIN_LIST_SEPARATOR)
-    self.domain_whitelist.reject! { |d| d.empty? }
+    self.domain_whitelist.reject!(&:empty?)
     self.domain_whitelist
   end
 
   def domain_blacklist_raw=(values)
     self.domain_blacklist = []
     self.domain_blacklist = values.split(DOMAIN_LIST_SEPARATOR)
-    self.domain_blacklist.reject! { |d| d.empty? }
+    self.domain_blacklist.reject!(&:empty?)
     self.domain_blacklist
   end
 

@@ -279,9 +279,7 @@ describe 'Merge request > User resolves diff notes and discussions', :js do
 
       it 'resolves discussion' do
         resolve_buttons = page.all('.note .line-resolve-btn', count: 2)
-        resolve_buttons.each do |button|
-          button.click
-        end
+        resolve_buttons.each(&:click)
 
         wait_for_requests
 
@@ -316,9 +314,7 @@ describe 'Merge request > User resolves diff notes and discussions', :js do
       end
 
       it 'allows user to mark all notes as resolved' do
-        page.all('.note .line-resolve-btn', count: 2).each do |btn|
-          btn.click
-        end
+        page.all('.note .line-resolve-btn', count: 2).each(&:click)
 
         page.within '.line-resolve-all-container' do
           expect(page).to have_content('2/2 discussions resolved')

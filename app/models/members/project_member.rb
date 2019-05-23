@@ -56,9 +56,7 @@ class ProjectMember < Member
       ProjectMember.transaction do
         members = ProjectMember.where(source_id: project_ids)
 
-        members.each do |member|
-          member.destroy
-        end
+        members.each(&:destroy)
       end
 
       true

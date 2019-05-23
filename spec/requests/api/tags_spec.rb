@@ -40,7 +40,7 @@ describe API::Tags do
       it 'sorts by name in descending order when requested' do
         get api("#{route}?order_by=name", current_user)
 
-        ordered_by_name = project.repository.tags.map { |tag| tag.name }.sort.reverse
+        ordered_by_name = project.repository.tags.map(&:name).sort.reverse
 
         expect(json_response.map { |tag| tag['name'] }).to eq(ordered_by_name)
       end
@@ -48,7 +48,7 @@ describe API::Tags do
       it 'sorts by name in ascending order when requested' do
         get api("#{route}?order_by=name&sort=asc", current_user)
 
-        ordered_by_name = project.repository.tags.map { |tag| tag.name }.sort
+        ordered_by_name = project.repository.tags.map(&:name).sort
 
         expect(json_response.map { |tag| tag['name'] }).to eq(ordered_by_name)
       end

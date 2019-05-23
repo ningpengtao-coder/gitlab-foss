@@ -9,9 +9,7 @@ describe Gitlab::OptimisticLocking do
       expect(pipeline).not_to receive(:reset)
       expect(pipeline).to receive(:succeed).and_call_original
 
-      described_class.retry_lock(pipeline) do |subject|
-        subject.succeed
-      end
+      described_class.retry_lock(pipeline, &:succeed)
     end
 
     it 'retries action if exception is raised' do
@@ -20,9 +18,7 @@ describe Gitlab::OptimisticLocking do
       expect(pipeline2).to receive(:reset).and_call_original
       expect(pipeline2).to receive(:drop).twice.and_call_original
 
-      described_class.retry_lock(pipeline2) do |subject|
-        subject.drop
-      end
+      described_class.retry_lock(pipeline2, &:drop)
     end
 
     it 'raises exception when too many retries' do

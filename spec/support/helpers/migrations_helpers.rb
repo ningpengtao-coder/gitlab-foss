@@ -53,9 +53,7 @@ module MigrationsHelpers
     # attr_encrypted also expects ActiveRecord attribute methods to be
     # defined, or it will override the accessors:
     # https://gitlab.com/gitlab-org/gitlab-ee/issues/8234#note_113976421
-    [ApplicationSetting, SystemHook].each do |model|
-      model.define_attribute_methods
-    end
+    [ApplicationSetting, SystemHook].each(&:define_attribute_methods)
   end
 
   def reset_column_information(klass)

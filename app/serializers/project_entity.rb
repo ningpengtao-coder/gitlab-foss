@@ -10,7 +10,5 @@ class ProjectEntity < Grape::Entity
     project_path(project)
   end
 
-  expose :full_name do |project|
-    project.full_name
-  end
+  expose :full_name, &:full_name
 end

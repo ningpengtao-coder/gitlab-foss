@@ -101,11 +101,7 @@ module Gitlab
         response = GitalyClient
           .call(@storage, :ref_service, :list_new_blobs, request, timeout: timeout)
 
-        response.flat_map do |msg|
-          # Returns an Array of Gitaly::NewBlobObject objects
-          # Available methods are: #size, #oid and #path
-          msg.new_blob_objects
-        end
+        response.flat_map(&:new_blob_objects)
       end
 
       def count_tag_names

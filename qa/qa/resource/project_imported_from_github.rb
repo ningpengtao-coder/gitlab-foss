@@ -17,13 +17,9 @@ module QA
 
         Page::Group::Show.perform(&:go_to_new_project)
 
-        Page::Project::New.perform do |page|
-          page.click_import_project
-        end
+        Page::Project::New.perform(&:click_import_project)
 
-        Page::Project::New.perform do |page|
-          page.click_github_link
-        end
+        Page::Project::New.perform(&:click_github_link)
 
         Page::Project::Import::Github.perform do |page|
           page.add_personal_access_token(@personal_access_token)

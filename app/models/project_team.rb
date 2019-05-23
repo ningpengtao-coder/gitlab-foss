@@ -130,9 +130,7 @@ class ProjectTeam
     end
 
     ProjectMember.transaction do
-      source_members.each do |member|
-        member.save
-      end
+      source_members.each(&:save)
     end
 
     true

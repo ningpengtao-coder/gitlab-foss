@@ -3,9 +3,7 @@
 class BuildArtifactEntity < Grape::Entity
   include RequestAwareEntity
 
-  expose :name do |job|
-    job.name
-  end
+  expose :name, &:name
 
   expose :artifacts_expired?, as: :expired
   expose :artifacts_expire_at, as: :expire_at

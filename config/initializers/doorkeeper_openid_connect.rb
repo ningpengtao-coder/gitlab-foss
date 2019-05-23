@@ -7,9 +7,7 @@ Doorkeeper::OpenidConnect.configure do
     User.active.find_by(id: access_token.resource_owner_id)
   end
 
-  auth_time_from_resource_owner do |user|
-    user.current_sign_in_at
-  end
+  auth_time_from_resource_owner(&:current_sign_in_at)
 
   reauthenticate_resource_owner do |user, return_to|
     store_location_for user, return_to
@@ -17,9 +15,7 @@ Doorkeeper::OpenidConnect.configure do
     redirect_to new_user_session_url
   end
 
-  subject do |user|
-    user.id
-  end
+  subject(&:id)
 
   claims do
     with_options scope: :openid do |o|
@@ -29,8 +25,8 @@ Doorkeeper::OpenidConnect.configure do
         Digest::SHA256.hexdigest "#{user.id}-#{Rails.application.secrets.secret_key_base}"
       end
 
-      o.claim(:name)           { |user| user.name }
-      o.claim(:nickname)       { |user| user.username }
+      o.claim(:name, &:name)
+      o.claim(:nickname, &:username)
 
       # Check whether the application has access to the email scope, and grant
       # access to the user's primary email address if so, otherwise their

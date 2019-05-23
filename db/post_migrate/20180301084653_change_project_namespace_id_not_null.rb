@@ -16,9 +16,7 @@ class ChangeProjectNamespaceIdNotNull < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def up
-    Project.where(namespace_id: nil).each_batch(of: BATCH_SIZE) do |batch|
-      batch.delete_all
-    end
+    Project.where(namespace_id: nil).each_batch(of: BATCH_SIZE, &:delete_all)
 
     change_column_null :projects, :namespace_id, false
   end

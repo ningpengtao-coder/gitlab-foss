@@ -37,7 +37,7 @@ class AddUniqueConstraintToProjectFeaturesProjectId < ActiveRecord::Migration[4.
       ProjectFeature
         .where(project_id: feature['project_id'])
         .where('id <> ?', feature['max'])
-        .each_batch { |batch| batch.delete_all }
+        .each_batch(&:delete_all)
     end
   end
 end

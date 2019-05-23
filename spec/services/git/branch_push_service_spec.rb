@@ -489,17 +489,17 @@ describe Git::BranchPushService, services: true do
 
     before do
       # Flush any raw key-value data stored by the housekeeping code.
-      Gitlab::Redis::Cache.with { |conn| conn.flushall }
-      Gitlab::Redis::Queues.with { |conn| conn.flushall }
-      Gitlab::Redis::SharedState.with { |conn| conn.flushall }
+      Gitlab::Redis::Cache.with(&:flushall)
+      Gitlab::Redis::Queues.with(&:flushall)
+      Gitlab::Redis::SharedState.with(&:flushall)
 
       allow(Projects::HousekeepingService).to receive(:new).and_return(housekeeping)
     end
 
     after do
-      Gitlab::Redis::Cache.with { |conn| conn.flushall }
-      Gitlab::Redis::Queues.with { |conn| conn.flushall }
-      Gitlab::Redis::SharedState.with { |conn| conn.flushall }
+      Gitlab::Redis::Cache.with(&:flushall)
+      Gitlab::Redis::Queues.with(&:flushall)
+      Gitlab::Redis::SharedState.with(&:flushall)
     end
 
     it 'does not perform housekeeping when not needed' do

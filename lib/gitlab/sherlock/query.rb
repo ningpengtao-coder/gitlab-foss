@@ -108,7 +108,7 @@ module Gitlab
 
       def format_sql(query)
         query.each_line
-          .map { |line| line.strip }
+          .map(&:strip)
           .join("\n")
           .gsub(PREFIX_NEWLINE) { "\n#{$1} " }
       end

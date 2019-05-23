@@ -53,13 +53,9 @@ class DiffFileEntity < DiffFileBaseEntity
   end
 
   # Used for inline diffs
-  expose :highlighted_diff_lines, using: DiffLineEntity, if: -> (diff_file, _) { diff_file.text? } do |diff_file|
-    diff_file.diff_lines_for_serializer
-  end
+  expose :highlighted_diff_lines, using: DiffLineEntity, if: -> (diff_file, _) { diff_file.text? }, &:diff_lines_for_serializer
 
-  expose :is_fully_expanded do |diff_file|
-    diff_file.fully_expanded?
-  end
+  expose :is_fully_expanded, &:fully_expanded?
 
   # Used for parallel diffs
   expose :parallel_diff_lines, using: DiffLineParallelEntity, if: -> (diff_file, _) { diff_file.text? }

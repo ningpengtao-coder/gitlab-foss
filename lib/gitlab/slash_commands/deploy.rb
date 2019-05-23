@@ -43,9 +43,7 @@ module Gitlab
         environment = project.environments.find_by(name: from)
         return unless environment
 
-        actions = environment.actions_for(to).select do |action|
-          action.starts_environment?
-        end
+        actions = environment.actions_for(to).select(&:starts_environment?)
 
         if actions.many?
           actions.find { |action| action.name == to.to_s }

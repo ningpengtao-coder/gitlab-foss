@@ -19,7 +19,7 @@ module ResourceEvents
     end
 
     def execute(notes = [])
-      (notes + label_notes).sort_by { |n| n.created_at }
+      (notes + label_notes).sort_by(&:created_at)
     end
 
     private
@@ -37,7 +37,7 @@ module ResourceEvents
       events = resource.resource_label_events.includes(:label, user: :status)
       events = since_fetch_at(events)
 
-      events.group_by { |event| event.discussion_id }
+      events.group_by(&:discussion_id)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

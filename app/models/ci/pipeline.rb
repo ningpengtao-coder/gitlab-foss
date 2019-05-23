@@ -131,9 +131,7 @@ module Ci
         pipeline.update_duration
       end
 
-      before_transition any => [:manual] do |pipeline|
-        pipeline.update_duration
-      end
+      before_transition any => [:manual], &:update_duration
 
       before_transition canceled: any - [:canceled] do |pipeline|
         pipeline.auto_canceled_by = nil

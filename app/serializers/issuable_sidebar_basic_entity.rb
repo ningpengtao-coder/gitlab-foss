@@ -4,9 +4,7 @@ class IssuableSidebarBasicEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :id
-  expose :type do |issuable|
-    issuable.to_ability_name
-  end
+  expose :type, &:to_ability_name
   expose :author_id
   expose :project_id do |issuable|
     issuable.project.id

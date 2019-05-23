@@ -5,11 +5,11 @@ describe MembersHelper do
     let(:requester) { create(:user) }
     let(:project) { create(:project, :public, :access_requestable) }
     let(:project_member) { build(:project_member, project: project) }
-    let(:project_member_invite) { build(:project_member, project: project).tap { |m| m.generate_invite_token! } }
+    let(:project_member_invite) { build(:project_member, project: project).tap(&:generate_invite_token!) }
     let(:project_member_request) { project.request_access(requester) }
     let(:group) { create(:group, :access_requestable) }
     let(:group_member) { build(:group_member, group: group) }
-    let(:group_member_invite) { build(:group_member, group: group).tap { |m| m.generate_invite_token! } }
+    let(:group_member_invite) { build(:group_member, group: group).tap(&:generate_invite_token!) }
     let(:group_member_request) { group.request_access(requester) }
 
     it { expect(remove_member_message(project_member)).to eq "Are you sure you want to remove #{project_member.user.name} from the #{project.full_name} project?" }

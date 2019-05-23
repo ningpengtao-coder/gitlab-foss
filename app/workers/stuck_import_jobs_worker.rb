@@ -37,7 +37,7 @@ class StuckImportJobsWorker
     # scheduled/started to finished/failed while we were looking up their Sidekiq status.
     completed_import_states = enqueued_import_states_with_jid.where(id: completed_import_state_ids)
 
-    completed_import_state_jids = completed_import_states.map { |import_state| import_state.jid }.join(', ')
+    completed_import_state_jids = completed_import_states.map(&:jid).join(', ')
     Rails.logger.info("Marked stuck import jobs as failed. JIDs: #{completed_import_state_jids}")
 
     completed_import_states.each do |import_state|

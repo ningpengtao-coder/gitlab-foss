@@ -60,9 +60,7 @@ module Gitlab
         end
 
         def do_master_restart
-          @master_restart_hooks && @master_restart_hooks.each do |block|
-            block.call
-          end
+          @master_restart_hooks && @master_restart_hooks.each(&:call)
         end
 
         # Puma doesn't use singletons (which is good) but

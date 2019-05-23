@@ -43,7 +43,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   def empty_repo_statistics_anchors
     [
       license_anchor_data
-    ].compact.select { |item| item.is_link }
+    ].compact.select(&:is_link)
   end
 
   def empty_repo_statistics_buttons
@@ -52,7 +52,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
       readme_anchor_data,
       changelog_anchor_data,
       contribution_guide_anchor_data
-    ].compact.reject { |item| item.is_link }
+    ].compact.reject(&:is_link)
   end
 
   def default_view

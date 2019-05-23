@@ -44,7 +44,7 @@ module Gitlab
           # This preloads the number of warnings for every stage, ensuring
           # that Ci::Stage#has_warnings? doesn't execute any additional
           # queries.
-          @pipeline.stages.each { |stage| stage.number_of_warnings }
+          @pipeline.stages.each(&:number_of_warnings)
         end
       end
     end

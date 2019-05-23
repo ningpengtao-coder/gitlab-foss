@@ -54,9 +54,7 @@ module Gitlab
           batch_remove_todos_cte(project_id)
         else
           unauthorized_project_todos(project_id)
-            .each_batch(of: 5000) do |batch|
-              batch.delete_all
-            end
+            .each_batch(of: 5000, &:delete_all)
         end
       end
 

@@ -74,7 +74,7 @@ module Gitlab
         request = Gitaly::CommitDeltaRequest.new(diff_from_parent_request_params(commit))
         response = GitalyClient.call(@repository.storage, :diff_service, :commit_delta, request, timeout: GitalyClient.fast_timeout)
 
-        response.flat_map { |msg| msg.deltas }
+        response.flat_map(&:deltas)
       end
 
       def tree_entry(ref, path, limit = nil)

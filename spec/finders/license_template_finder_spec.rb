@@ -29,7 +29,7 @@ describe LicenseTemplateFinder do
       let(:params) { { popular: nil } }
 
       it 'returns all licenses known by the Licensee gem' do
-        from_licensee = Licensee::License.all.map { |l| l.key }
+        from_licensee = Licensee::License.all.map(&:key)
 
         expect(result.map(&:key)).to match_array(from_licensee)
       end

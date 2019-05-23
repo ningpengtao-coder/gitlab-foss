@@ -37,7 +37,7 @@ module Gitlab
       def perform(start_id, stop_id)
         stages = Migratable::Build.where('stage_id IS NULL')
           .where('id BETWEEN ? AND ?', start_id, stop_id)
-          .map { |build| build.ensure_stage! }
+          .map(&:ensure_stage!)
           .compact.map(&:id)
 
         MigrateBuildStageIdReference.new.perform(start_id, stop_id)

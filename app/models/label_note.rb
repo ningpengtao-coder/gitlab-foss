@@ -75,7 +75,7 @@ class LabelNote < Note
   # added 3 deleted labels
   # added ~1 ~2 labels
   def labels_str(prefix, label_refs)
-    existing_refs = label_refs.select { |ref| ref.present? }.sort
+    existing_refs = label_refs.select(&:present?).sort
     refs_str = existing_refs.empty? ? nil : existing_refs.join(' ')
 
     deleted = label_refs.count - existing_refs.count

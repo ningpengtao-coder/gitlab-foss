@@ -47,7 +47,7 @@ module QA
       def fabricate!
         # Don't try to log-out if we're not logged-in
         if Page::Main::Menu.perform { |p| p.has_personal_area?(wait: 0) }
-          Page::Main::Menu.perform { |main| main.sign_out }
+          Page::Main::Menu.perform(&:sign_out)
         end
 
         if credentials_given?
@@ -55,9 +55,7 @@ module QA
             login.sign_in_using_credentials(self)
           end
         else
-          Page::Main::Login.perform do |login|
-            login.switch_to_register_tab
-          end
+          Page::Main::Login.perform(&:switch_to_register_tab)
           Page::Main::SignUp.perform do |signup|
             signup.sign_up!(self)
           end

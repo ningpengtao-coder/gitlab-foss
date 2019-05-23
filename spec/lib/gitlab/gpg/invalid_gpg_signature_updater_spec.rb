@@ -119,9 +119,7 @@ RSpec.describe Gitlab::Gpg::InvalidGpgSignatureUpdater do
 
     context 'gpg signature did have an associated unverified gpg key' do
       let!(:user) do
-        create(:user, email: 'unrelated@example.com').tap do |user|
-          user.skip_reconfirmation!
-        end
+        create(:user, email: 'unrelated@example.com').tap(&:skip_reconfirmation!)
       end
 
       let!(:invalid_gpg_signature) do

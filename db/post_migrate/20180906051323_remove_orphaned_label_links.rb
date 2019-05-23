@@ -26,9 +26,7 @@ class RemoveOrphanedLabelLinks < ActiveRecord::Migration[4.2]
       # staging, removing 100,000 rows generated a max replication lag of 6.7
       # MB. In total, removing all these rows will only generate about 136 MB
       # of data, so it should be safe to do this.
-      LabelLinks.orphaned.each_batch(of: 100_000) do |batch|
-        batch.delete_all
-      end
+      LabelLinks.orphaned.each_batch(of: 100_000, &:delete_all)
     end
 
     add_concurrent_foreign_key(:label_links, :labels, column: :label_id, on_delete: :cascade)

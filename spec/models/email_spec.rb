@@ -16,9 +16,7 @@ describe Email do
 
   describe '#update_invalid_gpg_signatures' do
     let(:user) do
-      create(:user, email: 'tula.torphy@abshire.ca').tap do |user|
-        user.skip_reconfirmation!
-      end
+      create(:user, email: 'tula.torphy@abshire.ca').tap(&:skip_reconfirmation!)
     end
     let(:user) { create(:user) }
 

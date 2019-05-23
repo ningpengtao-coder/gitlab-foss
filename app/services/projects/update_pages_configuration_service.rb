@@ -95,9 +95,7 @@ module Projects
     end
 
     def read_file(file)
-      File.open(file, 'r') do |f|
-        f.read
-      end
+      File.open(file, 'r', &:read)
     rescue
       nil
     end

@@ -10,12 +10,7 @@ module API
 
     included do |base|
       # OAuth2 Resource Server Authentication
-      use Rack::OAuth2::Server::Resource::Bearer, 'The API' do |request|
-        # The authenticator only fetches the raw token string
-
-        # Must yield access token to store it in the env
-        request.access_token
-      end
+      use Rack::OAuth2::Server::Resource::Bearer, 'The API', &:access_token
 
       helpers HelperMethods
 

@@ -29,11 +29,7 @@ module QA
       end
 
       def eager_load_api_client!
-        api_client.tap do |client|
-          # Eager-load the API client so that the personal token creation isn't
-          # taken in account in the actual resource creation timing.
-          client.personal_access_token
-        end
+        api_client.tap(&:personal_access_token)
       end
 
       private

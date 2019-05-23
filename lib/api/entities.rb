@@ -509,9 +509,7 @@ module API
 
     class ProtectedRefAccess < Grape::Entity
       expose :access_level
-      expose :access_level_description do |protected_ref_access|
-        protected_ref_access.humanize
-      end
+      expose :access_level_description, &:humanize
     end
 
     class ProtectedBranch < Grape::Entity
@@ -677,9 +675,7 @@ module API
       expose(:user_notes_count) { |merge_request, options| issuable_metadata(merge_request, options, :user_notes_count) }
       expose(:upvotes)          { |merge_request, options| issuable_metadata(merge_request, options, :upvotes) }
       expose(:downvotes)        { |merge_request, options| issuable_metadata(merge_request, options, :downvotes) }
-      expose :assignee, using: ::API::Entities::UserBasic do |merge_request|
-        merge_request.assignee
-      end
+      expose :assignee, using: ::API::Entities::UserBasic, &:assignee
       expose :author, :assignees, using: Entities::UserBasic
 
       expose :source_project_id, :target_project_id
