@@ -1,7 +1,15 @@
-# GitLab.com settings
+---
+type: reference
+description: Docs for the GitLab's instance settings applied for GitLab.com.
+---
 
-In this page you will find information about the settings that are used on
-[GitLab.com](https://about.gitlab.com/pricing).
+# GitLab.com settings **[FREE ONLY]**
+
+This page documents the GitLab's instances settings used in
+[GitLab.com](https://gitlab.com), valid for **GitLab.com users**.
+For GitLab self-managed instances the administrators of each
+instance have the ability to ajust them according to their needs
+and to their tier's availabilities.
 
 ## SSH host keys fingerprints
 
