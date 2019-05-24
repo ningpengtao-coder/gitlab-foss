@@ -18,8 +18,8 @@ module Gitlab
     class Manifest
       attr_reader :parsed_xml, :errors
 
-      def initialize(file)
-        @parsed_xml = Nokogiri::XML(file, &:strict)
+      def initialize(file_contents)
+        @parsed_xml = Nokogiri::XML(file_contents, &:strict)
         @errors = []
       rescue Nokogiri::XML::SyntaxError
         @errors = ['The uploaded file is not a valid XML file.']
