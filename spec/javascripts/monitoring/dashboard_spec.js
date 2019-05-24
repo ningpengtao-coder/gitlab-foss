@@ -135,6 +135,38 @@ describe('Dashboard', () => {
       });
     });
 
+    describe('toolbar', () => {
+      const mount = props =>
+        new DashboardComponent({
+          el: document.querySelector('.prometheus-graphs'),
+          store,
+          propsData: {
+            ...propsData,
+            hasMetrics: true,
+            showTimeWindowDropdown: false,
+            ...props,
+          },
+        });
+
+      it('renders toolbar by default', done => {
+        const component = mount();
+
+        setTimeout(() => {
+          expect(component.$refs.toolbar).toBeDefined();
+          done();
+        });
+      });
+
+      it('does not render toolbar when showToolbar is false', done => {
+        const component = mount({ showToolbar: false });
+
+        setTimeout(() => {
+          expect(component.$refs.toolbar).not.toBeDefined();
+          done();
+        });
+      });
+    });
+
     it('renders the environments dropdown with a number of environments', done => {
       component = new DashboardComponent({
         el: document.querySelector('.prometheus-graphs'),

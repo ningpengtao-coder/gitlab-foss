@@ -53,6 +53,11 @@ export default {
       required: false,
       default: true,
     },
+    showToolbar: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     documentationPath: {
       type: String,
       required: true,
@@ -226,7 +231,11 @@ export default {
 
 <template>
   <div v-if="!showEmptyState" class="prometheus-graphs">
-    <div class="gl-p-3 border-bottom bg-gray-light d-flex justify-content-between">
+    <div
+      v-if="showToolbar"
+      ref="toolbar"
+      class="gl-p-3 border-bottom bg-gray-light d-flex justify-content-between"
+    >
       <div
         v-if="environmentsEndpoint"
         class="dropdowns d-flex align-items-center justify-content-between"
