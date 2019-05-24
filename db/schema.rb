@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190506135400) do
+ActiveRecord::Schema.define(version: 20190516011213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -189,6 +189,8 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.string "encrypted_external_auth_client_key_pass_iv"
     t.string "lets_encrypt_notification_email"
     t.boolean "lets_encrypt_terms_of_service_accepted", default: false, null: false
+    t.integer "elasticsearch_shards", default: 5, null: false
+    t.integer "elasticsearch_replicas", default: 1, null: false
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
   end
 
@@ -378,6 +380,7 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.index ["project_id", "id"], name: "index_ci_builds_on_project_id_and_id", using: :btree
     t.index ["project_id", "status"], name: "index_ci_builds_project_id_and_status_for_live_jobs_partial2", where: "(((type)::text = 'Ci::Build'::text) AND ((status)::text = ANY (ARRAY[('running'::character varying)::text, ('pending'::character varying)::text, ('created'::character varying)::text])))", using: :btree
     t.index ["protected"], name: "index_ci_builds_on_protected", using: :btree
+    t.index ["queued_at"], name: "index_ci_builds_on_queued_at", using: :btree
     t.index ["runner_id"], name: "index_ci_builds_on_runner_id", using: :btree
     t.index ["scheduled_at"], name: "partial_index_ci_builds_on_scheduled_at_with_scheduled_jobs", where: "((scheduled_at IS NOT NULL) AND ((type)::text = 'Ci::Build'::text) AND ((status)::text = 'scheduled'::text))", using: :btree
     t.index ["stage_id", "stage_idx"], name: "tmp_build_stage_position_index", where: "(stage_idx IS NOT NULL)", using: :btree
@@ -1225,6 +1228,15 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.index ["merge_request_id", "user_id"], name: "index_merge_request_assignees_on_merge_request_id_and_user_id", unique: true, using: :btree
     t.index ["merge_request_id"], name: "index_merge_request_assignees_on_merge_request_id", using: :btree
     t.index ["user_id"], name: "index_merge_request_assignees_on_user_id", using: :btree
+  end
+
+  create_table "merge_request_blocks", force: :cascade do |t|
+    t.integer "blocking_merge_request_id", null: false
+    t.integer "blocked_merge_request_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["blocked_merge_request_id"], name: "index_merge_request_blocks_on_blocked_merge_request_id", using: :btree
+    t.index ["blocking_merge_request_id", "blocked_merge_request_id"], name: "index_mr_blocks_on_blocking_and_blocked_mr_ids", unique: true, using: :btree
   end
 
   create_table "merge_request_diff_commits", id: false, force: :cascade do |t|
@@ -2246,6 +2258,9 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.integer "first_day_of_week"
     t.string "issues_sort"
     t.string "merge_requests_sort"
+    t.string "timezone"
+    t.boolean "time_display_relative"
+    t.boolean "time_format_in_24h"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
@@ -2511,6 +2526,8 @@ ActiveRecord::Schema.define(version: 20190506135400) do
   add_foreign_key "members", "users", name: "fk_2e88fb7ce9", on_delete: :cascade
   add_foreign_key "merge_request_assignees", "merge_requests", on_delete: :cascade
   add_foreign_key "merge_request_assignees", "users", on_delete: :cascade
+  add_foreign_key "merge_request_blocks", "merge_requests", column: "blocked_merge_request_id", on_delete: :cascade
+  add_foreign_key "merge_request_blocks", "merge_requests", column: "blocking_merge_request_id", on_delete: :cascade
   add_foreign_key "merge_request_diff_commits", "merge_request_diffs", on_delete: :cascade
   add_foreign_key "merge_request_diff_files", "merge_request_diffs", on_delete: :cascade
   add_foreign_key "merge_request_diffs", "merge_requests", name: "fk_8483f3258f", on_delete: :cascade

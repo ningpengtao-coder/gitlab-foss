@@ -3,7 +3,7 @@
 module Clusters
   module Applications
     class Runner < ApplicationRecord
-      VERSION = '0.4.1'.freeze
+      VERSION = '0.5.0'.freeze
 
       self.table_name = 'clusters_applications_runners'
 
@@ -69,10 +69,12 @@ module Clusters
         }
 
         if cluster.group_type?
-          attributes.merge(groups: [group])
+          attributes[:groups] = [group]
         elsif cluster.project_type?
-          attributes.merge(projects: [project])
+          attributes[:projects] = [project]
         end
+
+        attributes
       end
 
       def gitlab_url

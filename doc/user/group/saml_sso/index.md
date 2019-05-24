@@ -15,15 +15,23 @@ SAML SSO for groups is used only as a convenient way to add users and does not s
 ## Configuring your Identity Provider
 
 1. Navigate to the group and click **Settings > SAML SSO**.
-1. Configure your SAML server using the **Assertion consumer service URL** and **Issuer**. See [your identity provider's documentation](#providers) for more details.
+1. Configure your SAML server using the **Assertion consumer service URL** and **Issuer**. Alternatively GitLab provides [metadata XML configuration](#metadata-configuration). See [your identity provider's documentation](#providers) for more details.
 1. Configure the SAML response to include a NameID that uniquely identifies each user.
 1. Configure required assertions using the [table below](#assertions).
 1. Once the identity provider is set up, move on to [configuring GitLab](#configuring-gitlab).
 
 ![Issuer and callback for configuring SAML identity provider with GitLab.com](img/group_saml_configuration_information.png)
 
-NOTE: **Note:**
-Partial SSO enforcement was introduced in [11.8](https://gitlab.com/gitlab-org/gitlab-ee/issues/5291). With this option enabled, users must use your group's GitLab single sign on URL to be added to the group or be added via SCIM. Users can no longer be added manually. After a user has been added to the group, GitLab does not continue to enforce the use of SSO, but we'll [add a persistent check](https://gitlab.com/gitlab-org/gitlab-ee/issues/9255) in a later version.
+### SSO enforcement
+
+SSO enforcement was:
+
+- [Introduced in GitLab 11.8](https://gitlab.com/gitlab-org/gitlab-ee/issues/5291).
+- [Improved upon in GitLab 11.11 with ongoing enforcement in the GitLab UI](https://gitlab.com/gitlab-org/gitlab-ee/issues/9255).
+
+With this option enabled, users must use your group's GitLab single sign on URL to be added to the group or be added via SCIM. Users cannot be added manually, and may only access project/group resources via the UI by signing in through the SSO URL.
+
+We intend to add a similar SSO requirement for [Git and API activity](https://gitlab.com/gitlab-org/gitlab-ee/issues/9152) in the future.
 
 ### NameID
 
@@ -41,6 +49,14 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 | Full Name | `name` |  |
 | First Name | `first_name`, `firstname`, `firstName` |  |
 | Last Name | `last_name`, `lastname`, `lastName` |  |
+
+## Metadata configuration
+
+GitLab provides metadata XML that can be used to configure your Identity Provider.
+
+1. Navigate to the group and click **Settings > SAML SSO**.
+1. Copy the provided **GitLab metadata URL**
+1. Follow your Identity Provider's documentation and paste the metadata URL when it is requested.
 
 ## Configuring GitLab
 

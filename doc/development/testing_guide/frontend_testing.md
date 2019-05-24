@@ -15,16 +15,25 @@ information on general testing practices at GitLab.
 
 ## Jest
 
-GitLab has started to migrate tests to the [Jest](https://jestjs.io)
-testing framework. You can read a [detailed evaluation](https://gitlab.com/gitlab-org/gitlab-ce/issues/49171)
-of Jest compared to our use of Karma and Jasmine. In summary, it will allow us
-to improve the performance and consistency of our frontend tests.
+We have started to migrate frontend tests to the [Jest](https://jestjs.io) testing framework (see also the corresponding
+[epic](https://gitlab.com/groups/gitlab-org/-/epics/895)).
 
 Jest tests can be found in `/spec/frontend` and `/ee/spec/frontend` in EE.
 
 It is not yet a requirement to use Jest. You can view the
 [epic](https://gitlab.com/groups/gitlab-org/-/epics/873) of issues
 we need to solve before being able to use Jest for all our needs.
+
+### Differences to Karma
+
+- Jest runs in a Node.js environment, not in a browser. Support for running Jest tests in a browser [is planned](https://gitlab.com/gitlab-org/gitlab-ce/issues/58205).
+- Because Jest runs in a Node.js environment, it uses [jsdom](https://github.com/jsdom/jsdom) by default.
+- All calls to `setTimeout` and `setInterval` are mocked away. See also [Jest Timer Mocks](https://jestjs.io/docs/en/timer-mocks).
+- `rewire` is not required because Jest supports mocking modules. See also [Manual Mocks](https://jestjs.io/docs/en/manual-mocks).
+- The following will cause tests to fail in Jest:
+  - Unmocked requests.
+  - Unhandled Promise rejections.
+  - Calls to `console.warn`, including warnings from libraries like Vue.
 
 ### Debugging Jest tests
 
@@ -187,6 +196,7 @@ export default function doSomething() {
   visitUrl('/foo/bar');
 }
 ```
+
 ```js
 // my_module_spec.js
 import doSomething from '~/my_module';
@@ -213,7 +223,187 @@ Further documentation on the babel rewire pluign API can be found on
 
 #### Waiting in tests
 
-If you cannot avoid using [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout) in tests, please use the [Jasmine mock clock](https://jasmine.github.io/api/2.9/Clock.html).
+Sometimes a test needs to wait for something to happen in the application before it continues.
+Avoid using [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)
+because it makes the reason for waiting unclear and if passed a time larger than zero it will slow down our test suite.
+Instead use one of the following approaches.
+
+##### Promises and Ajax calls
+
+Register handler functions to wait for the `Promise` to be resolved.
+
+```javascript
+const askTheServer = () => {
+  return axios
+    .get('/endpoint')
+    .then(response => {
+      // do something
+    })
+    .catch(error => {
+      // do something else
+    });
+};
+```
+
+**in Jest:**
+
+```javascript
+it('waits for an Ajax call', () => {
+  return askTheServer().then(() => {
+    expect(something).toBe('done');
+  });
+});
+```
+
+**in Karma:**
+
+```javascript
+it('waits for an Ajax call', done => {
+  askTheServer()
+    .then(() => {
+      expect(something).toBe('done');
+    })
+    .then(done)
+    .catch(done.fail);
+});
+```
+
+If you are not able to register handlers to the `Promise`—for example because it is executed in a synchronous Vue life
+cycle hook—you can flush all pending `Promise`s:
+
+**in Jest:**
+
+```javascript
+it('waits for an Ajax call', () => {
+  synchronousFunction();
+  jest.runAllTicks();
+
+  expect(something).toBe('done');
+});
+```
+
+**in Karma:**
+
+You are out of luck. The following only works sometimes and may lead to flaky failures:
+
+```javascript
+it('waits for an Ajax call', done => {
+  synchronousFunction();
+
+  // create a new Promise and hope that it resolves after the rest
+  Promise.resolve()
+    .then(() => {
+      expect(something).toBe('done');
+    })
+    .then(done)
+    .catch(done.fail);
+});
+```
+
+##### Vue rendering
+
+To wait until a Vue component is re-rendered, use either of the equivalent
+[`Vue.nextTick()`](https://vuejs.org/v2/api/#Vue-nextTick) or `vm.$nextTick()`.
+
+**in Jest:**
+
+```javascript
+it('renders something', () => {
+  wrapper.setProps({ value: 'new value' });
+
+  return wrapper.vm.$nextTick().then(() => {
+    expect(wrapper.text()).toBe('new value');
+  });
+});
+```
+
+**in Karma:**
+
+```javascript
+it('renders something', done => {
+  wrapper.setProps({ value: 'new value' });
+
+  wrapper.vm
+    .$nextTick()
+    .then(() => {
+      expect(wrapper.text()).toBe('new value');
+    })
+    .then(done)
+    .catch(done.fail);
+});
+```
+
+##### `setTimeout()` / `setInterval()` in application
+
+If the application itself is waiting for some time, mock await the waiting. In Jest this is already
+[done by default](https://gitlab.com/gitlab-org/gitlab-ce/blob/a2128edfee799e49a8732bfa235e2c5e14949c68/jest.config.js#L47)
+(see also [Jest Timer Mocks](https://jestjs.io/docs/en/timer-mocks)). In Karma you can use the
+[Jasmine mock clock](https://jasmine.github.io/api/2.9/Clock.html).
+
+```javascript
+const doSomethingLater = () => {
+  setTimeout(() => {
+    // do something
+  }, 4000);
+};
+```
+
+**in Jest:**
+
+```javascript
+it('does something', () => {
+  doSomethingLater();
+  jest.runAllTimers();
+
+  expect(something).toBe('done');
+});
+```
+
+**in Karma:**
+
+```javascript
+it('does something', () => {
+  jasmine.clock().install();
+
+  doSomethingLater();
+  jasmine.clock().tick(4000);
+
+  expect(something).toBe('done');
+  jasmine.clock().uninstall();
+});
+```
+
+##### Events
+
+If the application triggers an event that you need to wait for in your test, register an event handler which contains
+the assertions:
+
+```javascript
+it('waits for an event', done => {
+  eventHub.$once('someEvent', eventHandler);
+
+  someFunction();
+
+  function eventHandler() {
+    expect(something).toBe('done');
+    done();
+  }
+});
+```
+
+In Jest you can also use a `Promise` for this:
+
+```javascript
+it('waits for an event', () => {
+  const eventTriggered = new Promise(resolve => eventHub.$once('someEvent', resolve));
+
+  someFunction();
+
+  return eventTriggered.then(() => {
+    expect(something).toBe('done');
+  });
+});
+```
 
 #### Migrating flaky Karma tests to Jest
 

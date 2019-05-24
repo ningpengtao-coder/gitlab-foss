@@ -239,8 +239,10 @@ module ProjectsHelper
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  # TODO: Remove this method when removing the feature flag
+  # https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/11209#note_162234863
   def show_projects?(projects, params)
-    !!(params[:personal] || params[:name] || any_projects?(projects))
+    Feature.enabled?(:project_list_filter_bar) || !!(params[:personal] || params[:name] || any_projects?(projects))
   end
 
   def push_to_create_project_command(user = current_user)
@@ -311,6 +313,10 @@ module ProjectsHelper
       "ExternalAuthorizationService|When no classification label is set the "\
         "default label `%{default_label}` will be used."
     ) % { default_label: default_label }
+  end
+
+  def can_import_members?
+    Ability.allowed?(current_user, :admin_project_member, @project)
   end
 
   private

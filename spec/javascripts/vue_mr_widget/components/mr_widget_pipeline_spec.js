@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import pipelineComponent from '~/vue_merge_request_widget/components/mr_widget_pipeline.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import mockData from '../mock_data';
 
 describe('MRWidgetPipeline', () => {
@@ -70,6 +70,19 @@ describe('MRWidgetPipeline', () => {
         pipeline: mockData.pipeline,
         hasCi: true,
         ciStatus: null,
+        troubleshootingDocsPath: 'help',
+      });
+
+      expect(vm.$el.querySelector('.media-body').textContent.trim()).toContain(
+        'Could not retrieve the pipeline status. For troubleshooting steps, read the documentation.',
+      );
+    });
+
+    it('should render CI error when no pipeline is provided', () => {
+      vm = mountComponent(Component, {
+        pipeline: {},
+        hasCi: true,
+        ciStatus: 'success',
         troubleshootingDocsPath: 'help',
       });
 

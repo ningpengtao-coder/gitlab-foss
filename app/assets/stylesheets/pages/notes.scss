@@ -107,6 +107,7 @@ $note-form-margin-left: 72px;
 
     &.collapsed {
       color: $gl-text-color-secondary;
+      border-radius: 0 0 $border-radius-default $border-radius-default;
 
       svg {
         float: left;
@@ -471,6 +472,11 @@ $note-form-margin-left: 72px;
         vertical-align: top;
         white-space: normal;
 
+        // Fixes subpixel rounding issue https://gitlab.com/gitlab-org/gitlab-ce/issues/53973
+        // background-color is needed for dark code preference
+        padding-bottom: 1px;
+        background-color: $white-light;
+
         &.parallel {
           border-width: 1px;
 
@@ -639,7 +645,7 @@ $note-form-margin-left: 72px;
   display: inline-flex;
   align-items: center;
   margin-left: 10px;
-  color: $gray-darkest;
+  color: $gray-600;
 
   @include notes-media('max', map-get($grid-breakpoints, sm) - 1) {
     float: none;

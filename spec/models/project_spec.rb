@@ -214,6 +214,13 @@ describe Project do
       expect(project2).not_to be_valid
     end
 
+    it 'validates the visibility' do
+      expect_any_instance_of(described_class).to receive(:visibility_level_allowed_as_fork).and_call_original
+      expect_any_instance_of(described_class).to receive(:visibility_level_allowed_by_group).and_call_original
+
+      create(:project)
+    end
+
     describe 'wiki path conflict' do
       context "when the new path has been used by the wiki of other Project" do
         it 'has an error on the name attribute' do
@@ -3164,61 +3171,105 @@ describe Project do
   end
 
   describe '.with_feature_available_for_user' do
-    let!(:user) { create(:user) }
-    let!(:feature) { MergeRequest }
-    let!(:project) { create(:project, :public, :merge_requests_enabled) }
+    let(:user) { create(:user) }
+    let(:feature) { MergeRequest }
 
     subject { described_class.with_feature_available_for_user(feature, user) }
 
-    context 'when user has access to project' do
-      subject { described_class.with_feature_available_for_user(feature, user) }
+    shared_examples 'feature disabled' do
+      let(:project) { create(:project, :public, :merge_requests_disabled) }
 
+      it 'does not return projects with the project feature disabled' do
+        is_expected.not_to include(project)
+      end
+    end
+
+    shared_examples 'feature public' do
+      let(:project) { create(:project, :public, :merge_requests_public) }
+
+      it 'returns projects with the project feature public' do
+        is_expected.to include(project)
+      end
+    end
+
+    shared_examples 'feature enabled' do
+      let(:project) { create(:project, :public, :merge_requests_enabled) }
+
+      it 'returns projects with the project feature enabled' do
+        is_expected.to include(project)
+      end
+    end
+
+    shared_examples 'feature access level is nil' do
+      let(:project) { create(:project, :public) }
+
+      it 'returns projects with the project feature access level nil' do
+        project.project_feature.update(merge_requests_access_level: nil)
+
+        is_expected.to include(project)
+      end
+    end
+
+    context 'with user' do
       before do
         project.add_guest(user)
       end
 
-      context 'when public project' do
-        context 'when feature is public' do
-          it 'returns project' do
-            is_expected.to include(project)
-          end
-        end
+      it_behaves_like 'feature disabled'
+      it_behaves_like 'feature public'
+      it_behaves_like 'feature enabled'
+      it_behaves_like 'feature access level is nil'
 
-        context 'when feature is private' do
-          let!(:project) { create(:project, :public, :merge_requests_private) }
+      context 'when feature is private' do
+        let(:project) { create(:project, :public, :merge_requests_private) }
 
-          it 'returns project when user has access to the feature' do
-            project.add_maintainer(user)
-
-            is_expected.to include(project)
-          end
-
-          it 'does not return project when user does not have the minimum access level required' do
+        context 'when user does not has access to the feature' do
+          it 'does not return projects with the project feature private' do
             is_expected.not_to include(project)
           end
         end
-      end
 
-      context 'when private project' do
-        let!(:project) { create(:project) }
+        context 'when user has access to the feature' do
+          it 'returns projects with the project feature private' do
+            project.add_reporter(user)
 
-        it 'returns project when user has access to the feature' do
-          project.add_maintainer(user)
-
-          is_expected.to include(project)
-        end
-
-        it 'does not return project when user does not have the minimum access level required' do
-          is_expected.not_to include(project)
+            is_expected.to include(project)
+          end
         end
       end
     end
 
-    context 'when user does not have access to project' do
-      let!(:project) { create(:project) }
+    context 'user is an admin' do
+      let(:user) { create(:user, :admin) }
 
-      it 'does not return project when user cant access project' do
-        is_expected.not_to include(project)
+      it_behaves_like 'feature disabled'
+      it_behaves_like 'feature public'
+      it_behaves_like 'feature enabled'
+      it_behaves_like 'feature access level is nil'
+
+      context 'when feature is private' do
+        let(:project) { create(:project, :public, :merge_requests_private) }
+
+        it 'returns projects with the project feature private' do
+          is_expected.to include(project)
+        end
+      end
+    end
+
+    context 'without user' do
+      let(:user) { nil }
+
+      it_behaves_like 'feature disabled'
+      it_behaves_like 'feature public'
+      it_behaves_like 'feature enabled'
+      it_behaves_like 'feature access level is nil'
+
+      context 'when feature is private' do
+        let(:project) { create(:project, :public, :merge_requests_private) }
+
+        it 'does not return projects with the project feature private' do
+          is_expected.not_to include(project)
+        end
       end
     end
   end
@@ -3921,64 +3972,6 @@ describe Project do
 
       expect(project.api_variables.map { |variable| variable[:key] })
         .to contain_exactly(*required_variables)
-    end
-  end
-
-  describe '#auto_devops_variables' do
-    set(:project) { create(:project) }
-
-    subject { project.auto_devops_variables }
-
-    context 'when enabled in instance settings' do
-      before do
-        stub_application_setting(auto_devops_enabled: true)
-      end
-
-      context 'when domain is empty' do
-        before do
-          stub_application_setting(auto_devops_domain: nil)
-        end
-
-        it 'variables does not include AUTO_DEVOPS_DOMAIN' do
-          is_expected.not_to include(domain_variable)
-        end
-      end
-
-      context 'when domain is configured' do
-        before do
-          stub_application_setting(auto_devops_domain: 'example.com')
-        end
-
-        it 'variables includes AUTO_DEVOPS_DOMAIN' do
-          is_expected.to include(domain_variable)
-        end
-      end
-    end
-
-    context 'when explicitly enabled' do
-      context 'when domain is empty' do
-        before do
-          create(:project_auto_devops, project: project, domain: nil)
-        end
-
-        it 'variables does not include AUTO_DEVOPS_DOMAIN' do
-          is_expected.not_to include(domain_variable)
-        end
-      end
-
-      context 'when domain is configured' do
-        before do
-          create(:project_auto_devops, project: project, domain: 'example.com')
-        end
-
-        it 'variables includes AUTO_DEVOPS_DOMAIN' do
-          is_expected.to include(domain_variable)
-        end
-      end
-    end
-
-    def domain_variable
-      { key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true }
     end
   end
 
