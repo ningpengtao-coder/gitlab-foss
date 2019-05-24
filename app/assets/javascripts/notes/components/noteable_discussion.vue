@@ -407,7 +407,7 @@ Please check your network connection and try again.`;
                       :img-src="currentUser.avatar_url"
                       :img-alt="currentUser.name"
                       :img-size="40"
-                      class="d-none d-md-block"
+                      class="d-none d-sm-block"
                     />
                     <note-form
                       ref="noteForm"

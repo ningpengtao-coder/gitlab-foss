@@ -262,7 +262,7 @@ ul.related-merge-requests > li {
   .avatar-note-form-holder .note-edit-form {
     margin-left: $note-icon-gutter-width;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(xs) {
       margin-left: 0;
     }
   }

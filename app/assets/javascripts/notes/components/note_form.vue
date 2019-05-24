@@ -222,7 +222,10 @@ export default {
 </script>
 
 <template>
-  <div ref="editNoteForm" class="note-edit-form d-block current-note-edit-form js-discussion-note-form">
+  <div
+    ref="editNoteForm"
+    class="note-edit-form d-block current-note-edit-form js-discussion-note-form"
+  >
     <div v-if="conflictWhileEditing" class="js-conflict-edit-warning alert alert-danger">
       This comment has changed since you started editing, please review the
       <a :href="noteHash" target="_blank" rel="noopener noreferrer">updated comment</a> to ensure

@@ -207,8 +207,13 @@ $note-form-margin-left: 72px;
         display: none;
       }
 
+      .user-avatar-link img {
+        margin-top: 8px;
+      }
+
       .note-edit-form {
         display: block;
+        margin-left:0;
 
         &.current-note-edit-form + .note-awards {
           display: none;

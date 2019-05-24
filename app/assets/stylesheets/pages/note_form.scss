@@ -169,7 +169,7 @@
 .discussion-form {
   background-color: $white-light;
 
-  @include media-breakpoint-down(sm) {
+  @include media-breakpoint-down(xs) {
     .user-avatar-link {
       display: none;
     }
