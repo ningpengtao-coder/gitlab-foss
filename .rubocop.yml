@@ -220,3 +220,8 @@ Style/SymbolProc:
   IgnoredMethods:
     - tap # see: https://github.com/rubocop-hq/rubocop/issues/5098
     - respond_to
+    # StateMachine::Machine transition methoda
+    - before_transition 
+    - after_transition
+    - around_transition
+    - after_failure
