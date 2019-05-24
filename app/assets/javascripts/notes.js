@@ -1542,7 +1542,7 @@ export default class Notes {
                <div class="note-header">
                   <div class="note-header-info">
                      <a href="/${_.escape(currentUsername)}">
-                       <span class="d-none d-sm-inline-block">${_.escape(currentUsername)}</span>
+                       <span class="d-none d-sm-inline-block bold">${_.escape(currentUsername)}</span>
                        <span class="note-headline-light">${_.escape(currentUsername)}</span>
                      </a>
                   </div>
