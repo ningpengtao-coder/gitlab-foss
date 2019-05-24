@@ -387,7 +387,7 @@ Please check your network connection and try again.`;
                     :img-src="currentUser.avatar_url"
                     :img-alt="currentUser.name"
                     :img-size="40"
-                    class="d-block"
+                    class="d-none d-sm-block"
                   />
                   <discussion-actions
                     v-if="!isReplying && userCanReply"
@@ -407,7 +407,7 @@ Please check your network connection and try again.`;
                       :img-src="currentUser.avatar_url"
                       :img-alt="currentUser.name"
                       :img-size="40"
-                      class="d-block"
+                      class="d-none d-md-block"
                     />
                     <note-form
                       ref="noteForm"
