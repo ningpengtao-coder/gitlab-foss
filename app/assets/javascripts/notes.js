@@ -986,6 +986,16 @@ export default class Notes {
     form.find('#note_position').val(dataHolder.attr('data-position'));
 
     form
+      .prepend(
+        '<div class="avatar-note-form-holder"><div class="content"><a href="' +
+          escape(gon.current_usernamecurrentUsername) +
+          '" class="user-avatar-link d-none d-sm-block"><img class="avatar s40" src="' +
+          gon.current_user_avatar_url +
+          '" alt="' +
+          gon.current_user_fullname +
+          '" /></a></div></div>',
+      )
+      .append('</div>')
       .find('.js-close-discussion-note-form')
       .show()
       .removeClass('hide');
@@ -1021,6 +1031,9 @@ export default class Notes {
       target: $link,
       lineType: link.dataset.lineType,
       showReplyInput,
+      currentUsername: gon.current_username,
+      currentUserAvatar: gon.current_user_avatar_url,
+      currentUserFullname: gon.current_user_fullname,
     });
   }
 
@@ -1049,7 +1062,15 @@ export default class Notes {
     this.setupDiscussionNoteForm($link, newForm);
   }
 
-  toggleDiffNote({ target, lineType, forceShow, showReplyInput = false }) {
+  toggleDiffNote({
+    target,
+    lineType,
+    forceShow,
+    showReplyInput = false,
+    currentUsername,
+    currentUserAvatar,
+    currentUserFullname,
+  }) {
     var $link,
       addForm,
       hasNotes,

@@ -213,7 +213,7 @@ $note-form-margin-left: 72px;
 
       .note-edit-form {
         display: block;
-        margin-left:0;
+        margin-left: 0;
 
         &.current-note-edit-form + .note-awards {
           display: none;
@@ -521,6 +521,19 @@ $note-form-margin-left: 72px;
 .commit-diff {
   .notes-content {
     background-color: $white-light;
+
+    .avatar-note-form-holder {
+      .user-avatar-link img {
+        margin: 13px 16px 16px;
+      }
+
+      form,
+      ~ .discussion-form-container {
+        @include media-breakpoint-up(sm) {
+          margin-left: 55px;
+        }
+      }
+    }
   }
 }
 
