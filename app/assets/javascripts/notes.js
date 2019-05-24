@@ -988,11 +988,11 @@ export default class Notes {
     form
       .prepend(
         '<div class="avatar-note-form-holder"><div class="content"><a href="' +
-          escape(gon.current_usernamecurrentUsername) +
+          escape(gon.current_username) +
           '" class="user-avatar-link d-none d-sm-block"><img class="avatar s40" src="' +
-          gon.current_user_avatar_url +
+          escape(gon.current_user_avatar_url) +
           '" alt="' +
-          gon.current_user_fullname +
+          escape(gon.current_user_fullname) +
           '" /></a></div></div>',
       )
       .append('</div>')

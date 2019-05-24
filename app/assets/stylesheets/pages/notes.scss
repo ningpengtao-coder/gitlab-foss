@@ -208,7 +208,7 @@ $note-form-margin-left: 72px;
       }
 
       .user-avatar-link img {
-        margin-top: 8px;
+        margin-top: $gl-padding-8;
       }
 
       .note-edit-form {
@@ -524,13 +524,13 @@ $note-form-margin-left: 72px;
 
     .avatar-note-form-holder {
       .user-avatar-link img {
-        margin: 13px 16px 16px;
+        margin: 13px $gl-padding $gl-padding;
       }
 
       form,
       ~ .discussion-form-container {
         @include media-breakpoint-up(sm) {
-          margin-left: 55px;
+          margin-left: $note-icon-gutter-width;
         }
       }
     }
