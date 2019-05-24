@@ -259,14 +259,10 @@ ul.related-merge-requests > li {
 }
 
 .discussion-reply-holder {
-  .note-edit-form {
-    display: block;
-  }
-
   .avatar-note-form-holder .note-edit-form {
-    margin-left: 55px;
+    margin-left: $note-icon-gutter-width;
 
-    @media (max-width: map-get($grid-breakpoints, sm)-1) {
+    @include media-breakpoint-down(sm) {
       margin-left: 0;
     }
   }

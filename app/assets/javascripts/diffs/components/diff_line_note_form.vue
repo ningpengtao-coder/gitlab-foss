@@ -116,6 +116,7 @@ export default {
       :img-src="currentUser.avatar_url"
       :img-alt="currentUser.name"
       :img-size="40"
+      class="d-block"
     />
     <note-form
       ref="noteForm"
