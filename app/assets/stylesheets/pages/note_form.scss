@@ -263,10 +263,6 @@ table {
       img {
         margin-top: -3px;
       }
-
-      @include media-breakpoint-down(sm) {
-        display: none;
-      }
     }
   }
 }
