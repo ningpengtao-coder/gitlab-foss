@@ -50,7 +50,7 @@ export default {
       'getNotesDataByProp',
       'getUserData',
     ]),
-    currentUser() {
+    author() {
       return this.getUserData;
     },
     formData() {
@@ -111,10 +111,10 @@ export default {
 <template>
   <div class="content discussion-form discussion-form-container discussion-notes">
     <user-avatar-link
-      v-if="currentUser"
-      :link-href="currentUser.path"
-      :img-src="currentUser.avatar_url"
-      :img-alt="currentUser.name"
+      v-if="author"
+      :link-href="author.path"
+      :img-src="author.avatar_url"
+      :img-alt="author.name"
       :img-size="40"
       class="d-none d-sm-block"
     />
