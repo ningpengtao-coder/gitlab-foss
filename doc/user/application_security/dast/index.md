@@ -47,10 +47,7 @@ applications while you are developing and testing your applications.
 ## Requirements
 
 To run a DAST job, you need GitLab Runner with the
-[`docker`](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode) or
-[`kubernetes`](https://docs.gitlab.com/runner/install/kubernetes.html#running-privileged-containers-for-the-runners)
-executor running in privileged mode. If you're using the shared Runners on GitLab.com,
-this is enabled by default.
+[`docker` executor](https://docs.gitlab.com/runner/executors/docker.html).
 
 ## Configuring DAST
 
@@ -138,7 +135,7 @@ variables:
 
 #### Customizing the DAST settings
 
-The SAST settings can be changed through environment variables by using the
+The DAST settings can be changed through environment variables by using the
 [`variables`](../../../ci/yaml/README.md#variables) parameter in `.gitlab-ci.yml`.
 These variables are documented in the [DAST README](https://gitlab.com/gitlab-org/security-products/dast#settings).
 

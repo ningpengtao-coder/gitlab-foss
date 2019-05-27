@@ -126,10 +126,6 @@ Auto Deploy, and Auto Monitoring will be silently skipped.
 
 ## Auto DevOps base domain
 
-NOTE: **Note**
-`AUTO_DEVOPS_DOMAIN` environment variable is deprecated and
-[is scheduled to be removed](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959).
-
 The Auto DevOps base domain is required if you want to make use of [Auto
 Review Apps](#auto-review-apps) and [Auto Deploy](#auto-deploy). It can be defined
 in any of the following places:
@@ -161,6 +157,12 @@ Auto DevOps base domain to `1.2.3.4.nip.io`.
 
 Once set up, all requests will hit the load balancer, which in turn will route
 them to the Kubernetes pods that run your application(s).
+
+NOTE: **Note:**
+From GitLab 11.8, `KUBE_INGRESS_BASE_DOMAIN` replaces `AUTO_DEVOPS_DOMAIN`.
+Support for `AUTO_DEVOPS_DOMAIN` was [removed in GitLab
+12.0](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959).
+
 
 ## Using multiple Kubernetes clusters **[PREMIUM]**
 
@@ -208,10 +210,6 @@ Now that all is configured, you can test your setup by creating a merge request
 and verifying that your app is deployed as a review app in the Kubernetes
 cluster with the `review/*` environment scope. Similarly, you can check the
 other environments.
-
-NOTE: **Note:**
-From GitLab 11.8, `KUBE_INGRESS_BASE_DOMAIN` replaces `AUTO_DEVOPS_DOMAIN`.
-`AUTO_DEVOPS_DOMAIN` [is scheduled to be removed](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959).
 
 ## Enabling/Disabling Auto DevOps
 
@@ -734,7 +732,6 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 
 | **Variable**                 | **Description**                                                                                                                                                                                                               |
 | ------------                 | ---------------                                                                                                                                                                                                               |
-| `AUTO_DEVOPS_DOMAIN`         | The [Auto DevOps domain](#auto-devops-base-domain). By default, set automatically by the [Auto DevOps setting](#enablingdisabling-auto-devops). This variable is deprecated and [is scheduled to be removed](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959). Use `KUBE_INGRESS_BASE_DOMAIN` instead. |
 | `AUTO_DEVOPS_CHART`          | The Helm Chart used to deploy your apps; defaults to the one [provided by GitLab](https://gitlab.com/gitlab-org/charts/auto-deploy-app).                                                             |
 | `AUTO_DEVOPS_CHART_REPOSITORY` | The Helm Chart repository used to search for charts; defaults to `https://charts.gitlab.io`. |
 | `AUTO_DEVOPS_CHART_REPOSITORY_NAME` | From Gitlab 11.11, this variable can be used to set the name of the helm repository; defaults to "gitlab" |
@@ -771,6 +768,7 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 | `K8S_SECRET_*`               | From GitLab 11.7, any variable prefixed with [`K8S_SECRET_`](#application-secret-variables) will be made available by Auto DevOps as environment variables to the deployed application. |
 | `KUBE_INGRESS_BASE_DOMAIN`   | From GitLab 11.8, this variable can be used to set a domain per cluster. See [cluster domains](../../user/project/clusters/index.md#base-domain) for more information. |
 | `ROLLOUT_RESOURCE_TYPE`     | From GitLab 11.9, this variable allows specification of the resource type being deployed when using a custom helm chart. Default value is `deployment`. |
+| `ROLLOUT_STATUS_DISABLED`   | From GitLab 12.0, this variable allows to disable rollout status check because it doesn't support all resource types, for example, `cronjob`. |
 | `HELM_UPGRADE_EXTRA_ARGS`   | From GitLab 11.11, this variable allows extra arguments in `helm` commands when deploying the application. Note that using quotes will not prevent word splitting. |
 
 TIP: **Tip:**
@@ -1099,3 +1097,7 @@ curl --data "value=true" --header "PRIVATE-TOKEN: personal_access_token" https:/
 [ee]: https://about.gitlab.com/pricing/
 [ce-21955]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21955
 [ce-19507]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/19507
+
+## Development guides
+
+Configuring [GDK for Auto DevOps](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/auto_devops.md).

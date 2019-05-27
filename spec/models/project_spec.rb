@@ -214,6 +214,13 @@ describe Project do
       expect(project2).not_to be_valid
     end
 
+    it 'validates the visibility' do
+      expect_any_instance_of(described_class).to receive(:visibility_level_allowed_as_fork).and_call_original
+      expect_any_instance_of(described_class).to receive(:visibility_level_allowed_by_group).and_call_original
+
+      create(:project)
+    end
+
     describe 'wiki path conflict' do
       context "when the new path has been used by the wiki of other Project" do
         it 'has an error on the name attribute' do
@@ -3965,64 +3972,6 @@ describe Project do
 
       expect(project.api_variables.map { |variable| variable[:key] })
         .to contain_exactly(*required_variables)
-    end
-  end
-
-  describe '#auto_devops_variables' do
-    set(:project) { create(:project) }
-
-    subject { project.auto_devops_variables }
-
-    context 'when enabled in instance settings' do
-      before do
-        stub_application_setting(auto_devops_enabled: true)
-      end
-
-      context 'when domain is empty' do
-        before do
-          stub_application_setting(auto_devops_domain: nil)
-        end
-
-        it 'variables does not include AUTO_DEVOPS_DOMAIN' do
-          is_expected.not_to include(domain_variable)
-        end
-      end
-
-      context 'when domain is configured' do
-        before do
-          stub_application_setting(auto_devops_domain: 'example.com')
-        end
-
-        it 'variables includes AUTO_DEVOPS_DOMAIN' do
-          is_expected.to include(domain_variable)
-        end
-      end
-    end
-
-    context 'when explicitly enabled' do
-      context 'when domain is empty' do
-        before do
-          create(:project_auto_devops, project: project, domain: nil)
-        end
-
-        it 'variables does not include AUTO_DEVOPS_DOMAIN' do
-          is_expected.not_to include(domain_variable)
-        end
-      end
-
-      context 'when domain is configured' do
-        before do
-          create(:project_auto_devops, project: project, domain: 'example.com')
-        end
-
-        it 'variables includes AUTO_DEVOPS_DOMAIN' do
-          is_expected.to include(domain_variable)
-        end
-      end
-    end
-
-    def domain_variable
-      { key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true }
     end
   end
 
