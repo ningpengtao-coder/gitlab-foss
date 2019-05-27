@@ -6,9 +6,8 @@ import {
   fetchDeploymentsData,
   fetchEnvironmentsData,
   requestMetricsData,
-  setMetricsEndpoint,
-  setEnvironmentsEndpoint,
-  setDeploymentsEndpoint,
+  setEndpoints,
+  setGettingStartedEmptyState,
 } from '~/monitoring/stores/actions';
 import storeState from '~/monitoring/stores/state';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -40,7 +39,7 @@ describe('Monitoring store actions', () => {
 
   describe('fetchDeploymentsData', () => {
     it('commits RECEIVE_DEPLOYMENTS_DATA_SUCCESS on error', done => {
-      const commit = jasmine.createSpy();
+      const dispatch = jasmine.createSpy();
       const { state } = store;
       state.deploymentEndpoint = '/success';
 
@@ -48,27 +47,24 @@ describe('Monitoring store actions', () => {
         deployments: deploymentData,
       });
 
-      fetchDeploymentsData({ state, commit })
+      fetchDeploymentsData({ state, dispatch })
         .then(() => {
-          expect(commit).toHaveBeenCalledWith(
-            types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS,
-            deploymentData,
-          );
+          expect(dispatch).toHaveBeenCalledWith('receiveDeploymentsDataSuccess', deploymentData);
           done();
         })
         .catch(done.fail);
     });
 
     it('commits RECEIVE_DEPLOYMENTS_DATA_FAILURE on error', done => {
-      const commit = jasmine.createSpy();
+      const dispatch = jasmine.createSpy();
       const { state } = store;
       state.deploymentEndpoint = '/error';
 
       mock.onGet(state.deploymentEndpoint).reply(500);
 
-      fetchDeploymentsData({ state, commit })
+      fetchDeploymentsData({ state, dispatch })
         .then(() => {
-          expect(commit).toHaveBeenCalledWith(types.RECEIVE_DEPLOYMENTS_DATA_FAILURE);
+          expect(dispatch).toHaveBeenCalledWith('receiveDeploymentsDataFailure');
           done();
         })
         .catch(done.fail);
@@ -77,7 +73,7 @@ describe('Monitoring store actions', () => {
 
   describe('fetchEnvironmentsData', () => {
     it('commits RECEIVE_ENVIRONMENTS_DATA_SUCCESS on error', done => {
-      const commit = jasmine.createSpy();
+      const dispatch = jasmine.createSpy();
       const { state } = store;
       state.environmentsEndpoint = '/success';
 
@@ -85,27 +81,24 @@ describe('Monitoring store actions', () => {
         environments: environmentData,
       });
 
-      fetchEnvironmentsData({ state, commit })
+      fetchEnvironmentsData({ state, dispatch })
         .then(() => {
-          expect(commit).toHaveBeenCalledWith(
-            types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS,
-            environmentData,
-          );
+          expect(dispatch).toHaveBeenCalledWith('receiveEnvironmentsDataSuccess', environmentData);
           done();
         })
         .catch(done.fail);
     });
 
     it('commits RECEIVE_ENVIRONMENTS_DATA_FAILURE on error', done => {
-      const commit = jasmine.createSpy();
+      const dispatch = jasmine.createSpy();
       const { state } = store;
       state.environmentsEndpoint = '/error';
 
       mock.onGet(state.environmentsEndpoint).reply(500);
 
-      fetchEnvironmentsData({ state, commit })
+      fetchEnvironmentsData({ state, dispatch })
         .then(() => {
-          expect(commit).toHaveBeenCalledWith(types.RECEIVE_ENVIRONMENTS_DATA_FAILURE);
+          expect(dispatch).toHaveBeenCalledWith('receiveEnvironmentsDataFailure');
           done();
         })
         .catch(done.fail);
@@ -119,34 +112,44 @@ describe('Monitoring store actions', () => {
       mockedState = storeState();
     });
 
+    it('should commit SET_ENDPOINTS mutation', done => {
+      testAction(
+        setEndpoints,
+        {
+          metricsEndpoint: 'additional_metrics.json',
+          deploymentsEndpoint: 'deployments.json',
+          environmentsEndpoint: 'deployments.json',
+        },
+        mockedState,
+        [
+          {
+            type: types.SET_ENDPOINTS,
+            payload: {
+              metricsEndpoint: 'additional_metrics.json',
+              deploymentsEndpoint: 'deployments.json',
+              environmentsEndpoint: 'deployments.json',
+            },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('Set empty states', () => {
+    let mockedState;
+
+    beforeEach(() => {
+      mockedState = storeState();
+    });
+
     it('should commit SET_METRICS_ENDPOINT mutation', done => {
       testAction(
-        setMetricsEndpoint,
-        'additional_metrics.json',
+        setGettingStartedEmptyState,
+        null,
         mockedState,
-        [{ type: types.SET_METRICS_ENDPOINT, payload: 'additional_metrics.json' }],
-        [],
-        done,
-      );
-    });
-
-    it('should commit SET_ENVIRONMENTS_ENDPOINT mutation', done => {
-      testAction(
-        setEnvironmentsEndpoint,
-        'environments.json',
-        mockedState,
-        [{ type: types.SET_ENVIRONMENTS_ENDPOINT, payload: 'environments.json' }],
-        [],
-        done,
-      );
-    });
-
-    it('should commit SET_DEPLOYMENTS_ENDPOINT mutation', done => {
-      testAction(
-        setDeploymentsEndpoint,
-        'deployments.json',
-        mockedState,
-        [{ type: types.SET_DEPLOYMENTS_ENDPOINT, payload: 'deployments.json' }],
+        [{ type: types.SET_GETTING_STARTED_EMPTY_STATE }],
         [],
         done,
       );

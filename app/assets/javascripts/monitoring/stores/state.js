@@ -1,18 +1,13 @@
 export default () => ({
   hasMetrics: false,
   showPanels: true,
-  clustersPath: null,
-  tagsPath: null,
-  projectPath: null,
-  currentEnvironmentName: null, // Finish props
   metricsEndpoint: null,
   environmentsEndpoint: null,
   deploymentsEndpoint: null,
   emptyState: 'gettingStarted',
   showEmptyState: true,
-  selectedTimeWindow: null,
   useDashboardEndpoint: false,
-  groups: [], // From the monitoring store
+  groups: [],
   deploymentData: [],
   environments: [],
   queryResults: {},

@@ -9,10 +9,15 @@ Vue.use(Vuex);
 
 export const createStore = () =>
   new Vuex.Store({
-    actions,
-    getters,
-    mutations,
-    state,
+    modules: {
+      monitoringDashboard: {
+        namespaced: true,
+        actions,
+        mutations,
+        getters,
+        state,
+      },
+    },
   });
 
 export default createStore();

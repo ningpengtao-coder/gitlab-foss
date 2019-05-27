@@ -12,24 +12,22 @@ export default {
       ...group,
       metrics: normalizeMetrics(sortMetrics(group.metrics)),
     }));
-    if (state.groups.length < 1) {
+
+    if (!state.groups.length) {
       state.emptyState = 'noData';
     } else {
       state.showEmptyState = false;
     }
   },
   [types.RECEIVE_METRICS_DATA_FAILURE](state, error) {
-    state.emptyState = error ? 'unableToConnect' : 'noData'; // TODO: use error to deterine the appropiately determine which empty state to use
+    state.emptyState = error ? 'unableToConnect' : 'noData';
     state.showEmptyState = true;
   },
-  [types.SET_DASHBOARD_ENDPOINT](state, endpoint) {
-    state.dashboardEndpoint = endpoint;
-  },
   [types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS](state, deployments) {
-    state.deployments = deployments;
+    state.deploymentData = deployments;
   },
   [types.RECEIVE_DEPLOYMENTS_DATA_FAILURE](state) {
-    state.deployments = [];
+    state.deploymentData = [];
   },
   [types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS](state, environments) {
     state.environments = environments;
@@ -37,14 +35,11 @@ export default {
   [types.RECEIVE_ENVIRONMENTS_DATA_FAILURE](state) {
     state.environments = [];
   },
-  [types.SET_METRICS_ENDPOINT](state, endpoint) {
-    state.metricsEndpoint = endpoint;
-  },
-  [types.SET_ENVIRONMENTS_ENDPOINT](state, endpoint) {
-    state.environmentsEndpoint = endpoint;
-  },
-  [types.SET_DEPLOYMENTS_ENDPOINT](state, endpoint) {
-    state.deploymentsEndpoint = endpoint;
+  [types.SET_ENDPOINTS](state, endpoints) {
+    state.metricsEndpoint = endpoints.metricsEndpoint;
+    state.environmentsEndpoint = endpoints.environmentsEndpoint;
+    state.deploymentsEndpoint = endpoints.deploymentsEndpoint;
+    state.dashboardEndpoint = endpoints.dashboardEndpoint;
   },
   [types.SET_QUERY_RESULT](state, { metricId, result }) {
     state.showEmptyState = false;
@@ -58,5 +53,8 @@ export default {
   },
   [types.SET_DASHBOARD_ENABLED](state, enabled) {
     state.useDashboardEndpoint = enabled;
+  },
+  [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
+    state.emptyState = 'gettingStarted';
   },
 };

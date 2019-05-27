@@ -9,6 +9,7 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
 import { getParameterValues } from '~/lib/utils/url_utility';
@@ -151,18 +152,25 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['groups', 'groupsWithData']),
-    ...mapState(['emptyState', 'showEmptyState', 'environments', 'deploymentData']),
+    ...mapGetters('monitoringDashboard', ['groups', 'groupsWithData']),
     canAddMetrics() {
       return this.customMetricsAvailable && this.customMetricsPath.length;
     },
+    ...mapState('monitoringDashboard', [
+      'emptyState',
+      'showEmptyState',
+      'environments',
+      'deploymentData',
+    ]),
   },
   created() {
     this.setDashboardEnabled(this.usePrometheusEndpoint);
-    this.setDashboardEndpoint(this.dashboardEndpoint);
-    this.setMetricsEndpoint(this.metricsEndpoint);
-    this.setDeploymentsEndpoint(this.deploymentEndpoint);
-    this.setEnvironmentsEndpoint(this.environmentsEndpoint);
+    this.setEndpoints({
+      metricsEndpoint: this.metricsEndpoint,
+      environmentsEndpoint: this.environmentsEndpoint,
+      deploymentsEndpoint: this.deploymentEndpoint,
+      dashboardEndpoint: this.dashboardEndpoint,
+    });
 
     this.timeWindows = timeWindows;
     this.selectedTimeWindowKey =
@@ -182,14 +190,9 @@ export default {
   },
   mounted() {
     if (!this.hasMetrics) {
-      // TODO: This should be coming from a mutation/computedGetter
-      // this.state = 'gettingStarted';
+      this.setGettingStartedEmptyState();
     } else {
-      const startEndWindow = getTimeDiff(this.timeWindows[this.selectedTimeWindowKey]);
-
-      this.fetchMetricsData(startEndWindow);
-      this.fetchDeploymentsData();
-      this.fetchEnvironmentsData();
+      this.fetchData(getTimeDiff(this.timeWindows.eightHours));
 
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
@@ -200,15 +203,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
-      'fetchDashboard',
-      'fetchDeploymentsData',
-      'fetchEnvironmentsData',
-      'fetchMetricsData',
-      'setMetricsEndpoint',
-      'setDashboardEndpoint',
-      'setDeploymentsEndpoint',
-      'setEnvironmentsEndpoint',
+    ...mapActions('monitoringDashboard', [
+      'fetchData',
+      'setGettingStartedEmptyState',
+      'setEndpoints',
       'setDashboardEnabled',
     ]),
     getGraphAlerts(queries) {
@@ -269,10 +267,10 @@ export default {
             class="prepend-left-10 js-environments-dropdown"
             toggle-class="dropdown-menu-toggle"
             :text="currentEnvironmentName"
-            :disabled="store.environmentsData.length === 0"
+            :disabled="environments.length === 0"
           >
             <gl-dropdown-item
-              v-for="environment in store.environmentsData"
+              v-for="environment in environments"
               :key="environment.id"
               :active="environment.name === currentEnvironmentName"
               active-class="is-active"
