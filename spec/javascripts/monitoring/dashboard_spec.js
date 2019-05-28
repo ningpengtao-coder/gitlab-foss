@@ -57,10 +57,6 @@ describe('Dashboard', () => {
     };
 
     store = createStore();
-<<<<<<< HEAD
-
-=======
->>>>>>> 0b21835f0357bf2265faaf27faa89a34842dd83f
     mock = new MockAdapter(axios);
     DashboardComponent = Vue.extend(Dashboard);
   });
