@@ -1,8 +1,12 @@
+@mixin position-sticky() {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
 /**
  * Prefilled mixins
  * Mixins with fixed values
  */
-
 @mixin str-truncated($max-width: 82%) {
   display: inline-block;
   overflow: hidden;
@@ -219,13 +223,13 @@
 }
 
 @mixin build-trace-top-bar($height) {
+  @include position-sticky;
+
   height: $height;
   min-height: $height;
   background: $gray-light;
   border: 1px solid $border-color;
   color: $gl-text-color;
-  position: -webkit-sticky;
-  position: sticky;
   top: $header-height;
   padding: $grid-size;
 

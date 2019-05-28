@@ -11,8 +11,7 @@
       // the bottom of the compare-versions header and the top of the file header
       $mr-file-header-top: $mr-version-controls-height + $header-height + $mr-tabs-height - 1;
 
-      position: -webkit-sticky;
-      position: sticky;
+      @include position-sticky;
       top: $mr-file-header-top;
       z-index: 102;
       height: $mr-version-controls-height;
@@ -721,8 +720,7 @@ table.code {
   }
 
   @include media-breakpoint-up(sm) {
-    position: -webkit-sticky;
-    position: sticky;
+    @include position-sticky;
     top: $header-height;
     background-color: $white-light;
     z-index: 200;
@@ -1012,8 +1010,7 @@ table.code {
 }
 
 .diff-tree-list {
-  position: -webkit-sticky;
-  position: sticky;
+  @include position-sticky;
   $top-pos: $header-height + $mr-tabs-height + $mr-version-controls-height + 10px;
   top: $header-height + $mr-tabs-height + $mr-version-controls-height + 10px;
   max-height: calc(100vh - #{$top-pos});
