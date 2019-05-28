@@ -81,14 +81,14 @@
   }
 }
 
-@mixin btn-color($light, $border-light, $normal, $border-normal, $border-dark, $color) {
+@mixin btn-color($light, $border-light, $normal, $border-normal, $dark, $border-dark, $color) {
   background-color: $light;
   border-color: $border-light;
   color: $color;
 
   &:hover,
   &:focus {
-    background-color: $light;
+    background-color: $normal;
     border-color: $border-normal;
     color: $color;
   }
@@ -105,30 +105,30 @@
   &:not(:disabled):not(.disabled).active {
     box-shadow: inset 0 2px 4px 0 rgba($black, 0.2);
 
-    background-color: $normal;
+    background-color: $dark;
     border-color: $border-dark;
     color: $color;
   }
 }
 
 @mixin btn-green {
-  @include btn-color($green-500, $green-600, $green-600, $green-700, $green-800, $white-light);
+  @include btn-color($green-500, $green-600, $green-500, $green-700, $green-600, $green-800, $white-light);
 }
 
 @mixin btn-blue {
-  @include btn-color($blue-500, $blue-600, $blue-600, $blue-700, $blue-800, $white-light);
+  @include btn-color($blue-500, $blue-600, $blue-500, $blue-700, $blue-600, $blue-800, $white-light);
 }
 
 @mixin btn-orange {
-  @include btn-color($orange-500, $orange-600, $orange-600, $orange-700, $orange-800, $white-light);
+  @include btn-color($orange-500, $orange-600, $orange-500, $orange-700, $orange-600, $orange-800, $white-light);
 }
 
 @mixin btn-red {
-  @include btn-color($red-500, $red-600, $red-600, $red-700, $red-800, $white-light);
+  @include btn-color($red-500, $red-600, $red-500, $red-700, $red-600, $red-800, $white-light);
 }
 
 @mixin btn-white {
-  @include btn-color($white-light, $border-color, $white-normal, $border-white-normal, $border-gray-dark, $gl-text-color);
+  @include btn-color($white-light, $gray-400, $gray-200, $gray-400, $gl-gray-200, $gray-500, $gl-text-color);
 }
 
 @mixin btn-with-margin {
