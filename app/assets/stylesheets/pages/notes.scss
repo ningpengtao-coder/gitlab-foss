@@ -518,7 +518,8 @@ $note-form-margin-left: 72px;
   }
 }
 
-.commit-diff {
+.commit-diff,
+.diff-wrap-lines {
   .notes-content {
     background-color: $white-light;
 
