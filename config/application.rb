@@ -121,6 +121,7 @@ module Gitlab
     # config.active_record.schema_format = :sql
 
     # Configure webpack
+    config.webpack.binary = 'node_modules/.bin/parallel-webpack'
     config.webpack.config_file = "config/webpack.config.js"
     config.webpack.output_dir  = "public/assets/webpack"
     config.webpack.public_path = "assets/webpack"
