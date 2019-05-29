@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'getting nested projects', :nested_groups do
+describe 'getting projects', :nested_groups do
   include GraphqlHelpers
 
   let(:group)           { create(:group) }
@@ -14,10 +14,21 @@ describe 'getting nested projects', :nested_groups do
 
   subject { group }
 
+  let(:include_subgroups) { true }
   let(:query) do
-    graphql_query_for('namespace',
-                      { 'fullPath' => subject.full_path },
-                      "allProjects{ edges { node { #{all_graphql_fields_for('Project')} } } }")
+    graphql_query_for(
+      'namespace',
+      { 'fullPath' => subject.full_path },
+      <<~QUERY
+      projects(includeSubgroups: #{include_subgroups}) {
+        edges {
+          node {
+            #{all_graphql_fields_for('Project')}
+          }
+        }
+      }
+      QUERY
+    )
   end
 
   before do
@@ -34,15 +45,21 @@ describe 'getting nested projects', :nested_groups do
     it "includes the packages size if the user can read the statistics" do
       post_graphql(query, current_user: user)
 
-      expect(graphql_data['namespace']['allProjects']['edges'].size).to eq(subject.all_projects.count)
+      count = if include_subgroups
+                subject.all_projects.count
+              else
+                subject.projects.count
+              end
+
+      expect(graphql_data['namespace']['projects']['edges'].size).to eq(count)
     end
 
     context 'with no user' do
       it 'finds only public projects' do
         post_graphql(query, current_user: nil)
 
-        expect(graphql_data['namespace']['allProjects']['edges'].size).to eq(1)
-        project = graphql_data['namespace']['allProjects']['edges'][0]['node']
+        expect(graphql_data['namespace']['projects']['edges'].size).to eq(1)
+        project = graphql_data['namespace']['projects']['edges'][0]['node']
         expect(project['id']).to eq(public_project.id.to_s)
       end
     end
@@ -52,6 +69,13 @@ describe 'getting nested projects', :nested_groups do
 
   context 'when the namespace is a user' do
     subject { user.namespace }
+    let(:include_subgroups) { false }
+
+    it_behaves_like 'a graphql namespace'
+  end
+
+  context 'when not including subgroups' do
+    let(:include_subgroups) { false }
 
     it_behaves_like 'a graphql namespace'
   end

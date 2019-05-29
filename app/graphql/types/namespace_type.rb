@@ -16,9 +16,9 @@ module Types
     field :lfs_enabled, GraphQL::BOOLEAN_TYPE, null: true, method: :lfs_enabled?
     field :request_access_enabled, GraphQL::BOOLEAN_TYPE, null: true
 
-    field :all_projects,
+    field :projects,
           Types::ProjectType.connection_type,
           null: true,
-          resolve: -> (namespace, _, _) { namespace.all_projects }
+          resolver: ::Resolvers::NamespaceProjectsResolver
   end
 end
