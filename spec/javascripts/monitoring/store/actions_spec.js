@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import store from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import {
+  fetchDashboard,
   fetchDeploymentsData,
   fetchEnvironmentsData,
   requestMetricsData,
@@ -12,7 +13,7 @@ import {
 import storeState from '~/monitoring/stores/state';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { resetStore } from '../helpers';
-import { deploymentData, environmentData } from '../mock_data';
+import { deploymentData, environmentData, metricsDashboardResponse } from '../mock_data';
 
 describe('Monitoring store actions', () => {
   let mock;
@@ -153,6 +154,40 @@ describe('Monitoring store actions', () => {
         [],
         done,
       );
+    });
+  });
+
+  it('sets emptyState to loading', () => {
+    const commit = jasmine.createSpy();
+    const { state } = store;
+
+    requestMetricsData({ state, commit });
+
+    expect(commit).toHaveBeenCalledWith(types.REQUEST_METRICS_DATA);
+  });
+
+  describe('fetchDashboard', () => {
+    let commit;
+    let dispatch;
+    let state;
+
+    beforeEach(() => {
+      commit = jasmine.createSpy();
+      dispatch = jasmine.createSpy();
+      state = store.state;
+      state.dashboardEndpoint = '/dashboard';
+      mock.onGet(state.dashboardEndpoint).reply(200, metricsDashboardResponse);
+    });
+
+    it('stores groups ', done => {
+      const params = {};
+      fetchDashboard({state, commit, dispatch}, params)
+        .then(() => {
+          expect(commit).toHaveBeenCalledWith(types.SET_GROUPS, metricsDashboardResponse.dashboard.panel_groups);
+          expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetrics', params);
+          done();
+        })
+        .catch(done.fail);
     });
   });
 });
