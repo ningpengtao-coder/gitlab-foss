@@ -14,9 +14,6 @@ import Icon from '~/vue_shared/components/icon.vue';
 import '~/vue_shared/mixins/is_ee';
 import { getParameterValues } from '~/lib/utils/url_utility';
 import MonitorAreaChart from './charts/area.vue';
-import LineChart from './charts/line.vue';
-import SingleStatChart from './charts/single_stat.vue';
-import HeatmapChart from './charts/heatmap.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import { timeWindows, timeWindowsKeyNames } from '../constants';
@@ -34,13 +31,7 @@ export default {
     GlButton,
     GlDropdown,
     GlDropdownItem,
-    LineChart,
-    SingleStatChart,
-    HeatmapChart,
     GlLink,
-    LineChart,
-    SingleStatChart,
-    HeatmapChart,
     GlModal,
   },
   directives: {
@@ -345,43 +336,23 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <template v-for="(graphData, graphIndex) in metricsWithResults(groupData.metrics)">
-        <single-stat-chart
-          v-if="graphData.type === 'single_stat'"
-          :key="`single-stat-${graphIndex}`"
-          value="100"
-          unit="ms"
-          title="latency"
+      <monitor-area-chart
+        v-for="(graphData, graphIndex) in metricsWithResults(groupData.metrics)"
+        :key="`area-${graphIndex}`"
+        :graph-data="graphData"
+        :deployment-data="deploymentData"
+        :thresholds="getGraphAlertValues(graphData.queries)"
+        :container-width="elWidth"
+        group-id="monitor-area-chart"
+      >
+        <alert-widget
+          v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData"
+          :alerts-endpoint="alertsEndpoint"
+          :relevant-queries="graphData.queries"
+          :alerts-to-manage="getGraphAlerts(graphData.queries)"
+          @setAlerts="setAlerts"
         />
-        <line-chart
-          v-else-if="graphData.type === 'line_chart'"
-          :key="`line-${graphIndex}`"
-          :graph-data="graphData"
-          :container-width="elWidth"
-        />
-        <heatmap-chart
-          v-else-if="graphData.type === 'heatmap_chart'"
-          :key="`heatmap-${graphIndex}`"
-          :graph-data="graphData"
-        />
-        <monitor-area-chart
-          v-else
-          :key="`area-${graphIndex}`"
-          :graph-data="graphData"
-          :deployment-data="deploymentData"
-          :thresholds="getGraphAlertValues(graphData.queries)"
-          :container-width="elWidth"
-          group-id="monitor-area-chart"
-        >
-          <alert-widget
-            v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData"
-            :alerts-endpoint="alertsEndpoint"
-            :relevant-queries="graphData.queries"
-            :alerts-to-manage="getGraphAlerts(graphData.queries)"
-            @setAlerts="setAlerts"
-          />
-        </monitor-area-chart>
-      </template>
+      </monitor-area-chart>
     </graph-group>
   </div>
   <empty-state
