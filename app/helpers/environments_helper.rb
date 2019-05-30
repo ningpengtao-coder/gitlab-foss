@@ -29,6 +29,7 @@ module EnvironmentsHelper
       "dashboard-endpoint" => metrics_dashboard_project_environment_path(project, environment, format: :json),
       "deployment-endpoint" => project_environment_deployments_path(project, environment, format: :json),
       "environments-endpoint": project_environments_path(project, format: :json),
+      "prometheus-endpoint": prometheus_api_namespace_project_environment_path(project, environment, proxy_path: ':proxy_path'),
       "project-path" => project_path(project),
       "tags-path" => project_tags_path(project),
       "has-metrics" => "#{environment.has_metrics?}"

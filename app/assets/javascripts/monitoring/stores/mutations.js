@@ -40,6 +40,7 @@ export default {
     state.environmentsEndpoint = endpoints.environmentsEndpoint;
     state.deploymentsEndpoint = endpoints.deploymentsEndpoint;
     state.dashboardEndpoint = endpoints.dashboardEndpoint;
+    state.prometheusEndpoint = endpoints.prometheusEndpoint;
   },
   [types.SET_QUERY_RESULT](state, { metricId, result }) {
     state.showEmptyState = false;

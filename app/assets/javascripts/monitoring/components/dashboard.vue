@@ -119,6 +119,11 @@ export default {
       required: false,
       default: '',
     },
+    prometheusEndpoint: {
+      type: String,
+      required: false,
+      default: '',
+    },
     customMetricsAvailable: {
       type: Boolean,
       required: false,
@@ -163,6 +168,7 @@ export default {
       environmentsEndpoint: this.environmentsEndpoint,
       deploymentsEndpoint: this.deploymentEndpoint,
       dashboardEndpoint: this.dashboardEndpoint,
+      prometheusEndpoint: this.prometheusEndpoint,
     });
 
     this.timeWindows = timeWindows;

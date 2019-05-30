@@ -103,7 +103,7 @@ export const fetchPrometheusMetrics = ({ state, dispatch }, params) => {
     group.panels.forEach(panel => {
       panel.queries = panel.metrics;
       panel.queries.forEach(metric => {
-        dispatch('fetchPrometheusMetric', { metric, startEnd: params });
+        dispatch('fetchPrometheusMetric', { metric, params });
       });
     });
   });
@@ -133,29 +133,26 @@ function fetchPrometheusResult(prometheusEndpoint, params) {
  *
  * @param {metric} metric
  */
-export const fetchPrometheusMetric = ({ commit, getters }, { metric, startEnd }) => {
+export const fetchPrometheusMetric = ({ state, commit }, { metric, params }) => {
   const queryType = Object.keys(metric).find(key => ['query', 'query_range'].includes(key));
   const query = metric[queryType];
-  // TODO don't hardcode
-  const prometheusEndpoint = `/root/metrics/environments/37/prometheus/api/v1/${queryType}`;
+  const prometheusEndpoint = state.prometheusEndpoint.replace(':proxy_path', queryType);
 
-  // todo use timewindow
-  const timeDiff = 8 * 60 * 60; // 8hours in seconnds
-  const end = startEnd.end || Math.floor(Date.now() / 1000);
-  const start = startEnd.start || end - timeDiff;
+  const end = params.end || Math.floor(Date.now() / 1000);
+  const start = params.start || end - params.timeDiff;
 
   const minStep = 60;
   const queryDataPoints = 600;
-  const step = Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
+  const step = Math.max(minStep, Math.ceil(params.timeDiff / queryDataPoints));
 
-  const params = {
+  const queryParams = {
     query,
     start,
     end,
     step,
   };
 
-  fetchPrometheusResult(prometheusEndpoint, params).then(result => {
+  fetchPrometheusResult(prometheusEndpoint, queryParams).then(result => {
     commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
   });
 };

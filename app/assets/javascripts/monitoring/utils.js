@@ -24,10 +24,11 @@ const getTimeDifferenceSeconds = timeWindow => {
 };
 
 export const getTimeDiff = selectedTimeWindow => {
+  const timeDiff = getTimeDifferenceSeconds(selectedTimeWindow);
   const end = Date.now() / 1000; // convert milliseconds to seconds
-  const start = end - getTimeDifferenceSeconds(selectedTimeWindow);
+  const start = end - timeDiff;
 
-  return { start, end };
+  return { start, end, timeDiff };
 };
 
 export default {};

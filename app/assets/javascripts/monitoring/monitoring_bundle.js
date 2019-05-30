@@ -12,6 +12,7 @@ export default (props = {}) => {
       el,
       store,
       render(createElement) {
+        console.log(el.dataset)
         return createElement(Dashboard, {
           props: {
             ...el.dataset,
