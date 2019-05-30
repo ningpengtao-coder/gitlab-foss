@@ -126,11 +126,13 @@ export default {
     },
     customMetricsPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     validateQueryPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
   data() {
