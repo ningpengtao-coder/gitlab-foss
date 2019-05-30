@@ -85,17 +85,20 @@ describe 'getting group information' do
         expect(graphql_data['group']).to be_nil
       end
 
-      it 'avoids N+1 queries' do
+      it 'avoids N+1 queries', :nested_groups do
         post_graphql(group_query(group1), current_user: admin)
 
         control_count = ActiveRecord::QueryRecorder.new do
           post_graphql(group_query(group1), current_user: admin)
         end.count
 
-        create(:project, namespace: group1)
+        nested = create(:group, parent: group1)
+
+        # increase control_count: 1 for parent and 1 for parent projects
+        control_count += 2
 
         expect do
-          post_graphql(group_query(group1), current_user: admin)
+          post_graphql(group_query(nested), current_user: admin)
         end.not_to exceed_query_limit(control_count)
       end
     end
