@@ -2,6 +2,8 @@ import $ from 'jquery';
 
 import { isScrolledToBottom } from '~/lib/utils/scroll_utils';
 import axios from './lib/utils/axios_utils';
+import syntaxHighlight from './syntax_highlight';
+import FilesCommentButton from './files_comment_button';
 
 export default class CommitPageLoader {
   constructor() {
@@ -19,7 +21,7 @@ export default class CommitPageLoader {
   }
 
   callDiffForPaths() {
-    const url = `/${gon.project_full_path}/commit/${gon.commit_sha}/diff_for_paths`;
+    const url = `/${gon.project_full_path}/commit/${gon.commit_sha}/diffs_per_batch`;
     const divID = `.next-batch-section[data-next-batch="${this.currentBatch}"]`;
 
     return axios
@@ -31,7 +33,16 @@ export default class CommitPageLoader {
       .then(({ data }) => {
         if (data.html) {
           $(divID).html(data.html);
+          syntaxHighlight($(divID));
+          this.bindDiffFiles();
         }
       });
+  }
+
+  bindDiffFiles() {
+    const divID = `.next-batch-section[data-next-batch="${this.currentBatch}"] .diff-file`;
+    const $batchOfFiles = $(divID);
+
+    FilesCommentButton.init($batchOfFiles);
   }
 }

@@ -17,6 +17,7 @@ class Projects::CommitController < Projects::ApplicationController
   before_action :define_commit_vars, only: [:show, :diff_for_path, :pipelines, :merge_requests]
   before_action :define_note_vars, only: [:show, :diff_for_path]
   before_action :authorize_edit_tree!, only: [:revert, :cherry_pick]
+  before_action :environment, except: [:branches, :revert, :cherry_pick]
   before_action :define_gon_variables, only: [:show]
 
   BRANCH_SEARCH_LIMIT = 1000
@@ -41,11 +42,13 @@ class Projects::CommitController < Projects::ApplicationController
     render_diff_for_path(@commit.diffs(diff_options))
   end
 
-  def diff_for_paths
+  def diffs_per_batch
     batch_number = params[:batch_number].to_i
 
-    render_diff_for_paths(
-      commit, project, environment_for_batch_diff, batch_number)
+    @grouped_diff_discussions = commit.grouped_diff_discussions
+
+    render_diff_per_batch(
+      commit, project, environment, batch_number)
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -201,10 +204,6 @@ class Projects::CommitController < Projects::ApplicationController
     @commit_params = { commit: @commit }
   end
 
-  def environment_for_batch_diff
-    @environment ||= EnvironmentsFinder.new(@project, current_user, commit: @commit).execute.last
-  end
-
   def define_gon_variables
     gon.push(commit_gon_variables)
   end
@@ -216,5 +215,9 @@ class Projects::CommitController < Projects::ApplicationController
       project_full_path: project.full_path,
       commit_sha: params[:id]
     }
+  end
+
+  def environment
+    @environment ||= EnvironmentsFinder.new(@project, current_user, commit: @commit).execute.last
   end
 end

@@ -87,12 +87,12 @@ module Gitlab
         collection
       end
 
-      def decorate_batch!(start_diff, end_diff)
+      def decorate_batch!(start_diff_index, end_diff_index)
         collection = each_with_index do |element, i|
           @array[i] = yield(element)
         end
 
-        @array = @array[start_diff..end_diff]
+        @array = @array[start_diff_index..end_diff_index]
         collection
       end
 

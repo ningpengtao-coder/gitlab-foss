@@ -13,7 +13,7 @@ module DiffForPath
     render json: { html: view_to_html_string('projects/diffs/_content', diff_file: diff_file) }
   end
 
-  def render_diff_for_paths(commit, project, environment, batch_number)
+  def render_diff_per_batch(commit, project, environment, batch_number)
     options = diff_options.merge(batch_number: batch_number)
 
     file_collection = Gitlab::Diff::FileCollection::Batch.new(commit,
