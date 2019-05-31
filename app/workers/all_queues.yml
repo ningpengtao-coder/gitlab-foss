@@ -25,6 +25,7 @@
 - cronjob:issue_due_scheduler
 - cronjob:prune_web_hook_logs
 - cronjob:schedule_migrate_external_diffs
+- cronjob:namespaces_prune_aggregation_schedules
 
 - gcp_cluster:cluster_install_app
 - gcp_cluster:cluster_patch_app
@@ -60,6 +61,9 @@
 
 - mail_scheduler:mail_scheduler_issue_due
 - mail_scheduler:mail_scheduler_notification_service
+
+- namespace:namespaces_root_statistics
+- namespace:namespaces_aggregation_scheduler
 
 - object_storage:object_storage_background_move
 - object_storage:object_storage_migrate_uploads

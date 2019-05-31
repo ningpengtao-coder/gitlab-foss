@@ -25,16 +25,23 @@ shared_examples_for 'UpdateProjectStatistics' do
         .to change { reload_stat }
         .by(delta)
     end
+
+    it 'schedules a namespace statistics worker' do
+      expect(Namespaces::AggregationSchedulerWorker)
+        .to receive(:perform_async).once
+
+      subject.save!
+    end
   end
 
   context 'when updating' do
+    let(:delta) { 42 }
+
     before do
       subject.save!
     end
 
     it 'updates project statistics' do
-      delta = 42
-
       expect(ProjectStatistics)
         .to receive(:increment_statistic)
         .and_call_original
@@ -44,6 +51,14 @@ shared_examples_for 'UpdateProjectStatistics' do
       expect { subject.save! }
         .to change { reload_stat }
         .by(delta)
+    end
+
+    it 'schedules a namespace statistics worker' do
+      expect(Namespaces::AggregationSchedulerWorker)
+        .to receive(:perform_async).once
+
+      subject.write_attribute(statistic_attribute, read_attribute + delta)
+      subject.save!
     end
   end
 
@@ -59,15 +74,30 @@ shared_examples_for 'UpdateProjectStatistics' do
         .to receive(:increment_statistic)
         .and_call_original
 
-      expect { subject.destroy }
+      expect { subject.destroy! }
         .to change { reload_stat }
         .by(delta)
+    end
+
+    it 'schedules a namespace statistics worker' do
+      expect(Namespaces::AggregationSchedulerWorker)
+        .to receive(:perform_async)
+
+      subject.destroy!
     end
 
     context 'when it is destroyed from the project level' do
       it 'does not update the project statistics' do
         expect(ProjectStatistics)
           .not_to receive(:increment_statistic)
+
+        project.update(pending_delete: true)
+        project.destroy!
+      end
+
+      it 'does not schedule a namespace statistics worker' do
+        expect(Namespaces::AggregationSchedulerWorker)
+          .not_to receive(:perform_async)
 
         project.update(pending_delete: true)
         project.destroy!

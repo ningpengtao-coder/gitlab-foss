@@ -365,6 +365,10 @@ Settings.cron_jobs['schedule_migrate_external_diffs_worker'] ||= Settingslogic.n
 Settings.cron_jobs['schedule_migrate_external_diffs_worker']['cron'] ||= '15 * * * *'
 Settings.cron_jobs['schedule_migrate_external_diffs_worker']['job_class'] = 'ScheduleMigrateExternalDiffsWorker'
 
+Settings.cron_jobs['namespaces_prune_aggregation_schedules_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['namespaces_prune_aggregation_schedules_worker']['cron'] ||= '0 0 * * *'
+Settings.cron_jobs['namespaces_prune_aggregation_schedules_worker']['job_class'] = 'Namespaces::PruneAggregationSchedulesWorker'
+
 #
 # Sidekiq
 #

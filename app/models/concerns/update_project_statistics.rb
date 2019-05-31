@@ -19,7 +19,7 @@
 #
 # - `statistic_attribute` must be an ActiveRecord attribute
 # - The model must implement `project` and `project_id`. i.e. direct Project relationship or delegation
-#
+# - The model must include AfterCommitQueue module
 module UpdateProjectStatistics
   extend ActiveSupport::Concern
 
@@ -38,6 +38,7 @@ module UpdateProjectStatistics
 
       after_save(:update_project_statistics_after_save, if: :update_project_statistics_attribute_changed?)
       after_destroy(:update_project_statistics_after_destroy, unless: :project_destroyed?)
+      after_commit(:schedule_namespace_aggregation_worker)
     end
 
     private :update_project_statistics
@@ -67,6 +68,15 @@ module UpdateProjectStatistics
 
     def update_project_statistics(delta)
       ProjectStatistics.increment_statistic(project_id, self.class.project_statistics_name, delta)
+    end
+
+    def schedule_namespace_aggregation_worker
+      return unless update_project_statistics_attribute_changed?
+      return if destroyed? && project_destroyed?
+
+      run_after_commit do
+        Namespaces::AggregationSchedulerWorker.perform_async(project.namespace_id)
+      end
     end
   end
 end

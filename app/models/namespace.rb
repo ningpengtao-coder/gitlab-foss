@@ -291,6 +291,10 @@ class Namespace < ApplicationRecord
     end
   end
 
+  def aggregation_scheduled?
+    !aggregation_schedule.nil?
+  end
+
   private
 
   def parent_changed?
