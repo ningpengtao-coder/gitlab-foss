@@ -17,12 +17,13 @@ module Gitlab
               .fabricate(attributes.delete(:only))
             @except = Gitlab::Ci::Build::Policy
               .fabricate(attributes.delete(:except))
+            @rules = Gitlab::Ci::Build::rules
+              .fabricate(attributes.delete(:rules)
           end
 
           def included?
             strong_memoize(:inclusion) do
-              @only.all? { |spec| spec.satisfied_by?(@pipeline, self) } &&
-                @except.none? { |spec| spec.satisfied_by?(@pipeline, self) }
+              only_policies_satisfied? && except_policies_satisfied? && included_by_rules?
             end
           end
 
@@ -50,6 +51,25 @@ module Gitlab
                 ::Ci::Build.new(attributes)
               end
             end
+          end
+
+          private
+
+          def only_policies_satisfied?
+            @only.all? { |spec| spec.satisfied_by?(@pipeline, self) }
+          end
+
+          def except_policies_satisfied?
+            @except.none? { |spec| spec.satisfied_by?(@pipeline, self) }
+          end
+
+          def included_by_rules?
+            # By default, jobs with no matching rule are included.
+            matched_rule.nil? || matched_rule.includes_job?
+          end
+
+          def matched_rule
+            @matched_rule ||= @rules.find { |rule| rule.matched_by?(@pipeline, self) }
           end
         end
       end

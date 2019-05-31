@@ -54,6 +54,16 @@ module Gitlab
           end
         end
 
+        class ArrayOfHashesValidator < ActiveModel::EachValidator
+          include LegacyValidationHelpers
+
+          def validate_each(record, attribute, value)
+            unless value.is_a?(Array) && value.map { |hsh| hsh.is_a?(Hash) }.all?
+              record.errors.add(attribute, 'should be an array of hashes')
+            end
+          end
+        end
+
         class ArrayOrStringValidator < ActiveModel::EachValidator
           def validate_each(record, attribute, value)
             unless value.is_a?(Array) || value.is_a?(String)

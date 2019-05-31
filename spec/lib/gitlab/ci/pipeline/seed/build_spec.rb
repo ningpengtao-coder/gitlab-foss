@@ -349,6 +349,14 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
         it { is_expected.not_to be_included }
       end
+
+      context 'when using both only and except policies' do
+        let(:attributes) do
+          { name: 'rspec', only: { refs: ["branches@#{pipeline.project_full_path}"] }, except: { refs: ["branches@#{pipeline.project_full_path}"] } }
+        end
+
+        it { is_expected.not_to be_included }
+      end
     end
 
     context 'when repository path does not matches' do
@@ -378,6 +386,80 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
         end
 
         it { is_expected.not_to be_included }
+      end
+    end
+
+    context 'using rules:' do
+      using RSpec::Parameterized
+
+      let(:attributes) { { name: 'rspec', rules: rule_set } }
+
+      context 'with a matching policy' do
+        context 'with an explicit `drop` policy outcome' do
+          where(:rule_set) do
+            [
+              [[{ if: '$VARIABLE == null',              policy: 'drop' }]],
+              [[{ if: '$VARIABLE == null',              policy: 'drop' }, { if: '$VARIABLE == null', policy: 'run' }]],
+              [[{ if: '$VARIABLE != "the wrong value"', policy: 'drop' }, { if: '$VARIABLE == null', policy: 'run' }]]
+            ]
+          end
+
+          with_them do
+            it { is_expected.not_to be_included }
+          end
+        end
+
+        context 'with an explicit `run` policy outcome' do
+          where(:rule_set) do
+            [
+              [[{ if: '$VARIABLE == null',              policy: 'run' }]],
+              [[{ if: '$VARIABLE == null',              policy: 'run' }, { if: '$VARIABLE == null', policy: 'drop' }]],
+              [[{ if: '$VARIABLE != "the wrong value"', policy: 'run' }, { if: '$VARIABLE == null', policy: 'drop' }]]
+            ]
+          end
+
+          with_them do
+            it { is_expected.to be_included }
+          end
+        end
+
+        context 'without an explicit policy outcome' do
+          where(:rule_set) do
+            [
+              [[{ if: '$VARIABLE == null'              }]],
+              [[{ if: '$VARIABLE == null'              }, { if: '$VARIABLE == null' }]],
+              [[{ if: '$VARIABLE != "the wrong value"' }, { if: '$VARIABLE == null' }]]
+            ]
+          end
+
+          with_them do
+            it { is_expected.to be_included }
+          end
+        end
+      end
+
+      context 'with no matching policy' do
+        where(:rule_set) do
+          [
+            [[{ if: '$VARIABLE != null',              policy: 'drop' }]],
+            [[{ if: '$VARIABLE != null',              policy: 'drop' }, { if: '$VARIABLE != null', policy: 'run' }]],
+            [[{ if: '$VARIABLE == "the wrong value"', policy: 'drop' }, { if: '$VARIABLE != null', policy: 'run' }]],
+            [[{ if: '$VARIABLE != null',              policy: 'run'  }]],
+            [[{ if: '$VARIABLE != null',              policy: 'run'  }, { if: '$VARIABLE != null', policy: 'drop' }]],
+            [[{ if: '$VARIABLE == "the wrong value"', policy: 'run'  }, { if: '$VARIABLE != null', policy: 'drop' }]],
+            [[{ if: '$VARIABLE != null'                              }]],
+            [[{ if: '$VARIABLE != null'                              }, { if: '$VARIABLE != null' }]],
+            [[{ if: '$VARIABLE == "the wrong value"'                 }, { if: '$VARIABLE != null' }]]
+          ]
+        end
+
+        with_them do
+          it { is_expected.to be_included }
+        end
+      end
+
+      context 'with no policies' do
+        let(:rule_set) { [ ] }
       end
     end
   end

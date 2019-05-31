@@ -11,7 +11,7 @@ module Gitlab
           include ::Gitlab::Config::Entry::Configurable
           include ::Gitlab::Config::Entry::Attributable
 
-          ALLOWED_KEYS = %i[tags script only except type image services
+          ALLOWED_KEYS = %i[tags script only except rules type image services
                             allow_failure type stage when start_in artifacts cache
                             dependencies before_script after_script variables
                             environment coverage retry parallel extends].freeze
@@ -22,6 +22,14 @@ module Gitlab
             validates :script, presence: true
             validates :name, presence: true
             validates :name, type: Symbol
+            validate  :rules_only_except_exclusivity
+
+            def rules_only_except_exclusivity
+              return unless config.key?(:rules)
+
+              errors.add(:config, '`only:` may not be used with `rules:`') if config.key?(:only)
+              errors.add(:config, '`except:` may not be used with `rules:`') if config.key?(:except)
+            end
 
             with_options allow_nil: true do
               validates :tags, array_of_strings: true
@@ -35,6 +43,7 @@ module Gitlab
                                       'always, manual or delayed' }
               validates :dependencies, array_of_strings: true
               validates :extends, array_of_strings_or_string: true
+              validates :rules, array_of_hashes: true
             end
 
             validates :start_in, duration: { limit: '1 day' }, if: :delayed?
@@ -77,6 +86,9 @@ module Gitlab
           entry :except, Entry::Policy,
             description: 'Refs policy this job will be executed for.'
 
+          entry :rules, Entry::Rules,
+            description: 'List of evaluable Rules to determine job inclusion.'
+
           entry :variables, Entry::Variables,
             description: 'Environment variables available for this job.'
 
@@ -98,7 +110,7 @@ module Gitlab
                   :parallel
 
           attributes :script, :tags, :allow_failure, :when, :dependencies,
-                     :retry, :parallel, :extends, :start_in
+                     :retry, :parallel, :extends, :start_in, :rules
 
           def self.matching?(name, config)
             !name.to_s.start_with?('.') &&
