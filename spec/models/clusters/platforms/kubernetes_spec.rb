@@ -263,8 +263,9 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
     let(:kubernetes) { create(:cluster_platform_kubernetes, api_url: api_url, ca_cert: ca_pem) }
     let(:api_url) { 'https://kube.domain.com' }
     let(:ca_pem) { File.read(Rails.root.join('spec/fixtures/clusters/sample_cert.pem')) }
+    let(:environment) { create(:environment, project: cluster.project) }
 
-    subject { kubernetes.predefined_variables(project: cluster.project) }
+    subject { kubernetes.predefined_variables(environment: environment) }
 
     shared_examples 'setting variables' do
       it 'sets the variables' do
@@ -344,8 +345,9 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
       let!(:cluster) { create(:cluster, :group, platform_kubernetes: kubernetes) }
 
       let(:project) { create(:project, group: cluster.group) }
+      let(:environment) { create(:environment, project: project) }
 
-      subject { kubernetes.predefined_variables(project: project) }
+      subject { kubernetes.predefined_variables(environment: environment) }
 
       context 'no kubernetes namespace for the project' do
         it_behaves_like 'setting variables'
@@ -383,6 +385,7 @@ describe Clusters::Platforms::Kubernetes, :use_clean_rails_memory_store_caching 
     end
 
     context 'with a domain' do
+      let(:environment) { create(:environment) }
       let!(:cluster) do
         create(:cluster, :provided_by_gcp, :with_domain,
                platform_kubernetes: kubernetes)

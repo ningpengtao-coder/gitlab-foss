@@ -70,7 +70,9 @@ module Clusters
 
       default_value_for :authorization_type, :rbac
 
-      def predefined_variables(project:)
+      def predefined_variables(environment:)
+        project = environment.project
+
         Gitlab::Ci::Variables::Collection.new.tap do |variables|
           variables.append(key: 'KUBE_URL', value: api_url)
 

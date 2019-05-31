@@ -1860,8 +1860,8 @@ class Project < ApplicationRecord
     end
   end
 
-  def deployment_variables(environment: nil)
-    deployment_platform(environment: environment)&.predefined_variables(project: self) || []
+  def deployment_variables(environment_name: nil, persisted_environment: nil)
+    deployment_platform(environment: environment_name)&.predefined_variables(environment: persisted_environment) || []
   end
 
   def auto_devops_variables

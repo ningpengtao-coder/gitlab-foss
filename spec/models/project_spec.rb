@@ -2655,9 +2655,14 @@ describe Project do
       context 'when user configured kubernetes from CI/CD > Clusters and KubernetesNamespace migration has not been executed' do
         let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
         let(:project) { cluster.project }
+        let!(:environment) { create(:environment, project: project) }
+
+        let(:deployment_variables) do
+          project.deployment_variables(environment_name: environment.name, persisted_environment: environment)
+        end
 
         it 'does not return variables from this service' do
-          expect(project.deployment_variables).not_to include(
+          expect(deployment_variables).not_to include(
             { key: 'KUBE_TOKEN', value: project.deployment_platform.token, public: false, masked: true }
           )
         end
@@ -2667,9 +2672,14 @@ describe Project do
         let!(:kubernetes_namespace) { create(:cluster_kubernetes_namespace, :with_token) }
         let!(:cluster) { kubernetes_namespace.cluster }
         let(:project) { kubernetes_namespace.project }
+        let!(:environment) { create(:environment, project: project) }
+
+        let(:deployment_variables) do
+          project.deployment_variables(environment_name: environment.name, persisted_environment: environment)
+        end
 
         it 'returns token from kubernetes namespace' do
-          expect(project.deployment_variables).to include(
+          expect(deployment_variables).to include(
             { key: 'KUBE_TOKEN', value: kubernetes_namespace.service_account_token, public: false, masked: true }
           )
         end

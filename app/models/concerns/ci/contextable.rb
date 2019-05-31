@@ -15,7 +15,7 @@ module Ci
         variables.concat(project.predefined_variables)
         variables.concat(pipeline.predefined_variables)
         variables.concat(runner.predefined_variables) if runnable? && runner
-        variables.concat(project.deployment_variables(environment: environment)) if environment
+        variables.concat(deployment_variables(environment_name: environment)) if environment
         variables.concat(yaml_variables)
         variables.concat(user_variables)
         variables.concat(secret_group_variables)
@@ -103,6 +103,10 @@ module Ci
 
     def secret_project_variables(environment: persisted_environment)
       project.ci_variables_for(ref: git_ref, environment: environment)
+    end
+
+    def deployment_variables(environment_name:)
+      project.deployment_variables(environment_name: environment_name, persisted_environment: persisted_environment)
     end
   end
 end

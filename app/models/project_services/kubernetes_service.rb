@@ -94,7 +94,7 @@ class KubernetesService < Service
     ]
   end
 
-  def kubernetes_namespace_for(project)
+  def kubernetes_namespace_for(_)
     if namespace.present?
       namespace
     else
@@ -117,12 +117,12 @@ class KubernetesService < Service
   # as a way to keep this service compatible with
   # Clusters::Platforms::Kubernetes, it won't be used on this method
   # as it's only needed for Clusters::Cluster.
-  def predefined_variables(project:)
+  def predefined_variables(environment:)
     Gitlab::Ci::Variables::Collection.new.tap do |variables|
       variables
         .append(key: 'KUBE_URL', value: api_url)
         .append(key: 'KUBE_TOKEN', value: token, public: false, masked: true)
-        .append(key: 'KUBE_NAMESPACE', value: kubernetes_namespace_for(project))
+        .append(key: 'KUBE_NAMESPACE', value: kubernetes_namespace_for(nil))
         .append(key: 'KUBECONFIG', value: kubeconfig, public: false, file: true)
 
       if ca_pem.present?
