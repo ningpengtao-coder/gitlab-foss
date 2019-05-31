@@ -14,7 +14,7 @@ describe ProjectStatistics do
   describe 'scopes' do
     describe '.for_project_ids' do
       it 'returns only requested projects' do
-        stats = create_list(:project_statistics, 5)
+        stats = create_list(:project_statistics, 3)
         project_ids = stats[0..1].map { |s| s.project_id }
         expected_ids = stats[0..1].map { |s| s.id }
 

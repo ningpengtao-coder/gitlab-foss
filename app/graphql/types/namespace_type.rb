@@ -18,7 +18,7 @@ module Types
 
     field :projects,
           Types::ProjectType.connection_type,
-          null: true,
+          null: false,
           resolver: ::Resolvers::NamespaceProjectsResolver
   end
 end
