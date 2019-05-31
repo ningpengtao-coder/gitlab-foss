@@ -1,0 +1,5 @@
+---
+title: Add environment_id to clusters_kubernetes_namespaces
+merge_request: 29038
+author:
+type: other

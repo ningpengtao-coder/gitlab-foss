@@ -794,9 +794,11 @@ ActiveRecord::Schema.define(version: 20190611161641) do
     t.string "encrypted_service_account_token_iv"
     t.string "namespace", null: false
     t.string "service_account_name"
+    t.integer "environment_id"
+    t.index ["cluster_id", "environment_id"], name: "index_clusters_kubernetes_namespaces_on_cluster_and_environment", unique: true, using: :btree
     t.index ["cluster_id", "namespace"], name: "kubernetes_namespaces_cluster_and_namespace", unique: true, using: :btree
-    t.index ["cluster_id"], name: "index_clusters_kubernetes_namespaces_on_cluster_id", using: :btree
     t.index ["cluster_project_id"], name: "index_clusters_kubernetes_namespaces_on_cluster_project_id", using: :btree
+    t.index ["environment_id"], name: "index_clusters_kubernetes_namespaces_on_environment_id", using: :btree
     t.index ["project_id"], name: "index_clusters_kubernetes_namespaces_on_project_id", using: :btree
   end
 
@@ -2509,6 +2511,7 @@ ActiveRecord::Schema.define(version: 20190611161641) do
   add_foreign_key "clusters_applications_runners", "clusters", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "cluster_projects", on_delete: :nullify
   add_foreign_key "clusters_kubernetes_namespaces", "clusters", on_delete: :cascade
+  add_foreign_key "clusters_kubernetes_namespaces", "environments", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "projects", on_delete: :nullify
   add_foreign_key "container_repositories", "projects"
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
