@@ -16,12 +16,20 @@ cache:
   paths:
     - node_modules/
 
-test_async:
-  script:
-    - npm install
-    - node ./specs/start.js ./specs/async.spec.js
+#Make sure the project's root directory contains the .npmrc with the path to the @scope:registry and the path to where the packages are to be published/installed
+#Uncomment the commented lined under "build_package" if you don't have an .npmrc if your project
 
-test_db:
+###
+## TO TEST THE PACKAGE BUILD STEPS, UNCOMMENT build_package AND COMMENT OUT INSTALL PACKAGE
+###
+# build_package:
+#   script:
+#     # - echo "@scope/packge_name=https://gitlab.example.com/api/v4/packages/npm" >> .npmrc
+#     # - echo "//gitlab.example.com/api/v4/projects/<project_id>/packages/npm/:_authToken=<oauth_token>" >> .npmrc
+#     - cat .npmrc #to review the contents of your .npmrc
+#     - npm publish
+
+install_package:
   script:
-    - npm install
-    - node ./specs/start.js ./specs/db-postgres.spec.js
+    - npm install @scope/package_name
+    - node node_modules/@scope/package_name/index.js
