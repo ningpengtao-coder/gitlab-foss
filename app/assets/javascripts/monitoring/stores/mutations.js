@@ -43,10 +43,10 @@ export default {
     state.prometheusEndpoint = endpoints.prometheusEndpoint;
   },
   [types.SET_QUERY_RESULT](state, { metricId, result }) {
-    state.showEmptyState = false;
     if (!metricId || !result) {
       return;
     }
+    state.showEmptyState = false;
     Vue.set(state.queryResults, metricId, Object.freeze(result));
   },
   [types.SET_GROUPS](state, groups) {
@@ -58,4 +58,8 @@ export default {
   [types.SET_GETTING_STARTED_EMPTY_STATE](state) {
     state.emptyState = 'gettingStarted';
   },
+  [types.SET_NO_DATA_EMPTY_STATE](state) {
+    state.showEmptyState = true;
+    state.emptyState = 'noData';
+  }
 };

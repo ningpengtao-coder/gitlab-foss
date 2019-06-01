@@ -44,6 +44,18 @@ export const receiveMetricsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_METRICS_DATA_SUCCESS, data);
 export const receiveMetricsDataFailure = ({ commit }, error) =>
   commit(types.RECEIVE_METRICS_DATA_FAILURE, error);
+
+export const requestMetricsDashboard = ({ commit }) => {
+  commit(types.REQUEST_METRICS_DASHBOARD);
+}
+export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response, params }) => {
+  commit(types.SET_GROUPS, response.dashboard.panel_groups);
+  dispatch('fetchPrometheusMetrics', params);
+}
+export const receiveMetricsDashboardFailure = ({ commit }, error) => {
+  commit(types.RECEIVE_METRICS_DASHBOARD_FAILURE, error);
+}
+
 export const receiveDeploymentsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, data);
 export const receiveDeploymentsDataFailure = ({ commit }) =>
@@ -82,6 +94,8 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
 };
 
 export const fetchDashboard = ({ state, commit, dispatch }, params) => {
+  dispatch('requestMetricsDashboard');
+
   return axios
     .get(state.dashboardEndpoint, { params })
     .then(resp => resp.data)
@@ -90,23 +104,11 @@ export const fetchDashboard = ({ state, commit, dispatch }, params) => {
         throw new Error(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
       }
 
-      commit(types.SET_GROUPS, response.dashboard.panel_groups);
-      dispatch('fetchPrometheusMetrics', params);
+      dispatch('receiveMetricsDashboardSuccess', { response, params })
     })
-    .catch(e => {
-      throw e;
+    .catch(error => {
+      dispatch('receiveMetricsDashboardFailure', error)
     });
-};
-
-export const fetchPrometheusMetrics = ({ state, dispatch }, params) => {
-  state.groups.forEach(group => {
-    group.panels.forEach(panel => {
-      panel.queries = panel.metrics;
-      panel.queries.forEach(metric => {
-        dispatch('fetchPrometheusMetric', { metric, params });
-      });
-    });
-  });
 };
 
 function fetchPrometheusResult(prometheusEndpoint, params) {
@@ -114,7 +116,7 @@ function fetchPrometheusResult(prometheusEndpoint, params) {
     .then(res => res.data)
     .then(response => {
       if (response.status === 'error') {
-        // {"status":"error","errorType":"bad_data","error":"exceeded maximum resolution of 11,000 points per timeseries. Try decreasing the query resolution (?step=XX)"}
+        throw new Error(response.error);
       }
 
       const { resultType, result } = response.data;
@@ -138,12 +140,12 @@ export const fetchPrometheusMetric = ({ state, commit }, { metric, params }) => 
   const query = metric[queryType];
   const prometheusEndpoint = state.prometheusEndpoint.replace(':proxy_path', queryType);
 
-  const end = params.end || Math.floor(Date.now() / 1000);
-  const start = params.start || end - params.timeDiff;
+  const { start, end } = params;
+  const timeDiff = end - start;
 
   const minStep = 60;
   const queryDataPoints = 600;
-  const step = Math.max(minStep, Math.ceil(params.timeDiff / queryDataPoints));
+  const step = Math.max(minStep, Math.ceil(timeDiff / queryDataPoints));
 
   const queryParams = {
     query,
@@ -152,8 +154,26 @@ export const fetchPrometheusMetric = ({ state, commit }, { metric, params }) => 
     step,
   };
 
-  fetchPrometheusResult(prometheusEndpoint, queryParams).then(result => {
+  return fetchPrometheusResult(prometheusEndpoint, queryParams).then(result => {
     commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
+  });
+};
+
+export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
+  let promises = [];
+  state.groups.forEach(group => {
+    group.panels.forEach(panel => {
+      panel.queries = panel.metrics;
+      panel.queries.forEach(metric => {
+        promises.push(dispatch('fetchPrometheusMetric', { metric, params }));
+      });
+    });
+  });
+
+  Promise.all(promises).then(() => {
+    if (Object.keys(state.queryResults).length === 0) {
+      commit(types.SET_NO_DATA_EMPTY_STATE);
+    }
   });
 };
 
