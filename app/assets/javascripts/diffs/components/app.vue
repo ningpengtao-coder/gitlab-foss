@@ -23,6 +23,8 @@ import {
   CENTERED_LIMITED_CONTAINER_CLASSES,
 } from '../constants';
 
+const isLeaving = {};
+
 export default {
   name: 'DiffsApp',
   components: {
@@ -177,6 +179,33 @@ export default {
       'scrollToFile',
       'toggleShowTreeList',
     ]),
+    setIntersectionObserver() {
+      const config = {
+        root: null, // avoiding 'root' or setting it to 'null' sets it to default value: viewport
+        rootMargin: '-25% 0px -50% 0px',
+        threshold: 0.1,
+      };
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // we are ENTERING the "capturing frame". Mark file as `active`
+            isLeaving[entry.target.id] = true;
+            // Do something with ENTERING entry
+            console.log(`${entry.target.id} is ENTERING the frame`);
+          } else if (isLeaving[entry.target.id]) {
+            // we are EXITING the "capturing frame". Mark file as `read`
+            isLeaving[entry.target.id] = false;
+            console.log(`${entry.target.id} is LEAVING the frame`);
+            // Do something with LEAVING entry
+          }
+        });
+      }, config);
+
+      const diffs = document.querySelectorAll('.diff-files-holder .diff-file');
+      diffs.forEach(diff => {
+        observer.observe(diff);
+      });
+    },
     refetchDiffData() {
       this.assignedDiscussions = false;
       this.fetchData(false);
@@ -192,6 +221,7 @@ export default {
             () => {
               this.setDiscussions();
               this.startRenderDiffsQueue();
+              this.setIntersectionObserver();
             },
             { timeout: 1000 },
           );
