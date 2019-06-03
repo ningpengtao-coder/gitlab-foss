@@ -27,9 +27,7 @@ module Resolvers
 
     def self.resolver_complexity(args)
       complexity = super
-      complexity += 10 if args[:include_subgroups]
-
-      complexity
+      complexity + 10
     end
   end
 end

@@ -5,16 +5,16 @@ require 'spec_helper'
 describe 'getting projects', :nested_groups do
   include GraphqlHelpers
 
-  let(:group)           { create(:group) }
-  let!(:project)        { create(:project, namespace: subject) }
-  let(:nested_group)    { create(:group, parent: group) }
-  let!(:nested_project) { create(:project, group: nested_group) }
-  let!(:public_project) { create(:project, :public, namespace: subject) }
-  let(:user)            { create(:user) }
+  let(:group)             { create(:group) }
+  let!(:project)          { create(:project, namespace: subject) }
+  let(:nested_group)      { create(:group, parent: group) }
+  let!(:nested_project)   { create(:project, group: nested_group) }
+  let!(:public_project)   { create(:project, :public, namespace: subject) }
+  let(:user)              { create(:user) }
+  let(:include_subgroups) { true }
 
   subject { group }
 
-  let(:include_subgroups) { true }
   let(:query) do
     graphql_query_for(
       'namespace',
