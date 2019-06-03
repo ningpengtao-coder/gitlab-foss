@@ -93,7 +93,7 @@ export const fetchMetricsData = ({ state, dispatch }, params) => {
     });
 };
 
-export const fetchDashboard = ({ state, commit, dispatch }, params) => {
+export const fetchDashboard = ({ state, dispatch }, params) => {
   dispatch('requestMetricsDashboard');
 
   return axios
@@ -170,7 +170,7 @@ export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
     });
   });
 
-  Promise.all(promises).then(() => {
+  return Promise.all(promises).then(() => {
     if (Object.keys(state.queryResults).length === 0) {
       commit(types.SET_NO_DATA_EMPTY_STATE);
     }
