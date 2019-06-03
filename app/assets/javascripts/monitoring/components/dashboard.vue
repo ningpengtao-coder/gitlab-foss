@@ -244,7 +244,7 @@ export default {
           m.queries[0].result &&
           m.queries[0].result.length > 0,
       );
-    }
+    },
   },
   addMetric: {
     title: s__('Metrics|Add metric'),

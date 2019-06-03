@@ -61,5 +61,5 @@ export default {
   [types.SET_NO_DATA_EMPTY_STATE](state) {
     state.showEmptyState = true;
     state.emptyState = 'noData';
-  }
+  },
 };

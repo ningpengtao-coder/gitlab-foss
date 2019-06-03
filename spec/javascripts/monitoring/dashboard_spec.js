@@ -4,7 +4,6 @@ import Dashboard from '~/monitoring/components/dashboard.vue';
 import { createStore } from '~/monitoring/stores';
 import * as types from '~/monitoring/stores/mutation_types';
 import { timeWindows, timeWindowsKeyNames } from '~/monitoring/constants';
-import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
 import {
   metricsGroupsAPIResponse,

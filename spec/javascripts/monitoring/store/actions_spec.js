@@ -17,7 +17,12 @@ import {
 import storeState from '~/monitoring/stores/state';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { resetStore } from '../helpers';
-import { deploymentData, environmentData, metricsDashboardResponse, prometheusResponse } from '../mock_data';
+import {
+  deploymentData,
+  environmentData,
+  metricsDashboardResponse,
+  prometheusResponse,
+} from '../mock_data';
 
 describe('Monitoring store actions', () => {
   let mock;
@@ -185,10 +190,13 @@ describe('Monitoring store actions', () => {
       const params = {};
       mock.onGet(state.dashboardEndpoint).reply(200, response);
 
-      fetchDashboard({state, dispatch}, params)
+      fetchDashboard({ state, dispatch }, params)
         .then(() => {
           expect(dispatch).toHaveBeenCalledWith('requestMetricsDashboard');
-          expect(dispatch).toHaveBeenCalledWith('receiveMetricsDashboardSuccess', { response, params });
+          expect(dispatch).toHaveBeenCalledWith('receiveMetricsDashboardSuccess', {
+            response,
+            params,
+          });
           done();
         })
         .catch(done.fail);
@@ -198,9 +206,12 @@ describe('Monitoring store actions', () => {
       const params = {};
       mock.onGet(state.dashboardEndpoint).reply(500);
 
-      fetchDashboard({state, dispatch}, params)
+      fetchDashboard({ state, dispatch }, params)
         .then(() => {
-          expect(dispatch).toHaveBeenCalledWith('receiveMetricsDashboardFailure', new Error('Request failed with status code 500'));
+          expect(dispatch).toHaveBeenCalledWith(
+            'receiveMetricsDashboardFailure',
+            new Error('Request failed with status code 500'),
+          );
           done();
         })
         .catch(done.fail);
@@ -220,9 +231,13 @@ describe('Monitoring store actions', () => {
       const params = {};
       const response = metricsDashboardResponse;
 
-      receiveMetricsDashboardSuccess({commit, dispatch}, { response, params });
+      receiveMetricsDashboardSuccess({ commit, dispatch }, { response, params });
 
-      expect(commit).toHaveBeenCalledWith(types.SET_GROUPS, metricsDashboardResponse.dashboard.panel_groups);
+      expect(commit).toHaveBeenCalledWith(
+        types.SET_GROUPS,
+        metricsDashboardResponse.dashboard.panel_groups,
+      );
+
       expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetrics', params);
     });
   });
@@ -281,25 +296,8 @@ describe('Monitoring store actions', () => {
 
       fetchPrometheusMetrics({ state, commit, dispatch }, params)
         .then(() => {
-          expect(dispatch.calls.count()).toEqual(3)
+          expect(dispatch.calls.count()).toEqual(3);
           expect(dispatch).toHaveBeenCalledWith('fetchPrometheusMetric', { metric, params });
-          done();
-        })
-        .catch(done.fail);
-
-      done();
-    });
-
-    it('aliases queries and metrics for each panel', done => {
-      const params = {};
-      const state = storeState();
-      state.groups = metricsDashboardResponse.dashboard.panel_groups;
-
-      const panel = state.groups[0].panels[0];
-
-      fetchPrometheusMetrics({ state, commit, dispatch }, params)
-        .then(() => {
-          expect(panel.queries).toEqual(panel.metrics);
           done();
         })
         .catch(done.fail);

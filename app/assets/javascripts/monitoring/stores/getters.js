@@ -1,11 +1,10 @@
-import _ from 'underscore';
 import { sortMetrics, normalizeMetrics } from './utils';
 
 export const getMetricsCount = state =>
   state.groups.reduce((count, group) => count + group.metrics.length, 0);
 
 export const groups = state => {
-  if (!gon.features.environmentMetricsUsePrometheusEndpoint) {
+  if (!state.useDashboardEndpoint) {
     return state.groups;
   }
 
@@ -42,7 +41,7 @@ function hasQueryResult(acc, panel) {
 }
 
 export function groupsWithData(state) {
-  if (!gon.features.environmentMetricsUsePrometheusEndpoint) {
+  if (!state.useDashboardEndpoint) {
     return state.groups;
   }
 

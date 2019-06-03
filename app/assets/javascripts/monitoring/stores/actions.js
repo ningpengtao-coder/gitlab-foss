@@ -47,14 +47,14 @@ export const receiveMetricsDataFailure = ({ commit }, error) =>
 
 export const requestMetricsDashboard = ({ commit }) => {
   commit(types.REQUEST_METRICS_DASHBOARD);
-}
+};
 export const receiveMetricsDashboardSuccess = ({ commit, dispatch }, { response, params }) => {
   commit(types.SET_GROUPS, response.dashboard.panel_groups);
   dispatch('fetchPrometheusMetrics', params);
-}
+};
 export const receiveMetricsDashboardFailure = ({ commit }, error) => {
   commit(types.RECEIVE_METRICS_DASHBOARD_FAILURE, error);
-}
+};
 
 export const receiveDeploymentsDataSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_DEPLOYMENTS_DATA_SUCCESS, data);
@@ -104,10 +104,10 @@ export const fetchDashboard = ({ state, dispatch }, params) => {
         throw new Error(s__('Metrics|Unexpected metrics data response from prometheus endpoint'));
       }
 
-      dispatch('receiveMetricsDashboardSuccess', { response, params })
+      dispatch('receiveMetricsDashboardSuccess', { response, params });
     })
     .catch(error => {
-      dispatch('receiveMetricsDashboardFailure', error)
+      dispatch('receiveMetricsDashboardFailure', error);
     });
 };
 
@@ -119,13 +119,7 @@ function fetchPrometheusResult(prometheusEndpoint, params) {
         throw new Error(response.error);
       }
 
-      const { resultType, result } = response.data;
-
-      if (resultType === 'matrix') {
-        if (result.length > 0) {
-          return result;
-        }
-      }
+      return response.data.result;
     });
 }
 
@@ -160,7 +154,7 @@ export const fetchPrometheusMetric = ({ state, commit }, { metric, params }) => 
 };
 
 export const fetchPrometheusMetrics = ({ state, commit, dispatch }, params) => {
-  let promises = [];
+  const promises = [];
   state.groups.forEach(group => {
     group.panels.forEach(panel => {
       panel.queries = panel.metrics;
