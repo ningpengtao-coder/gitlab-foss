@@ -17,7 +17,7 @@ cache:
     - node_modules/
 
 #Make sure the project's root directory contains the .npmrc with the path to the @scope:registry and the path to where the packages are to be published/installed
-#Uncomment the commented lined under "build_package" if you don't have an .npmrc if your project
+#Uncomment the line starting with "build_package" if you don't have an .npmrc for your project
 
 ###
 ## TO TEST THE PACKAGE BUILD STEPS, UNCOMMENT build_package AND COMMENT OUT INSTALL PACKAGE
