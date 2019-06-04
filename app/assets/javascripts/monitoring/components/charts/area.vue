@@ -79,23 +79,24 @@ export default {
             ? appearance.line.width
             : undefined;
 
-        if (query.result) {
-          const series = makeDataSeries(query.result, {
-            name: this.formatLegendLabel(query),
-            lineStyle: {
-              type: lineType,
-              width: lineWidth,
-            },
-            areaStyle: {
-              opacity:
-                appearance && appearance.area && typeof appearance.area.opacity === 'number'
-                  ? appearance.area.opacity
-                  : undefined,
-            },
-          });
-          return acc.concat(series);
+        if (!query.result) {
+          return acc;
         }
-        return acc;
+
+        const series = makeDataSeries(query.result, {
+          name: this.formatLegendLabel(query),
+          lineStyle: {
+            type: lineType,
+            width: lineWidth,
+          },
+          areaStyle: {
+            opacity:
+              appearance && appearance.area && typeof appearance.area.opacity === 'number'
+                ? appearance.area.opacity
+                : undefined,
+          },
+        });
+        return acc.concat(series);
       }, []);
     },
     chartOptions() {

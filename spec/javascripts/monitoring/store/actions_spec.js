@@ -271,9 +271,6 @@ describe('Monitoring store actions', () => {
       dispatch = jasmine.createSpy();
     });
 
-    // state.groups.forEach(group => {
-    //   group.panels.forEach(panel => {
-    //     panel.queries = panel.metrics;
     it('commits empty state when state.groups is empty', done => {
       const state = storeState();
       const params = {};
