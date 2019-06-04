@@ -22,10 +22,12 @@ Example request:
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/namespaces
 ```
 
-Example response:
+Example responses:
 
-```json
-[
+<p>
+<details>
+<summary>Click to expand/collapse example <b>Self-Hosted</b> or GitLab.com <b>Free</b> response:</summary>
+<pre><code>[
   {
     "id": 1,
     "name": "user1",
@@ -51,10 +53,45 @@ Example response:
     "parent_id": 9,
     "members_count_with_descendants": 5
   }
-]
-```
+]</code></pre>
+</details>
+</p>
 
-**Note**: `members_count_with_descendants` are presented only for group maintainers/owners.
+<p>
+<details>
+<summary>Click to expand/collapse example GitLab.com <b>Bronze</b> or higher response:</summary>
+<pre><code>[
+  {
+    "id": 1,
+    "name": "user1",
+    "path": "user1",
+    "kind": "user",
+    "full_path": "user1"
+  },
+  {
+    "id": 2,
+    "name": "group1",
+    "path": "group1",
+    "kind": "group",
+    "full_path": "group1",
+    "parent_id": null,
+    "members_count_with_descendants": 2,
+    "plan": "bronze"
+  },
+  {
+    "id": 3,
+    "name": "bar",
+    "path": "bar",
+    "kind": "group",
+    "full_path": "foo/bar",
+    "parent_id": 9,
+    "members_count_with_descendants": 5
+  }
+]</code></pre>
+</details>
+</p>
+
+**Note**: Only group maintainers/owners are presented with `members_count_with_descendants`, as well as `plan` **[BRONZE ONLY]**.
 
 ## Search for namespace
 

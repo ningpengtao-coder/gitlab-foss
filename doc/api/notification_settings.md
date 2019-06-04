@@ -17,22 +17,22 @@ custom
 
 If the `custom` level is used, specific email events can be controlled. Available events are returned by `NotificationSetting.email_events`. Currently, these events are recognized:
 
-```
-new_note
-new_issue
-reopen_issue
-close_issue
-reassign_issue
-issue_due
-new_merge_request
-push_to_merge_request
-reopen_merge_request
-close_merge_request
-reassign_merge_request
-merge_merge_request
-failed_pipeline
-success_pipeline
-```
+- `new_note`
+- `new_issue`
+- `reopen_issue`
+- `close_issue`
+- `reassign_issue`
+- `issue_due`
+- `new_merge_request`
+- `push_to_merge_request`
+- `reopen_merge_request`
+- `close_merge_request`
+- `reassign_merge_request`
+- `merge_merge_request`
+- `failed_pipeline`
+- `success_pipeline`
+- `new_epic` **[ULTIMATE]**
+
 
 ## Global notification settings
 
@@ -85,6 +85,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 | `merge_merge_request` | boolean | no | Enable/disable this notification |
 | `failed_pipeline` | boolean | no | Enable/disable this notification |
 | `success_pipeline` | boolean | no | Enable/disable this notification |
+| `new_epic` | boolean | no | Enable/disable this notification ([Introduced][ee-6626] in 11.3) **[ULTIMATE]** |
 
 Example response:
 
@@ -153,11 +154,14 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 | `merge_merge_request` | boolean | no | Enable/disable this notification |
 | `failed_pipeline` | boolean | no | Enable/disable this notification |
 | `success_pipeline` | boolean | no | Enable/disable this notification |
+| `new_epic` | boolean | no | Enable/disable this notification ([Introduced][ee-6626] in 11.3) **[ULTIMATE]** |
 
 Example responses:
 
-```json
-{
+<p>
+<details>
+<summary>Click to expand/collapse example response:</summary>
+<pre><code>{
   "level": "watch"
 }
 
@@ -179,7 +183,39 @@ Example responses:
     "failed_pipeline": false,
     "success_pipeline": false
   }
+}</code></pre>
+</details>
+</p>
+
+<p>
+<details>
+<summary>Click to expand/collapse example GitLab <b>Ultimate</b> or <b>Gold</b> response:</summary>
+<pre><code>{
+  "level": "watch"
 }
-```
+
+{
+  "level": "custom",
+  "events": {
+    "new_note": true,
+    "new_issue": false,
+    "reopen_issue": false,
+    "close_issue": false,
+    "reassign_issue": false,
+    "issue_due": false,
+    "new_merge_request": false,
+    "push_to_merge_request": false,
+    "reopen_merge_request": false,
+    "close_merge_request": false,
+    "reassign_merge_request": false,
+    "merge_merge_request": false,
+    "failed_pipeline": false,
+    "success_pipeline": false,
+    "new_epic": false
+  }
+}</code></pre>
+</details>
+</p>
 
 [ce-5632]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5632
+[ee-6626]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626
