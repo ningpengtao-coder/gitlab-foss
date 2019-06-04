@@ -3,6 +3,9 @@ import { sortMetrics, normalizeMetrics } from './utils';
 export const getMetricsCount = state =>
   state.groups.reduce((count, group) => count + group.metrics.length, 0);
 
+// combine groups and queryResults from state
+// queryResults is a bunch of large arrays, grouped be metricId
+// we want to combine them into a single big object for dashboard to use
 export const groups = state => {
   if (!state.useDashboardEndpoint) {
     return state.groups;
@@ -27,6 +30,7 @@ export const groups = state => {
   }, []);
 };
 
+// Reducer function to only include panels with metrics
 function hasQueryResult(acc, panel) {
   const metrics = panel.metrics.filter(query => query.result.length > 0);
 
@@ -40,6 +44,8 @@ function hasQueryResult(acc, panel) {
   return acc;
 }
 
+// Eliminate groups that don't have any panels with results
+// if group.panel.metrics.results.length > 0
 export function groupsWithData(state) {
   if (!state.useDashboardEndpoint) {
     return state.groups;

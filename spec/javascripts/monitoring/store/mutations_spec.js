@@ -82,11 +82,55 @@ describe('Monitoring mutations', () => {
         metricsEndpoint: 'additional_metrics.json',
         environmentsEndpoint: 'environments.json',
         deploymentsEndpoint: 'deployments.json',
+        dashboardEndpoint: 'dashboard.json',
+        prometheusEndpoint: 'prometheus/api',
       });
 
       expect(stateCopy.metricsEndpoint).toEqual('additional_metrics.json');
       expect(stateCopy.environmentsEndpoint).toEqual('environments.json');
       expect(stateCopy.deploymentsEndpoint).toEqual('deployments.json');
+      expect(stateCopy.dashboardEndpoint).toEqual('dashboard.json');
+      expect(stateCopy.prometheusEndpoint).toEqual('prometheus/api');
+    });
+  });
+
+  describe('SET_QUERY_RESULT', () =>{
+    it('clears empty state', () => {
+      const metricId = 123;
+      const result = [1, 2, 3];
+
+      mutations[types.SET_QUERY_RESULT](stateCopy, {
+        metricId,
+        result,
+      });
+
+      expect(stateCopy.showEmptyState).toBe(false);
+    });
+
+    it('sets queryResult value', () => {
+      const metricId = 123;
+      const result = [1, 2, 3];
+
+      mutations[types.SET_QUERY_RESULT](stateCopy, {
+        metricId,
+        result,
+      });
+
+      expect(stateCopy.queryResults).toEqual({
+        123: [1, 2, 3],
+      });
+    });
+
+    it('freezes query result', () => {
+      const metricId = 123;
+      const result = [1, 2, 3];
+
+      mutations[types.SET_QUERY_RESULT](stateCopy, {
+        metricId,
+        result,
+      });
+
+      expect(() => stateCopy.queryResults[123].push(4)).toThrow();
     });
   });
 });

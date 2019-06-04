@@ -108,6 +108,7 @@ export const fetchDashboard = ({ state, dispatch }, params) => {
     })
     .catch(error => {
       dispatch('receiveMetricsDashboardFailure', error);
+      createFlash(s__('Metrics|There was an error while retrieving metrics'));
     });
 };
 
