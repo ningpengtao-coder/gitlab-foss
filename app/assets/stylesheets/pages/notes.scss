@@ -555,9 +555,6 @@ $note-form-margin-left: 72px;
   @media (min-width: map-get($grid-breakpoints, sm)) {
     margin-right: 200px;
   }
-  @media (min-width: map-get($grid-breakpoints, md)) {
-    margin-right: 0;
-  }
 }
 
 .note-header-author-name {
@@ -573,6 +570,11 @@ $note-form-margin-left: 72px;
 
   .note-header-info {
     padding-bottom: 0;
+    margin-right: 0;
+
+    @media (min-width: map-get($grid-breakpoints, md)) {
+      margin-right: 10em;
+    }
   }
 
   .timeline-content {
@@ -648,12 +650,18 @@ $note-form-margin-left: 72px;
  */
 
 .discussion-actions {
-  float: right;
   color: $gray-darkest;
+  padding-top: $gl-padding;
 
   @include media-breakpoint-down(xs) {
     width: 100%;
     margin: $gl-padding-8 0;
+  }
+
+  @media (min-width: map-get($grid-breakpoints, md)) {
+    position: absolute;
+    top: 0;
+    right: $gl-padding;
   }
 
   .btn-group > .discussion-next-btn {

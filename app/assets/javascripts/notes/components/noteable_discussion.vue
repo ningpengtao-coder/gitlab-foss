@@ -208,6 +208,9 @@ export default {
     resolveWithIssuePath() {
       return !this.discussionResolved ? this.discussion.resolve_with_issue_path : '';
     },
+    toggleChevronClass() {
+      return this.isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
+    },
   },
   created() {
     eventHub.$on('startReplying', this.onStartReplying);
@@ -326,9 +329,6 @@ Please check your network connection and try again.`;
               :author="author"
               :created-at="firstNote.created_at"
               :note-id="firstNote.id"
-              :include-toggle="true"
-              :expanded="discussion.expanded"
-              :no-truncate="true"
               @toggleHandler="toggleDiscussionHandler"
             >
               <span v-html="actionText"></span>
@@ -347,6 +347,17 @@ Please check your network connection and try again.`;
               action-text="Last updated"
               class-name="discussion-headline-light js-discussion-headline"
             />
+
+            <div class="discussion-actions">
+              <button
+                class="note-action-button discussion-toggle-button js-vue-toggle-button"
+                type="button"
+                @click="toggleDiscussionHandler"
+              >
+                <i :class="toggleChevronClass" class="fa" aria-hidden="true"></i>
+                {{ __('Toggle discussion') }}
+              </button>
+            </div>
           </div>
         </div>
         <div v-if="!shouldHideDiscussionBody" class="discussion-body">

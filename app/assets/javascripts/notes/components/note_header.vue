@@ -27,16 +27,6 @@ export default {
       required: false,
       default: null,
     },
-    includeToggle: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    expanded: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     noTruncate: {
       type: Boolean,
       required: false,
@@ -44,9 +34,6 @@ export default {
     },
   },
   computed: {
-    toggleChevronClass() {
-      return this.expanded ? 'fa-chevron-up' : 'fa-chevron-down';
-    },
     noteTimestampLink() {
       return `#note_${this.noteId}`;
     },
@@ -75,16 +62,6 @@ export default {
       'mr-0': noTruncate,
     }"
   >
-    <div v-if="includeToggle" class="discussion-actions">
-      <button
-        class="note-action-button discussion-toggle-button js-vue-toggle-button"
-        type="button"
-        @click="handleToggle"
-      >
-        <i :class="toggleChevronClass" class="fa" aria-hidden="true"></i>
-        {{ __('Toggle discussion') }}
-      </button>
-    </div>
     <a
       v-if="hasAuthor"
       v-once
