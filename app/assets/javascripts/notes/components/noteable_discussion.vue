@@ -328,6 +328,7 @@ Please check your network connection and try again.`;
               :note-id="firstNote.id"
               :include-toggle="true"
               :expanded="discussion.expanded"
+              :no-truncate="true"
               @toggleHandler="toggleDiscussionHandler"
             >
               <span v-html="actionText"></span>

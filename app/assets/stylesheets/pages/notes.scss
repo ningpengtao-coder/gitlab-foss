@@ -549,6 +549,17 @@ $note-form-margin-left: 72px;
   }
 }
 
+.note-header-info {
+  margin-right: 110px;
+
+  @media (min-width: map-get($grid-breakpoints, sm)) {
+    margin-right: 200px;
+  }
+  @media (min-width: map-get($grid-breakpoints, md)) {
+    margin-right: 0;
+  }
+}
+
 .note-header-author-name {
   display: none;
 
@@ -655,21 +666,9 @@ $note-form-margin-left: 72px;
 }
 
 .note-actions {
-  display: flex;
-  align-self: flex-start;
-  flex-shrink: 0;
-  justify-content: flex-end;
-  width: 100%;
-  padding-bottom: $gl-padding-8;
+  top: 0;
+  right: 0;
   color: $gray-600;
-
-  @include media-breakpoint-up(md) {
-    display: inline-flex;
-    align-items: center;
-    width: auto;
-    margin-left: 10px;
-    padding-bottom: 0;
-  }
 }
 
 .more-actions {

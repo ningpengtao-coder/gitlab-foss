@@ -121,8 +121,10 @@ export default {
 </script>
 
 <template>
-  <div class="note-actions">
-    <span v-if="accessLevel" class="note-role user-access-role">{{ accessLevel }}</span>
+  <div class="note-actions position-absolute d-inline-flex">
+    <span v-if="accessLevel" class="note-role user-access-role d-none d-sm-inline-block">{{
+      accessLevel
+    }}</span>
     <div v-if="canResolve" class="note-actions-item">
       <button
         ref="resolveButton"

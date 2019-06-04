@@ -37,6 +37,11 @@ export default {
       required: false,
       default: true,
     },
+    noTruncate: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     toggleChevronClass() {
@@ -62,7 +67,14 @@ export default {
 </script>
 
 <template>
-  <div class="note-header-info">
+  <div
+    class="note-header-info"
+    :class="{
+      'overflow-hidden': !noTruncate,
+      'text-truncate': !noTruncate,
+      'mr-0': noTruncate,
+    }"
+  >
     <div v-if="includeToggle" class="discussion-actions">
       <button
         class="note-action-button discussion-toggle-button js-vue-toggle-button"

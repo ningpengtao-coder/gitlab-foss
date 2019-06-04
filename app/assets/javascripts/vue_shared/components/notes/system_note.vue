@@ -87,7 +87,12 @@ export default {
     <div class="timeline-icon" v-html="iconHtml"></div>
     <div class="timeline-content">
       <div class="note-header">
-        <note-header :author="note.author" :created-at="note.created_at" :note-id="note.id">
+        <note-header
+          :author="note.author"
+          :created-at="note.created_at"
+          :note-id="note.id"
+          :no-truncate="true"
+        >
           <span v-html="actionTextHtml"></span>
         </note-header>
       </div>
