@@ -32,7 +32,8 @@ module EnvironmentsHelper
       "prometheus-endpoint": prometheus_api_project_environment_path(project, environment, proxy_path: ':proxy_path'),
       "project-path" => project_path(project),
       "tags-path" => project_tags_path(project),
-      "has-metrics" => "#{environment.has_metrics?}"
+      "has-metrics" => "#{environment.has_metrics?}",
+      "external-dashboard-url" => project.metrics_setting_external_dashboard_url
     }
   end
 end

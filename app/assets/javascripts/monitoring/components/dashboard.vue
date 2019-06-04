@@ -38,7 +38,7 @@ export default {
     GlModalDirective,
   },
   props: {
-    externalDashboardPath: {
+    externalDashboardUrl: {
       type: String,
       required: false,
       default: '',
@@ -277,7 +277,7 @@ export default {
             >
           </gl-dropdown>
         </div>
-        <div v-if="showTimeWindowDropdown" class="d-flex align-items-center">
+        <div v-if="showTimeWindowDropdown" class="d-flex align-items-center prepend-left-8">
           <strong>{{ s__('Metrics|Show last') }}</strong>
           <gl-dropdown
             class="prepend-left-10 js-time-window-dropdown"
@@ -328,10 +328,11 @@ export default {
           </gl-modal>
         </div>
         <gl-button
-          v-if="externalDashboardPath.length"
+          v-if="externalDashboardUrl.length"
           class="js-external-dashboard-link prepend-left-8"
           variant="primary"
-          :href="externalDashboardPath"
+          :href="externalDashboardUrl"
+          target="_blank"
         >
           {{ __('View full dashboard') }}
           <icon name="external-link" />

@@ -177,10 +177,6 @@ describe('Dashboard', () => {
         store,
       });
 
-      component.$store.commit(
-        `monitoringDashboard/${types.SET_ENVIRONMENTS_ENDPOINT}`,
-        '/environments',
-      );
       component.$store.commit(`monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`, []);
       component.$store.commit(
         `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
@@ -214,10 +210,6 @@ describe('Dashboard', () => {
         store,
       });
 
-      component.$store.commit(
-        `monitoringDashboard/${types.SET_ENVIRONMENTS_ENDPOINT}`,
-        '/environments',
-      );
       component.$store.commit(
         `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
         environmentData,
@@ -405,7 +397,7 @@ describe('Dashboard', () => {
             hasMetrics: true,
             showPanels: false,
             showTimeWindowDropdown: false,
-            externalDashboardPath: '/mockPath',
+            externalDashboardUrl: '/mockUrl',
           },
           store,
         });
@@ -431,7 +423,7 @@ describe('Dashboard', () => {
             hasMetrics: true,
             showPanels: false,
             showTimeWindowDropdown: false,
-            externalDashboardPath: '',
+            externalDashboardUrl: '',
           },
           store,
         });

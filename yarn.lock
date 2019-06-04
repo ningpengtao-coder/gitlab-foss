@@ -680,10 +680,10 @@
   dependencies:
     bootstrap "^4.1.3"
 
-"@gitlab/eslint-config@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/eslint-config/-/eslint-config-1.5.0.tgz#0c8c3ae74f276eb6671bd7c60f331bc0f2d2e5cf"
-  integrity sha512-KgJgoIZNpGauFpCV1iCptesYN7I8abtYRBLU9xcH0oocC/xp3JmbLfsZ+lEtrk8pl99Q2mKiAuaPpzxjXr6hBw==
+"@gitlab/eslint-config@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/eslint-config/-/eslint-config-1.6.0.tgz#1fd247d6ab477d53d4c330e05f007e3afa303689"
+  integrity sha512-EZffCwsRZmRWPP6N3wp20EJDVGYLG1v43/W7fF/gYQpUjcRclC8ks/jEv8UppasSDlanDmkh1bLWoE9CelSyyw==
   dependencies:
     babel-eslint "^10.0.1"
     eslint-config-airbnb-base "^13.1.0"
@@ -698,10 +698,10 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.63.0.tgz#9dd544026d203e4ce6efed72b05db68f710c4d49"
   integrity sha512-YztrReFTg31B7v5wtUC5j15KHNcMebtW+kACytEU42XomMaIwk4USIbygqWlq0VRHA2VHJrHApfJHIjxiCCQcA==
 
-"@gitlab/ui@^3.10.0":
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-3.10.0.tgz#0f16772b7fe8052dabd37aba2ae436255b9e0f0a"
-  integrity sha512-po6fh2T8esa2Nach73AYLdoTg8N0YrRa5GkJk5GoxVrHYoAUD8T1Rn3pXXXKSsQdQcYjIZJ6uvY8sL+qg+Yjww==
+"@gitlab/ui@^3.10.3":
+  version "3.10.3"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-3.10.3.tgz#dba2ddc726e203ab341d870cea2fe634f583c08d"
+  integrity sha512-Y48DKhOSC+Yw0X8PN+TyR8gITAq6jVHbiTsw+eZkCacs367L1u6w82lr7ba/Bl+4W6DhDWT34VCG0hYbGVrUJw==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.2.1"
@@ -712,7 +712,7 @@
     js-beautify "^1.8.8"
     lodash "^4.17.11"
     url-search-params-polyfill "^5.0.0"
-    vue "^2.5.21"
+    vue "^2.6.10"
     vue-loader "^15.4.2"
 
 "@gitlab/vue-toasted@^1.2.1":
@@ -1398,6 +1398,24 @@ apollo-client@^2.5.1:
     tslib "^1.9.3"
     zen-observable "^0.8.0"
 
+apollo-link-batch-http@^1.2.11:
+  version "1.2.11"
+  resolved "https://registry.yarnpkg.com/apollo-link-batch-http/-/apollo-link-batch-http-1.2.11.tgz#ae42dbcc02820658e1e267d05bf2aae7ac208088"
+  integrity sha512-f+KEdbP51I3AeEaBDW2lKS3eaPK/1IXaTM9F2moj02s1hgC/TzeUORRuUeOExW8ggXveW1Jzp6aYMJ2SQkZJyA==
+  dependencies:
+    apollo-link "^1.2.11"
+    apollo-link-batch "^1.1.12"
+    apollo-link-http-common "^0.2.13"
+    tslib "^1.9.3"
+
+apollo-link-batch@^1.1.12:
+  version "1.1.12"
+  resolved "https://registry.yarnpkg.com/apollo-link-batch/-/apollo-link-batch-1.1.12.tgz#64eb231082f182b0395ef7ab903600627f6c7fe8"
+  integrity sha512-6NqLiB9tEGxRiyhtnX/7CPHkmFG0IXfEP7pC5kirhjV+4KxqBaWvJnJGKpGp7Owgdph7KJlV+9+niOKEkcwreg==
+  dependencies:
+    apollo-link "^1.2.11"
+    tslib "^1.9.3"
+
 apollo-link-dedup@^1.0.0:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/apollo-link-dedup/-/apollo-link-dedup-1.0.10.tgz#7b94589fe7f969777efd18a129043c78430800ae"
@@ -1405,7 +1423,7 @@ apollo-link-dedup@^1.0.0:
   dependencies:
     apollo-link "^1.2.3"
 
-apollo-link-http-common@^0.2.8:
+apollo-link-http-common@^0.2.13, apollo-link-http-common@^0.2.8:
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/apollo-link-http-common/-/apollo-link-http-common-0.2.13.tgz#c688f6baaffdc7b269b2db7ae89dae7c58b5b350"
   integrity sha512-Uyg1ECQpTTA691Fwx5e6Rc/6CPSu4TB4pQRTGIpwZ4l5JDOQ+812Wvi/e3IInmzOZpwx5YrrOfXrtN8BrsDXoA==
@@ -2798,10 +2816,15 @@ core-js@3.0.1:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.0.1.tgz#1343182634298f7f38622f95e73f54e48ddf4738"
   integrity sha512-sco40rF+2KlE0ROMvydjkrVMMG1vYilP2ALoRXcYR4obqbYIuV3Bg+51GEDW+HF8n7NRA+iaA4qD0nD9lo9mew==
 
-core-js@^2.2.0, core-js@^2.4.0, core-js@^2.4.1:
+core-js@^2.2.0, core-js@^2.4.0:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
   integrity sha512-RszJCAxg/PP6uzXVXL6BsxSXx/B05oJAQ2vkJRjyjrEcNVycaqOmNb5OTxZPE3xa5gwZduqza6L9JOCenh/Ecw==
+
+core-js@^3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.1.3.tgz#95700bca5f248f5f78c0ec63e784eca663ec4138"
+  integrity sha512-PWZ+ZfuaKf178BIAg+CRsljwjIMRV8MY00CbZczkR6Zk5LfkSkjGoaab3+bqRQWVITNZxQB7TFYz+CFcyuamvA==
 
 core-js@~2.3.0:
   version "2.3.0"
@@ -11353,7 +11376,7 @@ vue-virtual-scroll-list@^1.3.1:
   resolved "https://registry.yarnpkg.com/vue-virtual-scroll-list/-/vue-virtual-scroll-list-1.3.1.tgz#efcb83d3a3dcc69cd886fa4de1130a65493e8f76"
   integrity sha512-PMTxiK9/P1LtgoWWw4n1QnmDDkYqIdWWCNdt1L4JD9g6rwDgnsGsSV10bAnd5n7DQLHGWHjRex+zAbjXWT8t0g==
 
-vue@^2.5.21, vue@^2.6.10:
+vue@^2.6.10:
   version "2.6.10"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
   integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==

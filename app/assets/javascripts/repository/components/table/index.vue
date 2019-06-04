@@ -50,7 +50,7 @@ export default {
       );
     },
     showParentRow() {
-      return !this.isLoadingFiles && this.path !== '';
+      return !this.isLoadingFiles && ['', '/'].indexOf(this.path) === -1;
     },
   },
   watch: {
@@ -100,7 +100,7 @@ export default {
             this.fetchFiles();
           }
         })
-        .catch(() => createFlash(__('An error occurding while fetching folder content.')));
+        .catch(() => createFlash(__('An error occurred while fetching folder content.')));
     },
     normalizeData(key, data) {
       return this.entries[key].concat(data.map(({ node }) => node));

@@ -307,8 +307,8 @@ GitLabDropdown = (function() {
     // Set Defaults
     this.filterInput = this.options.filterInput || this.getElement(FILTER_INPUT);
     this.noFilterInput = this.options.noFilterInput || this.getElement(NO_FILTER_INPUT);
-    this.highlight = !!this.options.highlight;
-    this.icon = !!this.options.icon;
+    this.highlight = Boolean(this.options.highlight);
+    this.icon = Boolean(this.options.icon);
     this.filterInputBlur =
       this.options.filterInputBlur != null ? this.options.filterInputBlur : true;
     // If no input is passed create a default one
@@ -335,6 +335,10 @@ GitLabDropdown = (function() {
               _this.fullData = data;
               _this.parseData(_this.fullData);
               _this.focusTextInput();
+
+              // Update dropdown position since remote data may have changed dropdown size
+              _this.dropdown.find('.dropdown-menu-toggle').dropdown('update');
+
               if (
                 _this.options.filterable &&
                 _this.filter &&

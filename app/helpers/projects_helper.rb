@@ -343,6 +343,10 @@ module ProjectsHelper
     description.html_safe % { project_name: project.name }
   end
 
+  def metrics_external_dashboard_url
+    @project.metrics_setting_external_dashboard_url
+  end
+
   private
 
   def get_project_nav_tabs(project, current_user)
@@ -654,5 +658,9 @@ module ProjectsHelper
       project.has_auto_devops_implicitly_enabled? &&
       project.builds_enabled? &&
       !project.repository.gitlab_ci_yml
+  end
+
+  def vue_file_list_enabled?
+    Gitlab::Graphql.enabled? && Feature.enabled?(:vue_file_list, @project)
   end
 end
