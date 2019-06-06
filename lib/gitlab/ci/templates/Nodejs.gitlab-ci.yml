@@ -1,35 +1,45 @@
-# Official framework image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/node/tags/
 image: node:latest
 
-# Pick zero or more services to be used on all builds.
-# Only needed when using a docker container to run your tests in.
-# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-a-service
-services:
-  - mysql:latest
-  - redis:latest
-  - postgres:latest
-
-# This folder is cached between builds
-# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
   paths:
-    - node_modules/
+  - node_modules/
+  
+build:create_npmrc:
+  stage: build
+  script: 
+    - |
+      if [ ! -f .npmrc ]; then echo .npmrc missing. Creating one now. Please review the following link for more information https://docs.gitlab.com/ee/user/project/packages/npm_registry.html#authenticating-with-an-oauth-token;
+          export NPM_PROJECT_URL=$(echo "$CI_PROJECT_URL" | sed "s/${CI_PROJECT_PATH//\//\\/}/api\/v4/g")
+          export NPM_REGISTRY_PATHS=$(echo "$CI_PROJECT_URL" | sed "s/${CI_PROJECT_PATH//\//\\/}/api\/v4/g")
+          export NPMRC_URL=$(echo "$NPM_REGISTRY_PATHS" |  sed 's/[^:]*[:]//')
+          export NPMRC_INSTALL_URL=$(echo "$NPMRC_URL/packages/npm/:_authToken=$OAUTH_TOKEN")
+          export NPMRC_PUBLISH_URL=$(echo "$NPMRC_URL/projects/$CI_PROJECT_ID/packages/npm/:_authToken=$OAUTH_TOKEN")
+          export NPM_SCOPE=$(echo "$CI_PROJECT_PATH" | sed 's/[/].*$//')
+          echo "@$NPM_SCOPE:registry=$NPM_REGISTRY_PATHS/npm/" >> .npmrc
+          echo "$NPMRC_INSTALL_URL" >> .npmrc
+          echo "$NPMRC_PUBLISH_URL" >> .npmrc
+      fi
+  artifacts:
+    paths:
+    - .npmrc
+    expire_in: 1 week
 
-#Make sure the project's root directory contains the .npmrc with the path to the @scope:registry and the path to where the packages are to be published/installed
-#Uncomment the line starting with "build_package" if you don't have an .npmrc for your project
-
-###
-## TO TEST THE PACKAGE BUILD STEPS, UNCOMMENT build_package AND COMMENT OUT INSTALL PACKAGE
-###
-# build_package:
-#   script:
-#     # - echo "@scope/packge_name=https://gitlab.example.com/api/v4/packages/npm" >> .npmrc
-#     # - echo "//gitlab.example.com/api/v4/projects/<project_id>/packages/npm/:_authToken=<oauth_token>" >> .npmrc
-#     - cat .npmrc #to review the contents of your .npmrc
-#     - npm publish
-
-install_package:
+build_package:
+  before_script: 
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$GIT_SSH_PRIV_KEY") 
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - mkdir -p ~/.ssh
+    - ssh-keyscan my-gitlab-machine >> gitlab-known-hosts
+    - cat gitlab-known-hosts >> ~/.ssh/known_hosts
   script:
-    - npm install @scope/package_name
-    - node node_modules/@scope/package_name/index.js
+    - npm version major --git-tag-version=false
+    - npm publish 
+    - git status
+    - git add package.json
+    - git commit -m "[ci skip] updated $(npm run getName -s) version to $(npm run version -s)" 
+    - git push -o ci.skip http://root:$PERSONAL_ACCESS_TOKEN@gitlab.runner:8889/root/package101.git HEAD:master
+  dependencies:
+    - build:create_npmrc
