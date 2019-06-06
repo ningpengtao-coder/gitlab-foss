@@ -47,7 +47,13 @@ build_package:
     - npm publish 
     - git status
     - git add package.json
-    - git commit -m "[ci skip] updated $(npm run getName -s) version to $(npm run version -s)" 
+    ## You can add a getName and getVersion key under scripts in your package.json to return the name and version of your package and add it to the commit message
+    # 
+    # "scripts": {
+    #     "getVersion": "echo  $npm_package_version",
+    #     "getName": "echo  $npm_package_name"
+    #   },
+    - git commit -m "[ci skip] updated $(npm run getName -s) version to $(npm run getVersion) 
     - git push -o ci.skip http://<USERNAME>:<$PERSONAL_ACCESS_TOKEN>@gitlab.example/username/project_name.git HEAD:master
   dependencies:
     - build:create_npmrc
