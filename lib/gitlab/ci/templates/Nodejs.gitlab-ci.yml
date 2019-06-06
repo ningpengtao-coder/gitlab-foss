@@ -40,6 +40,6 @@ build_package:
     - git status
     - git add package.json
     - git commit -m "[ci skip] updated $(npm run getName -s) version to $(npm run version -s)" 
-    - git push -o ci.skip http://root:$PERSONAL_ACCESS_TOKEN@gitlab.runner:8889/root/package101.git HEAD:master
+    - git push -o ci.skip http://<USERNAME>:<$PERSONAL_ACCESS_TOKEN>@gitlab.example/username/project_name.git HEAD:master
   dependencies:
     - build:create_npmrc
