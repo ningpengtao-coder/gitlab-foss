@@ -7,14 +7,13 @@ image: node:latest
 ######
 ######
 
-
 cache:
   paths:
   - node_modules/
-  
+
 build:create_npmrc:
   stage: build
-  script: 
+  script:
     - |
       if [ ! -f .npmrc ]; then echo .npmrc missing. Creating one now. Please review the following link for more information https://docs.gitlab.com/ee/user/project/packages/npm_registry.html#authenticating-with-an-oauth-token;
           export NPM_PROJECT_URL=$(echo "$CI_PROJECT_URL" | sed "s/${CI_PROJECT_PATH//\//\\/}/api\/v4/g")
@@ -33,10 +32,10 @@ build:create_npmrc:
     expire_in: 1 week
 
 build_package:
-  before_script: 
+  before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
-    - ssh-add <(echo "$GIT_SSH_PRIV_KEY") 
+    - ssh-add <(echo "$GIT_SSH_PRIV_KEY")
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - mkdir -p ~/.ssh
@@ -44,16 +43,16 @@ build_package:
     - cat gitlab-known-hosts >> ~/.ssh/known_hosts
   script:
     - npm version minor --git-tag-version=false
-    - npm publish 
+    - npm publish
     - git status
     - git add package.json
     ## You can add a getName and getVersion key under scripts in your package.json to return the name and version of your package and add it to the commit message
-    # 
+    #
     # "scripts": {
     #     "getVersion": "echo  $npm_package_version",
     #     "getName": "echo  $npm_package_name"
     #   },
-    - git commit -m "[ci skip] updated $(npm run getName -s) version to $(npm run getVersion) 
+    - git commit -m "[ci skip] updated $(npm run getName -s) version to $(npm run getVersion)
     - git push -o ci.skip http://<USERNAME>:<$PERSONAL_ACCESS_TOKEN>@gitlab.example/username/project_name.git HEAD:master
   dependencies:
     - build:create_npmrc
