@@ -28,7 +28,7 @@ build:create_npmrc:
       fi
   artifacts:
     paths:
-     - .npmrc
+      - .npmrc
     expire_in: 1 week
 
 build_package:
