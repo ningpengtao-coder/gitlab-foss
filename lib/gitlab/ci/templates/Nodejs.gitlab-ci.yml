@@ -1,15 +1,15 @@
 image: node:latest
 
-#This template assumes you have the following settings configured:
-#OAUTH Access Token generated and added as an Environment Variable under Project -> Settings -> CI/CD https://docs.gitlab.com/ee/api/oauth2.html
-#Personal Access Token added as an Environment Variable in order to update your package.json with the new version value
-#Your package.json contains the path to your private NPM Registry on GitLab. https://docs.gitlab.com/ee/user/project/packages/npm_registry.html#uploading-packages
+# This template assumes you have the following settings configured:
+# OAUTH Access Token generated and added as an Environment Variable under Project -> Settings -> CI/CD https://docs.gitlab.com/ee/api/oauth2.html
+# Personal Access Token added as an Environment Variable in order to update your package.json with the new version value
+# Your package.json contains the path to your private NPM Registry on GitLab. https://docs.gitlab.com/ee/user/project/packages/npm_registry.html#uploading-packages
 ######
 ######
 
 cache:
   paths:
-  - node_modules/
+    - node_modules/
 
 build:create_npmrc:
   stage: build
@@ -28,7 +28,7 @@ build:create_npmrc:
       fi
   artifacts:
     paths:
-    - .npmrc
+     - .npmrc
     expire_in: 1 week
 
 build_package:
