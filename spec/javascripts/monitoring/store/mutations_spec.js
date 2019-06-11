@@ -79,10 +79,6 @@ describe('Monitoring mutations', () => {
     describe('dashboard endpoint enabled', () => {
       const dashboardGroups = metricsDashboardResponse.dashboard.panel_groups;
 
-      beforeEach(() => {
-        stateCopy.useDashboardEndpoint = true;
-      });
-
       it('aliases group panels to metrics for backwards compatibility', () => {
         mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboardGroups);
 
@@ -131,7 +127,6 @@ describe('Monitoring mutations', () => {
     const result = [{ values: [[0, 1], [1, 1], [1, 3]] }];
 
     beforeEach(() => {
-      stateCopy.useDashboardEndpoint = true;
       const dashboardGroups = metricsDashboardResponse.dashboard.panel_groups;
       mutations[types.RECEIVE_METRICS_DATA_SUCCESS](stateCopy, dashboardGroups);
     });
