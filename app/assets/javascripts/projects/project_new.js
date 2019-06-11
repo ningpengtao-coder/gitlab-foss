@@ -303,7 +303,7 @@ const bindEvents = () => {
     hasUserDefinedProjectPath = $projectPath.val().trim().length > 0;
   });
 
-  if (window.gon.features.newProjectAdvancedFields) {
+  if (window.gon.features && window.gon.features.newProjectAdvancedFields) {
     const $projectVisibilityLevel = $(
       '.visibility-level-setting [name="project[visibility_level]"]',
     );
