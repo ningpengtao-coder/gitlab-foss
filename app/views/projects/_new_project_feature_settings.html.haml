@@ -3,7 +3,7 @@
     %span= _("Features")
   .js-project-feature-settings.project-feature-settings.bg-white.p-0.border-0
     .js-project-feature-row
-      %label.label-bold
+      %label.label-bold{ :for => "project-features-issues" }
         %span= _("Issues")
       %span.form-text.text-muted= ("Lightweight issue tracking system for this project")
       .js-project-feature-controls.project-feature-controls{ "data-for" => "project_feature_attributes[issues_access_level]" }
@@ -12,16 +12,16 @@
             -# haml-lint:disable NoPlainNodes
             %input.js-project-feature-toggle-input{ :type => "hidden", :value => "0" }/
             .loading-container.text-center.loading-icon
-              = sprite_icon('spinner', size: 16, css_class: 'fa-spin')
+              = sprite_icon('spinner', size: 16)
             %span.toggle-icon
               = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
               = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
         .select-wrapper
-          %select.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[issues_access_level]" }
+          %select#project-features-issues.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[issues_access_level]" }
             %option{ :value => "0" }
               %span= _("Enable feature to choose access level")
     .js-project-feature-row
-      %label.label-bold
+      %label.label-bold{ :for => "project-features-repository" }
         %span= _("Repository")
       %span.form-text.text-muted= _("View and edit files in this project")
       .js-project-feature-controls.project-feature-controls{ "data-for" => "project_feature_attributes[repository_access_level]" }
@@ -30,16 +30,16 @@
             -# haml-lint:disable NoPlainNodes
             %input.js-project-feature-toggle-input{ :type => "hidden", :value => "0" }/
             .loading-container.text-center.loading-icon
-              = sprite_icon('spinner', size: 16, css_class: 'fa-spin')
+              = sprite_icon('spinner', size: 16)
             %span.toggle-icon
               = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
               = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
         .select-wrapper
-          %select.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[repository_access_level]", }
+          %select#project-features-repository.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[repository_access_level]", }
             %option{ :value => "0" }
               %span= _("Enable feature to choose access level")
     .js-project-feature-row
-      %label.label-bold
+      %label.label-bold{ :for => "project-features-wiki" }
         %span= _("Wiki")
       %span.form-text.text-muted= _("Pages for project documentation")
       .js-project-feature-controls.project-feature-controls{ "data-for" => "project_feature_attributes[wiki_access_level]" }
@@ -48,16 +48,16 @@
             -# haml-lint:disable NoPlainNodes
             %input.js-project-feature-toggle-input{ :type => "hidden", :value => "0" }/
             .loading-container.text-center.loading-icon
-              = sprite_icon('spinner', size: 16, css_class: 'fa-spin')
+              = sprite_icon('spinner', size: 16)
             %span.toggle-icon
               = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
               = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
         .select-wrapper
-          %select.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[wiki_access_level]" }
+          %select#project-features-wiki.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[wiki_access_level]" }
             %option{ :value => "0" }
               %span= _("Enable feature to choose access level")
     .js-project-feature-row
-      %label.label-bold
+      %label.label-bold{ :for => "project-features-snippets" }
         %span= _("Snippets")
       %span.form-text.text-muted= _("Share code pastes with others out of Git repository")
       .js-project-feature-controls.project-feature-controls{ "data-for" => "project_feature_attributes[snippets_access_level]" }
@@ -66,11 +66,11 @@
             -# haml-lint:disable NoPlainNodes
             %input.js-project-feature-toggle-input{ :type => "hidden", :value => "0" }/
             .loading-container.text-center.loading-icon
-              = sprite_icon('spinner', size: 16, css_class: 'fa-spin')
+              = sprite_icon('spinner', size: 16)
             %span.toggle-icon
               = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
               = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
         .select-wrapper
-          %select.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[snippets_access_level]" }
+          %select#project-features-snippets.js-project-repo-select.form-control.project-repo-select.select-control{ :disabled => "disabled", :name => "project_feature_attributes[snippets_access_level]" }
             %option{ :value => "0" }
               %span= _("Enable feature to choose access level")
