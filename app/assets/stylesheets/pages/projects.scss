@@ -1308,11 +1308,8 @@ pre.light-well {
 }
 
 .project-path-slug-separator {
-  position: relative;
   top: 6px;
   left: 16px;
-  display: none;
-  @include media-breakpoint-up(sm) { display: block; }
 }
 
 .project-home-empty {

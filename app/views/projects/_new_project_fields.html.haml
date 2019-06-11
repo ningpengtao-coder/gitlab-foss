@@ -28,7 +28,7 @@
                    {},
                    { class: 'select2 js-select-namespace qa-project-namespace-select block-truncated', tabindex: 1, data: { track_label: "#{track_label}", track_event: "activate_form_input", track_property: "project_path", track_value: "" }})
         - if advanced_fields_flag
-          .input-group-addon.project-path-slug-separator /
+          .project-path-slug-separator.input-group-addon.d-none.d-sm-block.position-relative /
 
       - else
         .input-group-prepend.static-namespace.flex-shrink-0.has-tooltip{ title: user_url(current_user.username) + '/' }
