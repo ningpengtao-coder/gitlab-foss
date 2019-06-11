@@ -65,14 +65,14 @@ const getProjectVisibilityLevel = (
 ) => $(projectVisibilitySelector).val();
 
 function updateFeatureVisibilityOptions(
-  visibilitySelector, // jquery element
+  visibilitySelector,
   projectVisibilityLevel,
   featureEnabled = false,
 ) {
   if (featureEnabled && projectVisibilityLevel > 0) {
-    visibilitySelector.removeAttr('disabled');
+    visibilitySelector.removeAttribute('disabled');
   } else {
-    visibilitySelector.attr('disabled', 'disabled');
+    visibilitySelector.setAttribute('disabled', 'disabled');
   }
 
   const accessLevelOptions = getAccessLevelOptionsForFeature(featureEnabled);
@@ -91,23 +91,23 @@ function updateFeatureVisibilityOptions(
 
 function onToggleFeatureSetting(featureEnabled, toggle) {
   const projectVisibilityLevel = getProjectVisibilityLevel();
-  const toggleContext = $(toggle).closest('.js-project-feature-controls');
-  const visibilitySelector = $('.js-project-repo-select', toggleContext);
+  const toggleContext = toggle.closest('.js-project-feature-controls');
+  const visibilitySelector = toggleContext.querySelector('.js-project-repo-select');
   updateFeatureVisibilityOptions(visibilitySelector, projectVisibilityLevel, featureEnabled);
-  $(toggle).attr(
+  toggle.setAttribute(
     'aria-label',
     featureEnabled ? s__('Toggle Status: ON') : s__('Toggle Status: OFF'),
   );
 }
 
-function onProjectVisitbilityChange(featureSelectors) {
+function onProjectVisibilityChange(featureSelectors) {
   const projectVisibilityLevel = getProjectVisibilityLevel();
   featureSelectors.forEach(context => {
     const featureEnabled = parseBoolean(
       context.querySelector('.js-project-feature-toggle-input').getAttribute('value'),
     );
 
-    const visibilitySelector = $('.js-project-repo-select', context);
+    const visibilitySelector = context.querySelector('.js-project-repo-select');  
     updateFeatureVisibilityOptions(visibilitySelector, projectVisibilityLevel, featureEnabled);
   });
 }
@@ -304,11 +304,14 @@ const bindEvents = () => {
   });
 
   if (window.gon.features && window.gon.features.newProjectAdvancedFields) {
-    const $projectVisibilityLevel = $(
+    const $projectVisibilityLevelSetting = document.querySelectorAll(
       '.visibility-level-setting [name="project[visibility_level]"]',
     );
+
     const $projectFeatures = document.querySelectorAll('.js-project-feature-row');
-    $projectVisibilityLevel.on('change', () => onProjectVisitbilityChange($projectFeatures));
+    $projectVisibilityLevelSetting.forEach(setting => {
+      setting.addEventListener('change', () => onProjectVisibilityChange($projectFeatures));
+    });
 
     initSettingsPanels({
       expandedPanelText: s__('Hide avatar, license and features settings'),
