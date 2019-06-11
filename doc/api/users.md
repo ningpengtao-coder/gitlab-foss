@@ -225,10 +225,8 @@ Parameters:
 
 Example Responses:
 
-<p>
-<details>
-<summary>Click to expand/collapse example response:</summary>
-<pre><code>{
+```json
+{
   "id": 1,
   "username": "john_smith",
   "email": "john@example.com",
@@ -265,53 +263,15 @@ Example Responses:
   "private_profile": false,
   "highest_role":10
 }
-</code></pre>
-</details>
-</p>
+```
 
-<p>
-<details>
-<summary>Click to expand/collapse example <b>Starter</b> or higher response:</summary>
-<pre><code>{
-  "id": 1,
-  "username": "john_smith",
-  "email": "john@example.com",
-  "name": "John Smith",
-  "state": "active",
-  "avatar_url": "http://localhost:3000/uploads/user/avatar/1/index.jpg",
-  "web_url": "http://localhost:3000/john_smith",
-  "created_at": "2012-05-23T08:00:58Z",
-  "is_admin": false,
-  "bio": null,
-  "location": null,
-  "public_email": "john@example.com",
-  "skype": "",
-  "linkedin": "",
-  "twitter": "",
-  "website_url": "",
-  "organization": "",
-  "last_sign_in_at": "2012-06-01T11:41:01Z",
-  "confirmed_at": "2012-05-23T09:05:22Z",
-  "theme_id": 1,
-  "last_activity_on": "2012-05-23",
-  "color_scheme_id": 2,
-  "projects_limit": 100,
-  "current_sign_in_at": "2012-06-02T06:36:55Z",
-  "identities": [
-    {"provider": "github", "extern_uid": "2435223452345"},
-    {"provider": "bitbucket", "extern_uid": "john.smith"},
-    {"provider": "google_oauth2", "extern_uid": "8776128412476123468721346"}
-  ],
-  "can_create_group": true,
-  "can_create_project": true,
-  "two_factor_enabled": true,
-  "external": false,
-  "private_profile": false,
+Users on GitLab [Starter, Bronze, or higher](https://about.gitlab.com/pricing/) will also see
+the `shared_runners_minutes_limit` and `extra_shared_runners_minutes_limit` parameters:
+
+```json
   "shared_runners_minutes_limit": 133,
   "extra_shared_runners_minutes_limit": 133
-}</code></pre>
-</details>
-</p>
+```
 
 You can include the user's [custom attributes](custom_attributes.md) in the response with:
 
@@ -351,7 +311,7 @@ Parameters:
 - `external` (optional)          - Flags the user as external - true or false(default)
 - `avatar` (optional)            - Image file for user's avatar
 - `private_profile` (optional)   - User's profile is private - true or false
-- `shared_runners_minutes_limit` (optional) - Pipeline minutes quota for this user **[STARTER]**
+- `shared_runners_minutes_limit` (optional)       - Pipeline minutes quota for this user **[STARTER]**
 - `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user **[STARTER]**
 
 ## User modification
@@ -385,7 +345,7 @@ Parameters:
 - `external` (optional)            - Flags the user as external - true or false(default)
 - `avatar` (optional)              - Image file for user's avatar
 - `private_profile` (optional)     - User's profile is private - true or false
-- `shared_runners_minutes_limit` (optional) - Pipeline minutes quota for this user **[STARTER]**
+- `shared_runners_minutes_limit` (optional)       - Pipeline minutes quota for this user **[STARTER]**
 - `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user **[STARTER]**
 
 On password update, user will be forced to change it upon next login.

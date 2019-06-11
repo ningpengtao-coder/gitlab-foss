@@ -1,6 +1,6 @@
 # Notification settings API
 
->**Note:** This feature was [introduced][ce-5632] in GitLab 8.12.
+>**Note:** This feature was [introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5632) in GitLab 8.12.
 
 **Valid notification levels**
 
@@ -85,7 +85,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 | `merge_merge_request` | boolean | no | Enable/disable this notification |
 | `failed_pipeline` | boolean | no | Enable/disable this notification |
 | `success_pipeline` | boolean | no | Enable/disable this notification |
-| `new_epic` | boolean | no | Enable/disable this notification ([Introduced][ee-6626] in 11.3) **[ULTIMATE]** |
+| `new_epic` | boolean | no | Enable/disable this notification ([Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626) in 11.3) **[ULTIMATE]** |
 
 Example response:
 
@@ -154,14 +154,12 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 | `merge_merge_request` | boolean | no | Enable/disable this notification |
 | `failed_pipeline` | boolean | no | Enable/disable this notification |
 | `success_pipeline` | boolean | no | Enable/disable this notification |
-| `new_epic` | boolean | no | Enable/disable this notification ([Introduced][ee-6626] in 11.3) **[ULTIMATE]** |
+| `new_epic` | boolean | no | Enable/disable this notification ([Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626) in 11.3) **[ULTIMATE]** |
 
 Example responses:
 
-<p>
-<details>
-<summary>Click to expand/collapse example response:</summary>
-<pre><code>{
+```json
+{
   "level": "watch"
 }
 
@@ -183,39 +181,12 @@ Example responses:
     "failed_pipeline": false,
     "success_pipeline": false
   }
-}</code></pre>
-</details>
-</p>
-
-<p>
-<details>
-<summary>Click to expand/collapse example GitLab <b>Ultimate</b> or <b>Gold</b> response:</summary>
-<pre><code>{
-  "level": "watch"
 }
+```
 
-{
-  "level": "custom",
-  "events": {
-    "new_note": true,
-    "new_issue": false,
-    "reopen_issue": false,
-    "close_issue": false,
-    "reassign_issue": false,
-    "issue_due": false,
-    "new_merge_request": false,
-    "push_to_merge_request": false,
-    "reopen_merge_request": false,
-    "close_merge_request": false,
-    "reassign_merge_request": false,
-    "merge_merge_request": false,
-    "failed_pipeline": false,
-    "success_pipeline": false,
+Users on GitLab [Ultimate or Gold](https://about.gitlab.com/pricing/) will also see
+the `new_epic` parameter:
+
+```json
     "new_epic": false
-  }
-}</code></pre>
-</details>
-</p>
-
-[ce-5632]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5632
-[ee-6626]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626
+```
