@@ -91,8 +91,8 @@ function updateFeatureVisibilityOptions(
 
 function onToggleFeatureSetting(featureEnabled, toggle) {
   const projectVisibilityLevel = getProjectVisibilityLevel();
-  const toggleContext = $(toggle).closest('.project-feature-controls');
-  const visibilitySelector = $('.select-control', toggleContext);
+  const toggleContext = $(toggle).closest('.js-project-feature-controls');
+  const visibilitySelector = $('.js-project-repo-select', toggleContext);
   updateFeatureVisibilityOptions(visibilitySelector, projectVisibilityLevel, featureEnabled);
   $(toggle).attr(
     'aria-label',
@@ -107,7 +107,7 @@ function onProjectVisitbilityChange(featureSelectors) {
       context.querySelector('.js-project-feature-toggle-input').getAttribute('value'),
     );
 
-    const visibilitySelector = $('.select-control', context);
+    const visibilitySelector = $('.js-project-repo-select', context);
     updateFeatureVisibilityOptions(visibilitySelector, projectVisibilityLevel, featureEnabled);
   });
 }
@@ -307,7 +307,7 @@ const bindEvents = () => {
     const $projectVisibilityLevel = $(
       '.visibility-level-setting [name="project[visibility_level]"]',
     );
-    const $projectFeatures = document.querySelectorAll('.project-feature-row');
+    const $projectFeatures = document.querySelectorAll('.js-project-feature-row');
     $projectVisibilityLevel.on('change', () => onProjectVisitbilityChange($projectFeatures));
 
     initSettingsPanels({
@@ -315,7 +315,7 @@ const bindEvents = () => {
       collapsedPanelText: s__('Show avatar, license and features settings'),
     });
 
-    const $toggleContainer = document.querySelector('.project-feature-settings');
+    const $toggleContainer = document.querySelector('.js-project-feature-settings');
     setupToggleButtons($toggleContainer, onToggleFeatureSetting);
 
     // init the license template selector

@@ -178,7 +178,9 @@ describe 'New project' do
   it 'will set the license field when we select a license from the list', :js do
     license = 'MIT License'
     visit new_project_path
+
     select_license(license)
+
     expect(find('[name="project_license"]', visible: false).value).to eq("mit")
   end
 
