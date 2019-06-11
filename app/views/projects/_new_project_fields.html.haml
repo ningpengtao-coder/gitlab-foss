@@ -82,7 +82,7 @@
         = f.label :avatar, class: 'label-bold' do
           %span= _("Project avatar")
         .prepend-top-5.append-bottom-10
-          %button.btn.js-choose-project-avatar-button{ type: 'button', track_label: "#{track_label}", track_event: "click_button", track_property: "select_project_avatar" }= _("Choose file...")
+          %button.btn.btn-default.js-choose-project-avatar-button{ type: 'button', track_label: "#{track_label}", track_event: "click_button", track_property: "select_project_avatar" }= _("Choose file...")
           %span.file_name.prepend-left-default.js-filename= _("No file chosen")
           = f.file_field :avatar, class: "js-project-avatar-input hidden"
         .form-text.text-muted= _("The maximum file size allowed is 200KB.")
