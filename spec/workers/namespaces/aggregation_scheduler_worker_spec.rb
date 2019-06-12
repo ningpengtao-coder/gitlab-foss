@@ -27,4 +27,12 @@ describe Namespaces::AggregationSchedulerWorker, '#perform' do
       end.to change(Namespace::AggregationSchedule, :count).by(1)
     end
   end
+
+  context 'when namespace does not exist' do
+    it 'logs the error' do
+      expect(Gitlab::AppLogger).to receive(:error).once
+
+      worker.perform(12345)
+    end
+  end
 end

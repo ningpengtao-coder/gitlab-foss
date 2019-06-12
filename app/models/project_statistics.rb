@@ -81,10 +81,4 @@ class ProjectStatistics < ApplicationRecord
 
     update_all(updates.join(', '))
   end
-
-  def self.arel_sum_column(column_name)
-    Arel::Nodes::NamedFunction.new(
-      'COALESCE', [self.arel_table[column_name.to_sym].sum, 0]
-    ).as(column_name)
-  end
 end

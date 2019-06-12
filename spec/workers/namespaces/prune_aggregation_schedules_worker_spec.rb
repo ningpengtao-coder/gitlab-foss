@@ -25,7 +25,7 @@ describe Namespaces::PruneAggregationSchedulesWorker, '#perform' do
 
   context 'without pending aggregation schedules' do
     it 'does not schedules a worker' do
-       expect(Namespaces::RootStatisticsWorker)
+      expect(Namespaces::RootStatisticsWorker)
         .not_to receive(:perform)
 
       worker.perform

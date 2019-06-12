@@ -24,7 +24,8 @@ describe Namespaces::RootStatisticsWorker, '#perform' do
     context 'when something goes wrong when updating' do
       before do
         allow_any_instance_of(Namespaces::StatisticsRefresherService)
-          .to receive(:execute).and_raise(Namespaces::StatisticsRefresherService::RefresherError, 'error')
+          .to receive(:execute)
+          .and_raise(Namespaces::StatisticsRefresherService::RefresherError, 'error')
       end
 
       it 'does not delete the aggregation schedule' do
@@ -34,6 +35,16 @@ describe Namespaces::RootStatisticsWorker, '#perform' do
       end
 
       it 'logs the error' do
+        # A Namespace::RootStatisticsWorker is scheduled when
+        # a Namespace::AggregationSchedule is created, so having
+        # create(:group, :with_aggregation_schedule), will execute
+        # another worker
+        allow_any_instance_of(Namespace::AggregationSchedule)
+          .to receive(:schedule_root_storage_statistics).and_return(nil)
+
+        expect(Gitlab::AppLogger).to receive(:error).once
+
+        worker.perform(group.id)
       end
     end
   end

@@ -14,13 +14,17 @@ module Namespaces
       statistics_refresher_service.execute(namespace)
       namespace.aggregation_schedule.destroy
     rescue ::Namespaces::StatisticsRefresherService::RefresherError, ActiveRecord::RecordNotFound => ex
-      # Log error
+      log_error(namespace.full_path, ex.message) if namespace
     end
 
     private
 
     def statistics_refresher_service
       @statistics_refresher_service ||= Namespaces::StatisticsRefresherService.new
+    end
+
+    def log_error(namespace_path, error_message)
+      Gitlab::AppLogger.error("Namespace statistics can't be updated for #{namespace_path}: #{error_message}")
     end
   end
 end
