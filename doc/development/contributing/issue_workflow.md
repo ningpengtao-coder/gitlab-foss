@@ -27,7 +27,7 @@ labels, you can _always_ add the team and type, and often also the subject.
 Type labels are very important. They define what kind of issue this is. Every
 issue should have one or more.
 
-Examples of type labels are ~feature, ~"type::bug", ~customer, ~security,
+Examples of type labels are ~"type::feature", ~"type::bug", ~security,
 and ~direction.
 
 A number of type labels have a priority assigned to them, which automatically
