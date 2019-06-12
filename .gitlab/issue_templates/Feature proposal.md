@@ -34,4 +34,4 @@ Add all known Documentation Requirements here, per https://docs.gitlab.com/ee/de
 
 ### Links / references
 
-/label ~feature
+/label ~"type::feature"

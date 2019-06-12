@@ -6,7 +6,7 @@ scheduling into milestones. Labelling is a task for everyone.
 
 Most issues will have labels for at least one of the following:
 
-- Type: ~feature, ~"type::bug", ~customer, etc.
+- Type: ~"type::feature", ~"type::bug", etc.
 - Subject: ~wiki, ~"Container Registry", ~ldap, ~api, ~frontend, etc.
 - Team: ~Plan, ~Manage, ~Quality, etc.
 - Stage: ~"devops:plan", ~"devops:create", etc.
@@ -224,7 +224,7 @@ We add the ~"Accepting merge requests" label to:
 
 - Low priority ~"type::bug" issues (i.e. we do not add it to the bugs that we want to
   solve in the ~"Next Patch Release")
-- Small ~feature
+- Small ~"type::feature"
 - Small ~"technical debt" issues
 
 After adding the ~"Accepting merge requests" label, we try to estimate the
@@ -285,8 +285,8 @@ For feature proposals for EE, open an issue on the
 In order to help track the feature proposals, we have created a
 [`feature`][fl] label. For the time being, users that are not members
 of the project cannot add labels. You can instead ask one of the [core team]
-members to add the label ~feature to the issue or add the following
-code snippet right after your description in a new line: `~feature`.
+members to add the label ~"type::feature" to the issue or add the following
+code snippet right after your description in a new line: `~"type::feature"`.
 
 Please keep feature proposals as small and simple as possible, complex ones
 might be edited to make them small and simple.
