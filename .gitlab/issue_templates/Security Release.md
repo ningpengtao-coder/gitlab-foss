@@ -65,5 +65,5 @@ gitlab.com: {https://gitlab.com/gitlab-com/www-gitlab-com/merge_requests/ link}
 ## Email notification
 {https://gitlab.com/gitlab-com/marketing/general/issues/ link}
 
-/label ~security
+/label ~"type::security"
 /confidential

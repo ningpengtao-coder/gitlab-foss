@@ -27,7 +27,7 @@ labels, you can _always_ add the team and type, and often also the subject.
 Type labels are very important. They define what kind of issue this is. Every
 issue should have one or more.
 
-Examples of type labels are ~"type::feature", ~"type::bug", ~security,
+Examples of type labels are ~"type::feature", ~"type::bug", ~"type::security",
 and ~direction.
 
 A number of type labels have a priority assigned to them, which automatically
@@ -165,7 +165,7 @@ Priority labels help us define the time a ~"type::bug" fix should be completed. 
 If there are multiple defects, the priority decides which defect has to be fixed immediately versus later.
 This label documents the planned timeline & urgency which is used to measure against our actual SLA on delivering ~"type::bug" fixes.
 
-| Label | Meaning         | Defect SLA (applies only to ~"type::bug" and ~security defects)                                                    |
+| Label | Meaning         | Defect SLA (applies only to ~"type::bug" and ~"type::security" defects)                                                    |
 |-------|-----------------|----------------------------------------------------------------------------|
 | ~P1   | Urgent Priority | The current release + potentially immediate hotfix to GitLab.com (30 days) |
 | ~P2   | High Priority   | The next release (60 days)                                                 |

@@ -67,4 +67,4 @@ Set the title to: `Description of the original issue`
 [security process for developers]: https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md
 [RM list]:  https://about.gitlab.com/release-managers/
 
-/label ~security
+/label ~"type::security"

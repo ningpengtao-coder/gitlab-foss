@@ -32,4 +32,4 @@ manually merging CE into EE is no longer required.
 - [ ] Correct milestone is applied and the title is matching across all backports
 - [ ] Assigned to `@gitlab-release-tools-bot` with passing CI pipelines
 
-/label ~security
+/label ~"type::security"
