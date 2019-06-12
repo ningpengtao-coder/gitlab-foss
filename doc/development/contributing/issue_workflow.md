@@ -6,7 +6,7 @@ scheduling into milestones. Labelling is a task for everyone.
 
 Most issues will have labels for at least one of the following:
 
-- Type: ~feature, ~bug, ~customer, etc.
+- Type: ~feature, ~"type::bug", ~customer, etc.
 - Subject: ~wiki, ~"Container Registry", ~ldap, ~api, ~frontend, etc.
 - Team: ~Plan, ~Manage, ~Quality, etc.
 - Stage: ~"devops:plan", ~"devops:create", etc.
@@ -27,7 +27,7 @@ labels, you can _always_ add the team and type, and often also the subject.
 Type labels are very important. They define what kind of issue this is. Every
 issue should have one or more.
 
-Examples of type labels are ~feature, ~bug, ~customer, ~security,
+Examples of type labels are ~feature, ~"type::bug", ~customer, ~security,
 and ~direction.
 
 A number of type labels have a priority assigned to them, which automatically
@@ -161,11 +161,11 @@ or ~"Stretch". Any open issue for a previous milestone should be labeled
 
 ### Priority labels
 
-Priority labels help us define the time a ~bug fix should be completed. Priority determines how quickly the defect turnaround time must be.
+Priority labels help us define the time a ~"type::bug" fix should be completed. Priority determines how quickly the defect turnaround time must be.
 If there are multiple defects, the priority decides which defect has to be fixed immediately versus later.
-This label documents the planned timeline & urgency which is used to measure against our actual SLA on delivering ~bug fixes.
+This label documents the planned timeline & urgency which is used to measure against our actual SLA on delivering ~"type::bug" fixes.
 
-| Label | Meaning         | Defect SLA (applies only to ~bug and ~security defects)                                                    |
+| Label | Meaning         | Defect SLA (applies only to ~"type::bug" and ~security defects)                                                    |
 |-------|-----------------|----------------------------------------------------------------------------|
 | ~P1   | Urgent Priority | The current release + potentially immediate hotfix to GitLab.com (30 days) |
 | ~P2   | High Priority   | The next release (60 days)                                                 |
@@ -177,7 +177,7 @@ priority label.
 
 ## Severity labels
 
-Severity labels help us clearly communicate the impact of a ~bug on users.
+Severity labels help us clearly communicate the impact of a ~"type::bug" on users.
 
 | Label | Meaning           | Impact on Functionality                               | Example |
 |-------|-------------------|-------------------------------------------------------|---------|
@@ -222,7 +222,7 @@ different way.
 
 We add the ~"Accepting merge requests" label to:
 
-- Low priority ~bug issues (i.e. we do not add it to the bugs that we want to
+- Low priority ~"type::bug" issues (i.e. we do not add it to the bugs that we want to
   solve in the ~"Next Patch Release")
 - Small ~feature
 - Small ~"technical debt" issues

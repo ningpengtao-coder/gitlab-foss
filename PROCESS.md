@@ -248,9 +248,9 @@ Check [this guide](https://gitlab.com/gitlab-org/release/docs/blob/master/genera
 
 ## Bugs
 
-A ~bug is a defect, error, failure which causes the system to behave incorrectly or prevents it from fulfilling the product requirements.
+A ~"type::bug" is a defect, error, failure which causes the system to behave incorrectly or prevents it from fulfilling the product requirements.
 
-The level of impact of a ~bug can vary from blocking a whole functionality
+The level of impact of a ~"type::bug" can vary from blocking a whole functionality
 or a feature usability bug. A bug should always be linked to a severity level.
 Refer to our [severity levels](https://docs.gitlab.com/ee/development/contributing/issue_workflow.html#severity-labels)
 
@@ -263,7 +263,7 @@ A ~regression implies that a previously **verified working functionality** no lo
 Regressions are a subset of bugs. We use the ~regression label to imply that the defect caused the functionality to regress.
 The label tells us that something worked before and it needs extra attention from Engineering and Product Managers to schedule/reschedule.
 
-The regression label does not apply to ~bugs for new features for which functionality was **never verified as working**.
+The regression label does not apply to ~"type::bug"s for new features for which functionality was **never verified as working**.
 These, by definition, are not regressions.
 
 A regression should always have the `regression:xx.x` label on it to designate when it was introduced.
@@ -289,7 +289,7 @@ When a bug is found:
    and any other label that may apply in the specific case
 1. Notify the respective Engineering Manager to evaluate and apply the [Severity label](https://docs.gitlab.com/ee/development/contributing/issue_workflow.html#severity-labels) and [Priority label](https://docs.gitlab.com/ee/development/contributing/issue_workflow.html#priority-labels).
 The counterpart Product Manager is included to weigh-in on prioritization as needed.
-1. If the ~bug is **NOT** a regression:
+1. If the ~"type::bug" is **NOT** a regression:
    1. The Engineering Manager decides which milestone the bug will be fixed. The appropriate milestone is applied.
 1. If the bug is a ~regression:
    1. Determine the release that the regression affects and add the corresponding `regression:xx.x` label.

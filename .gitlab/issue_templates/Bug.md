@@ -2,7 +2,7 @@
 Please read this!
 
 Before opening a new issue, make sure to search for keywords in the issues
-filtered by the "regression" or "bug" label.
+filtered by the "regression" or "type::bug" label.
 
 For the Community Edition issue tracker:
 
@@ -84,4 +84,4 @@ logs, and code as it's tough to read otherwise.)
 
 (If you can, link to the line of code that might be responsible for the problem)
 
-/label ~bug
+/label ~"type::bug"

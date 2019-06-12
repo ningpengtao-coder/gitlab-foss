@@ -79,7 +79,7 @@ subgraph CNG-mirror pipeline
 **Additional notes:**
 
 - If the `review-deploy` job keep failing (note that we already retry it twice),
-  please post a message in the `#quality` channel and/or create a ~Quality ~bug
+  please post a message in the `#quality` channel and/or create a ~Quality ~"type::bug"
   issue with a link to your merge request. Note that the deployment failure can
   reveal an actual problem introduced in your merge request (i.e. this isn't
   necessarily a transient failure)!
@@ -88,7 +88,7 @@ subgraph CNG-mirror pipeline
   your merge request. You can also download the artifacts to see screenshots of
   the page at the time the failures occurred. If you don't find the cause of the
   failure or if it seems unrelated to your change, please post a message in the
-  `#quality` channel and/or create a ~Quality ~bug issue with a link to your
+  `#quality` channel and/or create a ~Quality ~"type::bug" issue with a link to your
   merge request.
 - The manual [`review-stop`][gitlab-ci-yml] in the `test` stage can be used to
   stop a Review App manually, and is also started by GitLab once a merge
