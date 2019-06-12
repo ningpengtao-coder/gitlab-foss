@@ -1,0 +1,5 @@
+---
+title: Remove feature flag environment_metrics_use_prometheus_endpoint
+merge_request: 29478
+author:
+type: changed
