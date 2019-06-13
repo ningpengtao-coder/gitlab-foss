@@ -80,8 +80,6 @@ module Gitlab
           @puma_options = options
         end
 
-        private
-
         def in_clustered_environment?
           # Sidekiq doesn't fork
           return false if Sidekiq.server?

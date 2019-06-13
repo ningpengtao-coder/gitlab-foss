@@ -49,9 +49,6 @@ on_restart do
 end
 
 before_fork do
-  # Signal to the puma killer
-  Gitlab::Cluster::PumaWorkerKillerInitializer.start @config.options unless ENV['DISABLE_PUMA_WORKER_KILLER']
-
   # Signal application hooks that we're about to fork
   Gitlab::Cluster::LifecycleEvents.do_before_fork
 end
