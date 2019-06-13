@@ -63,7 +63,7 @@
 - mail_scheduler:mail_scheduler_notification_service
 
 - namespace:namespaces_root_statistics
-- namespace:namespaces_aggregation_scheduler
+- namespace:namespaces_schedule_aggregation
 
 - object_storage:object_storage_background_move
 - object_storage:object_storage_migrate_uploads

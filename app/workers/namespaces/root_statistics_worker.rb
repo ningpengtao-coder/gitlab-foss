@@ -24,7 +24,7 @@ module Namespaces
     end
 
     def log_error(namespace_path, error_message)
-      Gitlab::AppLogger.error("Namespace statistics can't be updated for #{namespace_path}: #{error_message}")
+      Gitlab::SidekiqLogger.error("Namespace statistics can't be updated for #{namespace_path}: #{error_message}")
     end
   end
 end

@@ -116,28 +116,20 @@ describe Namespaces::StatisticsRefresherService, '#execute' do
       end
     end
 
-    context 'and a subgroup is updated' do
-      it 'updates root statistics' do
-        service.execute(subgroup)
+    it 'updates root statistics with subgroups details' do
+      service.execute(group)
 
-        all_projects = group.all_projects
-        all_project_statistics = ProjectStatistics.where(project_id: all_projects)
-        root_statistics = group.reload.root_storage_statistics
+      all_projects = group.all_projects
+      all_project_statistics = ProjectStatistics.where(project_id: all_projects)
+      root_statistics = group.reload.root_storage_statistics
 
-        expect(root_statistics).to be_persisted
-        expect(root_statistics.storage_size).to eq(all_project_statistics.sum(:storage_size))
-        expect(root_statistics.repository_size).to eq(all_project_statistics.sum(:repository_size))
-        expect(root_statistics.lfs_objects_size).to eq(all_project_statistics.sum(:lfs_objects_size))
-        expect(root_statistics.build_artifacts_size).to eq(all_project_statistics.sum(:build_artifacts_size))
-        expect(root_statistics.packages_size).to eq(all_project_statistics.sum(:packages_size))
-        expect(root_statistics.wiki_size).to eq(all_project_statistics.sum(:wiki_size))
-      end
-
-      it 'does not create a root storage statistics for the subgroup' do
-        service.execute(subgroup)
-
-        expect(subgroup.root_storage_statistics).to be_nil
-      end
+      expect(root_statistics).to be_persisted
+      expect(root_statistics.storage_size).to eq(all_project_statistics.sum(:storage_size))
+      expect(root_statistics.repository_size).to eq(all_project_statistics.sum(:repository_size))
+      expect(root_statistics.lfs_objects_size).to eq(all_project_statistics.sum(:lfs_objects_size))
+      expect(root_statistics.build_artifacts_size).to eq(all_project_statistics.sum(:build_artifacts_size))
+      expect(root_statistics.packages_size).to eq(all_project_statistics.sum(:packages_size))
+      expect(root_statistics.wiki_size).to eq(all_project_statistics.sum(:wiki_size))
     end
   end
 

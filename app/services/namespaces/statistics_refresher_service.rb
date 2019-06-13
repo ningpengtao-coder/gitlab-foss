@@ -4,8 +4,7 @@ module Namespaces
   class StatisticsRefresherService
     RefresherError = Class.new(StandardError)
 
-    def execute(namespace)
-      root_namespace = namespace.root_ancestor
+    def execute(root_namespace)
       cte_query = Namespace::CteQuery.new(root_namespace).generate
 
       return if cte_query.nil?

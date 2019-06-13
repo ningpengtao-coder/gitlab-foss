@@ -27,7 +27,7 @@ shared_examples_for 'UpdateProjectStatistics' do
     end
 
     it 'schedules a namespace statistics worker' do
-      expect(Namespaces::AggregationSchedulerWorker)
+      expect(Namespaces::ScheduleAggregationWorker)
         .to receive(:perform_async).once
 
       subject.save!
@@ -54,7 +54,7 @@ shared_examples_for 'UpdateProjectStatistics' do
     end
 
     it 'schedules a namespace statistics worker' do
-      expect(Namespaces::AggregationSchedulerWorker)
+      expect(Namespaces::ScheduleAggregationWorker)
         .to receive(:perform_async).once
 
       subject.write_attribute(statistic_attribute, read_attribute + delta)
@@ -80,8 +80,8 @@ shared_examples_for 'UpdateProjectStatistics' do
     end
 
     it 'schedules a namespace statistics worker' do
-      expect(Namespaces::AggregationSchedulerWorker)
-        .to receive(:perform_async)
+      expect(Namespaces::ScheduleAggregationWorker)
+        .to receive(:perform_async).once
 
       subject.destroy!
     end
@@ -96,7 +96,7 @@ shared_examples_for 'UpdateProjectStatistics' do
       end
 
       it 'does not schedule a namespace statistics worker' do
-        expect(Namespaces::AggregationSchedulerWorker)
+        expect(Namespaces::ScheduleAggregationWorker)
           .not_to receive(:perform_async)
 
         project.update(pending_delete: true)

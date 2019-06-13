@@ -38,7 +38,6 @@ module UpdateProjectStatistics
 
       after_save(:update_project_statistics_after_save, if: :update_project_statistics_attribute_changed?)
       after_destroy(:update_project_statistics_after_destroy, unless: :project_destroyed?)
-      after_commit(:schedule_namespace_aggregation_worker)
     end
 
     private :update_project_statistics
@@ -52,6 +51,7 @@ module UpdateProjectStatistics
       delta = read_attribute(attr).to_i - attribute_before_last_save(attr).to_i
 
       update_project_statistics(delta)
+      schedule_namespace_aggregation_worker
     end
 
     def update_project_statistics_attribute_changed?
@@ -60,6 +60,8 @@ module UpdateProjectStatistics
 
     def update_project_statistics_after_destroy
       update_project_statistics(-read_attribute(self.class.statistic_attribute).to_i)
+
+      schedule_namespace_aggregation_worker
     end
 
     def project_destroyed?
@@ -71,11 +73,10 @@ module UpdateProjectStatistics
     end
 
     def schedule_namespace_aggregation_worker
-      return unless update_project_statistics_attribute_changed?
-      return if destroyed? && project_destroyed?
+      return if project.nil?
 
       run_after_commit do
-        Namespaces::AggregationSchedulerWorker.perform_async(project.namespace_id)
+        Namespaces::ScheduleAggregationWorker.perform_async(project.namespace_id)
       end
     end
   end
