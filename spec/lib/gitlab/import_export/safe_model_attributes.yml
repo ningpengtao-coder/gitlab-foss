@@ -587,6 +587,7 @@ PrometheusMetric:
 - group
 - common
 - identifier
+- metric_type
 Badge:
 - id
 - link_url
