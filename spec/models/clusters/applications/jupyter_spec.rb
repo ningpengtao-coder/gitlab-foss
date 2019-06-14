@@ -10,6 +10,15 @@ describe Clusters::Applications::Jupyter do
 
   it { is_expected.to belong_to(:oauth_application) }
 
+  describe '#can_uninstall?' do
+    let(:ingress) { create(:clusters_applications_ingress, :installed, external_hostname: 'localhost.localdomain') }
+    let(:jupyter) { create(:clusters_applications_jupyter, cluster: ingress.cluster) }
+
+    subject { jupyter.can_uninstall? }
+
+    it { is_expected.to be_falsey }
+  end
+
   describe '#set_initial_status' do
     before do
       jupyter.set_initial_status
@@ -87,6 +96,8 @@ describe Clusters::Applications::Jupyter do
       expect(values).to match(/clientId: '?#{application.oauth_application.uid}/)
       expect(values).to match(/callbackUrl: '?#{application.callback_url}/)
       expect(values).to include("gitlabProjectIdWhitelist:\n    - #{application.cluster.project.id}")
+      expect(values).to include("c.GitLabOAuthenticator.scope = ['api read_repository write_repository']")
+      expect(values).to match(/GITLAB_HOST: '?#{Gitlab.config.gitlab.host}/)
     end
 
     context 'when cluster belongs to a project' do

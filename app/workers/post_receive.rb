@@ -21,8 +21,10 @@ class PostReceive
 
     if repo_type.wiki?
       process_wiki_changes(post_received)
-    else
+    elsif repo_type.project?
       process_project_changes(post_received)
+    else
+      # Other repos don't have hooks for now
     end
   end
 
@@ -72,6 +74,8 @@ class PostReceive
 
   def process_wiki_changes(post_received)
     post_received.project.touch(:last_activity_at, :last_repository_updated_at)
+    post_received.project.wiki.repository.expire_statistics_caches
+    ProjectCacheWorker.perform_async(post_received.project.id, [], [:wiki_size])
   end
 
   def log(message)

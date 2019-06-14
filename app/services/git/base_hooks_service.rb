@@ -17,6 +17,8 @@ module Git
       # Not a hook, but it needs access to the list of changed commits
       enqueue_invalidate_cache
 
+      update_remote_mirrors
+
       push_data
     end
 
@@ -73,13 +75,13 @@ module Git
 
     def push_data
       @push_data ||= Gitlab::DataBuilder::Push.build(
-        project,
-        current_user,
-        params[:oldrev],
-        params[:newrev],
-        params[:ref],
-        limited_commits,
-        event_message,
+        project: project,
+        user: current_user,
+        oldrev: params[:oldrev],
+        newrev: params[:newrev],
+        ref: params[:ref],
+        commits: limited_commits,
+        message: event_message,
         commits_count: commits_count,
         push_options: params[:push_options] || {}
       )
@@ -91,6 +93,13 @@ module Git
     # to be overridden in EE
     def pipeline_options
       {}
+    end
+
+    def update_remote_mirrors
+      return unless project.has_remote_mirror?
+
+      project.mark_stuck_remote_mirrors_as_failed!
+      project.update_remote_mirrors
     end
   end
 end

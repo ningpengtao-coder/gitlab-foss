@@ -337,6 +337,8 @@ Please check your network connection and try again.`;
               v-if="hasWarning(getNoteableData)"
               :is-locked="isLocked(getNoteableData)"
               :is-confidential="isConfidential(getNoteableData)"
+              :locked-issue-docs-path="lockedIssueDocsPath"
+              :confidential-issue-docs-path="confidentialIssueDocsPath"
             />
 
             <markdown-field
@@ -351,6 +353,7 @@ Please check your network connection and try again.`;
                 ref="textarea"
                 slot="textarea"
                 v-model="note"
+                dir="auto"
                 :disabled="isSubmitting"
                 name="note[note]"
                 class="note-textarea js-vue-comment-form js-note-text

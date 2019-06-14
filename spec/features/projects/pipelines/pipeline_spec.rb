@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Pipeline', :js do
@@ -89,7 +91,7 @@ describe 'Pipeline', :js do
 
       within '.pipeline-info' do
         expect(page).to have_content("#{pipeline.statuses.count} jobs " \
-                                      "for #{pipeline.ref} ")
+                                      "for #{pipeline.ref}")
         expect(page).to have_link(pipeline.ref,
           href: project_commits_path(pipeline.project, pipeline.ref))
       end
@@ -236,6 +238,20 @@ describe 'Pipeline', :js do
       end
     end
 
+    context 'when the pipeline has manual stage' do
+      before do
+        create(:ci_build, :manual, pipeline: pipeline, stage: 'publish', name: 'CentOS')
+        create(:ci_build, :manual, pipeline: pipeline, stage: 'publish', name: 'Debian')
+        create(:ci_build, :manual, pipeline: pipeline, stage: 'publish', name: 'OpenSUDE')
+
+        visit_pipeline
+      end
+
+      it 'displays play all button' do
+        expect(page).to have_selector('.js-stage-action')
+      end
+    end
+
     context 'page tabs' do
       before do
         visit_pipeline
@@ -314,6 +330,12 @@ describe 'Pipeline', :js do
         expect(page).not_to have_link(pipeline.ref)
         expect(page).to have_content(pipeline.ref)
       end
+
+      it 'does not render render raw HTML to the pipeline ref' do
+        page.within '.pipeline-info' do
+          expect(page).not_to have_content('<span class="ref-name"')
+        end
+      end
     end
 
     context 'when pipeline is detached merge request pipeline' do
@@ -331,11 +353,9 @@ describe 'Pipeline', :js do
         merge_request.all_pipelines.last
       end
 
-      before do
-        visit_pipeline
-      end
-
       it 'shows the pipeline information' do
+        visit_pipeline
+
         within '.pipeline-info' do
           expect(page).to have_content("#{pipeline.statuses.count} jobs " \
                                        "for !#{merge_request.iid} " \
@@ -344,6 +364,21 @@ describe 'Pipeline', :js do
             href: project_merge_request_path(project, merge_request))
           expect(page).to have_link(merge_request.source_branch,
             href: project_commits_path(merge_request.source_project, merge_request.source_branch))
+        end
+      end
+
+      context 'when source branch does not exist' do
+        before do
+          project.repository.rm_branch(user, merge_request.source_branch)
+        end
+
+        it 'does not link to the source branch commit path' do
+          visit_pipeline
+
+          within '.pipeline-info' do
+            expect(page).not_to have_link(merge_request.source_branch)
+            expect(page).to have_content(merge_request.source_branch)
+          end
         end
       end
 
@@ -386,11 +421,11 @@ describe 'Pipeline', :js do
 
       before do
         pipeline.update(user: user)
-
-        visit_pipeline
       end
 
       it 'shows the pipeline information' do
+        visit_pipeline
+
         within '.pipeline-info' do
           expect(page).to have_content("#{pipeline.statuses.count} jobs " \
                                        "for !#{merge_request.iid} " \
@@ -402,6 +437,21 @@ describe 'Pipeline', :js do
             href: project_commits_path(merge_request.source_project, merge_request.source_branch))
           expect(page).to have_link(merge_request.target_branch,
             href: project_commits_path(merge_request.target_project, merge_request.target_branch))
+        end
+      end
+
+      context 'when target branch does not exist' do
+        before do
+          project.repository.rm_branch(user, merge_request.target_branch)
+        end
+
+        it 'does not link to the target branch commit path' do
+          visit_pipeline
+
+          within '.pipeline-info' do
+            expect(page).not_to have_link(merge_request.target_branch)
+            expect(page).to have_content(merge_request.target_branch)
+          end
         end
       end
 

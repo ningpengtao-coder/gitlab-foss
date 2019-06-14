@@ -1,3 +1,7 @@
+---
+type: reference
+---
+
 # Where variables can be used
 
 As it's described in the [CI/CD variables](README.md) docs, you can
@@ -85,6 +89,14 @@ Supported:
   - In `script`, it will work in the following lines of `script`.
   - In `after_script`, it will work in following lines of `after_script`.
 
+Please notice the specific case of `after_script` scripts, that can:
+
+- Only use variables defined before the script within the same `after_script` section.
+- Not use variables defined in `before_script` and `script`.
+
+Both restrictions are caused by the fact, that `after_script` script is executed in a
+[separated shell context](https://docs.gitlab.com/ee/ci/yaml/README.html#before_script-and-after_script).
+
 ## Persisted variables
 
 NOTE: **Note:**
@@ -112,3 +124,22 @@ They are:
 - Not supported:
   - For definitions where the ["Expansion place"](#gitlab-ciyml-file) is GitLab.
   - In the `only` and `except` [variables expressions](README.md#environment-variables-expressions).
+
+## Variables with an environment scope
+
+Variables defined with an environment scope are supported. Given that
+there is a variable `$STAGING_SECRET` defined in a scope of
+`review/staging/*`, the following job that is using dynamic environments
+is going to be created, based on the matching variable expression:
+
+```yaml
+my-job:
+  stage: staging
+  environment:
+    name: review/$CI_JOB_STAGE/deploy
+  script:
+    - 'deploy staging'
+  only:
+    variables:
+      - $STAGING_SECRET == 'something'
+```

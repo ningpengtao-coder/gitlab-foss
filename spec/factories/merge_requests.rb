@@ -95,7 +95,8 @@ FactoryBot.define do
     end
 
     trait :merge_when_pipeline_succeeds do
-      merge_when_pipeline_succeeds true
+      auto_merge_enabled true
+      auto_merge_strategy AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS
       merge_user { author }
     end
 
@@ -119,7 +120,7 @@ FactoryBot.define do
 
     trait :with_legacy_detached_merge_request_pipeline do
       after(:create) do |merge_request|
-        merge_request.merge_request_pipelines << create(:ci_pipeline,
+        merge_request.pipelines_for_merge_request << create(:ci_pipeline,
           source: :merge_request_event,
           merge_request: merge_request,
           project: merge_request.source_project,
@@ -130,7 +131,7 @@ FactoryBot.define do
 
     trait :with_detached_merge_request_pipeline do
       after(:create) do |merge_request|
-        merge_request.merge_request_pipelines << create(:ci_pipeline,
+        merge_request.pipelines_for_merge_request << create(:ci_pipeline,
           source: :merge_request_event,
           merge_request: merge_request,
           project: merge_request.source_project,
@@ -147,7 +148,7 @@ FactoryBot.define do
       end
 
       after(:create) do |merge_request, evaluator|
-        merge_request.merge_request_pipelines << create(:ci_pipeline,
+        merge_request.pipelines_for_merge_request << create(:ci_pipeline,
           source: :merge_request_event,
           merge_request: merge_request,
           project: merge_request.source_project,

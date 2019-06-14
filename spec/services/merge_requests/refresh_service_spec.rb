@@ -23,7 +23,8 @@ describe MergeRequests::RefreshService do
                               source_branch: 'master',
                               target_branch: 'feature',
                               target_project: @project,
-                              merge_when_pipeline_succeeds: true,
+                              auto_merge_enabled: true,
+                              auto_merge_strategy: AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS,
                               merge_user: @user)
 
       @another_merge_request = create(:merge_request,
@@ -31,7 +32,8 @@ describe MergeRequests::RefreshService do
                                       source_branch: 'master',
                                       target_branch: 'test',
                                       target_project: @project,
-                                      merge_when_pipeline_succeeds: true,
+                                      auto_merge_enabled: true,
+                                      auto_merge_strategy: AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS,
                                       merge_user: @user)
 
       @fork_merge_request = create(:merge_request,
@@ -83,7 +85,7 @@ describe MergeRequests::RefreshService do
 
         expect(@merge_request.notes).not_to be_empty
         expect(@merge_request).to be_open
-        expect(@merge_request.merge_when_pipeline_succeeds).to be_falsey
+        expect(@merge_request.auto_merge_enabled).to be_falsey
         expect(@merge_request.diff_head_sha).to eq(@newrev)
         expect(@fork_merge_request).to be_open
         expect(@fork_merge_request.notes).to be_empty
@@ -166,8 +168,8 @@ describe MergeRequests::RefreshService do
 
         it 'create detached merge request pipeline with commits' do
           expect { subject }
-            .to change { @merge_request.merge_request_pipelines.count }.by(1)
-            .and change { @another_merge_request.merge_request_pipelines.count }.by(0)
+            .to change { @merge_request.pipelines_for_merge_request.count }.by(1)
+            .and change { @another_merge_request.pipelines_for_merge_request.count }.by(0)
 
           expect(@merge_request.has_commits?).to be_truthy
           expect(@another_merge_request.has_commits?).to be_falsy
@@ -175,13 +177,13 @@ describe MergeRequests::RefreshService do
 
         it 'does not create detached merge request pipeline for forked project' do
           expect { subject }
-            .not_to change { @fork_merge_request.merge_request_pipelines.count }
+            .not_to change { @fork_merge_request.pipelines_for_merge_request.count }
         end
 
         it 'create detached merge request pipeline for non-fork merge request' do
           subject
 
-          expect(@merge_request.merge_request_pipelines.first)
+          expect(@merge_request.pipelines_for_merge_request.first)
             .to be_detached_merge_request_pipeline
         end
 
@@ -190,7 +192,7 @@ describe MergeRequests::RefreshService do
 
           it 'does not create detached merge request pipeline' do
             expect { subject }
-              .not_to change { @merge_request.merge_request_pipelines.count }
+              .not_to change { @merge_request.pipelines_for_merge_request.count }
           end
         end
 
@@ -199,9 +201,9 @@ describe MergeRequests::RefreshService do
 
           it 'creates legacy detached merge request pipeline for fork merge request' do
             expect { subject }
-              .to change { @fork_merge_request.merge_request_pipelines.count }.by(1)
+              .to change { @fork_merge_request.pipelines_for_merge_request.count }.by(1)
 
-            expect(@fork_merge_request.merge_request_pipelines.first)
+            expect(@fork_merge_request.pipelines_for_merge_request.first)
               .to be_legacy_detached_merge_request_pipeline
           end
         end
@@ -214,7 +216,7 @@ describe MergeRequests::RefreshService do
           it 'create legacy detached merge request pipeline for non-fork merge request' do
             subject
 
-            expect(@merge_request.merge_request_pipelines.first)
+            expect(@merge_request.pipelines_for_merge_request.first)
               .to be_legacy_detached_merge_request_pipeline
           end
         end
@@ -245,11 +247,11 @@ describe MergeRequests::RefreshService do
           it 'does not re-create a duplicate detached merge request pipeline' do
             expect do
               service.new(@project, @user).execute(@oldrev, @newrev, 'refs/heads/master')
-            end.to change { @merge_request.merge_request_pipelines.count }.by(1)
+            end.to change { @merge_request.pipelines_for_merge_request.count }.by(1)
 
             expect do
               service.new(@project, @user).execute(@oldrev, @newrev, 'refs/heads/master')
-            end.not_to change { @merge_request.merge_request_pipelines.count }
+            end.not_to change { @merge_request.pipelines_for_merge_request.count }
           end
         end
       end
@@ -266,7 +268,7 @@ describe MergeRequests::RefreshService do
 
         it 'does not create a detached merge request pipeline' do
           expect { subject }
-            .not_to change { @merge_request.merge_request_pipelines.count }
+            .not_to change { @merge_request.pipelines_for_merge_request.count }
         end
       end
     end
@@ -292,7 +294,7 @@ describe MergeRequests::RefreshService do
 
         expect(@merge_request.notes).not_to be_empty
         expect(@merge_request).to be_open
-        expect(@merge_request.merge_when_pipeline_succeeds).to be_falsey
+        expect(@merge_request.auto_merge_enabled).to be_falsey
         expect(@merge_request.diff_head_sha).to eq(@newrev)
         expect(@fork_merge_request).to be_open
         expect(@fork_merge_request.notes).to be_empty

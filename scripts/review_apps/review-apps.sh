@@ -1,26 +1,6 @@
 [[ "$TRACE" ]] && set -x
 export TILLER_NAMESPACE="$KUBE_NAMESPACE"
 
-function echoerr() {
-  local header="${2}"
-
-  if [ -n "${header}" ]; then
-    printf "\n\033[0;31m** %s **\n\033[0m" "${1}" >&2;
-  else
-    printf "\033[0;31m%s\n\033[0m" "${1}" >&2;
-  fi
-}
-
-function echoinfo() {
-  local header="${2}"
-
-  if [ -n "${header}" ]; then
-    printf "\n\033[0;33m** %s **\n\033[0m" "${1}" >&2;
-  else
-    printf "\033[0;33m%s\n\033[0m" "${1}" >&2;
-  fi
-}
-
 function deployExists() {
   local namespace="${1}"
   local deploy="${2}"
@@ -68,7 +48,7 @@ function delete() {
 
   echoinfo "Deleting release '$name'..." true
 
-  helm delete --purge "$name" || true
+  helm delete --purge "$name"
 }
 
 function cleanup() {
@@ -81,8 +61,8 @@ function cleanup() {
 
   kubectl -n "$KUBE_NAMESPACE" delete \
     ingress,svc,pdb,hpa,deploy,statefulset,job,pod,secret,configmap,pvc,secret,clusterrole,clusterrolebinding,role,rolebinding,sa \
-    -l release="$CI_ENVIRONMENT_SLUG" \
-    || true
+    --now --ignore-not-found --include-uninitialized \
+    -l release="$CI_ENVIRONMENT_SLUG"
 }
 
 function get_pod() {
@@ -109,7 +89,7 @@ function perform_review_app_deployment() {
   ensure_namespace
   install_tiller
   install_external_dns
-  time deploy || true
+  time deploy
   wait_for_review_app_to_be_accessible
   add_license
 }
@@ -236,6 +216,7 @@ HELM_CMD=$(cat << EOF
     --set global.ingress.configureCertmanager=false \
     --set global.ingress.tls.secretName=tls-cert \
     --set global.ingress.annotations."external-dns\.alpha\.kubernetes\.io/ttl"="10"
+    --set nginx-ingress.controller.service.enableHttp=false \
     --set nginx-ingress.defaultBackend.resources.requests.memory=7Mi \
     --set nginx-ingress.controller.resources.requests.memory=440M \
     --set nginx-ingress.controller.replicaCount=2 \
@@ -270,7 +251,7 @@ EOF
   echoinfo "Deploying with:"
   echoinfo "${HELM_CMD}"
 
-  eval $HELM_CMD
+  eval $HELM_CMD || true
 }
 
 function wait_for_review_app_to_be_accessible() {
@@ -327,81 +308,4 @@ function add_license() {
 
     puts "License added";
     '
-}
-
-function get_job_id() {
-  local job_name="${1}"
-  local query_string="${2:+&${2}}"
-
-  local max_page=3
-  local page=1
-
-  while true; do
-    local url="https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/jobs?per_page=100&page=${page}${query_string}"
-    echoinfo "GET ${url}"
-
-    local job_id
-    job_id=$(curl --silent --show-error --header "PRIVATE-TOKEN: ${API_TOKEN}" "${url}" | jq "map(select(.name == \"${job_name}\")) | map(.id) | last")
-    [[ "${job_id}" == "null" && "${page}" -lt "$max_page" ]] || break
-
-    let "page++"
-  done
-
-  if [[ "${job_id}" == "" ]]; then
-    echoerr "The '${job_name}' job ID couldn't be retrieved!"
-  else
-    echoinfo "The '${job_name}' job ID is ${job_id}"
-    echo "${job_id}"
-  fi
-}
-
-function play_job() {
-  local job_name="${1}"
-  local job_id
-  job_id=$(get_job_id "${job_name}" "scope=manual");
-  if [ -z "${job_id}" ]; then return; fi
-
-  local url="https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/jobs/${job_id}/play"
-  echoinfo "POST ${url}"
-
-  local job_url
-  job_url=$(curl --silent --show-error --request POST --header "PRIVATE-TOKEN: ${API_TOKEN}" "${url}" | jq ".web_url")
-  echoinfo "Manual job '${job_name}' started at: ${job_url}"
-}
-
-function wait_for_job_to_be_done() {
-  local job_name="${1}"
-  local query_string="${2}"
-  local job_id
-  job_id=$(get_job_id "${job_name}" "${query_string}")
-  if [ -z "${job_id}" ]; then return; fi
-
-  echoinfo "Waiting for the '${job_name}' job to finish..."
-
-  local url="https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/jobs/${job_id}"
-  echoinfo "GET ${url}"
-
-  # In case the job hasn't finished yet. Keep trying until the job times out.
-  local interval=30
-  local elapsed_seconds=0
-  while true; do
-    local job_status
-    job_status=$(curl --silent --show-error --header "PRIVATE-TOKEN: ${API_TOKEN}" "${url}" | jq ".status" | sed -e s/\"//g)
-    [[ "${job_status}" == "pending" || "${job_status}" == "running" ]] || break
-
-    printf "."
-    let "elapsed_seconds+=interval"
-    sleep ${interval}
-  done
-
-  local elapsed_minutes=$((elapsed_seconds / 60))
-  echoinfo "Waited '${job_name}' for ${elapsed_minutes} minutes."
-
-  if [[ "${job_status}" == "failed" ]]; then
-    echoerr "The '${job_name}' failed."
-  elif [[ "${job_status}" == "manual" ]]; then
-    echoinfo "The '${job_name}' is manual."
-  else
-    echoinfo "The '${job_name}' passed."
-  fi
 }

@@ -5,7 +5,7 @@ module LabelsHelper
   include ActionView::Helpers::TagHelper
 
   def show_label_issuables_link?(label, issuables_type, current_user: nil, project: nil)
-    return true if label.is_a?(GroupLabel)
+    return true unless label.project_label?
     return true unless project
 
     project.feature_available?(issuables_type, current_user)
@@ -13,9 +13,7 @@ module LabelsHelper
 
   # Link to a Label
   #
-  # label   - Label object to link to
-  # subject - Project/Group object which will be used as the context for the
-  #           label's link. If omitted, defaults to the label's own group/project.
+  # label   - LabelPresenter object to link to
   # type    - The type of item the link will point to (:issue or
   #           :merge_request). If omitted, defaults to :issue.
   # block   - An optional block that will be passed to `link_to`, forming the
@@ -40,41 +38,13 @@ module LabelsHelper
   #   link_to_label(label) { "My Custom Label Text" }
   #
   # Returns a String
-  def link_to_label(label, subject: nil, type: :issue, tooltip: true, css_class: nil, &block)
-    link = label_filter_path(subject || label.subject, label, type: type)
+  def link_to_label(label, type: :issue, tooltip: true, css_class: nil, &block)
+    link = label.filter_path(type: type)
 
     if block_given?
       link_to link, class: css_class, &block
     else
       render_label(label, tooltip: tooltip, link: link, css: css_class)
-    end
-  end
-
-  def label_filter_path(subject, label, type: :issue)
-    case subject
-    when Group
-      send("#{type.to_s.pluralize}_group_path", # rubocop:disable GitlabSecurity/PublicSend
-                  subject,
-                  label_name: [label.name])
-    when Project
-      send("namespace_project_#{type.to_s.pluralize}_path", # rubocop:disable GitlabSecurity/PublicSend
-                  subject.namespace,
-                  subject,
-                  label_name: [label.name])
-    end
-  end
-
-  def edit_label_path(label)
-    case label
-    when GroupLabel then edit_group_label_path(label.group, label)
-    when ProjectLabel then edit_project_label_path(label.project, label)
-    end
-  end
-
-  def destroy_label_path(label)
-    case label
-    when GroupLabel then group_label_path(label.group, label)
-    when ProjectLabel then project_label_path(label.project, label)
     end
   end
 
@@ -106,29 +76,39 @@ module LabelsHelper
   end
 
   def suggested_colors
-    [
-      '#0033CC',
-      '#428BCA',
-      '#44AD8E',
-      '#A8D695',
-      '#5CB85C',
-      '#69D100',
-      '#004E00',
-      '#34495E',
-      '#7F8C8D',
-      '#A295D6',
-      '#5843AD',
-      '#8E44AD',
-      '#FFECDB',
-      '#AD4363',
-      '#D10069',
-      '#CC0033',
-      '#FF0000',
-      '#D9534F',
-      '#D1D100',
-      '#F0AD4E',
-      '#AD8D43'
-    ]
+    {
+      '#0033CC' => s_('SuggestedColors|UA blue'),
+      '#428BCA' => s_('SuggestedColors|Moderate blue'),
+      '#44AD8E' => s_('SuggestedColors|Lime green'),
+      '#A8D695' => s_('SuggestedColors|Feijoa'),
+      '#5CB85C' => s_('SuggestedColors|Slightly desaturated green'),
+      '#69D100' => s_('SuggestedColors|Bright green'),
+      '#004E00' => s_('SuggestedColors|Very dark lime green'),
+      '#34495E' => s_('SuggestedColors|Very dark desaturated blue'),
+      '#7F8C8D' => s_('SuggestedColors|Dark grayish cyan'),
+      '#A295D6' => s_('SuggestedColors|Slightly desaturated blue'),
+      '#5843AD' => s_('SuggestedColors|Dark moderate blue'),
+      '#8E44AD' => s_('SuggestedColors|Dark moderate violet'),
+      '#FFECDB' => s_('SuggestedColors|Very pale orange'),
+      '#AD4363' => s_('SuggestedColors|Dark moderate pink'),
+      '#D10069' => s_('SuggestedColors|Strong pink'),
+      '#CC0033' => s_('SuggestedColors|Strong red'),
+      '#FF0000' => s_('SuggestedColors|Pure red'),
+      '#D9534F' => s_('SuggestedColors|Soft red'),
+      '#D1D100' => s_('SuggestedColors|Strong yellow'),
+      '#F0AD4E' => s_('SuggestedColors|Soft orange'),
+      '#AD8D43' => s_('SuggestedColors|Dark moderate orange')
+    }
+  end
+
+  def render_suggested_colors
+    colors_html = suggested_colors.map do |color_hex_value, color_name|
+      link_to('', '#', class: "has-tooltip", style: "background-color: #{color_hex_value}", data: { color: color_hex_value }, title: color_name)
+    end
+
+    content_tag(:div, class: 'suggest-colors') do
+      colors_html.join.html_safe
+    end
   end
 
   def text_color_for_bg(bg_color)
@@ -168,10 +148,6 @@ module LabelsHelper
     end
   end
 
-  def can_subscribe_to_label_in_different_levels?(label)
-    defined?(@project) && label.is_a?(GroupLabel)
-  end
-
   def label_subscription_status(label, project)
     return 'group-level' if label.subscribed?(current_user)
     return 'project-level' if label.subscribed?(current_user, project)
@@ -191,13 +167,6 @@ module LabelsHelper
 
   def label_subscription_toggle_button_text(label, project = nil)
     label.subscribed?(current_user, project) ? 'Unsubscribe' : 'Subscribe'
-  end
-
-  def label_deletion_confirm_text(label)
-    case label
-    when GroupLabel then _('Remove this label? This will affect all projects within the group. Are you sure?')
-    when ProjectLabel then _('Remove this label? Are you sure?')
-    end
   end
 
   def create_label_title(subject)
@@ -234,15 +203,15 @@ module LabelsHelper
   end
 
   def label_status_tooltip(label, status)
-    type = label.is_a?(ProjectLabel) ? 'project' : 'group'
+    type = label.project_label? ? 'project' : 'group'
     level = status.unsubscribed? ? type : status.sub('-level', '')
     action = status.unsubscribed? ? 'Subscribe' : 'Unsubscribe'
 
     "#{action} at #{level} level"
   end
 
-  def labels_sorted_by_title(labels)
-    labels.sort_by(&:title)
+  def presented_labels_sorted_by_title(labels, subject)
+    labels.sort_by(&:title).map { |label| label.present(issuable_subject: subject) }
   end
 
   def label_dropdown_data(project, opts = {})
@@ -274,6 +243,10 @@ module LabelsHelper
     klass = hash[:group_id] ? GroupLabel : ProjectLabel
 
     klass.new(hash.slice(:color, :description, :title, :group_id, :project_id))
+  end
+
+  def issuable_types
+    ['issues', 'merge requests']
   end
 
   # Required for Banzai::Filter::LabelReferenceFilter

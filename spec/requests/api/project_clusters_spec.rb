@@ -189,6 +189,7 @@ describe API::ProjectClusters do
       {
         name: 'test-cluster',
         domain: 'domain.example.com',
+        managed: false,
         platform_kubernetes_attributes: platform_kubernetes_attributes
       }
     end
@@ -220,6 +221,7 @@ describe API::ProjectClusters do
           expect(cluster_result.project).to eq(project)
           expect(cluster_result.name).to eq('test-cluster')
           expect(cluster_result.domain).to eq('domain.example.com')
+          expect(cluster_result.managed).to be_falsy
           expect(platform_kubernetes.rbac?).to be_truthy
           expect(platform_kubernetes.api_url).to eq(api_url)
           expect(platform_kubernetes.namespace).to eq(namespace)
@@ -349,7 +351,7 @@ describe API::ProjectClusters do
         it 'does not update cluster attributes' do
           expect(cluster.domain).not_to eq('new_domain.com')
           expect(cluster.platform_kubernetes.namespace).not_to eq('invalid_namespace')
-          expect(cluster.kubernetes_namespace.namespace).not_to eq('invalid_namespace')
+          expect(cluster.kubernetes_namespace_for(project)).not_to eq('invalid_namespace')
         end
 
         it 'returns validation errors' do

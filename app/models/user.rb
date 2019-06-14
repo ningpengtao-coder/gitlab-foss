@@ -194,7 +194,7 @@ class User < ApplicationRecord
   before_validation :ensure_namespace_correct
   before_save :ensure_namespace_correct # in case validation is skipped
   after_validation :set_username_errors
-  after_update :username_changed_hook, if: :username_changed?
+  after_update :username_changed_hook, if: :saved_change_to_username?
   after_destroy :post_destroy_hook
   after_destroy :remove_key_cache
   after_commit(on: :update) do
@@ -230,6 +230,9 @@ class User < ApplicationRecord
   delegate :notes_filter_for, to: :user_preference
   delegate :set_notes_filter, to: :user_preference
   delegate :first_day_of_week, :first_day_of_week=, to: :user_preference
+  delegate :timezone, :timezone=, to: :user_preference
+  delegate :time_display_relative, :time_display_relative=, to: :user_preference
+  delegate :time_format_in_24h, :time_format_in_24h=, to: :user_preference
 
   accepts_nested_attributes_for :user_preference, update_only: true
 
@@ -757,11 +760,15 @@ class User < ApplicationRecord
 
   # Typically used in conjunction with projects table to get projects
   # a user has been given access to.
+  # The param `related_project_column` is the column to compare to the
+  # project_authorizations. By default is projects.id
   #
   # Example use:
   # `Project.where('EXISTS(?)', user.authorizations_for_projects)`
-  def authorizations_for_projects(min_access_level: nil)
-    authorizations = project_authorizations.select(1).where('project_authorizations.project_id = projects.id')
+  def authorizations_for_projects(min_access_level: nil, related_project_column: 'projects.id')
+    authorizations = project_authorizations
+                      .select(1)
+                      .where("project_authorizations.project_id = #{related_project_column}")
 
     return authorizations unless min_access_level.present?
 
@@ -1488,15 +1495,6 @@ class User < ApplicationRecord
     return true unless can?(:receive_notifications)
 
     devise_mailer.__send__(notification, self, *args).deliver_later # rubocop:disable GitlabSecurity/PublicSend
-  end
-
-  # This works around a bug in Devise 4.2.0 that erroneously causes a user to
-  # be considered active in MySQL specs due to a sub-second comparison
-  # issue. For more details, see: https://gitlab.com/gitlab-org/gitlab-ee/issues/2362#note_29004709
-  def confirmation_period_valid?
-    return false if self.class.allow_unconfirmed_access_for == 0.days
-
-    super
   end
 
   def ensure_user_rights_and_limits

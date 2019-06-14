@@ -43,7 +43,7 @@ module Ci
         if pipeline.ref_exists?
           _("for %{link_to_pipeline_ref}").html_safe % { link_to_pipeline_ref: link_to_pipeline_ref }
         else
-          _("for %{ref}") % { ref: content_tag(:span, pipeline.ref, class: 'ref-name') }
+          _("for %{ref}").html_safe % { ref: content_tag(:span, pipeline.ref, class: 'ref-name') }
         end
       end
     end
@@ -63,19 +63,11 @@ module Ci
     end
 
     def link_to_merge_request_source_branch
-      return unless merge_request_presenter
-
-      link_to(merge_request_presenter.source_branch,
-        merge_request_presenter.source_branch_commits_path,
-        class: 'ref-name')
+      merge_request_presenter&.source_branch_link
     end
 
     def link_to_merge_request_target_branch
-      return unless merge_request_presenter
-
-      link_to(merge_request_presenter.target_branch,
-        merge_request_presenter.target_branch_commits_path,
-        class: 'ref-name')
+      merge_request_presenter&.target_branch_link
     end
 
     private

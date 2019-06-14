@@ -1,11 +1,11 @@
 %div
 - if Gitlab::CurrentSettings.help_page_text.present?
-  = markdown_field(Gitlab::CurrentSettings.current_application_settings, :help_page_text)
+  .prepend-top-default.md
+    = markdown_field(Gitlab::CurrentSettings.current_application_settings, :help_page_text)
   %hr
 
 %h1
-  GitLab
-  Community Edition
+  = default_brand_title
   - if user_signed_in?
     %span= link_to_version
     = version_status_badge

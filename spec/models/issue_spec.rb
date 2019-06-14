@@ -55,6 +55,29 @@ describe Issue do
     end
   end
 
+  describe 'locking' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:lock_version) do
+      [
+        [0],
+        ["0"]
+      ]
+    end
+
+    with_them do
+      it 'works when an issue has a NULL lock_version' do
+        issue = create(:issue)
+
+        described_class.where(id: issue.id).update_all('lock_version = NULL')
+
+        issue.update!(lock_version: lock_version, title: 'locking test')
+
+        expect(issue.reload.title).to eq('locking test')
+      end
+    end
+  end
+
   describe '#order_by_position_and_priority' do
     let(:project) { create :project }
     let(:p1) { create(:label, title: 'P1', project: project, priority: 1) }
@@ -67,6 +90,21 @@ describe Issue do
     it 'returns ordered list' do
       expect(project.issues.order_by_position_and_priority)
         .to match [issue3, issue4, issue1, issue2]
+    end
+  end
+
+  describe '#sort' do
+    let(:project) { create(:project) }
+
+    context "by relative_position" do
+      let!(:issue)  { create(:issue, project: project) }
+      let!(:issue2) { create(:issue, project: project, relative_position: 2) }
+      let!(:issue3) { create(:issue, project: project, relative_position: 1) }
+
+      it "sorts asc with nulls at the end" do
+        issues = project.issues.sort_by_attribute('relative_position')
+        expect(issues).to eq([issue3, issue2, issue])
+      end
     end
   end
 

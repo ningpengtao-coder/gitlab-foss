@@ -47,14 +47,14 @@ class NotificationRecipient
 
   def suitable_notification_level?
     case notification_level
-    when :disabled, nil
-      false
-    when :custom
-      custom_enabled? || %i[participating mention].include?(@type)
-    when :watch, :participating
-      !action_excluded?
     when :mention
       @type == :mention
+    when :participating
+      @custom_action == :failed_pipeline || %i[participating mention].include?(@type)
+    when :custom
+      custom_enabled? || %i[participating mention].include?(@type)
+    when :watch
+      !excluded_watcher_action?
     else
       false
     end
@@ -100,20 +100,11 @@ class NotificationRecipient
     end
   end
 
-  def action_excluded?
-    excluded_watcher_action? || excluded_participating_action?
-  end
-
   def excluded_watcher_action?
-    return false unless @custom_action && notification_level == :watch
+    return false unless @type == :watch
+    return false unless @custom_action
 
     NotificationSetting::EXCLUDED_WATCHER_EVENTS.include?(@custom_action)
-  end
-
-  def excluded_participating_action?
-    return false unless @custom_action && notification_level == :participating
-
-    NotificationSetting::EXCLUDED_PARTICIPATING_EVENTS.include?(@custom_action)
   end
 
   private
@@ -123,15 +114,19 @@ class NotificationRecipient
     return @read_ability if instance_variable_defined?(:@read_ability)
 
     @read_ability =
-      case @target
-      when Issuable
-        :"read_#{@target.to_ability_name}"
-      when Ci::Pipeline
+      if @target.is_a?(Ci::Pipeline)
         :read_build # We have build trace in pipeline emails
-      when ActiveRecord::Base
-        :"read_#{@target.class.model_name.name.underscore}"
-      else
-        nil
+      elsif default_ability_for_target
+        :"read_#{default_ability_for_target}"
+      end
+  end
+
+  def default_ability_for_target
+    @default_ability_for_target ||=
+      if @target.respond_to?(:to_ability_name)
+        @target.to_ability_name
+      elsif @target.class.respond_to?(:model_name)
+        @target.class.model_name.name.underscore
       end
   end
 
@@ -146,7 +141,7 @@ class NotificationRecipient
 
     return project_setting unless project_setting.nil? || project_setting.global?
 
-    group_setting = closest_non_global_group_notification_settting
+    group_setting = closest_non_global_group_notification_setting
 
     return group_setting unless group_setting.nil?
 
@@ -154,25 +149,13 @@ class NotificationRecipient
   end
 
   # Returns the notification_setting of the lowest group in hierarchy with non global level
-  def closest_non_global_group_notification_settting
+  def closest_non_global_group_notification_setting
     return unless @group
-    return if indexed_group_notification_settings.empty?
 
-    notification_setting = nil
-
-    @group.self_and_ancestors_ids.each do |id|
-      notification_setting = indexed_group_notification_settings[id]
-      break if notification_setting
-    end
-
-    notification_setting
-  end
-
-  def indexed_group_notification_settings
-    strong_memoize(:indexed_group_notification_settings) do
-      @group.notification_settings.where(user_id: user.id)
-        .where.not(level: NotificationSetting.levels[:global])
-        .index_by(&:source_id)
-    end
+    @group
+      .notification_settings(hierarchy_order: :asc)
+      .where(user: user)
+      .where.not(level: NotificationSetting.levels[:global])
+      .first
   end
 end

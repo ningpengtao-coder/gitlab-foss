@@ -22,9 +22,9 @@ class MergeRequestPresenter < Gitlab::View::Presenter::Delegated
     end
   end
 
-  def cancel_merge_when_pipeline_succeeds_path
-    if can_cancel_merge_when_pipeline_succeeds?(current_user)
-      cancel_merge_when_pipeline_succeeds_project_merge_request_path(project, merge_request)
+  def cancel_auto_merge_path
+    if can_cancel_auto_merge?(current_user)
+      cancel_auto_merge_project_merge_request_path(project, merge_request)
     end
   end
 
@@ -214,6 +214,22 @@ class MergeRequestPresenter < Gitlab::View::Presenter::Delegated
 
   def merge_request_pipelines_docs_path
     help_page_path('ci/merge_request_pipelines/index.md')
+  end
+
+  def source_branch_link
+    if source_branch_exists?
+      link_to(source_branch, source_branch_commits_path, class: 'ref-name')
+    else
+      content_tag(:span, source_branch, class: 'ref-name')
+    end
+  end
+
+  def target_branch_link
+    if target_branch_exists?
+      link_to(target_branch, target_branch_commits_path, class: 'ref-name')
+    else
+      content_tag(:span, target_branch, class: 'ref-name')
+    end
   end
 
   private

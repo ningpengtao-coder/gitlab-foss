@@ -158,21 +158,6 @@ Follow these steps to deploy a function using the Node.js runtime to your Knativ
        description: "node.js runtime function"
        environment:
          MY_FUNCTION: echo-js
-
-     echo-rb:
-       handler: MyEcho.my_function
-       source: ./echo-rb
-       runtime: https://gitlab.com/gitlab-org/serverless/runtimes/ruby
-       description: "Ruby runtime function"
-       environment:
-         MY_FUNCTION: echo-rb
-
-     echo-docker:
-       handler: echo-docker
-       source: ./echo-docker
-       description: "Dockerfile runtime function"
-       environment:
-         MY_FUNCTION: echo-docker
    ```
 
 Explanation of the fields used above:
@@ -231,7 +216,7 @@ The sample function can now be triggered from any HTTP client using a simple `PO
       --header "Content-Type: application/json" \
       --request POST \
       --data '{"GitLab":"FaaS"}' \
-      http://functions-echo.functions-1.functions.example.com
+      http://functions-echo.functions-1.functions.example.com/
       ```
   2. Using a web-based tool (ie. postman, restlet, etc)
 

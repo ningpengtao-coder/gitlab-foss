@@ -130,6 +130,7 @@ module QA
     autoload :View, 'qa/page/view'
     autoload :Element, 'qa/page/element'
     autoload :Validator, 'qa/page/validator'
+    autoload :Validatable, 'qa/page/validatable'
 
     module Main
       autoload :Login, 'qa/page/main/login'
@@ -275,6 +276,7 @@ module QA
 
     module Layout
       autoload :Banner, 'qa/page/layout/banner'
+      autoload :PerformanceBar, 'qa/page/layout/performance_bar'
     end
 
     module Label
@@ -293,10 +295,12 @@ module QA
       module Settings
         autoload :Repository, 'qa/page/admin/settings/repository'
         autoload :General, 'qa/page/admin/settings/general'
+        autoload :MetricsAndProfiling, 'qa/page/admin/settings/metrics_and_profiling'
 
         module Component
           autoload :RepositoryStorage, 'qa/page/admin/settings/component/repository_storage'
           autoload :AccountAndLimit, 'qa/page/admin/settings/component/account_and_limit'
+          autoload :PerformanceBar, 'qa/page/admin/settings/component/performance_bar'
         end
       end
     end

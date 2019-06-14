@@ -382,6 +382,54 @@ describe Ci::Pipeline, :mailer do
     end
   end
 
+  describe '#source_ref' do
+    subject { pipeline.source_ref }
+
+    let(:pipeline) { create(:ci_pipeline, ref: 'feature') }
+
+    it 'returns source ref' do
+      is_expected.to eq('feature')
+    end
+
+    context 'when the pipeline is a detached merge request pipeline' do
+      let(:merge_request) { create(:merge_request) }
+
+      let(:pipeline) do
+        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, ref: merge_request.ref_path)
+      end
+
+      it 'returns source ref' do
+        is_expected.to eq(merge_request.source_branch)
+      end
+    end
+  end
+
+  describe '#source_ref_slug' do
+    subject { pipeline.source_ref_slug }
+
+    let(:pipeline) { create(:ci_pipeline, ref: 'feature') }
+
+    it 'slugifies with the source ref' do
+      expect(Gitlab::Utils).to receive(:slugify).with('feature')
+
+      subject
+    end
+
+    context 'when the pipeline is a detached merge request pipeline' do
+      let(:merge_request) { create(:merge_request) }
+
+      let(:pipeline) do
+        create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, ref: merge_request.ref_path)
+      end
+
+      it 'slugifies with the source ref of the merge request' do
+        expect(Gitlab::Utils).to receive(:slugify).with(merge_request.source_branch)
+
+        subject
+      end
+    end
+  end
+
   describe '.triggered_for_branch' do
     subject { described_class.triggered_for_branch(ref) }
 
@@ -418,7 +466,7 @@ describe Ci::Pipeline, :mailer do
           target_branch: 'master')
       end
 
-      let(:pipeline) { merge_request.merge_request_pipelines.first }
+      let(:pipeline) { merge_request.pipelines_for_merge_request.first }
 
       it 'does not return the pipeline' do
         is_expected.to be_empty
@@ -690,7 +738,8 @@ describe Ci::Pipeline, :mailer do
                             CI_PIPELINE_SOURCE
                             CI_COMMIT_MESSAGE
                             CI_COMMIT_TITLE
-                            CI_COMMIT_DESCRIPTION]
+                            CI_COMMIT_DESCRIPTION
+                            CI_COMMIT_REF_PROTECTED]
     end
 
     context 'when source is merge request' do
@@ -1329,6 +1378,40 @@ describe Ci::Pipeline, :mailer do
         expect(ExpirePipelineCacheWorker).to receive(:perform_async).with(pipeline.id)
 
         pipeline.cancel
+      end
+    end
+
+    describe 'auto merge' do
+      let(:merge_request) { create(:merge_request, :merge_when_pipeline_succeeds) }
+
+      let(:pipeline) do
+        create(:ci_pipeline, :running, project: merge_request.source_project,
+                                       ref: merge_request.source_branch,
+                                       sha: merge_request.diff_head_sha)
+      end
+
+      before do
+        merge_request.update_head_pipeline
+      end
+
+      %w[succeed! drop! cancel! skip!].each do |action|
+        context "when the pipeline recieved #{action} event" do
+          it 'performs AutoMergeProcessWorker' do
+            expect(AutoMergeProcessWorker).to receive(:perform_async).with(merge_request.id)
+
+            pipeline.public_send(action)
+          end
+        end
+      end
+
+      context 'when auto merge is not enabled in the merge request' do
+        let(:merge_request) { create(:merge_request) }
+
+        it 'performs AutoMergeProcessWorker' do
+          expect(AutoMergeProcessWorker).not_to receive(:perform_async)
+
+          pipeline.succeed!
+        end
       end
     end
 
@@ -2890,6 +2973,38 @@ describe Ci::Pipeline, :mailer do
 
       it "returns false" do
         expect(subject).to be_falsey
+      end
+    end
+  end
+
+  describe '#find_stage_by_name' do
+    let(:pipeline) { create(:ci_pipeline) }
+    let(:stage_name) { 'test' }
+
+    let(:stage) do
+      create(:ci_stage_entity,
+             pipeline: pipeline,
+             project: pipeline.project,
+             name: 'test')
+    end
+
+    before do
+      create_list(:ci_build, 2, pipeline: pipeline, stage: stage.name)
+    end
+
+    subject { pipeline.find_stage_by_name!(stage_name) }
+
+    context 'when stage exists' do
+      it { is_expected.to eq(stage) }
+    end
+
+    context 'when stage does not exist' do
+      let(:stage_name) { 'build' }
+
+      it 'raises an ActiveRecord exception' do
+        expect do
+          subject
+        end.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end

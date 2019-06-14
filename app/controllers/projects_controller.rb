@@ -7,6 +7,7 @@ class ProjectsController < Projects::ApplicationController
   include PreviewMarkdown
   include SendFileUpload
   include RecordUserLastActivity
+  include ImportUrlParams
 
   prepend_before_action(only: [:show]) { authenticate_sessionless_user!(:rss) }
 
@@ -36,10 +37,10 @@ class ProjectsController < Projects::ApplicationController
 
   # rubocop: disable CodeReuse/ActiveRecord
   def new
-    namespace = Namespace.find_by(id: params[:namespace_id]) if params[:namespace_id]
-    return access_denied! if namespace && !can?(current_user, :create_projects, namespace)
+    @namespace = Namespace.find_by(id: params[:namespace_id]) if params[:namespace_id]
+    return access_denied! if @namespace && !can?(current_user, :create_projects, @namespace)
 
-    @project = Project.new(namespace_id: namespace&.id)
+    @project = Project.new(namespace_id: @namespace&.id)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
@@ -333,6 +334,7 @@ class ProjectsController < Projects::ApplicationController
   def project_params(attributes: [])
     params.require(:project)
       .permit(project_params_attributes + attributes)
+      .merge(import_url_params)
   end
 
   def project_params_attributes

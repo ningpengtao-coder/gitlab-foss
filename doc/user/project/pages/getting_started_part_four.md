@@ -1,10 +1,6 @@
 ---
-last_updated: 2018-02-16
-author: Marcia Ramos
-author_gitlab: marcia
-level: intermediate
-article_type: user guide
-date: 2017-02-22
+last_updated: 2019-06-04
+type: reference, howto
 ---
 
 # Creating and Tweaking GitLab CI/CD for GitLab Pages
@@ -54,7 +50,7 @@ Of course, before building it, you had to install Jekyll in your computer.
 For that, you had to open your terminal and run `gem install jekyll`.
 Right? GitLab CI + GitLab Runner do the same thing. But you need to
 write in the `.gitlab-ci.yml` the script you want to run so
-GitLab Runner will do it for you. It looks more complicated then it
+GitLab Runner will do it for you. It looks more complicated than it
 is. What you need to tell the Runner:
 
 ```

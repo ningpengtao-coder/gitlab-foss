@@ -15,13 +15,19 @@ module Types
     field :description, GraphQL::STRING_TYPE, null: true
     field :state, IssueStateEnum, null: false
 
+    field :reference, GraphQL::STRING_TYPE, null: false, method: :to_reference do
+      argument :full, GraphQL::BOOLEAN_TYPE, required: false, default_value: false
+    end
+
     field :author, Types::UserType,
           null: false,
           resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchModelLoader.new(User, obj.author_id).find }
 
-    field :assignees, Types::UserType.connection_type, null: true
+    # Remove complexity when BatchLoader is used
+    field :assignees, Types::UserType.connection_type, null: true, complexity: 5
 
-    field :labels, Types::LabelType.connection_type, null: true
+    # Remove complexity when BatchLoader is used
+    field :labels, Types::LabelType.connection_type, null: true, complexity: 5
     field :milestone, Types::MilestoneType,
           null: true,
           resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchModelLoader.new(Milestone, obj.milestone_id).find }
@@ -35,7 +41,9 @@ module Types
     field :upvotes, GraphQL::INT_TYPE, null: false
     field :downvotes, GraphQL::INT_TYPE, null: false
     field :user_notes_count, GraphQL::INT_TYPE, null: false
+    field :web_path, GraphQL::STRING_TYPE, null: false, method: :issue_path
     field :web_url, GraphQL::STRING_TYPE, null: false
+    field :relative_position, GraphQL::INT_TYPE, null: true
 
     field :closed_at, Types::TimeType, null: true
 

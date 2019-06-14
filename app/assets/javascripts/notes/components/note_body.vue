@@ -83,10 +83,12 @@ export default {
     formCancelHandler(shouldConfirm, isDirty) {
       this.$emit('cancelForm', shouldConfirm, isDirty);
     },
-    applySuggestion({ suggestionId, flashContainer, callback }) {
+    applySuggestion({ suggestionId, flashContainer, callback = () => {} }) {
       const { discussion_id: discussionId, id: noteId } = this.note;
 
-      this.submitSuggestion({ discussionId, noteId, suggestionId, flashContainer, callback });
+      return this.submitSuggestion({ discussionId, noteId, suggestionId, flashContainer }).then(
+        callback,
+      );
     },
   },
 };
@@ -122,6 +124,7 @@ export default {
       v-model="note.note"
       :data-update-url="note.path"
       class="hidden js-task-list-field"
+      dir="auto"
     ></textarea>
     <note-edited-text
       v-if="note.last_edited_at"

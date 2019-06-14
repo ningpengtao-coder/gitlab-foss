@@ -1,6 +1,6 @@
 import ProjectListItem from '~/vue_shared/components/project_selector/project_list_item.vue';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 
 const localVue = createLocalVue();
 
@@ -9,8 +9,8 @@ describe('ProjectListItem component', () => {
   let wrapper;
   let vm;
   let options;
-  loadJSONFixtures('projects.json');
-  const project = getJSONFixture('projects.json')[0];
+  loadJSONFixtures('static/projects.json');
+  const project = getJSONFixture('static/projects.json')[0];
 
   beforeEach(() => {
     options = {

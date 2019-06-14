@@ -1,5 +1,6 @@
 ---
 table_display_block: true
+type: reference
 ---
 
 # GitLab CI/CD environment variables
@@ -51,6 +52,53 @@ or directly in the `.gitlab-ci.yml` file and reuse them as you wish.
 
 That can be very powerful as it can be used for scripting without
 the need to specify the value itself.
+
+#### Variable types
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/46806) in GitLab 11.11.
+
+There are two types of variables supported by GitLab:
+
+- "Variable": the Runner will create an environment variable named same as the variable key and set its value to the variable value.
+- "File": the Runner will write the variable value to a temporary file and set the path to this file as the value of an environment variable named same as the variable key.
+
+Many tools (like [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) and [kubectl](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable)) provide the ability to customise configuration using files by either providing the file path as a command line argument or an environment variable. Prior to the introduction of variable types, the common pattern was to use the value of a CI variable, save it in a file, and then use the newly created file in your script:
+
+```bash
+# Save the content of variable in a file
+echo "$KUBE_CA_PEM" > "$(pwd)/kube.ca.pem"
+ # Use the newly created file
+kubectl config set-cluster e2e --server="$KUBE_URL" --certificate-authority="$(pwd)/kube.ca.pem"
+```
+
+This can be simplified by creating a variable of type "File" and using it directly. For example, let's say we have the following variables.
+
+![CI/CD settings - variable types usage example](img/variable_types_usage_example.png)
+
+We can then call them from `.gitlab-ci.yml` like this:
+
+```bash
+kubectl config set-cluster e2e --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM"
+```
+
+Variable types can be set via the [UI](#via-the-ui) or the [API](../../api/project_level_variables.md#create-variable), but not in `.gitlab-ci.yml`.
+
+#### Masked variables
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/13784) in GitLab 11.10
+
+Variables can be created as masked variables.
+This means that the value of the variable will be hidden in job logs,
+though it must match certain requirements to do so:
+
+- The value must be in a single line.
+- The value must only consist of characters from the Base64 alphabet, defined in [RFC4648](https://tools.ietf.org/html/rfc4648).
+- The value must be at least 8 characters long.
+- The value must not use variables.
+
+If the value does not meet the requirements above, then the CI variable will fail to save.
+In order to save, either alter the value to meet the masking requirements
+or disable **Masked** for the variable.
 
 ## Getting started
 
@@ -104,7 +152,10 @@ let's say you want to output `HELLO WORLD` for a `TEST` variable.
 You can either set the variable directly in the `.gitlab-ci.yml`
 file or through the UI.
 
-#### Via [`.gitlab-ci.yml`](../yaml/README.md#variables)
+#### Via `.gitlab-ci.yml`
+
+To create a new custom `env_var` variable via [`.gitlab-ci.yml`](../yaml/README.md#variables), define their variable/value pair under
+`variables`:
 
 ```yaml
 variables:
@@ -116,11 +167,13 @@ For a deeper look into them, see [`.gitlab-ci.yml` defined variables](#gitlab-ci
 #### Via the UI
 
 From the UI, navigate to your project's **Settings > CI/CD** and
-expand **Environment variables**. Create a new variable by naming
-it in the field **Input variable key**, and define its value in the
+expand **Variables**. Create a new variable by choosing its **type**, naming
+it in the field **Input variable key**, and defining its value in the
 **Input variable value** field:
 
-![CI/CD settings - new variable](img/new_custom_variable_example.png)
+![CI/CD settings - new variable](img/new_custom_variables_example.png)
+
+You'll also see the option to mask and/or protect your variables.
 
 Once you've set the variables, call them from the `.gitlab-ci.yml` file:
 
@@ -129,19 +182,14 @@ test_variable:
   stage: test
   script:
     - echo $CI_JOB_STAGE # calls a predefined variable
-    - echo $TEST # calls a custom variable
+    - echo $TEST # calls a custom variable of type `env_var`
+    - echo $GREETING # calls a custom variable of type `file` that contains the path to the temp file
+    - cat $GREETING # the temp file itself contains the variable value
 ```
 
 The output will be:
 
-![Output custom variable](img/custom_variable_output.png)
-
-CAUTION: **Important:**
-Be aware that variables are not masked, and their values can be shown
-in the job logs if explicitly asked to do so. If your project is public or
-internal, you can set the pipelines private from your [project's Pipelines
-settings](../../user/project/pipelines/settings.md#visibility-of-pipelines).
-Follow the discussion in issue [#13784][ce-13784] for masking the variables.
+![Output custom variable](img/custom_variables_output.png)
 
 ### Syntax of environment variables in job scripts
 
@@ -288,7 +336,7 @@ use for storing things like passwords, SSH keys, and credentials.
 Group-level variables can be added by:
 
 1. Navigating to your group's **Settings > CI/CD** page.
-1. Inputing variable keys and values in the **Environment variables** section.
+1. Inputing variable types, keys, and values in the **Variables** section.
 Any variables of [subgroups](../../user/group/subgroups/index.md) will be inherited recursively.
 
 Once you set them, they will be available for all subsequent pipelines.
@@ -339,6 +387,13 @@ Protected variables can be added by going to your project's
 
 Once you set them, they will be available for all subsequent pipelines.
 
+### Limiting environment scopes of environment variables **[PREMIUM]**
+
+You can limit the environment scope of a variable by
+[defining which environments][envs] it can be available for.
+
+To learn more about about scoping environments, see [Scoping environments with specs](../environments.md#scoping-environments-with-specs-premium).
+
 ### Deployment environment variables
 
 > Introduced in GitLab 8.15.
@@ -379,8 +434,7 @@ For instance, suppose you added a
 [custom variable `$TEST`](#creating-a-custom-environment-variable)
 as exemplified above and you want to override it in a manual pipeline.
 Navigate to your project's **CI/CD > Pipelines** and click **Run pipeline**.
-Choose the branch you want to run the pipeline for, then add a new variable
-pair through the UI:
+Choose the branch you want to run the pipeline for, then add a new variable through the UI:
 
 ![Override variable value](img/override_variable_manual_pipeline.png)
 
@@ -426,7 +480,9 @@ Below you can find supported syntax reference:
 
     > Example: `$VARIABLE == "some value"`
 
-    You can use equality operator `==` to compare a variable content to a
+    > Example: `$VARIABLE != "some value"` _(added in 11.11)_
+
+    You can use equality operator `==` or `!=` to compare a variable content to a
     string. We support both, double quotes and single quotes to define a string
     value, so both `$VARIABLE == "some value"` and `$VARIABLE == 'some value'`
     are supported. `"some value" == $VARIABLE` is correct too.
@@ -435,21 +491,28 @@ Below you can find supported syntax reference:
 
     > Example: `$VARIABLE == null`
 
+    > Example: `$VARIABLE != null` _(added in 11.11)_
+
     It sometimes happens that you want to check whether a variable is defined
     or not. To do that, you can compare a variable to `null` keyword, like
     `$VARIABLE == null`. This expression is going to evaluate to truth if
-    variable is not defined.
+    variable is not defined when `==` is used, or to falsey if `!=` is used.
 
 1. Checking for an empty variable
 
     > Example: `$VARIABLE == ""`
 
+    > Example: `$VARIABLE != ""` _(added in 11.11)_
+
     If you want to check whether a variable is defined, but is empty, you can
-    simply compare it against an empty string, like `$VAR == ''`.
+    simply compare it against an empty string, like `$VAR == ''` or non-empty
+    string `$VARIABLE != ""`.
 
 1. Comparing two variables
 
     > Example: `$VARIABLE_1 == $VARIABLE_2`
+
+    > Example: `$VARIABLE_1 != $VARIABLE_2` _(added in 11.11)_
 
     It is possible to compare two variables. This is going to compare values
     of these variables.
@@ -469,11 +532,27 @@ Below you can find supported syntax reference:
 
     > Example: `$VARIABLE =~ /^content.*/`
 
+    > Example: `$VARIABLE_1 !~ /^content.*/` _(added in 11.11)_
+
     It is possible perform pattern matching against a variable and regular
-    expression. Expression like this evaluates to truth if matches are found.
+    expression. Expression like this evaluates to truth if matches are found
+    when using `=~`. It evaluates to truth if matches are not found when `!~` is used.
 
     Pattern matching is case-sensitive by default. Use `i` flag modifier, like
     `/pattern/i` to make a pattern case-insensitive.
+
+1. Conjunction / Disjunction
+
+    > Example: `$VARIABLE1 =~ /^content.*/ && $VARIABLE2 == "something"`
+
+    > Example: `$VARIABLE1 =~ /^content.*/ && $VARIABLE2 =~ /thing$/ && $VARIABLE3`
+
+    > Example: `$VARIABLE1 =~ /^content.*/ || $VARIABLE2 =~ /thing$/ && $VARIABLE3`
+
+    It is possible to join multiple conditions using `&&` or `||`. Any of the otherwise
+    supported syntax may be used in a conjunctive or disjunctive statement.
+    Precedence of operators follows standard Ruby 2.5 operation
+    [precedence](https://ruby-doc.org/core-2.5.0/doc/syntax/precedence_rdoc.html).
 
 ## Debug tracing
 
@@ -539,8 +618,8 @@ $'\''git'\'' "checkout" "-f" "-q" "dd648b2e48ce6518303b0bb580b2ee32fadaf045"
 Running on runner-8a2f473d-project-1796893-concurrent-0 via runner-8a2f473d-machine-1480971377-317a7d0f-digital-ocean-4gb...
 ++ export CI=true
 ++ CI=true
-++ export CI_API_V4_API_URL=https://example.com:3000/api/v4
-++ CI_API_V4_API_URL=https://example.com:3000/api/v4
+++ export CI_API_V4_URL=https://example.com:3000/api/v4
+++ CI_API_V4_URL=https://example.com:3000/api/v4
 ++ export CI_DEBUG_TRACE=false
 ++ CI_DEBUG_TRACE=false
 ++ export CI_COMMIT_SHA=dd648b2e48ce6518303b0bb580b2ee32fadaf045
@@ -579,8 +658,8 @@ Running on runner-8a2f473d-project-1796893-concurrent-0 via runner-8a2f473d-mach
 ++ GITLAB_CI=true
 ++ export CI=true
 ++ CI=true
-++ export CI_API_V4_API_URL=https://example.com:3000/api/v4
-++ CI_API_V4_API_URL=https://example.com:3000/api/v4
+++ export CI_API_V4_URL=https://example.com:3000/api/v4
+++ CI_API_V4_URL=https://example.com:3000/api/v4
 ++ export GITLAB_CI=true
 ++ GITLAB_CI=true
 ++ export CI_JOB_ID=7046507
@@ -645,12 +724,13 @@ MIIFQzCCBCugAwIBAgIRAL/ElDjuf15xwja1ZnCocWAwDQYJKoZIhvcNAQELBQAw'
 ```
 
 [ce-13784]: https://gitlab.com/gitlab-org/gitlab-ce/issues/13784 "Simple protection of CI variables"
-[eep]: https://about.gitlab.com/pricing/ "Available only in GitLab Premium"
 [envs]: ../environments.md
 [protected branches]: ../../user/project/protected_branches.md
 [protected tags]: ../../user/project/protected_tags.md
 [shellexecutors]: https://docs.gitlab.com/runner/executors/
 [triggered]: ../triggers/README.md
+[trigger-job-token]: ../triggers/README.md#ci-job-token
 [gitlab-deploy-token]: ../../user/project/deploy_tokens/index.md#gitlab-deploy-token
 [registry]: ../../user/project/container_registry.md
 [dependent-repositories]: ../../user/project/new_ci_build_permissions_model.md#dependent-repositories
+[get-job-artifacts]:  ../../api/jobs.html#get-job-artifacts

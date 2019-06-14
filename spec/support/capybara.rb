@@ -17,6 +17,8 @@ JS_CONSOLE_FILTER = Regexp.union([
   "Download the Vue Devtools extension"
 ])
 
+CAPYBARA_WINDOW_SIZE = [1366, 768].freeze
+
 Capybara.register_driver :chrome do |app|
   capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
     # This enables access to logs with `page.driver.manage.get_log(:browser)`
@@ -29,7 +31,7 @@ Capybara.register_driver :chrome do |app|
   )
 
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("window-size=1240,1400")
+  options.add_argument("window-size=#{CAPYBARA_WINDOW_SIZE.join(',')}")
 
   # Chrome won't work properly in a Docker container in sandbox mode
   options.add_argument("no-sandbox")
@@ -40,6 +42,9 @@ Capybara.register_driver :chrome do |app|
   # Disable /dev/shm use in CI. See https://gitlab.com/gitlab-org/gitlab-ee/issues/4252
   options.add_argument("disable-dev-shm-usage") if ENV['CI'] || ENV['CI_SERVER']
 
+  # Explicitly set user-data-dir to prevent crashes. See https://gitlab.com/gitlab-org/gitlab-ce/issues/58882#note_179811508
+  options.add_argument("user-data-dir=/tmp/chrome") if ENV['CI'] || ENV['CI_SERVER']
+
   Capybara::Selenium::Driver.new(
     app,
     browser: :chrome,
@@ -48,9 +53,11 @@ Capybara.register_driver :chrome do |app|
   )
 end
 
+Capybara.server = :webrick
 Capybara.javascript_driver = :chrome
 Capybara.default_max_wait_time = timeout
 Capybara.ignore_hidden_elements = true
+Capybara.default_normalize_ws = true
 
 # Keep only the screenshots generated from the last failing test suite
 Capybara::Screenshot.prune_strategy = :keep_last_run
@@ -78,8 +85,11 @@ RSpec.configure do |config|
       protocol: 'http')
 
     # reset window size between tests
-    unless session.current_window.size == [1240, 1400]
-      session.current_window.resize_to(1240, 1400) rescue nil
+    unless session.current_window.size == CAPYBARA_WINDOW_SIZE
+      begin
+        session.current_window.resize_to(*CAPYBARA_WINDOW_SIZE)
+      rescue # ?
+      end
     end
   end
 

@@ -2,7 +2,9 @@
 
 class Admin::ApplicationSettingsController < Admin::ApplicationController
   include InternalRedirect
+
   before_action :set_application_setting
+  before_action :whitelist_query_limiting, only: [:usage_data]
 
   def show
   end
@@ -89,10 +91,21 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     )
   end
 
+  # Getting ToS url requires `directory` api call to Let's Encrypt
+  # which could result in 500 error/slow rendering on settings page
+  # Because of that we use separate controller action
+  def lets_encrypt_terms_of_service
+    redirect_to ::Gitlab::LetsEncrypt.terms_of_service_url
+  end
+
   private
 
   def set_application_setting
     @application_setting = Gitlab::CurrentSettings.current_application_settings
+  end
+
+  def whitelist_query_limiting
+    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/63107')
   end
 
   def application_setting_params
@@ -127,11 +140,21 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     [
       *::ApplicationSettingsHelper.visible_attributes,
       *::ApplicationSettingsHelper.external_authorization_service_attributes,
+      *lets_encrypt_visible_attributes,
       :domain_blacklist_file,
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
       repository_storages: [],
       restricted_visibility_levels: []
+    ]
+  end
+
+  def lets_encrypt_visible_attributes
+    return [] unless Feature.enabled?(:pages_auto_ssl)
+
+    [
+      :lets_encrypt_notification_email,
+      :lets_encrypt_terms_of_service_accepted
     ]
   end
 end

@@ -99,6 +99,10 @@ The repository will push soon. To force a push, click the appropriate button.
 ## Pulling from a remote repository **[STARTER]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/51) in GitLab Enterprise Edition 8.2.
+> [Added Git LFS support](https://gitlab.com/gitlab-org/gitlab-ee/issues/10871) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.11.
+
+NOTE: **Note:** This feature [is available for free](https://gitlab.com/gitlab-org/gitlab-ee/issues/10361) to
+GitLab.com users until September 22nd, 2019.
 
 You can set up a repository to automatically have its branches, tags, and commits updated from an
 upstream repository.
@@ -222,8 +226,10 @@ being injected into your mirror, or your password being stolen.
 ### SSH public key authentication
 
 To use SSH public key authentication, you'll also need to choose that option
-from the **Authentication method** dropdown. GitLab will generate a 4096-bit RSA
-key and display the public component of that key to you.
+from the **Authentication method** dropdown. When the mirror is created,
+GitLab generates a 4096-bit RSA key that can be copied by clicking the **Copy SSH public key** button.
+
+![Repository mirroring copy SSH public key to clipboard button](img/copy_ssh_public_key_button.png)
 
 You then need to add the public SSH key to the other repository's configuration:
 
@@ -280,10 +286,10 @@ project mirroring again by [Forcing an update](#forcing-an-update-core).
 [GitLab Starter](https://about.gitlab.com/pricing/) 10.3.
 
 Pull mirroring uses polling to detect new branches and commits added upstream, often minutes
-afterwards. If you notify GitLab by [API](https://docs.gitlab.com/ee/api/projects.html#start-the-pull-mirroring-process-for-a-project),
+afterwards. If you notify GitLab by [API](https://docs.gitlab.com/ee/api/projects.html#start-the-pull-mirroring-process-for-a-project-starter),
 updates will be pulled immediately.
 
-For more information, see [Start the pull mirroring process for a Project](https://docs.gitlab.com/ee/api/projects.html#start-the-pull-mirroring-process-for-a-project).
+For more information, see [Start the pull mirroring process for a Project](https://docs.gitlab.com/ee/api/projects.html#start-the-pull-mirroring-process-for-a-project-starter).
 
 ## Forcing an update **[CORE]**
 

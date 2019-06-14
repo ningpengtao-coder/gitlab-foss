@@ -8,11 +8,11 @@ class Label < ApplicationRecord
   include OptionallySearch
   include Sortable
   include FromUnion
+  include Presentable
 
   cache_markdown_field :description, pipeline: :single_line
 
   DEFAULT_COLOR = '#428BCA'
-  NONE = 'no label'
 
   default_value_for :color, DEFAULT_COLOR
 
@@ -231,6 +231,10 @@ class Label < ApplicationRecord
 
   def hook_attrs
     attributes
+  end
+
+  def present(attributes)
+    super(attributes.merge(presenter_class: ::LabelPresenter))
   end
 
   private

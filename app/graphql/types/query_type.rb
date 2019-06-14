@@ -9,6 +9,16 @@ module Types
           resolver: Resolvers::ProjectResolver,
           description: "Find a project"
 
+    field :group, Types::GroupType,
+          null: true,
+          resolver: Resolvers::GroupResolver,
+          description: "Find a group"
+
+    field :namespace, Types::NamespaceType,
+          null: true,
+          resolver: Resolvers::NamespaceResolver,
+          description: "Find a namespace"
+
     field :metadata, Types::MetadataType,
           null: true,
           resolver: Resolvers::MetadataResolver,

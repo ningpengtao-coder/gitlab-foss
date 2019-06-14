@@ -45,6 +45,10 @@ describe Notify do
 
   context 'for a project' do
     shared_examples 'an assignee email' do
+      let(:test_recipient) { assignee }
+
+      it_behaves_like 'an email sent to a user'
+
       it 'is sent to the assignee as the author' do
         sender = subject.header[:from].addrs.first
 
@@ -618,8 +622,10 @@ describe Notify do
     end
 
     describe 'project was moved' do
+      let(:test_recipient) { user }
       subject { described_class.project_was_moved_email(project.id, user.id, "gitlab/gitlab") }
 
+      it_behaves_like 'an email sent to a user'
       it_behaves_like 'an email sent from GitLab'
       it_behaves_like 'it should not have Gmail Actions links'
       it_behaves_like "a user cannot unsubscribe through footer link"
@@ -701,6 +707,8 @@ describe Notify do
         is_expected.to have_body_text project.full_name
         is_expected.to have_body_text project.web_url
         is_expected.to have_body_text project_member.human_access
+        is_expected.to have_body_text 'leave the project'
+        is_expected.to have_body_text project_url(project, leave: 1)
       end
     end
 
@@ -771,7 +779,7 @@ describe Notify do
         invitee
       end
 
-      subject { described_class.member_invite_declined_email('project', project.id, project_member.invite_email, maintainer.id) }
+      subject { described_class.member_invite_declined_email('Project', project.id, project_member.invite_email, maintainer.id) }
 
       it_behaves_like 'an email sent from GitLab'
       it_behaves_like 'it should not have Gmail Actions links'
@@ -1081,8 +1089,6 @@ describe Notify do
   end
 
   context 'for a group' do
-    set(:group) { create(:group) }
-
     describe 'group access requested' do
       let(:group) { create(:group, :public, :access_requestable) }
       let(:group_member) do
@@ -1144,6 +1150,8 @@ describe Notify do
         is_expected.to have_body_text group.name
         is_expected.to have_body_text group.web_url
         is_expected.to have_body_text group_member.human_access
+        is_expected.to have_body_text 'leave the group'
+        is_expected.to have_body_text group_url(group, leave: 1)
       end
     end
 

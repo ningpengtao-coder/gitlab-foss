@@ -44,6 +44,8 @@ Dir[Rails.root.join("spec/support/shared_contexts/*.rb")].each { |f| require f }
 Dir[Rails.root.join("spec/support/shared_examples/*.rb")].each { |f| require f }
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
+quality_level = Quality::TestLevel.new
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.use_instantiated_fixtures  = false
@@ -53,10 +55,12 @@ RSpec.configure do |config|
   config.display_try_failure_messages = true
 
   config.infer_spec_type_from_file_location!
+  config.full_backtrace = !!ENV['CI']
 
-  config.define_derived_metadata(file_path: %r{/spec/}) do |metadata|
+  config.define_derived_metadata(file_path: %r{(ee)?/spec/.+_spec\.rb\z}) do |metadata|
     location = metadata[:location]
 
+    metadata[:level] = quality_level.level_for(location)
     metadata[:api] = true if location =~ %r{/spec/requests/api/}
 
     # do not overwrite type if it's already set
@@ -83,6 +87,7 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :feature
   config.include LoginHelpers, type: :feature
   config.include SearchHelpers, type: :feature
+  config.include WaitHelpers, type: :feature
   config.include EmailHelpers, :mailer, type: :mailer
   config.include Warden::Test::Helpers, type: :request
   config.include Gitlab::Routing, type: :routing
@@ -136,7 +141,7 @@ RSpec.configure do |config|
       .and_return(false)
   end
 
-  config.before(:example, :quarantine) do
+  config.around(:example, :quarantine) do
     # Skip tests in quarantine unless we explicitly focus on them.
     skip('In quarantine') unless config.inclusion_filter[:quarantine]
   end

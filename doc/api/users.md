@@ -33,7 +33,7 @@ GET /users
 ]
 ```
 
-You can also search for users by email or username with: `/users?search=John`
+You can also search for users by name or primary email using `?search=`. For example. `/users?search=John`.
 
 In addition, you can lookup users by username:
 
@@ -140,8 +140,7 @@ GET /users
     "can_create_project": true,
     "two_factor_enabled": true,
     "external": false,
-    "private_profile": false,
-    "highest_role":10
+    "private_profile": false
   }
 ]
 ```
@@ -257,7 +256,8 @@ Parameters:
   "can_create_project": true,
   "two_factor_enabled": true,
   "external": false,
-  "private_profile": false
+  "private_profile": false,
+  "highest_role":10
 }
 ```
 

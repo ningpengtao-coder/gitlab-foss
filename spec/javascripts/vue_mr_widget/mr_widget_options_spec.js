@@ -21,7 +21,6 @@ describe('mrWidgetOptions', () => {
   const COLLABORATION_MESSAGE = 'Allows commits from members who can merge to the target branch';
 
   beforeEach(() => {
-    gon.features = { approvalRules: false };
     // Prevent component mounting
     delete mrWidgetOptions.el;
 
@@ -32,7 +31,6 @@ describe('mrWidgetOptions', () => {
   });
 
   afterEach(() => {
-    gon.features = null;
     vm.$destroy();
   });
 
@@ -221,44 +219,6 @@ describe('mrWidgetOptions', () => {
 
         it('should be true', () => {
           expect(vm.showMergePipelineForkWarning).toEqual(true);
-        });
-      });
-    });
-
-    describe('showTargetBranchAdvancedError', () => {
-      describe(`when the pipeline's target_sha property doesn't exist`, () => {
-        beforeEach(done => {
-          Vue.set(vm.mr.pipeline, 'target_sha', undefined);
-          Vue.set(vm.mr, 'targetBranchSha', 'abcd');
-          vm.$nextTick(done);
-        });
-
-        it('should be false', () => {
-          expect(vm.showTargetBranchAdvancedError).toEqual(false);
-        });
-      });
-
-      describe(`when the pipeline's target_sha matches the target branch's sha`, () => {
-        beforeEach(done => {
-          Vue.set(vm.mr.pipeline, 'target_sha', 'abcd');
-          Vue.set(vm.mr, 'targetBranchSha', 'abcd');
-          vm.$nextTick(done);
-        });
-
-        it('should be false', () => {
-          expect(vm.showTargetBranchAdvancedError).toEqual(false);
-        });
-      });
-
-      describe(`when the pipeline's target_sha does not match the target branch's sha`, () => {
-        beforeEach(done => {
-          Vue.set(vm.mr.pipeline, 'target_sha', 'abcd');
-          Vue.set(vm.mr, 'targetBranchSha', 'bcde');
-          vm.$nextTick(done);
-        });
-
-        it('should be true', () => {
-          expect(vm.showTargetBranchAdvancedError).toEqual(true);
         });
       });
     });
@@ -584,6 +544,7 @@ describe('mrWidgetOptions', () => {
     ];
     const deploymentMockData = {
       id: 15,
+      iid: 7,
       name: 'review/diplo',
       url: '/root/acets-review-apps/environments/15',
       stop_url: '/root/acets-review-apps/environments/15/stop',
@@ -630,6 +591,7 @@ describe('mrWidgetOptions', () => {
         vm.mr.state = 'merged';
         vm.mr.mergePipeline = {
           id: 127,
+          iid: 35,
           user: {
             id: 1,
             name: 'Administrator',

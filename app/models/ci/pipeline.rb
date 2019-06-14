@@ -166,6 +166,16 @@ module Ci
         end
       end
 
+      after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
+        pipeline.run_after_commit do
+          pipeline.all_merge_requests.each do |merge_request|
+            next unless merge_request.auto_merge_enabled?
+
+            AutoMergeProcessWorker.perform_async(merge_request.id)
+          end
+        end
+      end
+
       after_transition any => [:success, :failed] do |pipeline|
         pipeline.run_after_commit do
           PipelineNotificationWorker.perform_async(pipeline.id)
@@ -642,6 +652,7 @@ module Ci
         variables.append(key: 'CI_COMMIT_MESSAGE', value: git_commit_message.to_s)
         variables.append(key: 'CI_COMMIT_TITLE', value: git_commit_full_title.to_s)
         variables.append(key: 'CI_COMMIT_DESCRIPTION', value: git_commit_description.to_s)
+        variables.append(key: 'CI_COMMIT_REF_PROTECTED', value: (!!protected_ref?).to_s)
 
         if merge_request_event? && merge_request
           variables.append(key: 'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA', value: source_sha.to_s)
@@ -756,6 +767,22 @@ module Ci
 
     def triggered_by?(current_user)
       user == current_user
+    end
+
+    def source_ref
+      if triggered_by_merge_request?
+        merge_request.source_branch
+      else
+        ref
+      end
+    end
+
+    def source_ref_slug
+      Gitlab::Utils.slugify(source_ref.to_s)
+    end
+
+    def find_stage_by_name!(name)
+      stages.find_by!(name: name)
     end
 
     private

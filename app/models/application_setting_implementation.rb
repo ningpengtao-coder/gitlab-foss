@@ -8,7 +8,7 @@ module ApplicationSettingImplementation
                             \s              # any whitespace character
                             |               # or
                             [\r\n]          # any number of newline characters
-                          }x
+                          }x.freeze
 
   # Setting a key restriction to `-1` means that all keys of this type are
   # forbidden.
@@ -21,6 +21,7 @@ module ApplicationSettingImplementation
         after_sign_up_text: nil,
         akismet_enabled: false,
         allow_local_requests_from_hooks_and_services: false,
+        dns_rebinding_protection_enabled: true,
         authorized_keys_enabled: true, # TODO default to false if the instance is configured to use AuthorizedKeysCommand
         container_registry_token_expire_delay: 5,
         default_artifacts_expire_in: '30 days',
@@ -181,6 +182,22 @@ module ApplicationSettingImplementation
   def strip_sentry_values
     sentry_dsn.strip! if sentry_dsn.present?
     clientside_sentry_dsn.strip! if clientside_sentry_dsn.present?
+  end
+
+  def sentry_enabled
+    Gitlab.config.sentry.enabled || read_attribute(:sentry_enabled)
+  end
+
+  def sentry_dsn
+    Gitlab.config.sentry.dsn || read_attribute(:sentry_dsn)
+  end
+
+  def clientside_sentry_enabled
+    Gitlab.config.sentry.enabled || read_attribute(:clientside_sentry_enabled)
+  end
+
+  def clientside_sentry_dsn
+    Gitlab.config.sentry.clientside_dsn || read_attribute(:clientside_sentry_dsn)
   end
 
   def performance_bar_allowed_group

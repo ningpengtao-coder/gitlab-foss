@@ -64,6 +64,7 @@ module Projects
 
       if project.previous_changes.include?(:visibility_level) && project.private?
         # don't enqueue immediately to prevent todos removal in case of a mistake
+        TodosDestroyer::ConfidentialIssueWorker.perform_in(Todo::WAIT_FOR_DELETE, nil, project.id)
         TodosDestroyer::ProjectPrivateWorker.perform_in(Todo::WAIT_FOR_DELETE, project.id)
       elsif (project_changed_feature_keys & todos_features_changes).present?
         TodosDestroyer::PrivateFeaturesWorker.perform_in(Todo::WAIT_FOR_DELETE, project.id)
@@ -79,10 +80,7 @@ module Projects
     end
 
     def after_rename_service(project)
-      # The path slug the project was using, before the rename took place.
-      path_before = project.previous_changes['path'].first
-
-      AfterRenameService.new(project, path_before: path_before, full_path_before: project.full_path_was)
+      AfterRenameService.new(project, path_before: project.path_before_last_save, full_path_before: project.full_path_before_last_save)
     end
 
     def changing_pages_related_config?

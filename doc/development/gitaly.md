@@ -63,6 +63,8 @@ If your test-suite is failing with Gitaly issues, as a first step, try running:
 rm -rf tmp/tests/gitaly
 ```
 
+During rspec tests, the Gitaly instance will write logs to `gitlab/log/gitaly-test.log`.
+
 ## Legacy Rugged code
 
 While Gitaly can handle all Git access, many of GitLab customers still
@@ -80,6 +82,8 @@ most commonly-used RPCs can be enabled via feature flags:
 * `rugged_get_tree_entries`
 * `rugged_tree_entry`
 * `rugged_commit_is_ancestor`
+* `rugged_commit_tree_entry`
+* `rugged_list_commits_by_oid`
 
 A convenience Rake task can be used to enable or disable these flags
 all together. To enable:
@@ -241,7 +245,7 @@ Here are the steps to gate a new feature in Gitaly behind a feature flag.
      // go implementation
    } else {
    	findAllTagsRequests.WithLabelValues("ruby").Inc()
-     // ruby impelmentation
+     // ruby implementation
    }
    ```
 

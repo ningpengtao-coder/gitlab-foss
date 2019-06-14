@@ -66,6 +66,15 @@ module Types
     field :only_allow_merge_if_all_discussions_are_resolved, GraphQL::BOOLEAN_TYPE, null: true
     field :printing_merge_request_link_enabled, GraphQL::BOOLEAN_TYPE, null: true
 
+    field :namespace, Types::NamespaceType, null: false
+    field :group, Types::GroupType, null: true
+
+    field :statistics, Types::ProjectStatisticsType,
+          null: false,
+          resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchProjectStatisticsLoader.new(obj.id).find }
+
+    field :repository, Types::RepositoryType, null: false
+
     field :merge_requests,
           Types::MergeRequestType.connection_type,
           null: true,

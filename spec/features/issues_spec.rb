@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Issues' do
@@ -91,7 +93,7 @@ describe 'Issues' do
         click_button 'Save changes'
 
         page.within('.assignee') do
-          expect(page).to have_content 'No assignee - assign yourself'
+          expect(page).to have_content 'None - assign yourself'
         end
 
         expect(issue.reload.assignees).to be_empty
@@ -208,7 +210,7 @@ describe 'Issues' do
       let(:issue) { @issue }
 
       it 'allows filtering by issues with no specified assignee' do
-        visit project_issues_path(project, assignee_id: IssuableFinder::NONE)
+        visit project_issues_path(project, assignee_id: IssuableFinder::FILTER_NONE)
 
         expect(page).to have_content 'foobar'
         expect(page).not_to have_content 'barbaz'
@@ -465,7 +467,7 @@ describe 'Issues' do
             click_link 'Edit'
             click_link 'Unassigned'
             first('.title').click
-            expect(page).to have_content 'No assignee'
+            expect(page).to have_content 'None'
           end
 
           # wait_for_requests does not work with vue-resource at the moment
@@ -479,7 +481,7 @@ describe 'Issues' do
           visit project_issue_path(project, issue2)
 
           page.within('.assignee') do
-            expect(page).to have_content "No assignee"
+            expect(page).to have_content "None"
           end
 
           page.within '.assignee' do
@@ -522,7 +524,7 @@ describe 'Issues' do
             close_dropdown_menu_if_visible
 
             page.within '.value .assign-yourself' do
-              expect(page).to have_content "No assignee"
+              expect(page).to have_content "None"
             end
           end
         end
@@ -775,10 +777,10 @@ describe 'Issues' do
 
             wait_for_requests
 
-            expect(page).to have_no_content 'No due date'
+            expect(page).to have_no_content 'None'
 
             click_link 'remove due date'
-            expect(page).to have_content 'No due date'
+            expect(page).to have_content 'None'
           end
         end
       end

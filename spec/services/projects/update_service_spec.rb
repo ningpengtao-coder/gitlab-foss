@@ -45,6 +45,7 @@ describe Projects::UpdateService do
 
         it 'updates the project to private' do
           expect(TodosDestroyer::ProjectPrivateWorker).to receive(:perform_in).with(Todo::WAIT_FOR_DELETE, project.id)
+          expect(TodosDestroyer::ConfidentialIssueWorker).to receive(:perform_in).with(Todo::WAIT_FOR_DELETE, nil, project.id)
 
           result = update_project(project, user, visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
@@ -440,6 +441,8 @@ describe Projects::UpdateService do
     context 'when auto devops is set to instance setting' do
       before do
         project.create_auto_devops!(enabled: nil)
+        project.reload
+
         allow(project.auto_devops).to receive(:previous_changes).and_return('enabled' => true)
       end
 

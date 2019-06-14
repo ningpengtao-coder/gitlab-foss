@@ -19,7 +19,7 @@ module Projects
 
             redirect_to project_settings_ci_cd_path(@project)
           else
-            render 'show'
+            redirect_to project_settings_ci_cd_path(@project), alert: result[:message]
           end
         end
       end
@@ -50,7 +50,8 @@ module Projects
           :runners_token, :builds_enabled, :build_allow_git_fetch,
           :build_timeout_human_readable, :build_coverage_regex, :public_builds,
           :auto_cancel_pending_pipelines, :ci_config_path,
-          auto_devops_attributes: [:id, :domain, :enabled, :deploy_strategy]
+          auto_devops_attributes: [:id, :domain, :enabled, :deploy_strategy],
+          ci_cd_settings_attributes: [:default_git_depth]
         )
       end
 

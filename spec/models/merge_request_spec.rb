@@ -31,6 +31,29 @@ describe MergeRequest do
     end
   end
 
+  describe 'locking' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:lock_version) do
+      [
+        [0],
+        ["0"]
+      ]
+    end
+
+    with_them do
+      it 'works when a merge request has a NULL lock_version' do
+        merge_request = create(:merge_request)
+
+        described_class.where(id: merge_request.id).update_all('lock_version = NULL')
+
+        merge_request.update!(lock_version: lock_version, title: 'locking test')
+
+        expect(merge_request.reload.title).to eq('locking test')
+      end
+    end
+  end
+
   describe '#squash_in_progress?' do
     let(:repo_path) do
       Gitlab::GitalyClient::StorageSettings.allow_disk_access do
@@ -147,6 +170,42 @@ describe MergeRequest do
         subject.merge_user = build(:user)
 
         expect(subject).to be_valid
+      end
+    end
+
+    context 'for branch' do
+      before do
+        stub_feature_flags(stricter_mr_branch_name: false)
+      end
+
+      using RSpec::Parameterized::TableSyntax
+
+      where(:branch_name, :valid) do
+        'foo' | true
+        'foo:bar' | false
+        '+foo:bar' | false
+        'foo bar' | false
+        '-foo' | false
+        'HEAD' | true
+        'refs/heads/master' | true
+      end
+
+      with_them do
+        it "validates source_branch" do
+          subject = build(:merge_request, source_branch: branch_name, target_branch: 'master')
+
+          subject.valid?
+
+          expect(subject.errors.added?(:source_branch)).to eq(!valid)
+        end
+
+        it "validates target_branch" do
+          subject = build(:merge_request, source_branch: 'master', target_branch: branch_name)
+
+          subject.valid?
+
+          expect(subject.errors.added?(:target_branch)).to eq(!valid)
+        end
       end
     end
 
@@ -1015,19 +1074,17 @@ describe MergeRequest do
     end
   end
 
-  describe "#reset_merge_when_pipeline_succeeds" do
-    let(:merge_if_green) do
-      create :merge_request, merge_when_pipeline_succeeds: true, merge_user: create(:user),
-                             merge_params: { "should_remove_source_branch" => "1", "commit_message" => "msg" }
-    end
+  describe "#auto_merge_strategy" do
+    subject { merge_request.auto_merge_strategy }
 
-    it "sets the item to false" do
-      merge_if_green.reset_merge_when_pipeline_succeeds
-      merge_if_green.reload
+    let(:merge_request) { create(:merge_request, :merge_when_pipeline_succeeds) }
 
-      expect(merge_if_green.merge_when_pipeline_succeeds).to be_falsey
-      expect(merge_if_green.merge_params["should_remove_source_branch"]).to be_nil
-      expect(merge_if_green.merge_params["commit_message"]).to be_nil
+    it { is_expected.to eq('merge_when_pipeline_succeeds') }
+
+    context 'when auto merge is disabled' do
+      let(:merge_request) { create(:merge_request) }
+
+      it { is_expected.to be_nil }
     end
   end
 
@@ -2123,7 +2180,7 @@ describe MergeRequest do
     end
 
     context 'when merges are not restricted to green builds' do
-      subject { build(:merge_request, target_project: build(:project, only_allow_merge_if_pipeline_succeeds: false)) }
+      subject { build(:merge_request, target_project: create(:project, only_allow_merge_if_pipeline_succeeds: false)) }
 
       context 'and a failed pipeline is associated' do
         before do
@@ -2258,6 +2315,50 @@ describe MergeRequest do
 
       it 'returns an empty array' do
         expect(merge_request.environments_for(user)).to be_empty
+      end
+    end
+  end
+
+  describe "#environments" do
+    subject { merge_request.environments }
+
+    let(:merge_request) { create(:merge_request, source_branch: 'feature', target_branch: 'master') }
+    let(:project) { merge_request.project }
+
+    let(:pipeline) do
+      create(:ci_pipeline,
+        source: :merge_request_event,
+        merge_request: merge_request, project: project,
+        sha: merge_request.diff_head_sha,
+        merge_requests_as_head_pipeline: [merge_request])
+    end
+
+    let!(:job) { create(:ci_build, :start_review_app, pipeline: pipeline, project: project) }
+
+    it 'returns environments' do
+      is_expected.to eq(pipeline.environments)
+      expect(subject.count).to be(1)
+    end
+
+    context 'when pipeline is not associated with environments' do
+      let!(:job) { create(:ci_build, pipeline: pipeline, project: project) }
+
+      it 'returns empty array' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when pipeline is not a pipeline for merge request' do
+      let(:pipeline) do
+        create(:ci_pipeline,
+          project: project,
+          ref: 'feature',
+          sha: merge_request.diff_head_sha,
+          merge_requests_as_head_pipeline: [merge_request])
+      end
+
+      it 'returns empty relation' do
+        is_expected.to be_empty
       end
     end
   end
