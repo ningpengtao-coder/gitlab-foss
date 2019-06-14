@@ -11,6 +11,7 @@ class PrometheusMetric < ApplicationRecord
     nginx: -4,
     kubernetes: -5,
     nginx_ingress: -6,
+    cluster_health: -7,
 
     # custom/user groups
     business: 0,
@@ -50,6 +51,11 @@ class PrometheusMetric < ApplicationRecord
       required_metrics: %w(container_memory_usage_bytes container_cpu_usage_seconds_total),
       priority: 5
     }.freeze,
+    cluster_health: {
+      group_title: _('Cluster Health'),
+      required_metrics: %w(container_cpu_usage_seconds_total container_memory_usage_bytes),
+      priority: 10
+    },
 
     # custom/user groups
     business: {
