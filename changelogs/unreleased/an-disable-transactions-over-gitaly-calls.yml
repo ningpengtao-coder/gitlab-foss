@@ -1,0 +1,5 @@
+---
+title: Disallow Gitaly calls when an active transaction is pending
+merge_request: 29774
+author:
+type: other

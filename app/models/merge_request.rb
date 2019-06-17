@@ -667,7 +667,7 @@ class MergeRequest < ApplicationRecord
     fetch_ref!
 
     # n+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/37435
-    Gitlab::GitalyClient.allow_n_plus_1_calls do
+    Gitlab::GitalyClient.allow_n_plus_1_calls(override_transaction_safety: true) do
       merge_request_diffs.create!
       reload_merge_request_diff
     end
@@ -880,10 +880,12 @@ class MergeRequest < ApplicationRecord
     return unless project.issues_enabled?
     return if closed? || merged?
 
+    issues_to_be_closed = closes_issues(current_user)
+
     transaction do
       self.merge_requests_closing_issues.delete_all
 
-      closes_issues(current_user).each do |issue|
+      issues_to_be_closed.each do |issue|
         next if issue.is_a?(ExternalIssue)
 
         self.merge_requests_closing_issues.create!(issue: issue)

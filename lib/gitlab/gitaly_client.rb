@@ -285,7 +285,9 @@ module Gitlab
     end
     private_class_method :enforce_gitaly_request_limits?
 
-    def self.allow_n_plus_1_calls
+    def self.allow_n_plus_1_calls(override_transaction_safety: false)
+      raise "Allowing Gitaly n+1 calls from within an active transaction is not allowed." if !override_transaction_safety && Gitlab::Database.inside_transaction?
+
       return yield unless Gitlab::SafeRequestStore.active?
 
       begin
