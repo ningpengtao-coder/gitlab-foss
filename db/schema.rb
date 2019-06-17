@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190613030606) do
+ActiveRecord::Schema.define(version: 20190617181054) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2098,6 +2098,7 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.integer "extra_shared_runners_minutes_limit"
     t.string "ldap_sync_status", default: "ready", null: false
     t.boolean "membership_lock", default: false
+    t.integer "root_id"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree

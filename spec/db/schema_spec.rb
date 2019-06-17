@@ -46,7 +46,7 @@ describe 'Database schema' do
     ldap_group_links: %w[group_id],
     members: %w[source_id created_by_id],
     merge_requests: %w[last_edited_by_id state_id],
-    namespaces: %w[owner_id parent_id],
+    namespaces: %w[owner_id parent_id root_id],
     notes: %w[author_id commit_id noteable_id updated_by_id resolved_by_id discussion_id],
     notification_settings: %w[source_id],
     oauth_access_grants: %w[resource_owner_id application_id],
