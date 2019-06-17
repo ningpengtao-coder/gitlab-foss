@@ -267,24 +267,34 @@ epic](https://gitlab.com/groups/gitlab-org/-/epics/1201).
 
 ## Troubleshooting applications
 
-Applications can fail with the following error:
+1. Applications can fail with the following error:
 
-```text
-Error: remote error: tls: bad certificate
-```
+    ```text
+    Error: remote error: tls: bad certificate
+    ```
 
-To avoid installation errors:
+    To avoid installation errors:
 
-- Before starting the installation of applications, make sure that time is synchronized
-  between your GitLab server and your Kubernetes cluster.
-- Ensure certificates are not out of sync. When installing applications, GitLab expects a new cluster with no previous installation of Helm.
+    - Before starting the installation of applications, make sure that time is synchronized
+    between your GitLab server and your Kubernetes cluster.
+    - Ensure certificates are not out of sync. When installing applications, GitLab expects a new cluster with no previous installation of Helm.
 
-  You can confirm that the certificates match via `kubectl`:
+    You can confirm that the certificates match via `kubectl`:
 
-  ```sh
-  kubectl get configmaps/values-content-configuration-ingress -n gitlab-managed-apps -o \
-  "jsonpath={.data['cert\.pem']}" | base64 -d > a.pem
-  kubectl get secrets/tiller-secret -n gitlab-managed-apps -o "jsonpath={.data['ca\.crt']}" | base64 -d > b.pem
-  diff a.pem b.pem
-  ```
+    ```sh
+    kubectl get configmaps/values-content-configuration-ingress -n gitlab-managed-apps -o \
+    "jsonpath={.data['cert\.pem']}" | base64 -d > a.pem
+    kubectl get secrets/tiller-secret -n gitlab-managed-apps -o "jsonpath={.data['ca\.crt']}" | base64 -d > b.pem
+    diff a.pem b.pem
+    ```
+
+1. Installation of helm or other applications can fail with the following error within a cluster created in Jelastic environment:
+
+    ```text
+    Get XYZ.COM: x509: certificate is valid for *.gitlab.domain.tld, gitlab.domain.tld, not XYZ.COM
+    ```
+
+    To fix it, in `/etc/resolv.conf` file on your Master and Worker nodes you need to search and remove `search XYZ.com` entry. Note that it will be necessary to remove it every time after a restart as it gets added by Jelastic automatically.
+
+
 
