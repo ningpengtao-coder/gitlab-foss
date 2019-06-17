@@ -10,10 +10,13 @@ plugins:
   - import
   - html
   - "@gitlab/i18n"
+  - vue-i18n
 settings:
   import/resolver:
     webpack:
       config: './config/webpack.config.js'
+  vue-i18n:
+    localeDir: './app/assets/javascripts/locale/gitlab.pot'      
 rules:
   "@gitlab/i18n/no-non-i18n-strings": error
   import/no-commonjs: error
@@ -34,11 +37,18 @@ rules:
   vue/no-use-v-if-with-v-for: off
   vue/no-v-html: off
   vue/use-v-on-exact: off
+  # disable additional rules appearing with vue-i18n
+  vue/attributes-order: off
+  vue/valid-template-root: off
+  vue/require-component-is: off  
+  vue-i18n/no-missing-keys: error
+  vue-i18n/no-dynamic-keys: error
+  vue-i18n/no-unused-keys:
+    - error
+    - extensions: [.vue]
+  vue-i18n/no-bare-strings: error  
 overrides:
   files:
-    # Vue is temporarily being disabled until the autofix errors are resolved
-    # Follow up issue https://gitlab.com/gitlab-org/gitlab-ce/issues/57969
-    - '*.vue'
     - '**/spec/**/*'
   rules:
     "@gitlab/i18n/no-non-i18n-strings": off
