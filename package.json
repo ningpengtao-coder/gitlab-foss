@@ -26,7 +26,8 @@
     "test": "node scripts/frontend/test",
     "webpack": "NODE_OPTIONS=\"--max-old-space-size=3584\" webpack --config config/webpack.config.js",
     "webpack-prod": "NODE_OPTIONS=\"--max-old-space-size=3584\" NODE_ENV=production webpack --config config/webpack.config.js",
-    "webpack-vrt": "NODE_OPTIONS=\"--max-old-space-size=3584\" NODE_ENV=production webpack --config config/webpack.config.review_toolbar.js"
+    "webpack-vrt": "NODE_OPTIONS=\"--max-old-space-size=3584\" NODE_ENV=production webpack --config config/webpack.config.review_toolbar.js",
+    "fix-i18n-imports": "jscodeshift -v 2 -t ./transform.js"
   },
   "dependencies": {
     "@babel/core": "^7.4.4",
@@ -195,6 +196,7 @@
     "stylelint-config-recommended": "^2.1.0",
     "stylelint-scss": "^3.5.4",
     "vue-jest": "^4.0.0-beta.2",
+    "vue-jscodeshift-adapter": "^2.0.2",
     "webpack-dev-server": "^3.1.14",
     "yarn-deduplicate": "^1.1.1"
   },
