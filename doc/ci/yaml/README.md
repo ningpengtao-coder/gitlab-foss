@@ -2213,6 +2213,10 @@ spinach:
   script: rake spinach
 ```
 
+#### Multiple `extends`
+
+> Introduced in GitLab 12.0
+
 It's also possible to use multiple parents for `extends`.
 The algorithm used for merge is "closest scope wins", so keys
 from the last member will always shadow anything defined on other levels.
