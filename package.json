@@ -48,7 +48,6 @@
     "autosize": "^4.0.0",
     "axios": "^0.17.1",
     "babel-loader": "^8.0.5",
-    "bootstrap": "4.3.1",
     "brace-expansion": "^1.1.8",
     "cache-loader": "^2.0.1",
     "chart.js": "2.7.2",
@@ -143,6 +142,9 @@
     "webpack-stats-plugin": "^0.2.1",
     "worker-loader": "^2.0.0",
     "xterm": "^3.5.0"
+  },
+  "peerDependencies": {
+    "bootstrap": "^4.3.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.2.0",
