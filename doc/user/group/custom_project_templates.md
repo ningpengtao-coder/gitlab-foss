@@ -9,12 +9,19 @@ type: reference
 When you create a new [project](../project/index.md), creating it based on custom project templates is
 a convenient bootstrap option.
 
+When a group-level project template is used, the following is copied into new
+projects:
+
+- Project settings.
+- Project files.
+
+This is in contrast to
+[instance-level project templates](../admin_area/custom_project_templates.md),
+which copy data as if GitLab's project
+[Import/Export feature](../project/settings/import_export.md) was used.
+
 Users can configure a GitLab group that serves as template
 source under a group's **Settings > General > Custom project templates**.
-
-NOTE: **Note:**
-GitLab administrators can
-[set project templates for an entire GitLab instance](../admin_area/custom_project_templates.md).
 
 Within this section, you can configure the group where all the custom project
 templates are sourced. Every project directly under the group namespace will be
@@ -25,9 +32,6 @@ However, private projects will be available only if the user is a member of the 
 
 NOTE: **Note:**
 Projects of nested subgroups of a selected template source cannot be used.
-
-Repository and database information that are copied over to each new project are
-identical to the data exported with [GitLab's Project Import/Export](../project/settings/import_export.md).
 
 <!-- ## Troubleshooting
 
