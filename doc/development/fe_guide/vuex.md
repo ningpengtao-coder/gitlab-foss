@@ -25,7 +25,7 @@ The following example shows an application that lists and adds users to the stat
 (For a more complex example implementation take a look at the security applications store in [here](https://gitlab.com/gitlab-org/gitlab-ee/tree/master/ee/app/assets/javascripts/vue_shared/security_reports/store))
 
 ### `index.js`
-This is the entry point for our store. You can use the following as a guide:
+This is the entry point for our store. Please do not instantiate the store here. The store instance should be managed in the root of the application [as seen below](#Communicating-with-the-Store). You can use the following as a guide:
 
 ```javascript
 import Vue from 'vue';
@@ -43,7 +43,37 @@ export const createStore = () => new Vuex.Store({
   mutations,
   state,
 });
-export default createStore();
+```
+
+```javascript
+import Vue from 'vue';
+import ErrorTrackingSettings from './components/app.vue';
+import createStore from './store';
+
+export default () => {
+  const formContainerEl = document.querySelector('.js-error-tracking-form');
+  const {
+    dataset: { apiHost, enabled, project, token, listProjectsEndpoint, operationsSettingsEndpoint },
+  } = formContainerEl;
+
+  return new Vue({
+    el: formContainerEl,
+    store: createStore(),
+    render(createElement) {
+      return createElement(ErrorTrackingSettings, {
+        props: {
+          initialApiHost: apiHost,
+          initialEnabled: enabled,
+          initialProject: project,
+          initialToken: token,
+          listProjectsEndpoint,
+          operationsSettingsEndpoint,
+        },
+      });
+    },
+  });
+};
+
 ```
 
 ### `state.js`
@@ -241,13 +271,37 @@ The store should be included in the main component of your application:
 ```
 
 ### Communicating with the Store
+
+Initialize the store at the root of your application:
+
+#### `root.js`
+```javascript
+import MyComponent from '(...)/my_component.vue';
+import { createStore } from '(...)/store/index.js';
+
+export const initComponent(el) => {
+    new Vue({
+        el,
+        name: 'MyApp',
+        store: createStore(),
+        components: { MyComponent },
+        render(createElement) {
+            return createElement('my-component');
+        },
+    })
+}
+```
+
+### `my_component.vue`
+
+You can then access the store by using `mapActions`, `mapState` and `mapGetters`.
+
 ```javascript
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import store from './store';
 
 export default {
-  store,
+  name: 'MyComponent'
   computed: {
     ...mapGetters([
       'getUsersWithPets'
@@ -293,6 +347,9 @@ export default {
   </ul>
 </template>
 ```
+
+If you need to, you can use `this.$store` in any child of the root Vue app.
+
 
 ### Vuex Gotchas
 
