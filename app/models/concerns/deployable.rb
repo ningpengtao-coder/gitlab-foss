@@ -4,8 +4,6 @@ module Deployable
   extend ActiveSupport::Concern
 
   included do
-    after_create :create_deployment
-
     def create_deployment
       return unless starts_environment? && !has_deployment?
 

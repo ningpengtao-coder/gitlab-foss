@@ -100,6 +100,10 @@ describe EnvironmentStatus do
     let(:environment) { build.deployment.environment }
     let(:user) { project.owner }
 
+    before do
+      build.create_deployment
+    end
+
     context 'when environment is created on a forked project' do
       let(:project) { create(:project, :repository) }
       let(:forked) { fork_project(project, user, repository: true) }

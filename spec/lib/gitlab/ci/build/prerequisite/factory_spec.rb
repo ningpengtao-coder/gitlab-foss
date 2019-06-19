@@ -3,32 +3,39 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Build::Prerequisite::Factory do
-  let(:build) { create(:ci_build) }
+  let(:build) { instance_double(Ci::Build) }
 
-  describe '.for_build' do
+  describe '.prerequisites' do
+    it 'returns KubernetesNamespace and Deployment' do
+      expect(described_class.prerequisites).to contain_exactly(
+        Gitlab::Ci::Build::Prerequisite::KubernetesNamespace,
+        Gitlab::Ci::Build::Prerequisite::Deployment
+      )
+    end
+  end
+
+  describe '#unmet' do
     let(:kubernetes_namespace) do
       instance_double(
         Gitlab::Ci::Build::Prerequisite::KubernetesNamespace,
-        unmet?: unmet)
+        unmet?: true)
     end
 
-    subject { described_class.new(build).unmet }
+    let(:deployment) do
+      instance_double(
+        Gitlab::Ci::Build::Prerequisite::Deployment,
+        unmet?: false)
+    end
 
-    before do
+    it 'returns only unmet prerequisites' do
       expect(Gitlab::Ci::Build::Prerequisite::KubernetesNamespace)
         .to receive(:new).with(build).and_return(kubernetes_namespace)
-    end
+      expect(Gitlab::Ci::Build::Prerequisite::Deployment)
+        .to receive(:new).with(build).and_return(deployment)
 
-    context 'prerequisite is unmet' do
-      let(:unmet) { true }
+      unmet = described_class.new(build).unmet
 
-      it { is_expected.to eq [kubernetes_namespace] }
-    end
-
-    context 'prerequisite is met' do
-      let(:unmet) { false }
-
-      it { is_expected.to be_empty }
+      expect(unmet).to contain_exactly(kubernetes_namespace)
     end
   end
 end

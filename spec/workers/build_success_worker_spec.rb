@@ -31,10 +31,12 @@ describe BuildSuccessWorker do
         end
       end
 
-      context 'when deployment was created with the build creation' do # Counter part of the above edge case
+      context 'when deployment was already created' do # Counter part of the above edge case
         let!(:build) { create(:ci_build, :deploy_to_production) }
 
         it 'does not create a new deployment' do
+          build.create_deployment
+
           expect(build).to be_has_deployment
 
           expect { subject }.not_to change { Deployment.count }

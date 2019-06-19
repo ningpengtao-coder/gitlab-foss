@@ -23,6 +23,7 @@ describe UpdateDeploymentService do
 
   before do
     allow(Deployments::FinishedWorker).to receive(:perform_async)
+    job.create_deployment
     job.success! # Create/Succeed deployment
   end
 

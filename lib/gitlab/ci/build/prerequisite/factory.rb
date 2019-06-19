@@ -8,7 +8,10 @@ module Gitlab
           attr_reader :build
 
           def self.prerequisites
-            [KubernetesNamespace]
+            [
+              Gitlab::Ci::Build::Prerequisite::KubernetesNamespace,
+              Gitlab::Ci::Build::Prerequisite::Deployment
+            ]
           end
 
           def initialize(build)

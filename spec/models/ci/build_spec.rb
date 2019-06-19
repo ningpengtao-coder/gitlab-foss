@@ -182,33 +182,22 @@ describe Ci::Build do
   end
 
   describe '#enqueue' do
-    let(:build) { create(:ci_build, :created) }
+    it 'transitions to preparing if build has unmet prerequisites' do
+      build = create(:ci_build, :start_review_app, status: 'created')
+      expect(Ci::BuildPrepareWorker).to receive(:perform_async).with(build.id)
 
-    subject { build.enqueue }
+      build.enqueue
 
-    before do
-      allow(build).to receive(:any_unmet_prerequisites?).and_return(has_prerequisites)
-      allow(Ci::PrepareBuildService).to receive(:perform_async)
+      expect(build).to be_preparing
     end
 
-    context 'build has unmet prerequisites' do
-      let(:has_prerequisites) { true }
+    it 'transitions to pending if build has no unmet prerequisites' do
+      build = create(:ci_build, :created)
+      expect(Ci::BuildPrepareWorker).not_to receive(:perform_async).with(build.id)
 
-      it 'transitions to preparing' do
-        subject
+      build.enqueue
 
-        expect(build).to be_preparing
-      end
-    end
-
-    context 'build has no prerequisites' do
-      let(:has_prerequisites) { false }
-
-      it 'transitions to pending' do
-        subject
-
-        expect(build).to be_pending
-      end
+      expect(build).to be_pending
     end
   end
 
@@ -374,6 +363,7 @@ describe Ci::Build do
       context 'build has unmet prerequisites' do
         before do
           allow(build).to receive(:prerequisites).and_return([double])
+          expect(Ci::BuildPrepareWorker).to receive(:perform_async).with(build.id)
         end
 
         it 'transits to preparing' do
@@ -791,13 +781,9 @@ describe Ci::Build do
       allow(Deployments::FinishedWorker).to receive(:perform_async)
     end
 
-    it 'has deployments record with created status' do
-      expect(deployment).to be_created
-      expect(environment.name).to eq('review/master')
-    end
-
     context 'when transits to running' do
       before do
+        build.create_deployment
         build.run!
       end
 
@@ -809,6 +795,7 @@ describe Ci::Build do
     context 'when transits to success' do
       before do
         allow(Deployments::SuccessWorker).to receive(:perform_async)
+        build.create_deployment
         build.success!
       end
 
@@ -819,6 +806,7 @@ describe Ci::Build do
 
     context 'when transits to failed' do
       before do
+        build.create_deployment
         build.drop!
       end
 
@@ -829,6 +817,7 @@ describe Ci::Build do
 
     context 'when transits to skipped' do
       before do
+        build.create_deployment
         build.skip!
       end
 
@@ -839,6 +828,7 @@ describe Ci::Build do
 
     context 'when transits to canceled' do
       before do
+        build.create_deployment
         build.cancel!
       end
 
@@ -1781,7 +1771,8 @@ describe Ci::Build do
     end
 
     context 'when build has a start environment' do
-      let(:build) { create(:ci_build, :deploy_to_production, pipeline: pipeline) }
+      let(:deployment) { create(:deployment) }
+      let(:build) { create(:ci_build, :deploy_to_production, pipeline: pipeline, deployment: deployment) }
 
       it 'does not expand environment name' do
         expect(build).not_to receive(:expanded_environment_name)

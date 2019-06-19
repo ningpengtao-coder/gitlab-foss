@@ -125,6 +125,7 @@ describe Ci::StopEnvironmentsService do
     let!(:stop_review_job) { create(:ci_build, :stop_review_app, :manual, pipeline: pipeline, project: project) }
 
     before do
+      review_job.create_deployment
       review_job.deployment.success!
     end
 
