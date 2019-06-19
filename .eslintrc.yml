@@ -47,6 +47,7 @@ rules:
     - error
     - extensions: [.vue]
   vue-i18n/no-bare-strings: error  
+  vue-i18n/no-bare-attribute-strings: error  
 overrides:
   files:
     - '**/spec/**/*'

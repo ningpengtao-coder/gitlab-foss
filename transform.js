@@ -7,7 +7,7 @@ const pkg = `~/locale`;
 
 const isExternalizationCall = exp => exp.value.callee.name === extFunc;
 const hasExternalizationCall = ({ root, j }) =>
-  !!root.find(j.CallExpression).filter(isExternalizationCall);
+  Boolean(root.find(j.CallExpression).filter(isExternalizationCall));
 
 const externalizationImportFilter = {
   imported: {
