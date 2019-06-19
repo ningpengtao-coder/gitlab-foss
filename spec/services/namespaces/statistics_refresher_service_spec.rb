@@ -73,7 +73,7 @@ describe Namespaces::StatisticsRefresherService, '#execute' do
     context 'when something goes wrong' do
       before do
         allow_any_instance_of(Namespace::RootStorageStatistics)
-          .to receive(:update).and_raise(ActiveRecord::ActiveRecordError)
+          .to receive(:recalculate!).and_raise(ActiveRecord::ActiveRecordError)
       end
 
       it 'raises RefreshError' do
