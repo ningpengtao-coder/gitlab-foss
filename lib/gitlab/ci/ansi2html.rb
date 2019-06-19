@@ -196,11 +196,18 @@ module Gitlab
         def handle_new_line
           css_classes = []
 
+          css_classes_for_br = []
+
           if @sections.any?
             css_classes = %w[section line] + sections.map { |section| "s_#{section}" }
           end
 
-          write_in_tag %{<br/>}
+          # Section classes should not apply to the first newline, so it stays visible after closing a section
+          unless beginning_of_section?
+            css_classes_for_br = section_classes(sections)
+          end
+
+          write_raw %{<span class="#{css_classes_for_br.join(' ')}"><br/></span>}
           write_raw %{<span class="#{css_classes.join(' ')}"></span>} if css_classes.any?
           @lineno_in_section += 1
           open_new_tag
@@ -310,12 +317,16 @@ module Gitlab
 
           if @sections.any?
             css_classes << "section"
-            css_classes << "js-section-header section-header" if @lineno_in_section == 0
-            css_classes += sections.map { |section| "js-s-#{section}" }
+            css_classes << "js-section-header section-header" if beginning_of_section?
+            css_classes += section_classes(sections)
           end
 
           @out << %{<span class="#{css_classes.join(' ')}">}
           @n_open_tags += 1
+        end
+
+        def beginning_of_section?
+          @lineno_in_section == 0
         end
 
         def close_open_tags
@@ -372,6 +383,10 @@ module Gitlab
 
         def set_bg_color(color_index, prefix = nil)
           @bg_color = get_term_color_class(color_index, ["bg", prefix])
+        end
+
+        def section_classes(sections)
+          sections.map { |section| "js-s-#{section}" }
         end
 
         def get_term_color_class(color_index, prefix)
