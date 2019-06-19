@@ -25,12 +25,9 @@ class Namespace::RootStorageStatistics < ApplicationRecord
       )
   end
 
-  def from_project_statistics_or_initialize
-    from_project_statistics.take || self.class.new
-  end
-
   def attributes_from_project_statistics
-    from_project_statistics_or_initialize
+    from_project_statistics
+      .take
       .attributes
       .slice(*%w[storage_size repository_size wiki_size lfs_objects_size build_artifacts_size packages_size])
   end
