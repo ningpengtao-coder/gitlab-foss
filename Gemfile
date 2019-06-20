@@ -300,7 +300,8 @@ gem 'peek-pg', '~> 1.3.0', group: :postgres
 gem 'peek-rblineprof', '~> 0.2.0'
 gem 'peek-redis', '~> 1.2.0'
 
-gem 'derailed_benchmarks', require: false
+# [WIP] temporary require gem
+gem 'derailed_benchmarks', require: true
 
 # Metrics
 group :metrics do
