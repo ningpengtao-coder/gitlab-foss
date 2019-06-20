@@ -70,18 +70,20 @@ The following quick actions are applicable for commit messages:
 
 The following quick actions are applicable for epics threads and description:
 
-| Command                    | Action                                  |
-|:---------------------------|:----------------------------------------|
-| `/tableflip <Comment>`     | Append the comment with `(╯°□°)╯︵ ┻━┻` |
-| `/shrug <Comment>`         | Append the comment with `¯\＿(ツ)＿/¯`  |
-| `/todo`                    | Add a todo                              |
-| `/done`                    | Mark todo as done                       |
-| `/subscribe`               | Subscribe                               |
-| `/unsubscribe`             | Unsubscribe                             |
-| `/close`                   | Close                                   |
-| `/reopen`                  | Reopen                                  |
-| `/title <New title>`       | Change title                            |
-| `/award :emoji:`           | Toggle emoji award                      |
-| `/label ~label1 ~label2`   | Add label(s)                            |
-| `/unlabel ~label1 ~label2` | Remove all or specific label(s)         |
-| `/relabel ~label1 ~label2` | Replace label                           |
+| Command                            | Action                                                                                                          |
+|:-----------------------------------|:----------------------------------------------------------------------------------------------------------------|
+| `/tableflip <Comment>`             | Append the comment with `(╯°□°)╯︵ ┻━┻`                                                                         |
+| `/shrug <Comment>`                 | Append the comment with `¯\＿(ツ)＿/¯`                                                                          |
+| `/todo`                            | Add a todo                                                                                                      |
+| `/done`                            | Mark todo as done                                                                                               |
+| `/subscribe`                       | Subscribe                                                                                                       |
+| `/unsubscribe`                     | Unsubscribe                                                                                                     |
+| `/close`                           | Close                                                                                                           |
+| `/reopen`                          | Reopen                                                                                                          |
+| `/title <New title>`               | Change title                                                                                                    |
+| `/award :emoji:`                   | Toggle emoji award                                                                                              |
+| `/label ~label1 ~label2`           | Add label(s)                                                                                                    |
+| `/unlabel ~label1 ~label2`         | Remove all or specific label(s)                                                                                 |
+| `/relabel ~label1 ~label2`         | Replace label                                                                                                   |
+| `/child_epic <epic_number>`        | Adds child epic to epic ([introduced in GitLab 12.0](https://gitlab.com/gitlab-org/gitlab-ee/issues/7330))      |
+| `/remove_child_epic <epic_number>` | Removes child epic from epic ([introduced in GitLab 12.0](https://gitlab.com/gitlab-org/gitlab-ee/issues/7330)) |
