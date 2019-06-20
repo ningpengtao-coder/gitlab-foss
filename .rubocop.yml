@@ -218,3 +218,5 @@ ThreadSafety/NewThread:
   Exclude:
     - 'db/post_migrate/**/*'
     - 'db/migrate/**/*'
+    - 'spec/**/*'
+    - 'qa/**/*'
