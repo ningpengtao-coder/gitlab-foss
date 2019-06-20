@@ -671,12 +671,16 @@ class Project < ApplicationRecord
   end
 
   def has_auto_devops_implicitly_enabled?
+    return false unless any_runners?
+
     auto_devops_config = first_auto_devops_config
 
     auto_devops_config[:scope] != :project && auto_devops_config[:status]
   end
 
   def has_auto_devops_implicitly_disabled?
+    return true unless any_runners?
+
     auto_devops_config = first_auto_devops_config
 
     auto_devops_config[:scope] != :project && !auto_devops_config[:status]
