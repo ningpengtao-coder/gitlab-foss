@@ -19,6 +19,7 @@ import { GlTooltip } from '@gitlab/ui';
 import defaultAvatarUrl from 'images/no_avatar.png';
 import { __ } from '~/locale';
 import { placeholderImage } from '../../../lazy_loader';
+import { __ } from '~/locale';
 
 export default {
   name: 'UserAvatarImage',
@@ -98,7 +99,7 @@ export default {
       :alt="imgAlt"
       :data-src="sanitizedSource"
       class="avatar"
-    />
+    >
     <gl-tooltip
       v-if="tooltipText || $slots.default"
       :target="() => $refs.userAvatarImage"
@@ -106,7 +107,7 @@ export default {
       boundary="window"
       class="js-user-avatar-image-toolip"
     >
-      <slot> {{ tooltipText }} </slot>
+      <slot>{{ tooltipText }}</slot>
     </gl-tooltip>
   </span>
 </template>

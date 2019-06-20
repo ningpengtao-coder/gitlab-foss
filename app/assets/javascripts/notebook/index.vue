@@ -39,6 +39,7 @@ export default {
   },
   methods: {
     cellType(type) {
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       return `${type}-cell`;
     },
   },

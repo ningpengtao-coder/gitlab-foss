@@ -84,7 +84,7 @@ export default {
         .removeSourceBranch()
         .then(res => res.data)
         .then(data => {
-          if (data.message === 'Branch was deleted') {
+          if (data.message === __('Branch was deleted')) {
             eventHub.$emit('MRWidgetUpdateRequested', () => {
               this.isMakingRequest = false;
             });

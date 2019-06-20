@@ -25,6 +25,7 @@ export default {
   },
   computed: {
     imgSrc() {
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       return `data:${this.outputType};base64,${this.rawCode}`;
     },
     showOutput() {
@@ -36,6 +37,7 @@ export default {
 
 <template>
   <div class="output">
-    <prompt type="out" :count="count" :show-output="showOutput" /> <img :src="imgSrc" />
+    <prompt type="out" :count="count" :show-output="showOutput"/>
+    <img :src="imgSrc">
   </div>
 </template>

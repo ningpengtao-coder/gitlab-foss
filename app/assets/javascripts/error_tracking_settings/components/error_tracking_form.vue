@@ -39,7 +39,7 @@ export default {
           <gl-form-input
             id="error-tracking-api-host"
             :value="apiHost"
-            placeholder="https://mysentryserver.com"
+            :placeholder="__(`https://mysentryserver.com`)"
             @input="$emit('update-api-host', $event)"
           />
         </div>

@@ -78,6 +78,7 @@ export default {
       return percent;
     },
     barStyle(percent) {
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       return `width: ${percent}%;`;
     },
     getTooltip(label, count) {
@@ -89,7 +90,7 @@ export default {
 
 <template>
   <div :class="cssClass" class="stacked-progress-bar">
-    <span v-if="!totalCount" class="status-unavailable"> {{ __('Not available') }} </span>
+    <span v-if="!totalCount" class="status-unavailable">{{ __('Not available') }}</span>
     <span
       v-if="successPercent"
       v-tooltip
@@ -97,9 +98,7 @@ export default {
       :style="successBarStyle"
       class="status-green"
       data-placement="bottom"
-    >
-      {{ successPercent }}%
-    </span>
+    >{{ successPercent }}%</span>
     <span
       v-if="neutralPercent"
       v-tooltip
@@ -107,9 +106,7 @@ export default {
       :style="neutralBarStyle"
       class="status-neutral"
       data-placement="bottom"
-    >
-      {{ neutralPercent }}%
-    </span>
+    >{{ neutralPercent }}%</span>
     <span
       v-if="failurePercent"
       v-tooltip
@@ -117,8 +114,6 @@ export default {
       :style="failureBarStyle"
       class="status-red"
       data-placement="bottom"
-    >
-      {{ failurePercent }}%
-    </span>
+    >{{ failurePercent }}%</span>
   </div>
 </template>

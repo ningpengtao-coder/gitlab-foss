@@ -43,6 +43,7 @@ renderer.paragraph = t => {
   if (typeof katex !== 'undefined') {
     const katexString = text
       .replace(/&amp;/g, '&')
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       .replace(/&=&/g, '\\space=\\space')
       .replace(/<(\/?)em>/g, '_');
     const regex = new RegExp(katexRegexString, 'gi');
@@ -99,7 +100,7 @@ export default {
 
 <template>
   <div class="cell text-cell">
-    <prompt />
+    <prompt/>
     <div class="markdown" v-html="markdown"></div>
   </div>
 </template>

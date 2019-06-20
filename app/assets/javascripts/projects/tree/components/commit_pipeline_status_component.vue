@@ -1,4 +1,5 @@
 <script>
+import { __ } from "~/locale";
 import Visibility from 'visibilityjs';
 import ciIcon from '~/vue_shared/components/ci_icon.vue';
 import Poll from '~/lib/utils/poll';

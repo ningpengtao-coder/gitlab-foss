@@ -3,6 +3,7 @@ import $ from 'jquery';
 import 'select2';
 
 export default {
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   name: 'Select2Select',
   props: {
     options: {
@@ -31,5 +32,5 @@ export default {
 </script>
 
 <template>
-  <input ref="dropdownInput" type="hidden" />
+  <input ref="dropdownInput" type="hidden">
 </template>

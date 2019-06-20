@@ -17,6 +17,7 @@
 import { __ } from '~/locale';
 import defaultAvatarUrl from 'images/no_avatar.png';
 import { placeholderImage } from '../../../lazy_loader';
+import { __ } from '~/locale';
 
 export default {
   name: 'ProjectAvatarImage',
@@ -77,5 +78,5 @@ export default {
     :alt="imgAlt"
     :data-src="sanitizedSource"
     class="avatar"
-  />
+  >
 </template>

@@ -78,8 +78,7 @@ export default {
           v-if="rawPath"
           :href="rawPath"
           class="js-raw-link text-plain text-underline prepend-left-5"
-          >{{ s__('Job|Complete Raw') }}</gl-link
-        >
+        >{{ s__('Job|Complete Raw') }}</gl-link>
       </template>
     </div>
     <!-- eo truncate information -->
@@ -93,7 +92,7 @@ export default {
         :href="rawPath"
         class="js-raw-link-controller controllers-buttons"
       >
-        <icon name="doc-text" />
+        <icon name="doc-text"/>
       </gl-link>
 
       <gl-link
@@ -105,7 +104,7 @@ export default {
         class="js-erase-link controllers-buttons"
         data-method="post"
       >
-        <icon name="remove" />
+        <icon name="remove"/>
       </gl-link>
       <!-- eo links -->
 
@@ -117,7 +116,7 @@ export default {
           class="js-scroll-top btn-scroll btn-transparent btn-blank"
           @click="handleScrollToTop"
         >
-          <icon name="scroll_up" />
+          <icon name="scroll_up"/>
         </gl-button>
       </div>
 

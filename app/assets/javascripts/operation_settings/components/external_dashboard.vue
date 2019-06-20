@@ -54,7 +54,7 @@ export default {
         >
           <gl-form-input
             v-model="userDashboardUrl"
-            placeholder="https://my-org.gitlab.io/my-dashboards"
+            :placeholder="__(`https://my-org.gitlab.io/my-dashboards`)"
             @keydown.enter.native.prevent="updateExternalDashboardUrl"
           />
         </gl-form-group>

@@ -42,6 +42,6 @@ export default {
     :class="{ disabled: disabled }"
     class="btn terminal-button d-none d-sm-none d-md-block text-secondary"
   >
-    <icon name="terminal" />
+    <icon name="terminal"/>
   </a>
 </template>
