@@ -17,3 +17,28 @@ memory-static:
       - tmp/memory_static_metrics.txt
     reports:
       metrics: tmp/memory_static_metrics.txt
+
+.use-pg: &use-pg
+  services:
+    - name: postgres:9.6
+      command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
+    - name: redis:alpine
+
+memory-on-boot:
+  extends: .dedicated-runner
+  <<: *use-pg
+  services:
+    - docker:stable-dind
+  variables:
+    NODE_ENV: "production"
+    RAILS_ENV: "production"
+    SETUP_DB: "false" # TODO: change to true
+    SKIP_STORAGE_VALIDATION: "true"
+    WEBPACK_REPORT: "true"
+    # we override the max_old_space_size to prevent OOM errors
+    NODE_OPTIONS: --max_old_space_size=3584
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+  script:
+    - echo "test!"
+    - bundle exec derailed exec perf:mem
