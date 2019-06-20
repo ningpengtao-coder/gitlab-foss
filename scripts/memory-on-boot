@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+puts 'in the script'
+
+require 'derailed_benchmarks'
+
+bundle exec derailed exec perf:mem
