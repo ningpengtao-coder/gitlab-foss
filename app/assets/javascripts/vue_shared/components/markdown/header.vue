@@ -91,12 +91,9 @@ export default {
   <div class="md-header">
     <ul class="nav-links clearfix">
       <li :class="{ active: !previewMarkdown }" class="md-header-tab">
-        <button
-          class="js-write-link"
-          tabindex="-1"
-          type="button"
-          @click="writeMarkdownTab($event)"
-        >{{ __('Write') }}</button>
+        <button class="js-write-link" tabindex="-1" type="button" @click="writeMarkdownTab($event)">
+          {{ __('Write') }}
+        </button>
       </li>
       <li :class="{ active: previewMarkdown }" class="md-header-tab">
         <button
@@ -104,12 +101,14 @@ export default {
           tabindex="-1"
           type="button"
           @click="previewMarkdownTab($event)"
-        >{{ __('Preview') }}</button>
+        >
+          {{ __('Preview') }}
+        </button>
       </li>
       <li :class="{ active: !previewMarkdown }" class="md-header-toolbar">
         <div class="d-inline-block">
-          <toolbar-button tag="**" :button-title="__('Add bold text')" icon="bold"/>
-          <toolbar-button tag="*" :button-title="__('Add italic text')" icon="italic"/>
+          <toolbar-button tag="**" :button-title="__('Add bold text')" icon="bold" />
+          <toolbar-button tag="*" :button-title="__('Add italic text')" icon="italic" />
           <toolbar-button
             :prepend="true"
             tag="> "
@@ -138,17 +137,15 @@ export default {
               :show="showSuggestPopover"
             >
               <strong>{{ __('New! Suggest changes directly') }}</strong>
-              <p
-                class="mb-2"
-              >{{ __('Suggest code changes which are immediately applied. Try it out!') }}</p>
-              <gl-button
-                variant="primary"
-                size="sm"
-                @click="handleSuggestDismissed"
-              >{{ __('Got it') }}</gl-button>
+              <p class="mb-2">
+                {{ __('Suggest code changes which are immediately applied. Try it out!') }}
+              </p>
+              <gl-button variant="primary" size="sm" @click="handleSuggestDismissed">{{
+                __('Got it')
+              }}</gl-button>
             </gl-popover>
           </template>
-          <toolbar-button tag="`" tag-block="```" :button-title="__('Insert code')" icon="code"/>
+          <toolbar-button tag="`" tag-block="```" :button-title="__('Insert code')" icon="code" />
           <toolbar-button
             tag="[{text}](url)"
             tag-select="url"
@@ -192,7 +189,7 @@ export default {
             :title="__('Go full screen')"
             type="button"
           >
-            <icon name="screen-full"/>
+            <icon name="screen-full" />
           </button>
         </div>
       </li>

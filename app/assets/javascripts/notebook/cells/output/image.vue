@@ -37,7 +37,7 @@ export default {
 
 <template>
   <div class="output">
-    <prompt type="out" :count="count" :show-output="showOutput"/>
-    <img :src="imgSrc">
+    <prompt type="out" :count="count" :show-output="showOutput" />
+    <img :src="imgSrc" />
   </div>
 </template>

@@ -78,5 +78,5 @@ export default {
     :alt="imgAlt"
     :data-src="sanitizedSource"
     class="avatar"
-  >
+  />
 </template>

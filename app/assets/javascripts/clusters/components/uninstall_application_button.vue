@@ -30,5 +30,5 @@ export default {
 </script>
 
 <template>
-  <loading-button :label="label" :disabled="disabled" :loading="loading"/>
+  <loading-button :label="label" :disabled="disabled" :loading="loading" />
 </template>

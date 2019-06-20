@@ -100,7 +100,7 @@ export default {
 
 <template>
   <div class="cell text-cell">
-    <prompt/>
+    <prompt />
     <div class="markdown" v-html="markdown"></div>
   </div>
 </template>

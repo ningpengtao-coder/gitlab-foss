@@ -98,7 +98,8 @@ export default {
       :style="successBarStyle"
       class="status-green"
       data-placement="bottom"
-    >{{ successPercent }}%</span>
+      >{{ successPercent }}%</span
+    >
     <span
       v-if="neutralPercent"
       v-tooltip
@@ -106,7 +107,8 @@ export default {
       :style="neutralBarStyle"
       class="status-neutral"
       data-placement="bottom"
-    >{{ neutralPercent }}%</span>
+      >{{ neutralPercent }}%</span
+    >
     <span
       v-if="failurePercent"
       v-tooltip
@@ -114,6 +116,7 @@ export default {
       :style="failureBarStyle"
       class="status-red"
       data-placement="bottom"
-    >{{ failurePercent }}%</span>
+      >{{ failurePercent }}%</span
+    >
   </div>
 </template>

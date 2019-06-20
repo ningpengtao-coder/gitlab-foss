@@ -32,5 +32,5 @@ export default {
 </script>
 
 <template>
-  <input ref="dropdownInput" type="hidden">
+  <input ref="dropdownInput" type="hidden" />
 </template>

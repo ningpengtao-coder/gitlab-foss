@@ -99,7 +99,7 @@ export default {
       :alt="imgAlt"
       :data-src="sanitizedSource"
       class="avatar"
-    >
+    />
     <gl-tooltip
       v-if="tooltipText || $slots.default"
       :target="() => $refs.userAvatarImage"
