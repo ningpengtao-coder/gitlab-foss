@@ -28,4 +28,8 @@ module TagsHelper
   def protected_tag?(project, tag)
     ProtectedTag.protected?(project, tag.name)
   end
+
+  def pre_release_tag?(project, tag)
+    true
+  end
 end

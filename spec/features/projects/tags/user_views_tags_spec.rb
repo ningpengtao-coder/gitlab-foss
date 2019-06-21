@@ -66,4 +66,19 @@ describe 'User views tags', :feature do
       end
     end
   end
+
+  context 'with pre-release' do
+    let(:project) { create(:project, :repository, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
+    let(:user) { create(:user) }
+
+    before do
+      project.add_developer(user)
+      sign_in(user)
+      visit project_tags_path(project)
+    end
+
+    it 'renders pre-release tag' do
+      expect(page).to have_content('Pre-release')
+    end
+  end
 end
