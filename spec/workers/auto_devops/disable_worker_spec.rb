@@ -13,6 +13,7 @@ describe AutoDevops::DisableWorker, '#perform' do
     project.add_developer(user)
     stub_application_setting(auto_devops_enabled: true)
     auto_devops.update_attribute(:enabled, nil)
+    allow_any_instance_of(Project).to receive(:any_runners?).and_return(true)
   end
 
   it 'disables auto devops for project' do
