@@ -60,6 +60,10 @@ describe "Projects > Settings > Pipelines settings" do
     end
 
     describe 'Auto DevOps' do
+      before do
+        create(:ci_runner, :instance)
+      end
+
       context 'when auto devops is turned on instance-wide' do
         before do
           stub_application_setting(auto_devops_enabled: true)

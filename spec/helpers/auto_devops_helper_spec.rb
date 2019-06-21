@@ -4,6 +4,10 @@ describe AutoDevopsHelper do
   set(:project) { create(:project) }
   set(:user) { create(:user) }
 
+  before do
+    create(:ci_runner, :instance)
+  end
+
   describe '.show_auto_devops_callout?' do
     let(:allowed) { true }
 

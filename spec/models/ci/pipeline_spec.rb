@@ -2079,6 +2079,7 @@ describe Ci::Pipeline, :mailer do
 
         context 'auto devops enabled' do
           before do
+            create(:ci_runner, :instance)
             allow(project).to receive(:ci_config_path) { 'custom' }
           end
 
@@ -2134,6 +2135,7 @@ describe Ci::Pipeline, :mailer do
     context 'when the source is auto_devops_source' do
       before do
         stub_application_setting(auto_devops_enabled: true)
+        create(:ci_runner, :instance)
         pipeline.auto_devops_source!
       end
 

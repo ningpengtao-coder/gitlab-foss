@@ -39,6 +39,7 @@ describe Projects::AutoDevops::DisableService, '#execute' do
     context 'when Auto DevOps is implicitly enabled' do
       before do
         auto_devops.update!(enabled: nil)
+        create(:ci_runner, :instance)
       end
 
       context 'when is the first pipeline failure' do
@@ -82,6 +83,7 @@ describe Projects::AutoDevops::DisableService, '#execute' do
       let(:project) { create(:project, :repository) }
 
       before do
+        create(:ci_runner, :instance)
         create(:ci_pipeline, :failed, :auto_devops_source, project: project)
       end
 

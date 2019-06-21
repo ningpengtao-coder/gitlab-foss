@@ -3669,21 +3669,19 @@ describe Project do
   end
 
   describe '#has_ci?' do
-    set(:project) { create(:project) }
+    subject(:project) { create(:project) }
     let(:repository) { double }
 
     before do
       expect(project).to receive(:repository) { repository }
     end
 
-    context 'when has .gitlab-ci.yml' do
+    context 'when there is a .gitlab-ci.yml' do
       before do
         expect(repository).to receive(:gitlab_ci_yml) { 'content' }
       end
 
-      it "CI is available" do
-        expect(project).to have_ci
-      end
+      it { is_expected.to have_ci }
     end
 
     context 'when there is no .gitlab-ci.yml' do
@@ -3691,17 +3689,23 @@ describe Project do
         expect(repository).to receive(:gitlab_ci_yml) { nil }
       end
 
-      it "CI is available" do
-        expect(project).to have_ci
+      context 'when no runner is available' do
+        it { is_expected.not_to have_ci }
       end
 
-      context 'when auto devops is disabled' do
+      context 'when a runner is available' do
         before do
-          stub_application_setting(auto_devops_enabled: false)
+          create(:ci_runner, :instance)
         end
 
-        it "CI is not available" do
-          expect(project).not_to have_ci
+        it { is_expected.to have_ci }
+
+        context 'when auto devops is disabled' do
+          before do
+            stub_application_setting(auto_devops_enabled: false)
+          end
+
+          it { is_expected.not_to have_ci }
         end
       end
     end
@@ -3711,6 +3715,7 @@ describe Project do
     before do
       allow(Feature).to receive(:enabled?).and_call_original
       Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(0)
+      create(:ci_runner, :instance)
     end
 
     set(:project) { create(:project) }
@@ -3848,14 +3853,14 @@ describe Project do
   end
 
   describe '#has_auto_devops_implicitly_enabled?' do
-    set(:project) { create(:project) }
+    subject(:project) { create(:project) }
 
     context 'when disabled in settings' do
       before do
         stub_application_setting(auto_devops_enabled: false)
       end
 
-      it 'does not have auto devops implicitly disabled' do
+      it 'does not have auto devops implicitly enabled' do
         expect(project).not_to have_auto_devops_implicitly_enabled
       end
     end
@@ -3865,8 +3870,16 @@ describe Project do
         stub_application_setting(auto_devops_enabled: true)
       end
 
-      it 'auto devops is implicitly disabled' do
-        expect(project).to have_auto_devops_implicitly_enabled
+      context 'when a runner is available' do
+        before do
+          create(:ci_runner, :instance)
+        end
+
+        it { is_expected.to have_auto_devops_implicitly_enabled }
+      end
+
+      context 'when no runner is available' do
+        it { is_expected.not_to have_auto_devops_implicitly_enabled }
       end
 
       context 'when explicitly disabled' do
@@ -3891,25 +3904,45 @@ describe Project do
     end
 
     context 'when enabled on group' do
-      it 'has auto devops implicitly enabled' do
+      before do
         project.update(namespace: create(:group, :auto_devops_enabled))
+      end
 
-        expect(project).to have_auto_devops_implicitly_enabled
+      context 'when runner is available' do
+        before do
+          create(:ci_runner, :instance)
+        end
+
+        it { is_expected.to have_auto_devops_implicitly_enabled }
+      end
+
+      context 'when no runner is available' do
+        it { is_expected.not_to have_auto_devops_implicitly_enabled }
       end
     end
 
     context 'when enabled on parent group' do
-      it 'has auto devops implicitly enabled' do
+      before do
         subgroup = create(:group, parent: create(:group, :auto_devops_enabled))
         project.update(namespace: subgroup)
+      end
 
-        expect(project).to have_auto_devops_implicitly_enabled
+      context 'when runner is available' do
+        before do
+          create(:ci_runner, :instance)
+        end
+
+        it { is_expected.to have_auto_devops_implicitly_enabled }
+      end
+
+      context 'when no runner is available' do
+        it { is_expected.not_to have_auto_devops_implicitly_enabled }
       end
     end
   end
 
   describe '#has_auto_devops_implicitly_disabled?' do
-    set(:project) { create(:project) }
+    subject(:project) { create(:project) }
 
     before do
       allow(Feature).to receive(:enabled?).and_call_original
@@ -3941,8 +3974,16 @@ describe Project do
         stub_application_setting(auto_devops_enabled: true)
       end
 
-      it 'does not have auto devops implicitly disabled' do
-        expect(project).not_to have_auto_devops_implicitly_disabled
+      context 'when a runner is available' do
+        before do
+          create(:ci_runner, :instance)
+        end
+
+        it { is_expected.not_to have_auto_devops_implicitly_disabled }
+      end
+
+      context 'when no runner is available' do
+        it { is_expected.to have_auto_devops_implicitly_disabled }
       end
     end
 

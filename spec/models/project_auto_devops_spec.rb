@@ -96,6 +96,10 @@ describe ProjectAutoDevops do
     end
 
     context 'when autodevops is enabled at instance level' do
+      before do
+        create(:ci_runner, :instance)
+      end
+
       let(:project) { create(:project, :repository, :internal) }
       let(:auto_devops) { build(:project_auto_devops, enabled: nil, project: project) }
 

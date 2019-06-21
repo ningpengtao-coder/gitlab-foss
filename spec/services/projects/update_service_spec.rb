@@ -451,7 +451,17 @@ describe Projects::UpdateService do
           stub_application_setting(auto_devops_enabled: true)
         end
 
-        it { is_expected.to eq(true) }
+        context 'when a runner is available' do
+          before do
+            create(:ci_runner, :instance)
+          end
+
+          it { is_expected.to eq(true) }
+        end
+
+        context 'when no runner is available' do
+          it { is_expected.to eq(false) }
+        end
       end
 
       context 'when auto devops is disabled system-wide' do

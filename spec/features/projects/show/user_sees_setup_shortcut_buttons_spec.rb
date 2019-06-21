@@ -76,6 +76,10 @@ describe 'Projects > Show > User sees setup shortcut buttons' do
       end
 
       context 'when Auto DevOps is enabled' do
+        before do
+          create(:ci_runner, :instance)
+        end
+
         it '"Auto DevOps enabled" button not linked' do
           visit project_path(project)
 
@@ -189,6 +193,10 @@ describe 'Projects > Show > User sees setup shortcut buttons' do
 
       describe 'GitLab CI configuration button' do
         context 'when Auto DevOps is enabled' do
+          before do
+            create(:ci_runner, :instance)
+          end
+
           it 'no "Set up CI/CD" button if the project has Auto DevOps enabled' do
             visit project_path(project)
 
@@ -235,6 +243,10 @@ describe 'Projects > Show > User sees setup shortcut buttons' do
 
       describe 'Auto DevOps button' do
         context 'when Auto DevOps is enabled' do
+          before do
+            create(:ci_runner, :instance)
+          end
+
           it '"Auto DevOps enabled" anchor linked to settings page' do
             visit project_path(project)
 

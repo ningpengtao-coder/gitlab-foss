@@ -713,57 +713,74 @@ describe ProjectsHelper do
       }
     end
 
-    where(:global_setting, :project_setting, :builds_visibility, :gitlab_ci_yml, :user_access, :result) do
+    where(:global_setting, :project_setting, :runner_available, :builds_visibility, :gitlab_ci_yml, :user_access, :result) do
       # With ADO implicitly enabled scenarios
-      true | nil | :disabled | true  | :developer  | false
-      true | nil | :disabled | true  | :maintainer | false
-      true | nil | :disabled | true  | :owner      | false
+      true | nil | true | :disabled | true  | :developer  | false
+      true | nil | true | :disabled | true  | :maintainer | false
+      true | nil | true | :disabled | true  | :owner      | false
 
-      true | nil | :disabled | false | :developer  | false
-      true | nil | :disabled | false | :maintainer | false
-      true | nil | :disabled | false | :owner      | false
+      true | nil | true | :disabled | false | :developer  | false
+      true | nil | true | :disabled | false | :maintainer | false
+      true | nil | true | :disabled | false | :owner      | false
 
-      true | nil | :enabled  | true  | :developer  | false
-      true | nil | :enabled  | true  | :maintainer | false
-      true | nil | :enabled  | true  | :owner      | false
+      true | nil | true | :enabled  | true  | :developer  | false
+      true | nil | true | :enabled  | true  | :maintainer | false
+      true | nil | true | :enabled  | true  | :owner      | false
 
-      true | nil | :enabled  | false | :developer  | false
-      true | nil | :enabled  | false | :maintainer | true
-      true | nil | :enabled  | false | :owner      | true
+      true | nil | true | :enabled  | false | :developer  | false
+      true | nil | true | :enabled  | false | :maintainer | true
+      true | nil | true | :enabled  | false | :owner      | true
 
-      # With ADO enabled scenarios
-      true | true | :disabled | true  | :developer  | false
-      true | true | :disabled | true  | :maintainer | false
-      true | true | :disabled | true  | :owner      | false
+      # With ADO globally enabled but no runner available scenarios
+      true | nil | false | :disabled | true  | :developer  | false
+      true | nil | false | :disabled | true  | :maintainer | false
+      true | nil | false | :disabled | true  | :owner      | false
 
-      true | true | :disabled | false | :developer  | false
-      true | true | :disabled | false | :maintainer | false
-      true | true | :disabled | false | :owner      | false
+      true | nil | false | :disabled | false | :developer  | false
+      true | nil | false | :disabled | false | :maintainer | false
+      true | nil | false | :disabled | false | :owner      | false
 
-      true | true | :enabled  | true  | :developer  | false
-      true | true | :enabled  | true  | :maintainer | false
-      true | true | :enabled  | true  | :owner      | false
+      true | nil | false | :enabled  | true  | :developer  | false
+      true | nil | false | :enabled  | true  | :maintainer | false
+      true | nil | false | :enabled  | true  | :owner      | false
 
-      true | true | :enabled  | false | :developer  | false
-      true | true | :enabled  | false | :maintainer | false
-      true | true | :enabled  | false | :owner      | false
+      true | nil | false | :enabled  | false | :developer  | false
+      true | nil | false | :enabled  | false | :maintainer | false
+      true | nil | false | :enabled  | false | :owner      | false
+
+      # With ADO enabled scenarios (runner availability doesn't matter)
+      true | true | true | :disabled | true  | :developer  | false
+      true | true | true | :disabled | true  | :maintainer | false
+      true | true | true | :disabled | true  | :owner      | false
+
+      true | true | true | :disabled | false | :developer  | false
+      true | true | true | :disabled | false | :maintainer | false
+      true | true | true | :disabled | false | :owner      | false
+
+      true | true | true | :enabled  | true  | :developer  | false
+      true | true | true | :enabled  | true  | :maintainer | false
+      true | true | true | :enabled  | true  | :owner      | false
+
+      true | true | true | :enabled  | false | :developer  | false
+      true | true | true | :enabled  | false | :maintainer | false
+      true | true | true | :enabled  | false | :owner      | false
 
       # With ADO disabled scenarios
-      true | false | :disabled | true  | :developer  | false
-      true | false | :disabled | true  | :maintainer | false
-      true | false | :disabled | true  | :owner      | false
+      true | false | true | :disabled | true  | :developer  | false
+      true | false | true | :disabled | true  | :maintainer | false
+      true | false | true | :disabled | true  | :owner      | false
 
-      true | false | :disabled | false | :developer  | false
-      true | false | :disabled | false | :maintainer | false
-      true | false | :disabled | false | :owner      | false
+      true | false | true | :disabled | false | :developer  | false
+      true | false | true | :disabled | false | :maintainer | false
+      true | false | true | :disabled | false | :owner      | false
 
-      true | false | :enabled  | true  | :developer  | false
-      true | false | :enabled  | true  | :maintainer | false
-      true | false | :enabled  | true  | :owner      | false
+      true | false | true | :enabled  | true  | :developer  | false
+      true | false | true | :enabled  | true  | :maintainer | false
+      true | false | true | :enabled  | true  | :owner      | false
 
-      true | false | :enabled  | false | :developer  | false
-      true | false | :enabled  | false | :maintainer | false
-      true | false | :enabled  | false | :owner      | false
+      true | false | true | :enabled  | false | :developer  | false
+      true | false | true | :enabled  | false | :maintainer | false
+      true | false | true | :enabled  | false | :owner      | false
     end
 
     def grant_user_access(project, user, access)
@@ -788,6 +805,8 @@ describe ProjectsHelper do
         stub_application_setting(auto_devops_enabled: global_setting)
 
         allow_any_instance_of(Repository).to receive(:gitlab_ci_yml).and_return(gitlab_ci_yml)
+
+        create(:ci_runner, :instance) if runner_available
 
         grant_user_access(project, user, user_access)
         project.project_feature.update_attribute(:builds_access_level, feature_visibilities[builds_visibility])
