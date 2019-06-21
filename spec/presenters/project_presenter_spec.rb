@@ -417,6 +417,7 @@ describe ProjectPresenter do
     let(:presenter) { described_class.new(project, current_user: user) }
 
     it 'orders the items correctly' do
+      allow(project).to receive(:auto_devops_enabled?).and_return(false)
       allow(project.repository).to receive(:readme).and_return(double(name: 'readme'))
       allow(project.repository).to receive(:changelog).and_return(nil)
       allow(project.repository).to receive(:contribution_guide).and_return(double(name: 'foo'))
