@@ -1,3 +1,5 @@
+require Rails.root.join('ee', 'db', 'importers', 'prometheus_metric_enums') if Gitlab.ee?
+
 module Importers
   module PrometheusMetricEnums
     def self.groups
