@@ -26,6 +26,7 @@ describe 'Project > Show > User interacts with auto devops implicitly enabled ba
 
     context 'when AutoDevOps is implicitly enabled' do
       before do
+        allow_any_instance_of(Project).to receive(:any_runners?).and_return true
         stub_application_setting(auto_devops_enabled: true)
 
         visit project_path(project)
