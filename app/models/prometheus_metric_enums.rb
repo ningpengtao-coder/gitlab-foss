@@ -67,8 +67,4 @@ module PrometheusMetricEnums
       }.freeze
     }.freeze
   end
-
-  def self.group_titles
-    @group_titles ||= group_details.map { |k, v| [k, v[:group_title]] }.to_h
-  end
 end
