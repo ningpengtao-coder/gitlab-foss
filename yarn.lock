@@ -705,10 +705,9 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.65.0.tgz#48a3a64c0b5524de4e57d51b82a71274af17744d"
   integrity sha512-GC9JgVu4/2Ysc3hKFmX6TQV6tqvHZDcfd/DzBzYjy3rHO9qYMZFnw/CKCGa8LkU9F79vfDo3G8NSja7FDXMccw==
 
-"@gitlab/ui@^4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-4.3.0.tgz#7d6e626e7143febef642a0418ceae1923dfa8f15"
-  integrity sha512-+r19vg9KkFhYO1mlC1Lz98ZnXEifJSumfIUvaRFPgw+LtU2SyOsxXp9fleaJVXXBgpQDiNnpe1FyRL0kWVcn3g==
+"@gitlab/ui@https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/235983230/artifacts/raw/gitlab-ui.222-add-label-component.tgz":
+  version "4.2.0"
+  resolved "https://gitlab.com/gitlab-org/gitlab-ui/-/jobs/235983230/artifacts/raw/gitlab-ui.222-add-label-component.tgz#34e772906a3bbb67d7dd795444abef3cc0c40b3a"
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.2.1"

@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlTooltipDirective, GlLabel } from '@gitlab/ui';
 import { sprintf, __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
@@ -9,7 +9,6 @@ import UserAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_
 import IssueDueDate from './issue_due_date.vue';
 import IssueTimeEstimate from './issue_time_estimate.vue';
 import boardsStore from '../stores/boards_store';
-import IssueCardInnerScopedLabel from './issue_card_inner_scoped_label.vue';
 import { isScopedLabel } from '~/lib/utils/common_utils';
 
 export default {
@@ -20,7 +19,7 @@ export default {
     IssueDueDate,
     IssueTimeEstimate,
     IssueCardWeight: () => import('ee_component/boards/components/issue_card_weight.vue'),
-    IssueCardInnerScopedLabel,
+    GlLabel,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -137,12 +136,6 @@ export default {
 
       boardsStore.toggleFilter(filter);
     },
-    labelStyle(label) {
-      return {
-        backgroundColor: label.color,
-        color: label.textColor,
-      };
-    },
     showScopedLabel(label) {
       return boardsStore.scopedLabels.enabled && isScopedLabel(label);
     },
@@ -166,28 +159,20 @@ export default {
       </h4>
     </div>
     <div v-if="showLabelFooter" class="board-card-labels prepend-top-4 d-flex flex-wrap">
-      <template v-for="label in orderedLabels" v-if="showLabel(label)">
-        <issue-card-inner-scoped-label
-          v-if="showScopedLabel(label)"
+      <template v-for="label in orderedLabels" >
+        <gl-Label
+          v-if="showLabel(label)"
           :key="label.id"
-          :label="label"
-          :label-style="labelStyle(label)"
+          :color="label.textColor"
+          :description="label.description"
+          :is-scoped="showScopedLabel(label)"
+          :background-color="label.color"
           :scoped-labels-documentation-link="helpLink"
-          @scoped-label-click="filterByLabel($event)"
-        />
-
-        <button
-          v-else
-          :key="label.id"
-          v-gl-tooltip
-          :style="labelStyle(label)"
-          :title="label.description"
-          class="badge color-label append-right-4 prepend-top-4"
-          type="button"
+          class="append-right-4 prepend-top-4"
           @click="filterByLabel(label)"
         >
           {{ label.title }}
-        </button>
+        </gl-Label>
       </template>
     </div>
     <div class="board-card-footer d-flex justify-content-between align-items-end">

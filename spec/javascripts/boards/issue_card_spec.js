@@ -246,15 +246,15 @@ describe('Issue card component', () => {
 
     it('renders label', () => {
       const nodes = [];
-      component.$el.querySelectorAll('.badge').forEach(label => {
-        nodes.push(label.getAttribute('data-original-title'));
+      component.$el.querySelectorAll('.badge .js-label-desc').forEach(label => {
+        nodes.push(label.textContent.trim());
       });
 
       expect(nodes.includes(label1.description)).toBe(true);
     });
 
-    it('sets label description as title', () => {
-      expect(component.$el.querySelector('.badge').getAttribute('data-original-title')).toContain(
+    it('sets label description', () => {
+      expect(component.$el.querySelector('.badge .js-label-desc').textContent.trim()).toContain(
         label1.description,
       );
     });
