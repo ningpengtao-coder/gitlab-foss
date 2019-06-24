@@ -18,7 +18,7 @@ test:
   # url: redis://localhost:6381
 production:
   # Redis (single instance)
-  url: redis://localhost:6379/11
+  url: unix:/var/run/redis/redis.queues.sock
   ##
   # Redis + Sentinel (for HA)
   #
