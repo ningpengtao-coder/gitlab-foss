@@ -46,3 +46,5 @@ memory-on-boot:
   artifacts:
     paths:
       - log/production.log
+      - config/
+      - /var/log/redis/redis-server.log
