@@ -143,8 +143,8 @@ describe('Board card', () => {
       expect(boardsStore.detail.issue).toEqual({});
     });
 
-    it('does not set detail issue if button is clicked', () => {
-      triggerEvent('mouseup', vm.$el.querySelector('button'));
+    it('does not set detail issue if label is clicked', () => {
+      triggerEvent('mouseup', vm.$el.querySelector('.js-label-wrapper'));
 
       expect(boardsStore.detail.issue).toEqual({});
     });
