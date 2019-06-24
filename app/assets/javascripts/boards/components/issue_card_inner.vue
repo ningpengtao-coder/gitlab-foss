@@ -159,7 +159,7 @@ export default {
       </h4>
     </div>
     <div v-if="showLabelFooter" class="board-card-labels prepend-top-4 d-flex flex-wrap">
-      <template v-for="label in orderedLabels" >
+      <template v-for="label in orderedLabels">
         <gl-Label
           v-if="showLabel(label)"
           :key="label.id"
