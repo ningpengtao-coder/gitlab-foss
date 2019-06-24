@@ -42,7 +42,8 @@ memory-on-boot:
     DOCKER_HOST: tcp://docker:2375
   script:
     - echo "test!"
-    - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem
+    - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem 2> tmp/error.log
   artifacts:
     paths:
       - /home/git/gitlab/log/production.log
+      - tmp/error.log
