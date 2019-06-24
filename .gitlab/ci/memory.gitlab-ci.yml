@@ -42,4 +42,4 @@ memory-on-boot:
     DOCKER_HOST: tcp://docker:2375
   script:
     - echo "test!"
-    - bundle exec derailed exec perf:mem
+    - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem
