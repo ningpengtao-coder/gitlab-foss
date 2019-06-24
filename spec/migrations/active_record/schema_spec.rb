@@ -13,14 +13,6 @@ describe ActiveRecord::Schema do
     migrations.map { |migration| File.basename(migration).split('_').first.to_i }.max
   end
 
-  it '> schema version equals last migration timestamp' do
-    defined_schema_version = File.open(Rails.root.join('db', 'schema.rb')) do |file|
-      file.find { |line| line =~ /ActiveRecord::Schema.define/ }
-    end.match(/(\d+)/)[0].to_i
-
-    expect(defined_schema_version).to eq(latest_migration_timestamp)
-  end
-
   it '> schema version should equal the latest migration timestamp stored in schema_migrations table' do
     expect(latest_migration_timestamp).to eq(ActiveRecord::Migrator.current_version.to_i)
   end
