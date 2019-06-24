@@ -24,6 +24,7 @@
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
     - name: redis:alpine
 
+# for now, I copied the config from frontend jobs (they also use production env)
 memory-on-boot:
   extends: .dedicated-runner
   <<: *use-pg
