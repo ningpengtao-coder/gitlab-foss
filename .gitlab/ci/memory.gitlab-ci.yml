@@ -43,3 +43,5 @@ memory-on-boot:
   script:
     - echo "test!"
     - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem
+  artifacts:
+    log/production.log
