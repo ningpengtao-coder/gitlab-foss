@@ -45,4 +45,4 @@ memory-on-boot:
     - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem || true; echo "after bundle"
   artifacts:
     paths:
-      - /home/git/gitlab/log/production.log
+      - log/production.log
