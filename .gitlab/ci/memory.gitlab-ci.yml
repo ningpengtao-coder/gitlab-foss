@@ -22,7 +22,9 @@
   services:
     - name: postgres:9.6
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
+      alias: postgres
     - name: redis:alpine
+      alias: redis
 
 # for now, I copied the config from frontend jobs (they also use production env)
 memory-on-boot:
