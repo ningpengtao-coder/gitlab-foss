@@ -214,8 +214,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       namespace :prometheus do
         resources :metrics, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy] do
-          post :validate_query, on: :collection
           get :active_common, on: :collection
+
+          Gitlab.ee do
+            post :validate_query, on: :collection
+          end
         end
 
         Gitlab.ee do
@@ -363,13 +366,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :builds
           get :failures
           get :status
-          get :security
-          get :licenses
-        end
 
-        member do
-          resources :stages, only: [], param: :name do
-            post :play_manual
+          Gitlab.ee do
+            get :security
+            get :licenses
           end
         end
 
@@ -512,7 +512,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
+        Gitlab.ee do
+          resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
+        end
       end
 
       resources :notes, only: [:create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ } do
