@@ -1,10 +1,4 @@
-# Feature flags in development of GitLab
-
-Feature flags can be used to gradually roll out changes, be
-it a new feature, or a performance improvement. By using feature flags, we can
-comfortably measure the impact of our changes, while still being able to easily
-disable those changes, without having to revert an entire release.
-
+# Feature flags process
 ## Feature flags for user applications
 
 This document only covers feature flags used in the development of GitLab
@@ -16,13 +10,13 @@ itself. Feature flags in deployed user applications can be found at
 The following highlights should be considered when deciding if feature flags
 should be leveraged:
 
-* By default, the feature flags should be **off**.
-* Feature flags should remain in the codebase for as short period as possible
+- By default, the feature flags should be **off**.
+- Feature flags should remain in the codebase for as short period as possible
 to reduce the need for feature flag accounting.
-* Person operating with feature flags is responsible for clearly communicating
+- The person operating with feature flags is responsible for clearly communicating
 the status of a feature behind the feature flag with responsible stakeholders.
-* Merge requests that make changes hidden behind a feature flag, or remove an
-existing feature flag because a feature is deemed stable should have the
+- Merge requests that make changes hidden behind a feature flag, or remove an
+existing feature flag because a feature is deemed stable must have the
 ~"feature flag" label assigned.
 
 One might be tempted to think that feature flags will delay the release of a
@@ -69,12 +63,12 @@ to be included in the final self-managed release.
 
 In addition to this, the feature behind feature flag should:
 
-* Run in all GitLab.com environments for a sufficient period of time. This time
+- Run in all GitLab.com environments for a sufficient period of time. This time
 period depends on the feature behind the feature flag, but as a general rule of
 thumb 2-4 working days should be sufficient to gather enough feedback.
-* The feature should be exposed to all users within the GitLab.com plan during
+- The feature should be exposed to all users within the GitLab.com plan during
 the above mentioned period of time. Exposing the feature to a smaller percentage
-or only a group of users might not expose sufficient amount of information to aid
+or only a group of users might not expose a sufficient amount of information to aid in
 making a decision on feature stability.
 
 While rare, release managers may decide to reject picking or revert a change in
@@ -95,8 +89,8 @@ Let's say we are building a new feature, and we have determined that the cost of
 this is 10. We have also determined that the cost of adding a feature flag check
 in a variety of places is 1. If we do not use feature flags, and our feature
 works as intended, our total cost is 10. This however is the best case scenario.
-Optimising for the best case scenario is guaranteed to lead to trouble, whereas
-optimising for the worst case scenario is almost always better.
+Optimizing for the best case scenario is guaranteed to lead to trouble, whereas
+optimizing for the worst case scenario is almost always better.
 
 To illustrate this, let's say our feature causes an outage, and there's no
 immediate way to resolve it. This means we'd have to take the following steps to
@@ -115,7 +109,7 @@ many developers, and worst of all: our users will have a bad experience using
 GitLab.com until the problem is resolved.
 
 Now let's say that all of this has an associated cost of 10. This means that in
-the worst case scenario, which we should optimise for, our total cost is now 20.
+the worst case scenario, which we should optimize for, our total cost is now 20.
 
 If we had used a feature flag, things would have been very different. We don't
 need to revert a release, and because feature flags are disabled by default we

@@ -1,6 +1,6 @@
 # Chatops on GitLab.com
 
-Chatops on GitLab.com allows GitLab team-members to run various automation tasks on GitLab.com using Slack.
+ChatOps on GitLab.com allows GitLab team members to run various automation tasks on GitLab.com using Slack.
 
 ## Requesting access
 
@@ -19,4 +19,4 @@ To request access to Chatops on GitLab.com:
 
  - [Chatops Usage](https://docs.gitlab.com/ee/ci/chatops/README.html)
  - [Understanding EXPLAIN plans](understanding_explain_plans.md)
- - [Feature Groups](feature_flags.md#feature-groups)
+ - [Feature Groups](feature_flags/development.md#feature-groups)
