@@ -43,7 +43,9 @@ memory-on-boot:
     DOCKER_HOST: tcp://docker:2375
   script:
     - RAILS_ENV=production bundle exec rails c
-    - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem || true; echo "after bundle"
+    - yarn install
+    - RAILS_ENV=production bundle exec rake webpack:compile
+    - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem || true
   artifacts:
     paths:
       - log/production.log
