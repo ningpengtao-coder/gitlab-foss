@@ -41,7 +41,6 @@ memory-on-boot:
     NODE_OPTIONS: --max_old_space_size=3584
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
-    POSTGRES_USER: git
   script:
     - RAILS_ENV=production bundle exec rails c
     - RAILS_ENV=production PATH_TO_HIT="/users/sign_in" CUT_OFF=0 bundle exec derailed exec perf:mem || true; echo "after bundle"
