@@ -6,7 +6,7 @@ production:
   encoding: unicode
   database: gitlabhq_production
   pool: 10
-  username: git
+  username: postgres
   password: "secure password"
   host: localhost
 
