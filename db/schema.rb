@@ -1282,6 +1282,8 @@ ActiveRecord::Schema.define(version: 2019_08_15_093949) do
     t.datetime "closed_at"
     t.integer "parent_id"
     t.integer "relative_position"
+    t.integer "start_date_sourcing_epic_id"
+    t.integer "due_date_sourcing_epic_id"
     t.index ["assignee_id"], name: "index_epics_on_assignee_id"
     t.index ["author_id"], name: "index_epics_on_author_id"
     t.index ["closed_by_id"], name: "index_epics_on_closed_by_id"

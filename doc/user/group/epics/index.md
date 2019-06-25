@@ -71,17 +71,23 @@ click on the <kbd>x</kbd> button in the parent epic's epic list.
 For each of the dates in the sidebar of an epic, you can choose to either:
 
 - Enter a fixed value.
-- Inherit a dynamic value called "From milestones".
+- Inherit a dynamic value called "Inherited".
 
-If you select "From milestones" for the start date, GitLab will automatically set the
-date to be earliest start date across all milestones that are currently assigned
-to the issues that are attached to the epic. Similarly, if you select "From milestones"
-for the due date, GitLab will set it to be the latest due date across all
-milestones that are currently assigned to those issues.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7332) in GitLab Ultimate 12.2
 
-These are dynamic dates in that if milestones are re-assigned to the issues, if the
+If you select "Inherited" for the start date, GitLab will automatically set the
+date to be earliest start date across all child epics or milestones
+that are currently assigned to the issues that are attached to the epic.
+Similarly, if you select "inherited" for the due date, GitLab will set it to be the
+latest due date across all direct child epics or milestones that are currently assigned to those issues.
+
+These are dynamic dates in that if child epics date change or milestones are re-assigned to the issues, if the
 milestone dates change, or if issues are added or removed from the epic, then
 the re-calculation will happen immediately to set a new dynamic date.
+
+Due to the fact that epic dates can inherit dates from its children the start and due date proagate from bottom to top level.
+So if start on a child epic on lowest level change so that it becomes the earliest possible start date for its parent epic,
+then parent epic start date will reflect the change and this will propagate upwards to the top level epic.
 
 ## Roadmap in epics
 
