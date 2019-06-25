@@ -1,7 +1,7 @@
-require 'fast_spec_helper'
+require 'spec_helper'
 
 describe Gitlab::Ci::Config::Extendable do
-  subject { described_class.new(hash) }
+  let(:extendable) { described_class.new(hash) }
 
   describe '#each' do
     context 'when there is extendable entry in the hash' do
@@ -14,12 +14,14 @@ describe Gitlab::Ci::Config::Extendable do
       end
 
       it 'yields control' do
-        expect { |b| subject.each(&b) }.to yield_control
+        expect { |b| extendable.each(&b) }.to yield_control
       end
     end
   end
 
   describe '#to_hash' do
+    subject { extendable.to_hash }
+
     context 'when hash does not contain extensions' do
       let(:hash) do
         {
@@ -32,7 +34,7 @@ describe Gitlab::Ci::Config::Extendable do
       end
 
       it 'does not modify the hash' do
-        expect(subject.to_hash).to eq hash
+        expect(subject).to eq hash
       end
     end
 
@@ -43,7 +45,6 @@ describe Gitlab::Ci::Config::Extendable do
             script: 'deploy',
             only: { variables: %w[$SOMETHING] }
           },
-
           test: {
             extends: 'something',
             script: 'ls',
@@ -53,12 +54,11 @@ describe Gitlab::Ci::Config::Extendable do
       end
 
       it 'extends a hash with a deep reverse merge' do
-        expect(subject.to_hash).to eq(
+        expect(subject).to eq(
           something: {
             script: 'deploy',
             only: { variables: %w[$SOMETHING] }
           },
-
           test: {
             extends: 'something',
             script: 'ls',
@@ -79,23 +79,19 @@ describe Gitlab::Ci::Config::Extendable do
             script: 'ls',
             only: { refs: %w[master] }
           },
-
           build: {
             extends: 'something',
             stage: 'build'
           },
-
           deploy: {
             stage: 'deploy',
             extends: '.first'
           },
-
           something: {
             extends: '.first',
             script: 'exec',
             only: { variables: %w[$SOMETHING] }
           },
-
           '.first': {
             script: 'run',
             only: { kubernetes: 'active' }
@@ -104,12 +100,11 @@ describe Gitlab::Ci::Config::Extendable do
       end
 
       it 'extends a hash with a deep reverse merge' do
-        expect(subject.to_hash).to eq(
+        expect(subject).to eq(
           '.first': {
             script: 'run',
             only: { kubernetes: 'active' }
           },
-
           something: {
             extends: '.first',
             script: 'exec',
@@ -118,14 +113,12 @@ describe Gitlab::Ci::Config::Extendable do
               variables: %w[$SOMETHING]
             }
           },
-
           deploy: {
             script: 'run',
             stage: 'deploy',
             only: { kubernetes: 'active' },
             extends: '.first'
           },
-
           build: {
             extends: 'something',
             script: 'exec',
@@ -135,7 +128,6 @@ describe Gitlab::Ci::Config::Extendable do
               variables: %w[$SOMETHING]
             }
           },
-
           test: {
             extends: 'something',
             script: 'ls',
@@ -157,13 +149,11 @@ describe Gitlab::Ci::Config::Extendable do
             script: 'ls',
             only: { refs: %w[master] }
           },
-
           something: {
             extends: '.first',
             script: 'deploy',
             only: { variables: %w[$SOMETHING] }
           },
-
           '.first': {
             extends: 'something',
             script: 'run',
@@ -172,9 +162,8 @@ describe Gitlab::Ci::Config::Extendable do
         }
       end
 
-      it 'raises an error about circular dependency' do
-        expect { subject.to_hash }
-          .to raise_error(described_class::Entry::CircularDependencyError)
+      it 'raises an ExtensionError' do
+        expect { subject }.to raise_error(described_class::ExtensionError)
       end
     end
 
@@ -189,9 +178,8 @@ describe Gitlab::Ci::Config::Extendable do
         }
       end
 
-      it 'raises an error about circular dependency' do
-        expect { subject.to_hash }
-          .to raise_error(described_class::Entry::CircularDependencyError)
+      it 'raises an ExtensionError' do
+        expect { subject }.to raise_error(described_class::ExtensionError)
       end
     end
 
@@ -200,9 +188,8 @@ describe Gitlab::Ci::Config::Extendable do
         { something: { extends: 1, script: 'ls' } }
       end
 
-      it 'raises an error about invalid extension' do
-        expect { subject.to_hash }
-          .to raise_error(described_class::Entry::InvalidExtensionError)
+      it 'raises an ExtensionError' do
+        expect { subject }.to raise_error(described_class::ExtensionError)
       end
     end
 
@@ -214,14 +201,12 @@ describe Gitlab::Ci::Config::Extendable do
             script: 'ls',
             only: { refs: %w[master] }
           },
-
           something: 'some text'
         }
       end
 
-      it 'raises an error about invalid base' do
-        expect { subject.to_hash }
-          .to raise_error(described_class::Entry::InvalidExtensionError)
+      it 'raises an ExtensionError' do
+        expect { subject }.to raise_error(described_class::ExtensionError)
       end
     end
   end

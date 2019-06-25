@@ -1513,12 +1513,16 @@ module Gitlab
                             'jobs:rspec:only changes should be an array of strings')
         end
 
-        it 'returns errors if extended hash configuration is invalid' do
+        it 'raises an exception if extended hash configuration is invalid' do
           config = YAML.dump({ rspec: { extends: 'something', script: 'test' } })
 
-          expect { Gitlab::Ci::YamlProcessor.new(config) }
-            .to raise_error(Gitlab::Ci::YamlProcessor::ValidationError,
-                            'rspec: unknown keys in `extends` (something)')
+          expect { Gitlab::Ci::YamlProcessor.new(config) }.to raise_error do |error|
+            expect(error).to be_a(Gitlab::Ci::YamlProcessor::ValidationError)
+
+            %w(key context errors).each do |key|
+              expect(JSON.parse(error.message)[key]).to be_present
+            end
+          end
         end
       end
 
