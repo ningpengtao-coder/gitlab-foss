@@ -125,9 +125,13 @@ describe Gitlab::Ci::Config::Extendable::Entry do
       end
 
       it 'raises an error' do
-        expect { subject.extend! }
-          .to raise_error(described_class::InvalidExtensionError,
-                          /invalid base hash/)
+        expect { subject.extend! }.to raise_error do |error|
+          expect(error).to be_a(Gitlab::Ci::Config::Extendable::ExtensionError)
+
+          expect(JSON.parse(error.message)['key']).to eq('test')
+          expect(JSON.parse(error.message)['context']).to eq(HashWithIndifferentAccess.new(hash))
+          expect(JSON.parse(error.message)['errors'].first['message']).to eq('invalid base hashes in `extends`')
+        end
       end
     end
 
@@ -137,9 +141,13 @@ describe Gitlab::Ci::Config::Extendable::Entry do
       end
 
       it 'raises an error' do
-        expect { subject.extend! }
-          .to raise_error(described_class::InvalidExtensionError,
-                          /unknown key/)
+        expect { subject.extend! }.to raise_error do |error|
+          expect(error).to be_a(Gitlab::Ci::Config::Extendable::ExtensionError)
+
+          expect(JSON.parse(error.message)['key']).to eq('test')
+          expect(JSON.parse(error.message)['context']).to eq(HashWithIndifferentAccess.new(hash))
+          expect(JSON.parse(error.message)['errors'].first['message']).to eq('unknown keys found in `extends`')
+        end
       end
     end
 
@@ -227,9 +235,13 @@ describe Gitlab::Ci::Config::Extendable::Entry do
       end
 
       it 'raises an error' do
-        expect { subject.extend! }
-          .to raise_error(described_class::CircularDependencyError,
-                          /circular dependency detected/)
+        expect { subject.extend! }.to raise_error do |error|
+          expect(error).to be_a(Gitlab::Ci::Config::Extendable::ExtensionError)
+
+          expect(JSON.parse(error.message)['key']).to eq('test')
+          expect(JSON.parse(error.message)['context']).to eq(HashWithIndifferentAccess.new(hash))
+          expect(JSON.parse(error.message)['errors'].first['message']).to eq('circular dependency detected in `extends`')
+        end
       end
     end
 
@@ -247,8 +259,13 @@ describe Gitlab::Ci::Config::Extendable::Entry do
       end
 
       it 'raises an error' do
-        expect { subject.extend! }
-          .to raise_error(described_class::NestingTooDeepError)
+        expect { subject.extend! }.to raise_error do |error|
+          expect(error).to be_a(Gitlab::Ci::Config::Extendable::ExtensionError)
+
+          expect(JSON.parse(error.message)['key']).to eq('second')
+          expect(JSON.parse(error.message)['context']).to eq(HashWithIndifferentAccess.new(hash))
+          expect(JSON.parse(error.message)['errors'].first['message']).to eq('nesting too deep in `extends`')
+        end
       end
     end
   end
