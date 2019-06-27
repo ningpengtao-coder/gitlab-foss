@@ -22,13 +22,13 @@ class WikiPage
   #
   # pages - an array of WikiPage objects.
   #
-  # Returns an array of WikiPage and WikiDirectory objects. The entries are
-  # sorted by alphabetical order (directories and pages inside each directory).
-  # Pages at the root level come before everything.
+  # Returns an array of WikiPage and WikiDirectory objects.
+  # The entries are sorted in the order of the input array, where
+  # directories appear in the position of their first member.
   def self.group_by_directory(pages = [])
     grouped = []
-    dirs = Hash.new do |h, dir_name|
-      WikiDirectory.new(dir_name, []).tap { |dir| grouped << (h[dir_name] = dir) }
+    dirs = Hash.new do |h, name|
+      WikiDirectory.new(name).tap { |dir| grouped << (h[name] = dir) }
     end
 
     pages.each_with_object(grouped) do |page, top_level|
