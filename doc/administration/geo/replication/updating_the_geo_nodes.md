@@ -335,7 +335,7 @@ is prepended with the relevant node for better clarity:
         ```
 
     1. **(secondary)** Create the `replica.sh` script as described in the
-       [database configuration document](database_source.md#step-3-initiate-the-replication-process).
+       [database configuration document][database-source-replication].
 
     1. 1. **(secondary)** Save the snippet below in a file, let's say `/tmp/replica.sh`. Modify the
        embedded paths if necessary:
