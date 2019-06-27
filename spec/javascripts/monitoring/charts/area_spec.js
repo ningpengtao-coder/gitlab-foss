@@ -249,7 +249,7 @@ describe('Area component', () => {
 
     describe('yAxisLabel', () => {
       it('constructs a label for the chart y-axis', () => {
-        expect(areaChart.vm.yAxisLabel).toBe('CPU');
+        expect(areaChart.vm.yAxisLabel).toBe('CPU (Cores)');
       });
     });
   });

@@ -178,8 +178,11 @@ export default {
         },
       };
     },
+    units() {
+      return `${this.graphData.queries[0].unit}`;
+    },
     yAxisLabel() {
-      return `${this.graphData.y_label}`;
+      return `${this.graphData.y_label} (${this.units})`;
     },
   },
   watch: {
@@ -196,7 +199,7 @@ export default {
   },
   methods: {
     formatLegendLabel(query) {
-      return `${query.label}`;
+      return `${query.label} ${this.units}`;
     },
     formatTooltipText(params) {
       this.tooltip.title = dateFormat(params.value, 'dd mmm yyyy, h:MMTT');
