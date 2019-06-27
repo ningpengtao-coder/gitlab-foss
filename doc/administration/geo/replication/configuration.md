@@ -17,7 +17,7 @@ You are encouraged to first read through all the steps before executing them
 in your testing/production environment.
 
 > **Notes:**
-> - **Do not** setup any custom authentication for the **secondary** nodes. This will be
+> - **Do not** set up any custom authentication for the **secondary** nodes. This will be
   handled by the **primary** node.
 > - Any change that requires access to the **Admin Area** needs to be done in the
   **primary** node because the **secondary** node is a read-only replica.
@@ -31,11 +31,11 @@ they must be manually replicated to the **secondary** node.
 
 1. SSH into the **primary** node, and execute the command below:
 
-    ```sh
-    sudo cat /etc/gitlab/gitlab-secrets.json
-    ```
+   ```sh
+   sudo cat /etc/gitlab/gitlab-secrets.json
+   ```
 
-    This will display the secrets that need to be replicated, in JSON format.
+   This will display the secrets that need to be replicated, in JSON format.
 
 1. SSH into the **secondary** node and login as the `root` user:
 
