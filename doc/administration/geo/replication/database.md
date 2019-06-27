@@ -404,38 +404,40 @@ data before running `pg_basebackup`.
    name as shown in the commands below.
 
 1. Execute the command below to start a backup/restore and begin the replication
-    CAUTION: **Warning:** Each Geo **secondary** node must have its own unique replication slot name.
-    Using the same slot name between two secondaries will break PostgreSQL replication.
 
-    ```sh
-    gitlab-ctl replicate-geo-database \
-       --slot-name=<secondary_node_name> \
-       --host=<primary_node_ip>
-    ```
+CAUTION: **Warning:** Each Geo **secondary** node must have its own unique replication slot name.
+Using the same slot name between two secondaries will break PostgreSQL replication.
 
-    When prompted, enter the _plaintext_ password you set up for the `gitlab_replicator`
-    user in the first step.
+   ```sh
+   gitlab-ctl replicate-geo-database \
+      --slot-name=<secondary_node_name> \
+      --host=<primary_node_ip>
+   ```
 
-    This command also takes a number of additional options. You can use `--help`
-    to list them all, but here are a couple of tips:
-     - If PostgreSQL is listening on a non-standard port, add `--port=` as well.
-     - If your database is too large to be transferred in 30 minutes, you will need
-       to increase the timeout, e.g., `--backup-timeout=3600` if you expect the
-       initial replication to take under an hour.
-     - Pass `--sslmode=disable` to skip PostgreSQL TLS authentication altogether
-       (e.g., you know the network path is secure, or you are using a site-to-site
-       VPN). This is **not** safe over the public Internet!
-     - You can read more details about each `sslmode` in the
-       [PostgreSQL documentation][pg-docs-ssl];
-       the instructions above are carefully written to ensure protection against
-       both passive eavesdroppers and active "man-in-the-middle" attackers.
-     - Change the `--slot-name` to the name of the replication slot
-       to be used on the **primary** database. The script will attempt to create the
-       replication slot automatically if it does not exist.
-     - If you're repurposing an old server into a Geo **secondary** node, you'll need to
-       add `--force` to the command line.
-     - When not in a production machine you can disable backup step if you
-       really sure this is what you want by adding `--skip-backup`
+   When prompted, enter the _plaintext_ password you set up for the `gitlab_replicator`
+   user in the first step.
+
+   This command also takes a number of additional options. You can use `--help`
+   to list them all, but here are a couple of tips:
+
+   - If PostgreSQL is listening on a non-standard port, add `--port=` as well.
+   - If your database is too large to be transferred in 30 minutes, you will need
+     to increase the timeout, e.g., `--backup-timeout=3600` if you expect the
+     initial replication to take under an hour.
+   - Pass `--sslmode=disable` to skip PostgreSQL TLS authentication altogether
+     (e.g., you know the network path is secure, or you are using a site-to-site
+     VPN). This is **not** safe over the public Internet!
+   - You can read more details about each `sslmode` in the
+     [PostgreSQL documentation][pg-docs-ssl];
+     the instructions above are carefully written to ensure protection against
+     both passive eavesdroppers and active "man-in-the-middle" attackers.
+   - Change the `--slot-name` to the name of the replication slot
+     to be used on the **primary** database. The script will attempt to create the
+     replication slot automatically if it does not exist.
+   - If you're repurposing an old server into a Geo **secondary** node, you'll need to
+     add `--force` to the command line.
+   - When not in a production machine you can disable backup step if you
+     really sure this is what you want by adding `--skip-backup`
 
 The replication process is now complete.
 

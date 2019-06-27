@@ -1,6 +1,6 @@
 # Adding a system message to every page
 
-> [Introduced][ee-1283] in [GitLab Premium][eep] 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/25474) in GitLab 10.7.
 
 Navigate to the **Admin** area and go to the **Appearance** page.
 
