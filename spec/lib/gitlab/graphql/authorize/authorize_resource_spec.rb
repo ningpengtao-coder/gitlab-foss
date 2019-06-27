@@ -34,12 +34,6 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
       end
     end
 
-    describe '#authorized_find' do
-      it 'returns the object' do
-        expect(loading_resource.authorized_find).to eq(project)
-      end
-    end
-
     describe '#authorized_find!' do
       it 'returns the object' do
         expect(loading_resource.authorized_find!).to eq(project)
@@ -63,12 +57,6 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
     before do
       allow(Ability).to receive(:allowed?).with(user, :read_the_thing, project, scope: :user) do
         false
-      end
-    end
-
-    describe '#authorized_find' do
-      it 'returns `nil`' do
-        expect(loading_resource.authorized_find).to be_nil
       end
     end
 
@@ -98,6 +86,63 @@ describe Gitlab::Graphql::Authorize::AuthorizeResource do
 
     it 'raises a comprehensive error message' do
       expect { fake_class.new.find_object }.to raise_error(/Implement #find_object in #{fake_class.name}/)
+    end
+  end
+
+  context 'when the class does not define authorize' do
+    let(:fake_class) do
+      Class.new do
+        include Gitlab::Graphql::Authorize::AuthorizeResource
+
+        attr_reader :user, :found_object
+
+        def initialize(user, found_object)
+          @user, @found_object = user, found_object
+        end
+
+        def find_object(*_args)
+          found_object
+        end
+
+        def current_user
+          user
+        end
+
+        def self.name
+          'TestClass'
+        end
+      end
+    end
+    let(:error) { /#{fake_class.name} has no authorizations/ }
+
+    describe '#authorized_find!' do
+      it 'raises a comprehensive error message' do
+        expect { loading_resource.authorized_find! }.to raise_error(error)
+      end
+    end
+
+    describe '#authorized?' do
+      it 'raises a comprehensive error message' do
+        expect { loading_resource.authorized?(project) }.to raise_error(error)
+      end
+    end
+  end
+
+  describe '#authorize' do
+    it 'adds permissions from subclasses to those of superclasses when used on classes' do
+      base_class = Class.new do
+        include Gitlab::Graphql::Authorize::AuthorizeResource
+
+        authorize :base_authorization
+      end
+
+      sub_class = Class.new(base_class) do
+        authorize :sub_authorization
+      end
+
+      expect(base_class.required_permissions).to contain_exactly(:base_authorization)
+      expect(sub_class.required_permissions)
+        .to contain_exactly(:base_authorization, :sub_authorization)
     end
   end
 end

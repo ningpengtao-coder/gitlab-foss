@@ -15,6 +15,8 @@ module API
         authenticate_non_get!
       end
 
+      helpers Helpers::UsersHelpers
+
       helpers do
         # rubocop: disable CodeReuse/ActiveRecord
         def find_user_by_id(params)
@@ -26,7 +28,7 @@ module API
         # rubocop: disable CodeReuse/ActiveRecord
         def reorder_users(users)
           if params[:order_by] && params[:sort]
-            users.reorder(params[:order_by] => params[:sort])
+            users.reorder(order_options_with_tie_breaker)
           else
             users
           end
@@ -51,6 +53,8 @@ module API
           optional :avatar, type: File, desc: 'Avatar image for user'
           optional :private_profile, type: Boolean, desc: 'Flag indicating the user has a private profile'
           all_or_none_of :extern_uid, :provider
+
+          use :optional_params_ee
         end
 
         params :sort_params do
@@ -80,6 +84,7 @@ module API
         use :sort_params
         use :pagination
         use :with_custom_attributes
+        use :optional_index_params_ee
       end
       # rubocop: disable CodeReuse/ActiveRecord
       get do
@@ -124,7 +129,7 @@ module API
         user = User.find_by(id: params[:id])
         not_found!('User') unless user && can?(current_user, :read_user, user)
 
-        opts = { with: current_user&.admin? ? Entities::UserWithAdmin : Entities::User, current_user: current_user }
+        opts = { with: current_user&.admin? ? Entities::UserDetailsWithAdmin : Entities::User, current_user: current_user }
         user, opts = with_custom_attributes(user, opts)
 
         present user, opts
@@ -133,10 +138,10 @@ module API
 
       desc "Get the status of a user"
       params do
-        requires :id_or_username, type: String, desc: 'The ID or username of the user'
+        requires :user_id, type: String, desc: 'The ID or username of the user'
       end
-      get ":id_or_username/status" do
-        user = find_user(params[:id_or_username])
+      get ":user_id/status", requirements: API::USER_REQUIREMENTS do
+        user = find_user(params[:user_id])
         not_found!('User') unless user && can?(current_user, :read_user, user)
 
         present user.status || {}, with: Entities::UserStatus
@@ -153,6 +158,7 @@ module API
         at_least_one_of :password, :reset_password
         requires :name, type: String, desc: 'The name of the user'
         requires :username, type: String, desc: 'The username of the user'
+        optional :force_random_password, type: Boolean, desc: 'Flag indicating a random password will be set'
         use :optional_attributes
       end
       post do
@@ -204,22 +210,9 @@ module API
                 .where.not(id: user.id).count > 0
 
         user_params = declared_params(include_missing: false)
-        identity_attrs = user_params.slice(:provider, :extern_uid)
-
-        if identity_attrs.any?
-          identity = user.identities.find_by(provider: identity_attrs[:provider])
-
-          if identity
-            identity.update(identity_attrs)
-          else
-            identity = user.identities.build(identity_attrs)
-            identity.save
-          end
-        end
 
         user_params[:password_expires_at] = Time.now if user_params[:password].present?
-
-        result = ::Users::UpdateService.new(current_user, user_params.except(:extern_uid, :provider).merge(user: user)).execute
+        result = ::Users::UpdateService.new(current_user, user_params.merge(user: user)).execute
 
         if result[:status] == :success
           present user, with: Entities::UserPublic, current_user: current_user

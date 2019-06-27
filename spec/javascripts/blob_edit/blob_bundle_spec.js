@@ -1,19 +1,13 @@
 import blobBundle from '~/blob_edit/blob_bundle';
 import $ from 'jquery';
 
-window.ace = {
-  config: {
-    set: () => {},
-    loadModule: () => {},
-  },
-  edit: () => ({ focus: () => {} }),
-};
-
-describe('EditBlob', () => {
+describe('BlobBundle', () => {
   beforeEach(() => {
+    spyOnDependency(blobBundle, 'EditBlob').and.stub();
     setFixtures(`
-      <div class="js-edit-blob-form">
+      <div class="js-edit-blob-form" data-blob-filename="blah">
         <button class="js-commit-button"></button>
+        <a class="btn btn-cancel" href="#"></a>
       </div>`);
     blobBundle();
   });
@@ -24,6 +18,12 @@ describe('EditBlob', () => {
 
   it('removes beforeunload listener if commit button is clicked', () => {
     $('.js-commit-button').click();
+
+    expect(window.onbeforeunload).toBeNull();
+  });
+
+  it('removes beforeunload listener when cancel link is clicked', () => {
+    $('.btn.btn-cancel').click();
 
     expect(window.onbeforeunload).toBeNull();
   });

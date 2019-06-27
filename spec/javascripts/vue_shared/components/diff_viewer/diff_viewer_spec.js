@@ -22,6 +22,7 @@ describe('DiffViewer', () => {
 
     createComponent({
       diffMode: 'replaced',
+      diffViewerMode: 'image',
       newPath: GREEN_BOX_IMAGE_URL,
       newSha: 'ABC',
       oldPath: RED_BOX_IMAGE_URL,
@@ -45,6 +46,7 @@ describe('DiffViewer', () => {
   it('renders fallback download diff display', done => {
     createComponent({
       diffMode: 'replaced',
+      diffViewerMode: 'added',
       newPath: 'test.abc',
       newSha: 'ABC',
       oldPath: 'testold.abc',
@@ -67,5 +69,33 @@ describe('DiffViewer', () => {
 
       done();
     });
+  });
+
+  it('renders renamed component', () => {
+    createComponent({
+      diffMode: 'renamed',
+      diffViewerMode: 'renamed',
+      newPath: 'test.abc',
+      newSha: 'ABC',
+      oldPath: 'testold.abc',
+      oldSha: 'DEF',
+    });
+
+    expect(vm.$el.textContent).toContain('File moved');
+  });
+
+  it('renders mode changed component', () => {
+    createComponent({
+      diffMode: 'mode_changed',
+      diffViewerMode: 'image',
+      newPath: 'test.abc',
+      newSha: 'ABC',
+      oldPath: 'testold.abc',
+      oldSha: 'DEF',
+      aMode: '123',
+      bMode: '321',
+    });
+
+    expect(vm.$el.textContent).toContain('File mode changed from 123 to 321');
   });
 });

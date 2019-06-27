@@ -67,7 +67,9 @@ export default {
     // In both cases we should render the defaultAvatarUrl
     sanitizedSource() {
       let baseSrc = this.imgSrc === '' || this.imgSrc === null ? defaultAvatarUrl : this.imgSrc;
-      if (baseSrc.indexOf('?') === -1) baseSrc += `?width=${this.size}`;
+      // Only adds the width to the URL if its not a base64 data image
+      if (!(baseSrc.indexOf('data:') === 0) && !baseSrc.includes('?'))
+        baseSrc += `?width=${this.size}`;
       return baseSrc;
     },
     resultantSrcAttribute() {
@@ -97,6 +99,7 @@ export default {
       class="avatar"
     />
     <gl-tooltip
+      v-if="tooltipText || $slots.default"
       :target="() => $refs.userAvatarImage"
       :placement="tooltipPlacement"
       boundary="window"

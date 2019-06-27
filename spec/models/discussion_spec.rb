@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Discussion do
@@ -25,6 +27,14 @@ describe Discussion do
         DiffDiscussion.new([first_note, second_note], merge_request),
         DiffDiscussion.new([third_note], merge_request)
       ])
+    end
+  end
+
+  describe 'authorization' do
+    it 'delegates to the first note' do
+      policy = DeclarativePolicy.policy_for(instance_double(User, id: 1), subject)
+
+      expect(policy).to be_a(NotePolicy)
     end
   end
 end

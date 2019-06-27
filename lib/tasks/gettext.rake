@@ -19,6 +19,7 @@ namespace :gettext do
     Rake::Task['gettext:po_to_json'].invoke
   end
 
+  desc 'Regenerate gitlab.pot file'
   task :regenerate do
     pot_file = 'locale/gitlab.pot'
     # Remove all translated files, this speeds up finding
@@ -82,7 +83,7 @@ namespace :gettext do
 
     # `gettext:find` writes touches to temp files to `stderr` which would cause
     # `static-analysis` to report failures. We can ignore these.
-    silence_sdterr do
+    silence_stderr do
       Rake::Task['gettext:find'].invoke
     end
 
@@ -119,7 +120,7 @@ namespace :gettext do
     end
   end
 
-  def silence_sdterr(&block)
+  def silence_stderr(&block)
     old_stderr = $stderr.dup
     $stderr.reopen(File::NULL)
     $stderr.sync = true

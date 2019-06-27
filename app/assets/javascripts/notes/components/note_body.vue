@@ -1,10 +1,13 @@
 <script>
+import { mapActions } from 'vuex';
 import $ from 'jquery';
+import getDiscussion from 'ee_else_ce/notes/mixins/get_discussion';
 import noteEditedText from './note_edited_text.vue';
 import noteAwardsList from './note_awards_list.vue';
 import noteAttachment from './note_attachment.vue';
 import noteForm from './note_form.vue';
 import autosave from '../mixins/autosave';
+import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 
 export default {
   components: {
@@ -12,12 +15,18 @@ export default {
     noteAwardsList,
     noteAttachment,
     noteForm,
+    Suggestions,
   },
-  mixins: [autosave],
+  mixins: [autosave, getDiscussion],
   props: {
     note: {
       type: Object,
       required: true,
+    },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
     },
     canEdit: {
       type: Boolean,
@@ -28,10 +37,21 @@ export default {
       required: false,
       default: false,
     },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     noteBody() {
       return this.note.note;
+    },
+    hasSuggestion() {
+      return this.note.suggestions && this.note.suggestions.length;
+    },
+    lineType() {
+      return this.line ? this.line.type : null;
     },
   },
   mounted() {
@@ -53,14 +73,22 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['submitSuggestion']),
     renderGFM() {
       $(this.$refs['note-body']).renderGFM();
     },
-    handleFormUpdate(note, parentElement, callback) {
-      this.$emit('handleFormUpdate', note, parentElement, callback);
+    handleFormUpdate(note, parentElement, callback, resolveDiscussion) {
+      this.$emit('handleFormUpdate', note, parentElement, callback, resolveDiscussion);
     },
     formCancelHandler(shouldConfirm, isDirty) {
       this.$emit('cancelForm', shouldConfirm, isDirty);
+    },
+    applySuggestion({ suggestionId, flashContainer, callback = () => {} }) {
+      const { discussion_id: discussionId, id: noteId } = this.note;
+
+      return this.submitSuggestion({ discussionId, noteId, suggestionId, flashContainer }).then(
+        callback,
+      );
     },
   },
 };
@@ -68,14 +96,26 @@ export default {
 
 <template>
   <div ref="note-body" :class="{ 'js-task-list-container': canEdit }" class="note-body">
-    <div class="note-text md" v-html="note.note_html"></div>
+    <suggestions
+      v-if="hasSuggestion && !isEditing"
+      :suggestions="note.suggestions"
+      :note-html="note.note_html"
+      :line-type="lineType"
+      :help-page-path="helpPagePath"
+      @apply="applySuggestion"
+    />
+    <div v-else class="note-text md" v-html="note.note_html"></div>
     <note-form
       v-if="isEditing"
       ref="noteForm"
       :is-editing="isEditing"
       :note-body="noteBody"
       :note-id="note.id"
-      :markdown-version="note.cached_markdown_version"
+      :line="line"
+      :note="note"
+      :help-page-path="helpPagePath"
+      :discussion="discussion"
+      :resolve-discussion="note.resolve_discussion"
       @handleFormUpdate="handleFormUpdate"
       @cancelForm="formCancelHandler"
     />
@@ -84,6 +124,7 @@ export default {
       v-model="note.note"
       :data-update-url="note.path"
       class="hidden js-task-list-field"
+      dir="auto"
     ></textarea>
     <note-edited-text
       v-if="note.last_edited_at"

@@ -9,7 +9,7 @@ module API
     params do
       requires :id, type: String, desc: 'The project ID'
     end
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get all Pipelines of the project' do
         detail 'This feature was introduced in GitLab 8.11.'
         success Entities::PipelineBasic
@@ -42,7 +42,7 @@ module API
         success Entities::Pipeline
       end
       params do
-        requires :ref, type: String,  desc: 'Reference'
+        requires :ref, type: String, desc: 'Reference'
         optional :variables, Array, desc: 'Array of variables available in the pipeline'
       end
       # rubocop: disable CodeReuse/ActiveRecord
@@ -76,9 +76,22 @@ module API
         requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
       end
       get ':id/pipelines/:pipeline_id' do
-        authorize! :read_pipeline, user_project
+        authorize! :read_pipeline, pipeline
 
         present pipeline, with: Entities::Pipeline
+      end
+
+      desc 'Gets the variables for a given pipeline' do
+        detail 'This feature was introduced in GitLab 11.11'
+        success Entities::Variable
+      end
+      params do
+        requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
+      end
+      get ':id/pipelines/:pipeline_id/variables' do
+        authorize! :read_pipeline_variable, pipeline
+
+        present pipeline.variables, with: Entities::Variable
       end
 
       desc 'Deletes a pipeline' do
@@ -101,10 +114,10 @@ module API
         success Entities::Pipeline
       end
       params do
-        requires :pipeline_id, type: Integer,  desc: 'The pipeline ID'
+        requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
       end
       post ':id/pipelines/:pipeline_id/retry' do
-        authorize! :update_pipeline, user_project
+        authorize! :update_pipeline, pipeline
 
         pipeline.retry_failed(current_user)
 
@@ -116,21 +129,21 @@ module API
         success Entities::Pipeline
       end
       params do
-        requires :pipeline_id, type: Integer,  desc: 'The pipeline ID'
+        requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
       end
       post ':id/pipelines/:pipeline_id/cancel' do
-        authorize! :update_pipeline, user_project
+        authorize! :update_pipeline, pipeline
 
         pipeline.cancel_running
 
         status 200
-        present pipeline.reload, with: Entities::Pipeline
+        present pipeline.reset, with: Entities::Pipeline
       end
     end
 
     helpers do
       def pipeline
-        @pipeline ||= user_project.pipelines.find(params[:pipeline_id])
+        @pipeline ||= user_project.ci_pipelines.find(params[:pipeline_id])
       end
     end
   end

@@ -1,14 +1,26 @@
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import Vue from 'vue';
 import collapsibleComponent from '~/registry/components/collapsible_container.vue';
 import store from '~/registry/stores';
-import { repoPropsData } from '../mock_data';
+import * as types from '~/registry/stores/mutation_types';
+
+import { repoPropsData, registryServerResponse, reposServerResponse } from '../mock_data';
 
 describe('collapsible registry container', () => {
   let vm;
-  let Component;
+  let mock;
+  const Component = Vue.extend(collapsibleComponent);
+
+  const findDeleteBtn = () => vm.$el.querySelector('.js-remove-repo');
 
   beforeEach(() => {
-    Component = Vue.extend(collapsibleComponent);
+    mock = new MockAdapter(axios);
+
+    mock.onGet(repoPropsData.tagsPath).replyOnce(200, registryServerResponse, {});
+
+    store.commit(types.SET_REPOS_LIST, reposServerResponse);
+
     vm = new Component({
       store,
       propsData: {
@@ -18,24 +30,23 @@ describe('collapsible registry container', () => {
   });
 
   afterEach(() => {
+    mock.restore();
     vm.$destroy();
   });
 
   describe('toggle', () => {
     it('should be closed by default', () => {
       expect(vm.$el.querySelector('.container-image-tags')).toBe(null);
-      expect(vm.$el.querySelector('.container-image-head i').className).toEqual(
-        'fa fa-chevron-right',
-      );
+      expect(vm.iconName).toEqual('angle-right');
     });
 
     it('should be open when user clicks on closed repo', done => {
       vm.$el.querySelector('.js-toggle-repo').click();
+
       Vue.nextTick(() => {
-        expect(vm.$el.querySelector('.container-image-tags')).toBeDefined();
-        expect(vm.$el.querySelector('.container-image-head i').className).toEqual(
-          'fa fa-chevron-up',
-        );
+        expect(vm.$el.querySelector('.container-image-tags')).not.toBeNull();
+        expect(vm.iconName).toEqual('angle-up');
+
         done();
       });
     });
@@ -45,12 +56,12 @@ describe('collapsible registry container', () => {
 
       Vue.nextTick(() => {
         vm.$el.querySelector('.js-toggle-repo').click();
-        Vue.nextTick(() => {
-          expect(vm.$el.querySelector('.container-image-tags')).toBe(null);
-          expect(vm.$el.querySelector('.container-image-head i').className).toEqual(
-            'fa fa-chevron-right',
-          );
-          done();
+        setTimeout(() => {
+          Vue.nextTick(() => {
+            expect(vm.$el.querySelector('.container-image-tags')).toBe(null);
+            expect(vm.iconName).toEqual('angle-right');
+            done();
+          });
         });
       });
     });
@@ -58,7 +69,25 @@ describe('collapsible registry container', () => {
 
   describe('delete repo', () => {
     it('should be possible to delete a repo', () => {
-      expect(vm.$el.querySelector('.js-remove-repo')).toBeDefined();
+      expect(findDeleteBtn()).not.toBeNull();
+    });
+
+    describe('clicked on delete', () => {
+      beforeEach(done => {
+        findDeleteBtn().click();
+        Vue.nextTick(done);
+      });
+
+      it('should open confirmation modal', () => {
+        expect(vm.$el.querySelector('#confirm-repo-deletion-modal')).not.toBeNull();
+      });
+
+      it('should call deleteItem when confirming deletion', () => {
+        spyOn(vm, 'deleteItem').and.returnValue(Promise.resolve());
+        vm.$el.querySelector('#confirm-repo-deletion-modal .btn-danger').click();
+
+        expect(vm.deleteItem).toHaveBeenCalledWith(vm.repo);
+      });
     });
   });
 });

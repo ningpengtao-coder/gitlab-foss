@@ -1,6 +1,21 @@
 # Discussions API
 
-Discussions are set of related notes on snippets, issues, merge requests or commits.
+Discussions are a set of related notes on:
+
+- Snippets
+- Issues
+- Epics **[ULTIMATE]**
+- Merge requests
+- Commits
+
+This includes system notes, which are notes about changes to the object (for example, when a milestone changes, there will be a corresponding system note). Label notes are not part of this API, but recorded as separate events in [resource label events](resource_label_events.md).
+
+## Discussions pagination
+
+By default, `GET` requests return 20 results at a time because the API results
+are paginated.
+
+Read more on [pagination](README.md#pagination).
 
 ## Issues
 
@@ -97,7 +112,7 @@ GET /projects/:id/issues/:issue_iid/discussions
 ```
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions
 ```
 
 ### Get single issue discussion
@@ -117,7 +132,7 @@ Parameters:
 | `discussion_id` | integer        | yes      | The ID of a discussion |
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new issue discussion
@@ -139,12 +154,13 @@ Parameters:
 | `created_at`    | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions?body=comment
 ```
 
 ### Add note to existing issue discussion
 
-Adds a new note to the discussion.
+Adds a new note to the discussion. This can also
+[create a discussion from a single comment](../user/discussions/#start-a-discussion-by-replying-to-a-standard-comment).
 
 ```
 POST /projects/:id/issues/:issue_iid/discussions/:discussion_id/notes
@@ -162,7 +178,7 @@ Parameters:
 | `created_at`    | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
 ```
 
 ### Modify existing issue discussion note
@@ -184,7 +200,7 @@ Parameters:
 | `body`          | string         | yes      | The content of a discussion |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
 ```
 
 ### Delete an issue discussion note
@@ -205,7 +221,7 @@ Parameters:
 | `note_id`       | integer        | yes      | The ID of a discussion note |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/636
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/issues/11/discussions/636
 ```
 
 ## Snippets
@@ -303,7 +319,7 @@ GET /projects/:id/snippets/:snippet_id/discussions
 ```
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions
 ```
 
 ### Get single snippet discussion
@@ -323,7 +339,7 @@ Parameters:
 | `discussion_id` | integer        | yes      | The ID of a discussion |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new snippet discussion
@@ -345,7 +361,7 @@ Parameters:
 | `created_at`    | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions?body=comment
 ```
 
 ### Add note to existing snippet discussion
@@ -368,7 +384,7 @@ Parameters:
 | `created_at`    | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
 ```
 
 ### Modify existing snippet discussion note
@@ -390,7 +406,7 @@ Parameters:
 | `body`          | string         | yes      | The content of a discussion |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
 ```
 
 ### Delete an snippet discussion note
@@ -411,7 +427,215 @@ Parameters:
 | `note_id`       | integer        | yes      | The ID of a discussion note |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/636
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/636
+```
+
+## Epics **[ULTIMATE]**
+
+### List group epic discussions
+
+Gets a list of all discussions for a single epic.
+
+```
+GET /groups/:id/epics/:epic_id/discussions
+```
+
+| Attribute           | Type             | Required   | Description  |
+| ------------------- | ---------------- | ---------- | ------------ |
+| `id`                | integer/string   | yes        | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `epic_id`           | integer          | yes        | The ID of an epic |
+
+```json
+[
+  {
+    "id": "6a9c1750b37d513a43987b574953fceb50b03ce7",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1126,
+        "type": "DiscussionNote",
+        "body": "discussion text",
+        "attachment": null,
+        "author": {
+          "id": 1,
+          "name": "root",
+          "username": "root",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/00afb8fb6ab07c3ee3e9c1f38777e2f4?s=80&d=identicon",
+          "web_url": "http://localhost:3000/root"
+        },
+        "created_at": "2018-03-03T21:54:39.668Z",
+        "updated_at": "2018-03-03T21:54:39.668Z",
+        "system": false,
+        "noteable_id": 3,
+        "noteable_type": "Epic",
+        "noteable_id": null,
+        "resolvable": false
+      },
+      {
+        "id": 1129,
+        "type": "DiscussionNote",
+        "body": "reply to the discussion",
+        "attachment": null,
+        "author": {
+          "id": 1,
+          "name": "root",
+          "username": "root",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/00afb8fb6ab07c3ee3e9c1f38777e2f4?s=80&d=identicon",
+          "web_url": "http://localhost:3000/root"
+        },
+        "created_at": "2018-03-04T13:38:02.127Z",
+        "updated_at": "2018-03-04T13:38:02.127Z",
+        "system": false,
+        "noteable_id": 3,
+        "noteable_type": "Epic",
+        "noteable_id": null,
+        "resolvable": false
+      }
+    ]
+  },
+  {
+    "id": "87805b7c09016a7058e91bdbe7b29d1f284a39e6",
+    "individual_note": true,
+    "notes": [
+      {
+        "id": 1128,
+        "type": null,
+        "body": "a single comment",
+        "attachment": null,
+        "author": {
+          "id": 1,
+          "name": "root",
+          "username": "root",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/00afb8fb6ab07c3ee3e9c1f38777e2f4?s=80&d=identicon",
+          "web_url": "http://localhost:3000/root"
+        },
+        "created_at": "2018-03-04T09:17:22.520Z",
+        "updated_at": "2018-03-04T09:17:22.520Z",
+        "system": false,
+        "noteable_id": 3,
+        "noteable_type": "Epic",
+        "noteable_id": null,
+        "resolvable": false
+      }
+    ]
+  }
+]
+```
+
+```bash
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions
+```
+
+### Get single epic discussion
+
+Returns a single discussion for a specific group epic
+
+```
+GET /groups/:id/epics/:epic_id/discussions/:discussion_id
+```
+
+Parameters:
+
+| Attribute       | Type           | Required | Description |
+| --------------- | -------------- | -------- | ----------- |
+| `id`            | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `epic_id`       | integer        | yes      | The ID of an epic |
+| `discussion_id` | integer        | yes      | The ID of a discussion |
+
+```bash
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+```
+
+### Create new epic discussion
+
+Creates a new discussion to a single group epic. This is similar to creating
+a note but but another comments (replies) can be added to it later.
+
+```
+POST /groups/:id/epics/:epic_id/discussions
+```
+
+Parameters:
+
+| Attribute       | Type           | Required | Description |
+| --------------- | -------------- | -------- | ----------- |
+| `id`            | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `epic_id`       | integer        | yes      | The ID of an epic |
+| `body`          | string         | yes      | The content of a discussion |
+| `created_at`    | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
+
+```bash
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions?body=comment
+```
+
+### Add note to existing epic discussion
+
+Adds a new note to the discussion. This can also
+[create a discussion from a single comment](../user/discussions/#start-a-discussion-by-replying-to-a-standard-comment).
+
+```
+POST /groups/:id/epics/:epic_id/discussions/:discussion_id/notes
+```
+
+Parameters:
+
+| Attribute       | Type           | Required | Description |
+| --------------- | -------------- | -------- | ----------- |
+| `id`            | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `epic_id`     | integer        | yes      | The ID of an epic |
+| `discussion_id` | integer        | yes      | The ID of a discussion |
+| `note_id`       | integer        | yes      | The ID of a discussion note |
+| `body`          | string         | yes      | The content of a discussion |
+| `created_at`    | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
+
+```bash
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
+```
+
+### Modify existing epic discussion note
+
+Modify existing discussion note of an epic.
+
+```
+PUT /groups/:id/epics/:epic_id/discussions/:discussion_id/notes/:note_id
+```
+
+Parameters:
+
+| Attribute       | Type           | Required | Description |
+| --------------- | -------------- | -------- | ----------- |
+| `id`            | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `epic_id`       | integer        | yes      | The ID of an epic |
+| `discussion_id` | integer        | yes      | The ID of a discussion |
+| `note_id`       | integer        | yes      | The ID of a discussion note |
+| `body`          | string         | yes      | The content of a discussion |
+
+```bash
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
+```
+
+### Delete an epic discussion note
+
+Deletes an existing discussion note of an epic.
+
+```
+DELETE /groups/:id/epics/:epic_id/discussions/:discussion_id/notes/:note_id
+```
+
+Parameters:
+
+| Attribute       | Type           | Required | Description |
+| --------------- | -------------- | -------- | ----------- |
+| `id`            | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) |
+| `epic_id`       | integer        | yes      | The ID of an epic |
+| `discussion_id` | integer        | yes      | The ID of a discussion |
+| `note_id`       | integer        | yes      | The ID of a discussion note |
+
+```bash
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/5/epics/11/discussions/636
 ```
 
 ## Merge requests
@@ -562,7 +786,7 @@ Diff comments contain also position:
 ```
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions
 ```
 
 ### Get single merge request discussion
@@ -582,7 +806,7 @@ Parameters:
 | `discussion_id`     | integer        | yes      | The ID of a discussion |
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new merge request discussion
@@ -617,7 +841,7 @@ Parameters:
 | `position[y]`             | integer        | no       | Y coordinate (for 'image' diff notes) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions?body=comment
 ```
 
 ### Resolve a merge request discussion
@@ -638,13 +862,13 @@ Parameters:
 | `resolved`          | boolean        | yes      | Resolve/unresolve the discussion |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7?resolved=true
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7?resolved=true
 ```
-
 
 ### Add note to existing merge request discussion
 
-Adds a new note to the discussion.
+Adds a new note to the discussion. This can also
+[create a discussion from a single comment](../user/discussions/#start-a-discussion-by-replying-to-a-standard-comment).
 
 ```
 POST /projects/:id/merge_requests/:merge_request_iid/discussions/:discussion_id/notes
@@ -662,7 +886,7 @@ Parameters:
 | `created_at`        | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
 ```
 
 ### Modify an existing merge request discussion note
@@ -685,13 +909,13 @@ Parameters:
 | `resolved`          | boolean        | no       | Resolve/unresolve the note (exactly one of `body` or `resolved` must be set |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
 ```
 
 Resolving a note:
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?resolved=true
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?resolved=true
 ```
 
 ### Delete a merge request discussion note
@@ -712,7 +936,7 @@ Parameters:
 | `note_id`           | integer        | yes      | The ID of a discussion note |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/636
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/merge_requests/11/discussions/636
 ```
 
 ## Commits
@@ -855,7 +1079,7 @@ Diff comments contain also position:
 ```
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions
 ```
 
 ### Get single commit discussion
@@ -875,7 +1099,7 @@ Parameters:
 | `discussion_id`     | integer        | yes      | The ID of a discussion |
 
 ```bash
-curl --request GET --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
+curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7
 ```
 
 ### Create new commit discussion
@@ -910,7 +1134,7 @@ Parameters:
 | `position[y]`             | integer        | no       | Y coordinate (for 'image' diff notes) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions?body=comment
 ```
 
 ### Add note to existing commit discussion
@@ -933,7 +1157,7 @@ Parameters:
 | `created_at`        | string         | no       | Date time string, ISO 8601 formatted, e.g. 2016-03-11T03:45:40Z (requires admin or project/group owner rights) |
 
 ```bash
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes?body=comment
 ```
 
 ### Modify an existing commit discussion note
@@ -955,13 +1179,13 @@ Parameters:
 | `body`              | string         | no       | The content of a note |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?body=comment
 ```
 
 Resolving a note:
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?resolved=true
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/6a9c1750b37d513a43987b574953fceb50b03ce7/notes/1108?resolved=true
 ```
 
 ### Delete a commit discussion note
@@ -982,5 +1206,5 @@ Parameters:
 | `note_id`           | integer        | yes      | The ID of a discussion note |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/636
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/commits/11/discussions/636
 ```

@@ -8,6 +8,10 @@ function selectedText(text, textarea) {
   return text.substring(textarea.selectionStart, textarea.selectionEnd);
 }
 
+function addBlockTags(blockTag, selected) {
+  return `${blockTag}\n${selected}\n${blockTag}`;
+}
+
 function lineBefore(text, textarea) {
   var split;
   split = text
@@ -24,58 +28,129 @@ function lineAfter(text, textarea) {
     .split('\n')[0];
 }
 
+function editorBlockTagText(text, blockTag, selected, editor) {
+  const lines = text.split('\n');
+  const selectionRange = editor.getSelectionRange();
+  const shouldRemoveBlock =
+    lines[selectionRange.start.row - 1] === blockTag &&
+    lines[selectionRange.end.row + 1] === blockTag;
+
+  if (shouldRemoveBlock) {
+    if (blockTag !== null) {
+      // ace is globally defined
+      // eslint-disable-next-line no-undef
+      const { Range } = ace.require('ace/range');
+      const lastLine = lines[selectionRange.end.row + 1];
+      const rangeWithBlockTags = new Range(
+        lines[selectionRange.start.row - 1],
+        0,
+        selectionRange.end.row + 1,
+        lastLine.length,
+      );
+      editor.getSelection().setSelectionRange(rangeWithBlockTags);
+    }
+    return selected;
+  }
+  return addBlockTags(blockTag, selected);
+}
+
 function blockTagText(text, textArea, blockTag, selected) {
-  const before = lineBefore(text, textArea);
-  const after = lineAfter(text, textArea);
-  if (before === blockTag && after === blockTag) {
+  const shouldRemoveBlock =
+    lineBefore(text, textArea) === blockTag && lineAfter(text, textArea) === blockTag;
+
+  if (shouldRemoveBlock) {
     // To remove the block tag we have to select the line before & after
     if (blockTag != null) {
       textArea.selectionStart = textArea.selectionStart - (blockTag.length + 1);
       textArea.selectionEnd = textArea.selectionEnd + (blockTag.length + 1);
     }
     return selected;
-  } else {
-    return blockTag + '\n' + selected + '\n' + blockTag;
   }
+  return addBlockTags(blockTag, selected);
 }
 
-function moveCursor({ textArea, tag, positionBetweenTags, removedLastNewLine, select }) {
+function moveCursor({
+  textArea,
+  tag,
+  cursorOffset,
+  positionBetweenTags,
+  removedLastNewLine,
+  select,
+  editor,
+  editorSelectionStart,
+  editorSelectionEnd,
+}) {
   var pos;
-  if (!textArea.setSelectionRange) {
+  if (textArea && !textArea.setSelectionRange) {
     return;
   }
   if (select && select.length > 0) {
-    // calculate the part of the text to be selected
-    const startPosition = textArea.selectionStart - (tag.length - tag.indexOf(select));
-    const endPosition = startPosition + select.length;
-    return textArea.setSelectionRange(startPosition, endPosition);
+    if (textArea) {
+      // calculate the part of the text to be selected
+      const startPosition = textArea.selectionStart - (tag.length - tag.indexOf(select));
+      const endPosition = startPosition + select.length;
+      return textArea.setSelectionRange(startPosition, endPosition);
+    } else if (editor) {
+      editor.navigateLeft(tag.length - tag.indexOf(select));
+      editor.getSelection().selectAWord();
+      return;
+    }
   }
-  if (textArea.selectionStart === textArea.selectionEnd) {
+  if (textArea) {
+    if (textArea.selectionStart === textArea.selectionEnd) {
+      if (positionBetweenTags) {
+        pos = textArea.selectionStart - tag.length;
+      } else {
+        pos = textArea.selectionStart;
+      }
+
+      if (removedLastNewLine) {
+        pos -= 1;
+      }
+
+      if (cursorOffset) {
+        pos -= cursorOffset;
+      }
+
+      return textArea.setSelectionRange(pos, pos);
+    }
+  } else if (editor && editorSelectionStart.row === editorSelectionEnd.row) {
     if (positionBetweenTags) {
-      pos = textArea.selectionStart - tag.length;
-    } else {
-      pos = textArea.selectionStart;
+      editor.navigateLeft(tag.length);
     }
-
-    if (removedLastNewLine) {
-      pos -= 1;
-    }
-
-    return textArea.setSelectionRange(pos, pos);
   }
 }
 
-export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wrap, select }) {
+export function insertMarkdownText({
+  textArea,
+  text,
+  tag,
+  cursorOffset,
+  blockTag,
+  selected = '',
+  wrap,
+  select,
+  editor,
+}) {
   var textToInsert,
     selectedSplit,
     startChar,
     removedLastNewLine,
     removedFirstNewLine,
     currentLineEmpty,
-    lastNewLine;
+    lastNewLine,
+    editorSelectionStart,
+    editorSelectionEnd;
   removedLastNewLine = false;
   removedFirstNewLine = false;
   currentLineEmpty = false;
+
+  if (editor) {
+    const selectionRange = editor.getSelectionRange();
+
+    editorSelectionStart = selectionRange.start;
+    editorSelectionEnd = selectionRange.end;
+  }
 
   // check for link pattern and selected text is an URL
   // if so fill in the url part instead of the text part of the pattern.
@@ -99,14 +174,27 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
   }
 
   // Remove the last newline
-  if (textArea.selectionEnd - textArea.selectionStart > selected.replace(/\n$/, '').length) {
-    removedLastNewLine = true;
-    selected = selected.replace(/\n$/, '');
+  if (textArea) {
+    if (textArea.selectionEnd - textArea.selectionStart > selected.replace(/\n$/, '').length) {
+      removedLastNewLine = true;
+      selected = selected.replace(/\n$/, '');
+    }
+  } else if (editor) {
+    if (editorSelectionStart.row !== editorSelectionEnd.row) {
+      removedLastNewLine = true;
+      selected = selected.replace(/\n$/, '');
+    }
   }
 
   selectedSplit = selected.split('\n');
 
-  if (!wrap) {
+  if (editor && !wrap) {
+    lastNewLine = editor.getValue().split('\n')[editorSelectionStart.row];
+
+    if (/^\s*$/.test(lastNewLine)) {
+      currentLineEmpty = true;
+    }
+  } else if (textArea && !wrap) {
     lastNewLine = textArea.value.substr(0, textArea.selectionStart).lastIndexOf('\n');
 
     // Check whether the current line is empty or consists only of spaces(=handle as empty)
@@ -115,13 +203,19 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
     }
   }
 
-  startChar = !wrap && !currentLineEmpty && textArea.selectionStart > 0 ? '\n' : '';
+  const isBeginning =
+    (textArea && textArea.selectionStart === 0) ||
+    (editor && editorSelectionStart.column === 0 && editorSelectionStart.row === 0);
+
+  startChar = !wrap && !currentLineEmpty && !isBeginning ? '\n' : '';
 
   const textPlaceholder = '{text}';
 
   if (selectedSplit.length > 1 && (!wrap || (blockTag != null && blockTag !== ''))) {
     if (blockTag != null && blockTag !== '') {
-      textToInsert = blockTagText(text, textArea, blockTag, selected);
+      textToInsert = editor
+        ? editorBlockTagText(text, blockTag, selected, editor)
+        : blockTagText(text, textArea, blockTag, selected);
     } else {
       textToInsert = selectedSplit
         .map(function(val) {
@@ -129,9 +223,9 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
             return tag.replace(textPlaceholder, val);
           }
           if (val.indexOf(tag) === 0) {
-            return '' + val.replace(tag, '');
+            return String(val.replace(tag, ''));
           } else {
-            return '' + tag + val;
+            return String(tag) + val;
           }
         })
         .join('\n');
@@ -139,7 +233,7 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
   } else if (tag.indexOf(textPlaceholder) > -1) {
     textToInsert = tag.replace(textPlaceholder, selected);
   } else {
-    textToInsert = '' + startChar + tag + selected + (wrap ? tag : ' ');
+    textToInsert = String(startChar) + tag + selected + (wrap ? tag : ' ');
   }
 
   if (removedFirstNewLine) {
@@ -150,24 +244,41 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
     textToInsert += '\n';
   }
 
-  insertText(textArea, textToInsert);
+  if (editor) {
+    editor.insert(textToInsert);
+  } else {
+    insertText(textArea, textToInsert);
+  }
   return moveCursor({
     textArea,
     tag: tag.replace(textPlaceholder, selected),
+    cursorOffset,
     positionBetweenTags: wrap && selected.length === 0,
     removedLastNewLine,
     select,
+    editor,
+    editorSelectionStart,
+    editorSelectionEnd,
   });
 }
 
-function updateText({ textArea, tag, blockTag, wrap, select }) {
+function updateText({ textArea, tag, cursorOffset, blockTag, wrap, select, tagContent }) {
   var $textArea, selected, text;
   $textArea = $(textArea);
   textArea = $textArea.get(0);
   text = $textArea.val();
-  selected = selectedText(text, textArea);
+  selected = selectedText(text, textArea) || tagContent;
   $textArea.focus();
-  return insertMarkdownText({ textArea, text, tag, blockTag, selected, wrap, select });
+  return insertMarkdownText({
+    textArea,
+    text,
+    tag,
+    cursorOffset,
+    blockTag,
+    selected,
+    wrap,
+    select,
+  });
 }
 
 export function addMarkdownListeners(form) {
@@ -178,10 +289,31 @@ export function addMarkdownListeners(form) {
       return updateText({
         textArea: $this.closest('.md-area').find('textarea'),
         tag: $this.data('mdTag'),
+        cursorOffset: $this.data('mdCursorOffset'),
         blockTag: $this.data('mdBlock'),
         wrap: !$this.data('mdPrepend'),
         select: $this.data('mdSelect'),
+        tagContent: $this.data('mdTagContent'),
       });
+    });
+}
+
+export function addEditorMarkdownListeners(editor) {
+  $('.js-md')
+    .off('click')
+    .on('click', function(e) {
+      const { mdTag, mdBlock, mdPrepend, mdSelect } = $(e.currentTarget).data();
+
+      insertMarkdownText({
+        tag: mdTag,
+        blockTag: mdBlock,
+        wrap: !mdPrepend,
+        select: mdSelect,
+        selected: editor.getSelectedText(),
+        text: editor.getValue(),
+        editor,
+      });
+      editor.focus();
     });
 }
 

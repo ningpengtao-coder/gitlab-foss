@@ -5,9 +5,11 @@
 # We'll move this class to Clusters::Platforms::Kubernetes, which contains exactly the same logic.
 # After we've migrated data, we'll remove KubernetesService. This would happen in a few months.
 # If you're modyfiyng this class, please note that you should update the same change in Clusters::Platforms::Kubernetes.
-class KubernetesService < DeploymentService
+class KubernetesService < Service
   include Gitlab::Kubernetes
   include ReactiveCaching
+
+  default_value_for :category, 'deployment'
 
   self.reactive_cache_key = ->(service) { [service.class.model_name.singular, service.project_id] }
 
@@ -32,7 +34,10 @@ class KubernetesService < DeploymentService
 
   before_validation :enforce_namespace_to_lower_case
 
-  validate :deprecation_validation, unless: :template?
+  attr_accessor :skip_deprecation_validation
+
+  validate :deprecation_validation, unless: :skip_deprecation_validation
+
   validates :namespace,
     allow_blank: true,
     length: 1..63,
@@ -44,6 +49,14 @@ class KubernetesService < DeploymentService
 
   after_save :clear_reactive_cache!
 
+  def self.supported_events
+    %w()
+  end
+
+  def can_test?
+    false
+  end
+
   def initialize_properties
     self.properties = {} if properties.nil?
   end
@@ -53,12 +66,7 @@ class KubernetesService < DeploymentService
   end
 
   def description
-    'Kubernetes / Openshift integration'
-  end
-
-  def help
-    'To enable terminal access to Kubernetes environments, label your ' \
-    'deployments with `app=$CI_ENVIRONMENT_SLUG`'
+    'Kubernetes / OpenShift integration'
   end
 
   def self.to_param
@@ -86,7 +94,7 @@ class KubernetesService < DeploymentService
     ]
   end
 
-  def actual_namespace
+  def kubernetes_namespace_for(project)
     if namespace.present?
       namespace
     else
@@ -110,14 +118,12 @@ class KubernetesService < DeploymentService
   # Clusters::Platforms::Kubernetes, it won't be used on this method
   # as it's only needed for Clusters::Cluster.
   def predefined_variables(project:)
-    config = YAML.dump(kubeconfig)
-
     Gitlab::Ci::Variables::Collection.new.tap do |variables|
       variables
         .append(key: 'KUBE_URL', value: api_url)
-        .append(key: 'KUBE_TOKEN', value: token, public: false)
-        .append(key: 'KUBE_NAMESPACE', value: actual_namespace)
-        .append(key: 'KUBECONFIG', value: config, public: false, file: true)
+        .append(key: 'KUBE_TOKEN', value: token, public: false, masked: true)
+        .append(key: 'KUBE_NAMESPACE', value: kubernetes_namespace_for(project))
+        .append(key: 'KUBECONFIG', value: kubeconfig, public: false, file: true)
 
       if ca_pem.present?
         variables
@@ -133,8 +139,10 @@ class KubernetesService < DeploymentService
   # short time later
   def terminals(environment)
     with_reactive_cache do |data|
-      pods = filter_by_label(data[:pods], app: environment.slug)
-      terminals = pods.flat_map { |pod| terminals_for_pod(api_url, actual_namespace, pod) }
+      project = environment.project
+
+      pods = filter_by_project_environment(data[:pods], project.full_path_slug, environment.slug)
+      terminals = pods.flat_map { |pod| terminals_for_pod(api_url, kubernetes_namespace_for(project), pod) }.compact
       terminals.each { |terminal| add_terminal_auth(terminal, terminal_auth) }
     end
   end
@@ -153,14 +161,24 @@ class KubernetesService < DeploymentService
   end
 
   def deprecated?
-    !active
+    true
+  end
+
+  def editable?
+    false
   end
 
   def deprecation_message
-    content = _("Kubernetes service integration has been deprecated. %{deprecated_message_content} your Kubernetes clusters using the new <a href=\"%{url}\"/>Kubernetes Clusters</a> page") % {
-      deprecated_message_content: deprecated_message_content,
-      url: Gitlab::Routing.url_helpers.project_clusters_path(project)
-    }
+    content = if project
+                _("Kubernetes service integration has been disabled. Fields on this page are not used by GitLab, you can configure your Kubernetes clusters using the new <a href=\"%{url}\"/>Kubernetes Clusters</a> page") % {
+                  url: Gitlab::Routing.url_helpers.project_clusters_path(project)
+                }
+              else
+                _("The instance-level Kubernetes service integration is disabled. Your data has been migrated to an <a href=\"%{url}\"/>instance-level cluster</a>.") % {
+                  url: Gitlab::Routing.url_helpers.admin_clusters_path
+                }
+              end
+
     content.html_safe
   end
 
@@ -171,7 +189,7 @@ class KubernetesService < DeploymentService
   def kubeconfig
     to_kubeconfig(
       url: api_url,
-      namespace: actual_namespace,
+      namespace: kubernetes_namespace_for(project),
       token: token,
       ca_pem: ca_pem)
   end
@@ -188,7 +206,7 @@ class KubernetesService < DeploymentService
   end
 
   def build_kube_client!
-    raise "Incomplete settings" unless api_url && actual_namespace && token
+    raise "Incomplete settings" unless api_url && kubernetes_namespace_for(project) && token
 
     Gitlab::Kubernetes::KubeClient.new(
       api_url,
@@ -202,7 +220,7 @@ class KubernetesService < DeploymentService
   def read_pods
     kubeclient = build_kube_client!
 
-    kubeclient.get_pods(namespace: actual_namespace).as_json
+    kubeclient.get_pods(namespace: kubernetes_namespace_for(project)).as_json
   rescue Kubeclient::ResourceNotFoundError
     []
   end
@@ -239,14 +257,6 @@ class KubernetesService < DeploymentService
 
     if deprecated?
       errors[:base] << deprecation_message
-    end
-  end
-
-  def deprecated_message_content
-    if active?
-      _("Your Kubernetes cluster information on this page is still editable, but you are advised to disable and reconfigure")
-    else
-      _("Fields on this page are now uneditable, you can configure")
     end
   end
 end

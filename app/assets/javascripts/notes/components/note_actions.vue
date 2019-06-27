@@ -1,18 +1,21 @@
 <script>
 import { mapGetters } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
-import tooltip from '~/vue_shared/directives/tooltip';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import resolvedStatusMixin from 'ee_else_ce/batch_comments/mixins/resolved_status';
+import ReplyButton from './note_actions/reply_button.vue';
 
 export default {
   name: 'NoteActions',
   components: {
     Icon,
+    ReplyButton,
     GlLoadingIcon,
   },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
+  mixins: [resolvedStatusMixin],
   props: {
     authorId: {
       type: Number,
@@ -36,6 +39,10 @@ export default {
       type: String,
       required: false,
       default: null,
+    },
+    showReply: {
+      type: Boolean,
+      required: true,
     },
     canEdit: {
       type: Boolean,
@@ -93,15 +100,6 @@ export default {
     currentUserId() {
       return this.getUserDataByProp('id');
     },
-    resolveButtonTitle() {
-      let title = 'Mark as resolved';
-
-      if (this.resolvedBy) {
-        title = `Resolved by ${this.resolvedBy.name}`;
-      }
-
-      return title;
-    },
   },
   methods: {
     onEdit() {
@@ -113,16 +111,22 @@ export default {
     onResolve() {
       this.$emit('handleResolve');
     },
+    closeTooltip() {
+      this.$nextTick(() => {
+        this.$root.$emit('bv::hide::tooltip');
+      });
+    },
   },
 };
 </script>
 
 <template>
   <div class="note-actions">
-    <span v-if="accessLevel" class="note-role user-access-role"> {{ accessLevel }} </span>
+    <span v-if="accessLevel" class="note-role user-access-role">{{ accessLevel }}</span>
     <div v-if="canResolve" class="note-actions-item">
       <button
-        v-tooltip
+        ref="resolveButton"
+        v-gl-tooltip
         :class="{ 'is-disabled': !resolvable, 'is-active': isResolved }"
         :title="resolveButtonTitle"
         :aria-label="resolveButtonTitle"
@@ -131,39 +135,37 @@ export default {
         @click="onResolve"
       >
         <template v-if="!isResolving">
-          <icon name="check-circle" />
+          <icon :name="isResolved ? 'check-circle-filled' : 'check-circle'" />
         </template>
         <gl-loading-icon v-else inline />
       </button>
     </div>
     <div v-if="canAwardEmoji" class="note-actions-item">
       <a
-        v-tooltip
+        v-gl-tooltip
         :class="{ 'js-user-authored': isAuthoredByCurrentUser }"
         class="note-action-button note-emoji-button js-add-award js-note-emoji"
-        data-position="right"
-        data-placement="bottom"
-        data-container="body"
         href="#"
         title="Add reaction"
+        data-position="right"
       >
-        <gl-loading-icon inline />
-        <icon
-          css-classes="link-highlight award-control-icon-neutral"
-          name="emoji_slightly_smiling_face"
-        />
-        <icon css-classes="link-highlight award-control-icon-positive" name="emoji_smiley" />
-        <icon css-classes="link-highlight award-control-icon-super-positive" name="emoji_smiley" />
+        <icon css-classes="link-highlight award-control-icon-neutral" name="slight-smile" />
+        <icon css-classes="link-highlight award-control-icon-positive" name="smiley" />
+        <icon css-classes="link-highlight award-control-icon-super-positive" name="smiley" />
       </a>
     </div>
+    <reply-button
+      v-if="showReply"
+      ref="replyButton"
+      class="js-reply-button"
+      @startReplying="$emit('startReplying')"
+    />
     <div v-if="canEdit" class="note-actions-item">
       <button
-        v-tooltip
+        v-gl-tooltip
         type="button"
         title="Edit comment"
         class="note-action-button js-note-edit btn btn-transparent"
-        data-container="body"
-        data-placement="bottom"
         @click="onEdit"
       >
         <icon name="pencil" css-classes="link-highlight" />
@@ -171,12 +173,10 @@ export default {
     </div>
     <div v-if="showDeleteAction" class="note-actions-item">
       <button
-        v-tooltip
+        v-gl-tooltip
         type="button"
         title="Delete comment"
         class="note-action-button js-note-delete btn btn-transparent"
-        data-container="body"
-        data-placement="bottom"
         @click="onDelete"
       >
         <icon name="remove" class="link-highlight" />
@@ -184,19 +184,18 @@ export default {
     </div>
     <div v-else-if="shouldShowActionsDropdown" class="dropdown more-actions note-actions-item">
       <button
-        v-tooltip
+        v-gl-tooltip
         type="button"
         title="More actions"
         class="note-action-button more-actions-toggle btn btn-transparent"
         data-toggle="dropdown"
-        data-container="body"
-        data-placement="bottom"
+        @click="closeTooltip"
       >
         <icon css-classes="icon" name="ellipsis_v" />
       </button>
       <ul class="dropdown-menu more-actions-dropdown dropdown-open-left">
         <li v-if="canReportAsAbuse">
-          <a :href="reportAbusePath"> {{ __('Report abuse to GitLab') }} </a>
+          <a :href="reportAbusePath">{{ __('Report abuse to admin') }}</a>
         </li>
         <li v-if="noteUrl">
           <button
@@ -213,7 +212,7 @@ export default {
             type="button"
             @click.prevent="onDelete"
           >
-            <span class="text-danger"> {{ __('Delete comment') }} </span>
+            <span class="text-danger">{{ __('Delete comment') }}</span>
           </button>
         </li>
       </ul>

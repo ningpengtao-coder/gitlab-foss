@@ -10,26 +10,26 @@ module QA
 
       it 'user adds an ssh key and pushes code to the repository' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.act { sign_in_using_credentials }
+        Page::Main::Login.perform(&:sign_in_using_credentials)
 
         key = Resource::SSHKey.fabricate! do |resource|
           resource.title = key_title
         end
 
-        Resource::Repository::ProjectPush.fabricate! do |push|
+        project_push = Resource::Repository::ProjectPush.fabricate! do |push|
           push.ssh_key = key
           push.file_name = 'README.md'
           push.file_content = '# Test Use SSH Key'
           push.commit_message = 'Add README.md'
         end
 
-        Page::Project::Show.act { wait_for_push }
+        project_push.project.visit!
 
         expect(page).to have_content('README.md')
         expect(page).to have_content('Test Use SSH Key')
 
-        Page::Main::Menu.act { go_to_profile_settings }
-        Page::Profile::Menu.act { click_ssh_keys }
+        Page::Main::Menu.perform(&:click_settings_link)
+        Page::Profile::Menu.perform(&:click_ssh_keys)
 
         Page::Profile::SSHKeys.perform do |ssh_keys|
           ssh_keys.remove_key(key_title)

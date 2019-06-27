@@ -7,6 +7,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   include RendersCommits
   include ToggleAwardEmoji
   include IssuableCollections
+  include RecordUserLastActivity
 
   skip_before_action :merge_request, only: [:index, :bulk_update]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
@@ -15,6 +16,8 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   before_action :authenticate_user!, only: [:assign_related_issues]
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
 
+  around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]
+
   def index
     @merge_requests = @issuables
 
@@ -22,8 +25,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
       format.html
       format.json do
         render json: {
-          html: view_to_html_string("projects/merge_requests/_merge_requests"),
-          labels: @labels.as_json(methods: :text_color)
+          html: view_to_html_string("projects/merge_requests/_merge_requests")
         }
       end
     end
@@ -31,7 +33,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def show
     close_merge_request_if_no_source_project
-    mark_merge_request_mergeable
+    @merge_request.check_mergeability
 
     respond_to do |format|
       format.html do
@@ -43,8 +45,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
         @noteable = @merge_request
         @commits_count = @merge_request.commits_count
-
-        labels
+        @issuable_sidebar = serializer.represent(@merge_request, serializer: 'sidebar')
 
         set_pipeline_variables
 
@@ -57,7 +58,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
         render json: serializer.represent(@merge_request, serializer: params[:serializer])
       end
 
-      format.patch  do
+      format.patch do
         break render_404 unless @merge_request.diff_refs
 
         send_git_patch @project.repository, @merge_request.diff_refs
@@ -97,20 +98,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def test_reports
-    result = @merge_request.compare_test_reports
-
-    case result[:status]
-    when :parsing
-      Gitlab::PollingInterval.set_header(response, interval: 3000)
-
-      render json: '', status: :no_content
-    when :parsed
-      render json: result[:data].to_json, status: :ok
-    when :error
-      render json: { status_reason: result[:status_reason] }, status: :bad_request
-    else
-      render json: { status_reason: 'Unknown error' }, status: :internal_server_error
-    end
+    reports_response(@merge_request.compare_test_reports)
   end
 
   def edit
@@ -122,17 +110,21 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
     respond_to do |format|
       format.html do
-        if @merge_request.valid?
-          redirect_to([@merge_request.target_project.namespace.becomes(Namespace), @merge_request.target_project, @merge_request])
-        else
+        if @merge_request.errors.present?
           define_edit_vars
 
           render :edit
+        else
+          redirect_to project_merge_request_path(@merge_request.target_project, @merge_request)
         end
       end
 
       format.json do
-        render json: serializer.represent(@merge_request, serializer: 'basic')
+        if merge_request.errors.present?
+          render json: @merge_request.errors, status: :bad_request
+        else
+          render json: serializer.represent(@merge_request, serializer: 'basic')
+        end
       end
     end
   rescue ActiveRecord::StaleObjectError
@@ -153,14 +145,12 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     render partial: 'projects/merge_requests/widget/commit_change_content', layout: false
   end
 
-  def cancel_merge_when_pipeline_succeeds
-    unless @merge_request.can_cancel_merge_when_pipeline_succeeds?(current_user)
+  def cancel_auto_merge
+    unless @merge_request.can_cancel_auto_merge?(current_user)
       return access_denied!
     end
 
-    ::MergeRequests::MergeWhenPipelineSucceedsService
-      .new(@project, current_user)
-      .cancel(@merge_request)
+    AutoMergeService.new(project, current_user).cancel(@merge_request)
 
     render json: serialize_widget(@merge_request)
   end
@@ -216,23 +206,33 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     head :ok
   end
 
+  def discussions
+    merge_request.preload_discussions_diff_highlight
+
+    super
+  end
+
   protected
 
   alias_method :subscribable_resource, :merge_request
   alias_method :issuable, :merge_request
   alias_method :awardable, :merge_request
 
+  def issuable_sorting_field
+    MergeRequest::SORTING_PREFERENCE_FIELD
+  end
+
   def merge_params
     params.permit(merge_params_attributes)
   end
 
   def merge_params_attributes
-    [:should_remove_source_branch, :commit_message, :squash]
+    [:should_remove_source_branch, :commit_message, :squash_commit_message, :squash, :auto_merge_strategy]
   end
 
-  def merge_when_pipeline_succeeds_active?
-    params[:merge_when_pipeline_succeeds].present? &&
-      @merge_request.head_pipeline && @merge_request.head_pipeline.active?
+  def auto_merge_requested?
+    # Support params[:merge_when_pipeline_succeeds] during the transition period
+    params[:auto_merge_strategy].present? || params[:merge_when_pipeline_succeeds].present?
   end
 
   def close_merge_request_if_no_source_project
@@ -251,14 +251,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     @merge_request.has_no_commits? && !@merge_request.target_branch_exists?
   end
 
-  def mark_merge_request_mergeable
-    @merge_request.check_if_can_be_merged
-  end
-
   def merge!
-    # Disable the CI check if merge_when_pipeline_succeeds is enabled since we have
+    # Disable the CI check if auto_merge_strategy is specified since we have
     # to wait until CI completes to know
-    unless @merge_request.mergeable?(skip_ci_check: merge_when_pipeline_succeeds_active?)
+    unless @merge_request.mergeable?(skip_ci_check: auto_merge_requested?)
       return :failed
     end
 
@@ -272,23 +268,15 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
     @merge_request.update(merge_error: nil, squash: merge_params.fetch(:squash, false))
 
-    if params[:merge_when_pipeline_succeeds].present?
-      return :failed unless @merge_request.actual_head_pipeline
-
-      if @merge_request.actual_head_pipeline.active?
-        ::MergeRequests::MergeWhenPipelineSucceedsService
-          .new(@project, current_user, merge_params)
-          .execute(@merge_request)
-
-        :merge_when_pipeline_succeeds
-      elsif @merge_request.actual_head_pipeline.success?
-        # This can be triggered when a user clicks the auto merge button while
-        # the tests finish at about the same time
-        @merge_request.merge_async(current_user.id, merge_params)
-
-        :success
+    if auto_merge_requested?
+      if merge_request.auto_merge_enabled?
+        # TODO: We should have a dedicated endpoint for updating merge params.
+        #       See https://gitlab.com/gitlab-org/gitlab-ce/issues/63130.
+        AutoMergeService.new(project, current_user, merge_params).update(merge_request)
       else
-        :failed
+        AutoMergeService.new(project, current_user, merge_params)
+          .execute(merge_request,
+                   params[:auto_merge_strategy] || AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS)
       end
     else
       @merge_request.merge_async(current_user.id, merge_params)
@@ -337,5 +325,20 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   def whitelist_query_limiting
     # Also see https://gitlab.com/gitlab-org/gitlab-ce/issues/42441
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42438')
+  end
+
+  def reports_response(report_comparison)
+    case report_comparison[:status]
+    when :parsing
+      ::Gitlab::PollingInterval.set_header(response, interval: 3000)
+
+      render json: '', status: :no_content
+    when :parsed
+      render json: report_comparison[:data].to_json, status: :ok
+    when :error
+      render json: { status_reason: report_comparison[:status_reason] }, status: :bad_request
+    else
+      render json: { status_reason: 'Unknown error' }, status: :internal_server_error
+    end
   end
 end

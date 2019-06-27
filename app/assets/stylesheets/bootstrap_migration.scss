@@ -1,7 +1,3 @@
-/*
- *  Scss to help with bootstrap 3 to 4 migration
- */
-
 $text-color: $gl-text-color;
 
 $brand-primary: $blue-500;
@@ -18,9 +14,16 @@ $input-border: $border-color;
 $padding-base-vertical: $gl-vert-padding;
 $padding-base-horizontal: $gl-padding;
 
-html {
-  // Override default font size used in bs4
-  font-size: 14px;
+/*
+ *  Scss to help with bootstrap 3 to 4 migration
+ */
+body,
+.form-control,
+.search form {
+  // Override default font size used in non-csslab UI
+  // Use rem to keep default font-size at 14px on body so 1rem still
+  // fits 8px grid, but also allow users to change browser font size
+  font-size: .875rem;
 }
 
 legend {
@@ -66,6 +69,17 @@ h6,
 .h6 {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+/* Our adjustments to hx & .hx above add unnecessary margins to modal-title
+   and page-title in modals, so we set them to 0 in order to have properly
+   formatted modal headers. */
+.modal-header {
+  .modal-title,
+  .page-title {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 }
 
 h5,
@@ -132,15 +146,13 @@ table {
   pointer-events: none;
 }
 
-.popover {
-  font-size: 14px;
-}
-
 @each $breakpoint in map-keys($grid-breakpoints) {
   @include media-breakpoint-up($breakpoint) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
-    .d#{$infix}-table-header-group { display: table-header-group !important; }
+    .d#{$infix}-table-header-group {
+      display: table-header-group !important;
+    }
   }
 }
 
@@ -209,7 +221,7 @@ h3.popover-header {
 }
 
 .info-well {
-  background: $theme-gray-50;
+  background: $gray-50;
   color: $gl-text-color;
   border: 1px solid $border-color;
   border-radius: 4px;
@@ -327,12 +339,11 @@ input[type=color].form-control {
   }
 }
 
-// Bootstrap 3 compatibility because bootstrap_form Gem is not updated yet
-.input-group-btn:first-child {
-  @extend .input-group-prepend;
-}
-
-// Bootstrap 3 compatibility because bootstrap_form Gem is not updated yet
-.input-group-btn:last-child {
-  @extend .input-group-append;
+/*
+ Bootstrap 4.1.2 introduced a new default vertical alignment which breaks our icons,
+ so we need to reset the vertical alignment to the default value. See:
+ - https://gitlab.com/gitlab-org/gitlab-ce/issues/51362
+ */
+svg {
+  vertical-align: baseline;
 }

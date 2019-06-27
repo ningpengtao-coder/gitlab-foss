@@ -3,8 +3,6 @@
 module Gitlab
   module Database
     module MigrationHelpers
-      include Gitlab::Database::ArelMethods
-
       BACKGROUND_MIGRATION_BATCH_SIZE = 1000 # Number of rows to process per job
       BACKGROUND_MIGRATION_JOB_BUFFER_SIZE = 1000 # Number of jobs to bulk queue at a time
 
@@ -151,7 +149,7 @@ module Gitlab
       # column - The name of the column to create the foreign key on.
       # on_delete - The action to perform when associated data is removed,
       #             defaults to "CASCADE".
-      def add_concurrent_foreign_key(source, target, column:, on_delete: :cascade)
+      def add_concurrent_foreign_key(source, target, column:, on_delete: :cascade, name: nil)
         # Transactions would result in ALTER TABLE locks being held for the
         # duration of the transaction, defeating the purpose of this method.
         if transaction_open?
@@ -169,14 +167,18 @@ module Gitlab
             return
           end
 
-          return add_foreign_key(source, target,
-                                 column: column,
-                                 on_delete: on_delete)
+          key_options = { column: column, on_delete: on_delete }
+
+          # The MySQL adapter tries to create a foreign key without a name when
+          # `:name` is nil, instead of generating a name for us.
+          key_options[:name] = name if name
+
+          return add_foreign_key(source, target, key_options)
         else
           on_delete = 'SET NULL' if on_delete == :nullify
         end
 
-        key_name = concurrent_foreign_key_name(source, column)
+        key_name = name || concurrent_foreign_key_name(source, column)
 
         unless foreign_key_exists?(source, target, column: column)
           Rails.logger.warn "Foreign key not created because it exists already " \
@@ -223,7 +225,10 @@ module Gitlab
       # here is based on Rails' foreign_key_name() method, which unfortunately
       # is private so we can't rely on it directly.
       def concurrent_foreign_key_name(table, column)
-        "fk_#{Digest::SHA256.hexdigest("#{table}_#{column}_fk").first(10)}"
+        identifier = "#{table}_#{column}_fk"
+        hashed_identifier = Digest::SHA256.hexdigest(identifier).first(10)
+
+        "fk_#{hashed_identifier}"
       end
 
       # Long-running migrations may take more than the timeout allowed by
@@ -284,6 +289,7 @@ module Gitlab
       # Updates the value of a column in batches.
       #
       # This method updates the table in batches of 5% of the total row count.
+      # A `batch_size` option can also be passed to set this to a fixed number.
       # This method will continue updating rows until no rows remain.
       #
       # When given a block this method will yield two values to the block:
@@ -322,7 +328,7 @@ module Gitlab
       # make things _more_ complex).
       #
       # rubocop: disable Metrics/AbcSize
-      def update_column_in_batches(table, column, value)
+      def update_column_in_batches(table, column, value, batch_size: nil)
         if transaction_open?
           raise 'update_column_in_batches can not be run inside a transaction, ' \
             'you can disable transactions by calling disable_ddl_transaction! ' \
@@ -338,14 +344,16 @@ module Gitlab
 
         return if total == 0
 
-        # Update in batches of 5% until we run out of any rows to update.
-        batch_size = ((total / 100.0) * 5.0).ceil
-        max_size = 1000
+        if batch_size.nil?
+          # Update in batches of 5% until we run out of any rows to update.
+          batch_size = ((total / 100.0) * 5.0).ceil
+          max_size = 1000
 
-        # The upper limit is 1000 to ensure we don't lock too many rows. For
-        # example, for "merge_requests" even 1% of the table is around 35 000
-        # rows for GitLab.com.
-        batch_size = max_size if batch_size > max_size
+          # The upper limit is 1000 to ensure we don't lock too many rows. For
+          # example, for "merge_requests" even 1% of the table is around 35 000
+          # rows for GitLab.com.
+          batch_size = max_size if batch_size > max_size
+        end
 
         start_arel = table.project(table[:id]).order(table[:id].asc).take(1)
         start_arel = yield table, start_arel if block_given?
@@ -361,7 +369,7 @@ module Gitlab
           stop_arel = yield table, stop_arel if block_given?
           stop_row = exec_query(stop_arel.to_sql).to_hash.first
 
-          update_arel = arel_update_manager
+          update_arel = Arel::UpdateManager.new
             .table(table)
             .set([[table[column], value]])
             .where(table[:id].gteq(start_id))
@@ -904,6 +912,12 @@ module Gitlab
         end
       end
 
+      def remove_foreign_key_if_exists(*args)
+        if foreign_key_exists?(*args)
+          remove_foreign_key(*args)
+        end
+      end
+
       def remove_foreign_key_without_error(*args)
         remove_foreign_key(*args)
       rescue ArgumentError
@@ -975,9 +989,10 @@ into similar problems in the future (e.g. when new tables are created).
         raise "#{model_class} does not have an ID to use for batch ranges" unless model_class.column_names.include?('id')
 
         jobs = []
+        table_name = model_class.quoted_table_name
 
         model_class.each_batch(of: batch_size) do |relation|
-          start_id, end_id = relation.pluck('MIN(id), MAX(id)').first
+          start_id, end_id = relation.pluck("MIN(#{table_name}.id), MAX(#{table_name}.id)").first
 
           if jobs.length >= BACKGROUND_MIGRATION_JOB_BUFFER_SIZE
             # Note: This code path generally only helps with many millions of rows

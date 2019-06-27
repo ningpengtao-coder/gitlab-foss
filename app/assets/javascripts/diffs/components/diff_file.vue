@@ -4,8 +4,10 @@ import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { GlLoadingIcon } from '@gitlab/ui';
+import eventHub from '../../notes/event_hub';
 import DiffFileHeader from './diff_file_header.vue';
 import DiffContent from './diff_content.vue';
+import { diffViewerErrors } from '~/ide/constants';
 
 export default {
   components: {
@@ -22,20 +24,23 @@ export default {
       type: Boolean,
       required: true,
     },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
       isLoadingCollapsedDiff: false,
       forkMessageVisible: false,
+      isCollapsed: this.file.viewer.collapsed || false,
     };
   },
   computed: {
     ...mapState('diffs', ['currentDiffFileId']),
     ...mapGetters(['isNotesFetched']),
     ...mapGetters('diffs', ['getDiffFileDiscussions']),
-    isCollapsed() {
-      return this.file.collapsed || false;
-    },
     viewBlobLink() {
       return sprintf(
         __('You can %{linkStart}view the blob%{linkEnd} instead.'),
@@ -44,15 +49,6 @@ export default {
           linkEnd: '</a>',
         },
         false,
-      );
-    },
-    showExpandMessage() {
-      return (
-        this.isCollapsed ||
-        (!this.file.highlighted_diff_lines &&
-          !this.isLoadingCollapsedDiff &&
-          !this.file.too_large &&
-          this.file.text)
       );
     },
     showLoadingIcon() {
@@ -65,22 +61,41 @@ export default {
         this.file.parallel_diff_lines.length > 0
       );
     },
+    isFileTooLarge() {
+      return this.file.viewer.error === diffViewerErrors.too_large;
+    },
+    errorMessage() {
+      return this.file.viewer.error_message;
+    },
   },
   watch: {
-    'file.collapsed': function fileCollapsedWatch(newVal, oldVal) {
+    isCollapsed: function fileCollapsedWatch(newVal, oldVal) {
       if (!newVal && oldVal && !this.hasDiffLines) {
         this.handleLoadCollapsedDiff();
       }
+
+      this.setFileCollapsed({ filePath: this.file.file_path, collapsed: newVal });
+    },
+    'file.viewer.collapsed': function setIsCollapsed(newVal) {
+      this.isCollapsed = newVal;
     },
   },
+  created() {
+    eventHub.$on(`loadCollapsedDiff/${this.file.file_hash}`, this.handleLoadCollapsedDiff);
+  },
   methods: {
-    ...mapActions('diffs', ['loadCollapsedDiff', 'assignDiscussionsToDiff']),
+    ...mapActions('diffs', [
+      'loadCollapsedDiff',
+      'assignDiscussionsToDiff',
+      'setRenderIt',
+      'setFileCollapsed',
+    ]),
     handleToggle() {
       if (!this.hasDiffLines) {
         this.handleLoadCollapsedDiff();
       } else {
-        this.file.collapsed = !this.file.collapsed;
-        this.file.renderIt = true;
+        this.isCollapsed = !this.isCollapsed;
+        this.setRenderIt(this.file);
       }
     },
     handleLoadCollapsedDiff() {
@@ -89,8 +104,8 @@ export default {
       this.loadCollapsedDiff(this.file)
         .then(() => {
           this.isLoadingCollapsedDiff = false;
-          this.file.collapsed = false;
-          this.file.renderIt = true;
+          this.isCollapsed = false;
+          this.setRenderIt(this.file);
         })
         .then(() => {
           requestIdleCallback(
@@ -136,41 +151,44 @@ export default {
 
     <div v-if="forkMessageVisible" class="js-file-fork-suggestion-section file-fork-suggestion">
       <span class="file-fork-suggestion-note">
-        You're not allowed to <span class="js-file-fork-suggestion-section-action">edit</span> files
-        in this project directly. Please fork this project, make your changes there, and submit a
-        merge request.
+        {{ sprintf(__("You're not allowed to %{tag_start}edit%{tag_end} files in this project
+        directly. Please fork this project, make your changes there, and submit a merge request."),
+        { tag_start: '<span class="js-file-fork-suggestion-section-action">', tag_end: '</span>' })
+        }}
       </span>
       <a
         :href="file.fork_path"
         class="js-fork-suggestion-button btn btn-grouped btn-inverted btn-success"
+        >{{ __('Fork') }}</a
       >
-        Fork
-      </a>
       <button
         class="js-cancel-fork-suggestion-button btn btn-grouped"
         type="button"
         @click="hideForkMessage"
       >
-        Cancel
+        {{ __('Cancel') }}
       </button>
     </div>
-
-    <diff-content
-      v-if="!isCollapsed && file.renderIt"
-      :class="{ hidden: isCollapsed || file.too_large }"
-      :diff-file="file"
-    />
     <gl-loading-icon v-if="showLoadingIcon" class="diff-content loading" />
-    <div v-else-if="showExpandMessage" class="nothing-here-block diff-collapsed">
-      {{ __('This diff is collapsed.') }}
-      <a class="click-to-expand js-click-to-expand" href="#" @click.prevent="handleToggle">
-        {{ __('Click to expand it.') }}
-      </a>
-    </div>
-    <div v-if="file.too_large" class="nothing-here-block diff-collapsed js-too-large-diff">
-      {{ __('This source diff could not be displayed because it is too large.') }}
-      <span v-html="viewBlobLink"></span>
-    </div>
+    <template v-else>
+      <div :id="`diff-content-${file.file_hash}`">
+        <div v-if="errorMessage" class="diff-viewer">
+          <div class="nothing-here-block" v-html="errorMessage"></div>
+        </div>
+        <div v-else-if="isCollapsed" class="nothing-here-block diff-collapsed">
+          {{ __('This diff is collapsed.') }}
+          <a class="click-to-expand js-click-to-expand" href="#" @click.prevent="handleToggle">{{
+            __('Click to expand it.')
+          }}</a>
+        </div>
+        <diff-content
+          v-else
+          :class="{ hidden: isCollapsed || isFileTooLarge }"
+          :diff-file="file"
+          :help-page-path="helpPagePath"
+        />
+      </div>
+    </template>
   </div>
 </template>
 

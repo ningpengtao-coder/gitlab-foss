@@ -5,6 +5,11 @@ require 'securerandom'
 module QA
   module Resource
     class Project < Base
+      include Events::Project
+
+      attr_writer :initialize_with_readme
+
+      attribute :id
       attribute :name
       attribute :description
 
@@ -12,22 +17,29 @@ module QA
         Group.fabricate!
       end
 
+      attribute :path_with_namespace do
+        "#{sandbox_path}#{group.path}/#{name}" if group
+      end
+
+      def sandbox_path
+        group.respond_to?('sandbox') ? "#{group.sandbox.path}/" : ''
+      end
+
       attribute :repository_ssh_location do
         Page::Project::Show.perform do |page|
-          page.choose_repository_clone_ssh
-          page.repository_location
+          page.repository_clone_ssh_location
         end
       end
 
       attribute :repository_http_location do
         Page::Project::Show.perform do |page|
-          page.choose_repository_clone_http
-          page.repository_location
+          page.repository_clone_http_location
         end
       end
 
       def initialize
         @description = 'My awesome project'
+        @initialize_with_readme = false
       end
 
       def name=(raw_name)
@@ -44,12 +56,19 @@ module QA
           page.choose_name(@name)
           page.add_description(@description)
           page.set_visibility('Public')
+          page.enable_initialize_with_readme if @initialize_with_readme
           page.create_new_project
         end
       end
 
+      def fabricate_via_api!
+        resource_web_url(api_get)
+      rescue ResourceNotFoundError
+        super
+      end
+
       def api_get_path
-        "/projects/#{name}"
+        "/projects/#{CGI.escape(path_with_namespace)}"
       end
 
       def api_post_path
@@ -62,7 +81,8 @@ module QA
           path: name,
           name: name,
           description: description,
-          visibility: 'public'
+          visibility: 'public',
+          initialize_with_readme: @initialize_with_readme
         }
       end
 

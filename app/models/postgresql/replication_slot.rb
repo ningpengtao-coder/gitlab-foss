@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Postgresql
-  class ReplicationSlot < ActiveRecord::Base
+  class ReplicationSlot < ApplicationRecord
     self.table_name = 'pg_replication_slots'
 
     # Returns true if there are any replication slots in use.
@@ -28,7 +28,7 @@ module Postgresql
       # We force the use of a transaction here so the query always goes to the
       # primary, even when using the EE DB load balancer.
       sizes = transaction { pluck(lag_function) }
-      too_great = sizes.count { |size| size >= max }
+      too_great = sizes.compact.count { |size| size >= max }
 
       # If too many replicas are falling behind too much, the availability of a
       # GitLab instance might suffer. To prevent this from happening we require

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Commit do
@@ -11,6 +13,7 @@ describe Commit do
     it { is_expected.to include_module(Participable) }
     it { is_expected.to include_module(Referable) }
     it { is_expected.to include_module(StaticModel) }
+    it { is_expected.to include_module(Presentable) }
   end
 
   describe '.lazy' do
@@ -39,6 +42,14 @@ describe Commit do
       it 'maintains ordering' do
         subject.each_with_index do |commit, i|
           expect(commit.id).to eq(oids[i])
+        end
+      end
+
+      it 'does not attempt to replace methods via BatchLoader' do
+        subject.each do |commit|
+          expect(commit).to receive(:method_missing).and_call_original
+
+          commit.id
         end
       end
     end
@@ -204,7 +215,7 @@ describe Commit do
       message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sodales id felis id blandit. Vivamus egestas lacinia lacus, sed rutrum mauris.'
 
       allow(commit).to receive(:safe_message).and_return(message)
-      expect(commit.title).to eq('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sodales id felis…')
+      expect(commit.title).to eq('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sodales id...')
     end
 
     it "truncates a message with a newline before 80 characters at the newline" do
@@ -541,7 +552,7 @@ eos
     end
   end
 
-  describe '#uri_type' do
+  shared_examples '#uri_type' do
     it 'returns the URI type at the given path' do
       expect(commit.uri_type('files/html')).to be(:tree)
       expect(commit.uri_type('files/images/logo-black.png')).to be(:raw)
@@ -558,6 +569,20 @@ eos
       expect(commit.uri_type(nil)).to be_nil
       expect(commit.uri_type("")).to be_nil
     end
+  end
+
+  describe '#uri_type with Gitaly enabled' do
+    it_behaves_like "#uri_type"
+  end
+
+  describe '#uri_type with Rugged enabled', :enable_rugged do
+    it 'calls out to the Rugged implementation' do
+      allow_any_instance_of(Rugged::Tree).to receive(:path).with('files/html').and_call_original
+
+      commit.uri_type('files/html')
+    end
+
+    it_behaves_like '#uri_type'
   end
 
   describe '.from_hash' do

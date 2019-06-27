@@ -13,22 +13,29 @@ describe Gitlab::UsageData do
       create(:service, project: projects[0], type: 'SlackSlashCommandsService', active: true)
       create(:service, project: projects[1], type: 'SlackService', active: true)
       create(:service, project: projects[2], type: 'SlackService', active: true)
+      create(:project_error_tracking_setting, project: projects[0])
+      create(:project_error_tracking_setting, project: projects[1], enabled: false)
 
       gcp_cluster = create(:cluster, :provided_by_gcp)
       create(:cluster, :provided_by_user)
       create(:cluster, :provided_by_user, :disabled)
+      create(:cluster, :group)
+      create(:cluster, :group, :disabled)
+      create(:cluster, :group, :disabled)
       create(:clusters_applications_helm, :installed, cluster: gcp_cluster)
       create(:clusters_applications_ingress, :installed, cluster: gcp_cluster)
       create(:clusters_applications_cert_managers, :installed, cluster: gcp_cluster)
       create(:clusters_applications_prometheus, :installed, cluster: gcp_cluster)
       create(:clusters_applications_runner, :installed, cluster: gcp_cluster)
       create(:clusters_applications_knative, :installed, cluster: gcp_cluster)
+
+      ProjectFeature.first.update_attribute('repository_access_level', 0)
     end
 
     subject { described_class.data }
 
     it "gathers usage data" do
-      expect(subject.keys).to match_array(%i(
+      expect(subject.keys).to include(*%i(
         active_user_count
         counts
         recorded_at
@@ -47,19 +54,17 @@ describe Gitlab::UsageData do
         gitlab_shared_runners_enabled
         gitlab_pages
         git
+        gitaly
         database
         avg_cycle_analytics
         web_ide_commits
+        influxdb_metrics_enabled
+        prometheus_metrics_enabled
       ))
     end
 
     it "gathers usage counts" do
-      count_data = subject[:counts]
-
-      expect(count_data[:boards]).to eq(1)
-      expect(count_data[:projects]).to eq(3)
-
-      expect(count_data.keys).to match_array(%i(
+      expected_keys = %i(
         assignee_lists
         boards
         ci_builds
@@ -74,10 +79,16 @@ describe Gitlab::UsageData do
         auto_devops_disabled
         deploy_keys
         deployments
+        successful_deployments
+        failed_deployments
         environments
         clusters
         clusters_enabled
+        project_clusters_enabled
+        group_clusters_enabled
         clusters_disabled
+        project_clusters_disabled
+        group_clusters_disabled
         clusters_platforms_gke
         clusters_platforms_user
         clusters_applications_helm
@@ -97,6 +108,7 @@ describe Gitlab::UsageData do
         milestone_lists
         milestones
         notes
+        pool_repositories
         projects
         projects_imported_from_github
         projects_jira_active
@@ -105,15 +117,31 @@ describe Gitlab::UsageData do
         projects_slack_notifications_active
         projects_slack_slash_active
         projects_prometheus_active
+        projects_with_repositories_enabled
+        projects_with_error_tracking_enabled
         pages_domains
         protected_branches
         releases
         remote_mirrors
         snippets
+        suggestions
         todos
         uploads
         web_hooks
-      ))
+        user_preferences
+      )
+
+      count_data = subject[:counts]
+
+      expect(count_data[:boards]).to eq(1)
+      expect(count_data[:projects]).to eq(3)
+      expect(count_data.keys).to include(*expected_keys)
+      expect(expected_keys - count_data.keys).to be_empty
+    end
+
+    it 'does not gather user preferences usage data when the feature is disabled' do
+      stub_feature_flags(group_overview_security_dashboard: false)
+      expect(subject[:counts].keys).not_to include(:user_preferences)
     end
 
     it 'gathers projects data correctly' do
@@ -126,9 +154,16 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_jira_cloud_active]).to eq(1)
       expect(count_data[:projects_slack_notifications_active]).to eq(2)
       expect(count_data[:projects_slack_slash_active]).to eq(1)
+      expect(count_data[:projects_with_repositories_enabled]).to eq(2)
+      expect(count_data[:projects_with_error_tracking_enabled]).to eq(1)
 
-      expect(count_data[:clusters_enabled]).to eq(6)
-      expect(count_data[:clusters_disabled]).to eq(1)
+      expect(count_data[:clusters_enabled]).to eq(7)
+      expect(count_data[:project_clusters_enabled]).to eq(6)
+      expect(count_data[:group_clusters_enabled]).to eq(1)
+      expect(count_data[:clusters_disabled]).to eq(3)
+      expect(count_data[:project_clusters_disabled]).to eq(1)
+      expect(count_data[:group_clusters_disabled]).to eq(2)
+      expect(count_data[:group_clusters_enabled]).to eq(1)
       expect(count_data[:clusters_platforms_gke]).to eq(1)
       expect(count_data[:clusters_platforms_user]).to eq(1)
       expect(count_data[:clusters_applications_helm]).to eq(1)
@@ -171,6 +206,10 @@ describe Gitlab::UsageData do
       expect(subject[:git][:version]).to eq(Gitlab::Git.version)
       expect(subject[:database][:adapter]).to eq(Gitlab::Database.adapter_name)
       expect(subject[:database][:version]).to eq(Gitlab::Database.version)
+      expect(subject[:gitaly][:version]).to be_present
+      expect(subject[:gitaly][:servers]).to be >= 1
+      expect(subject[:gitaly][:filesystems]).to be_an(Array)
+      expect(subject[:gitaly][:filesystems].first).to be_a(String)
     end
   end
 
@@ -180,7 +219,7 @@ describe Gitlab::UsageData do
     it "gathers license data" do
       expect(subject[:uuid]).to eq(Gitlab::CurrentSettings.uuid)
       expect(subject[:version]).to eq(Gitlab::VERSION)
-      expect(subject[:installation_type]).to eq(Gitlab::INSTALLATION_TYPE)
+      expect(subject[:installation_type]).to eq('gitlab-development-kit')
       expect(subject[:active_user_count]).to eq(User.active.count)
       expect(subject[:recorded_at]).to be_a(Time)
     end
@@ -199,6 +238,31 @@ describe Gitlab::UsageData do
       allow(relation).to receive(:count).and_raise(ActiveRecord::StatementInvalid.new(''))
 
       expect(described_class.count(relation, fallback: 15)).to eq(15)
+    end
+  end
+
+  describe '#approximate_counts' do
+    it 'gets approximate counts for selected models' do
+      create(:label)
+
+      expect(Gitlab::Database::Count).to receive(:approximate_counts)
+        .with(described_class::APPROXIMATE_COUNT_MODELS).once.and_call_original
+
+      counts = described_class.approximate_counts.values
+
+      expect(counts.count).to eq(described_class::APPROXIMATE_COUNT_MODELS.count)
+      expect(counts.any? { |count| count < 0 }).to be_falsey
+    end
+
+    it 'returns default values if counts can not be retrieved' do
+      described_class::APPROXIMATE_COUNT_MODELS.map do |model|
+        model.name.underscore.pluralize.to_sym
+      end
+
+      expect(Gitlab::Database::Count).to receive(:approximate_counts)
+        .and_return({})
+
+      expect(described_class.approximate_counts.values.uniq).to eq([-1])
     end
   end
 end

@@ -7,9 +7,9 @@ module Gitlab
         ##
         # Entry that represents a concrete CI/CD job.
         #
-        class Job < Node
-          include Configurable
-          include Attributable
+        class Job < ::Gitlab::Config::Entry::Node
+          include ::Gitlab::Config::Entry::Configurable
+          include ::Gitlab::Config::Entry::Attributable
 
           ALLOWED_KEYS = %i[tags script only except type image services
                             allow_failure type stage when start_in artifacts cache
@@ -34,7 +34,7 @@ module Gitlab
                              message: 'should be on_success, on_failure, ' \
                                       'always, manual or delayed' }
               validates :dependencies, array_of_strings: true
-              validates :extends, type: String
+              validates :extends, array_of_strings_or_string: true
             end
 
             validates :start_in, duration: { limit: '1 day' }, if: :delayed?
@@ -42,7 +42,8 @@ module Gitlab
           end
 
           entry :before_script, Entry::Script,
-            description: 'Global before script overridden in this job.'
+            description: 'Global before script overridden in this job.',
+            inherit: true
 
           entry :script, Entry::Commands,
             description: 'Commands that will be executed in this job.'
@@ -54,19 +55,24 @@ module Gitlab
             description: 'Deprecated: stage this job will be executed into.'
 
           entry :after_script, Entry::Script,
-            description: 'Commands that will be executed when finishing job.'
+            description: 'Commands that will be executed when finishing job.',
+            inherit: true
 
           entry :cache, Entry::Cache,
-            description: 'Cache definition for this job.'
+            description: 'Cache definition for this job.',
+            inherit: true
 
           entry :image, Entry::Image,
-            description: 'Image that will be used to execute this job.'
+            description: 'Image that will be used to execute this job.',
+            inherit: true
 
           entry :services, Entry::Services,
-            description: 'Services that will be used to execute this job.'
+            description: 'Services that will be used to execute this job.',
+            inherit: true
 
           entry :only, Entry::Policy,
-            description: 'Refs policy this job will be executed for.'
+            description: 'Refs policy this job will be executed for.',
+            default: Entry::Policy::DEFAULT_ONLY
 
           entry :except, Entry::Policy,
             description: 'Refs policy this job will be executed for.'
@@ -88,11 +94,20 @@ module Gitlab
 
           helpers :before_script, :script, :stage, :type, :after_script,
                   :cache, :image, :services, :only, :except, :variables,
-                  :artifacts, :commands, :environment, :coverage, :retry,
+                  :artifacts, :environment, :coverage, :retry,
                   :parallel
 
           attributes :script, :tags, :allow_failure, :when, :dependencies,
                      :retry, :parallel, :extends, :start_in
+
+          def self.matching?(name, config)
+            !name.to_s.start_with?('.') &&
+              config.is_a?(Hash) && config.key?(:script)
+          end
+
+          def self.visible?
+            true
+          end
 
           def compose!(deps = nil)
             super do
@@ -114,10 +129,6 @@ module Gitlab
             @config.merge(to_hash.compact)
           end
 
-          def commands
-            (before_script_value.to_a + script_value.to_a).join("\n")
-          end
-
           def manual_action?
             self.when == 'manual'
           end
@@ -132,15 +143,19 @@ module Gitlab
 
           private
 
+          # We inherit config entries from `default:`
+          # if the entry has the `inherit: true` flag set
           def inherit!(deps)
             return unless deps
 
-            self.class.nodes.each_key do |key|
-              global_entry = deps[key]
+            self.class.nodes.each do |key, factory|
+              next unless factory.inheritable?
+
+              default_entry = deps.default[key]
               job_entry = self[key]
 
-              if global_entry.specified? && !job_entry.specified?
-                @entries[key] = global_entry
+              if default_entry.specified? && !job_entry.specified?
+                @entries[key] = default_entry
               end
             end
           end
@@ -149,14 +164,13 @@ module Gitlab
             { name: name,
               before_script: before_script_value,
               script: script_value,
-              commands: commands,
               image: image_value,
               services: services_value,
               stage: stage_value,
               cache: cache_value,
               only: only_value,
               except: except_value,
-              variables: variables_defined? ? variables_value : nil,
+              variables: variables_defined? ? variables_value : {},
               environment: environment_defined? ? environment_value : nil,
               environment_name: environment_defined? ? environment_value[:name] : nil,
               coverage: coverage_defined? ? coverage_value : nil,

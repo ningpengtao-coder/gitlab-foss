@@ -7,16 +7,14 @@ module API
 
     before { authenticate! }
 
-    EVENTABLE_TYPES = [Issue, MergeRequest].freeze
-
-    EVENTABLE_TYPES.each do |eventable_type|
+    Helpers::ResourceLabelEventsHelpers.eventable_types.each do |eventable_type|
       parent_type = eventable_type.parent_class.to_s.underscore
       eventables_str = eventable_type.to_s.underscore.pluralize
 
       params do
         requires :id, type: String, desc: "The ID of a #{parent_type}"
       end
-      resource parent_type.pluralize.to_sym, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+      resource parent_type.pluralize.to_sym, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
         desc "Get a list of #{eventable_type.to_s.downcase} resource label events" do
           success Entities::ResourceLabelEvent
           detail 'This feature was introduced in 11.3'
@@ -28,7 +26,7 @@ module API
 
         # rubocop: disable CodeReuse/ActiveRecord
         get ":id/#{eventables_str}/:eventable_id/resource_label_events" do
-          eventable = find_noteable(parent_type, eventables_str, params[:eventable_id])
+          eventable = find_noteable(parent_type, params[:id], eventable_type, params[:eventable_id])
           events = eventable.resource_label_events.includes(:label, :user)
 
           present paginate(events), with: Entities::ResourceLabelEvent
@@ -44,7 +42,7 @@ module API
           requires :eventable_id, types: [Integer, String], desc: 'The ID of the eventable'
         end
         get ":id/#{eventables_str}/:eventable_id/resource_label_events/:event_id" do
-          eventable = find_noteable(parent_type, eventables_str, params[:eventable_id])
+          eventable = find_noteable(parent_type, params[:id], eventable_type, params[:eventable_id])
           event = eventable.resource_label_events.find(params[:event_id])
 
           present event, with: Entities::ResourceLabelEvent

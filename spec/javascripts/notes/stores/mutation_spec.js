@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import mutations from '~/notes/stores/mutations';
+import { DISCUSSION_NOTE } from '~/notes/constants';
 import {
   note,
   discussionMock,
@@ -8,6 +9,11 @@ import {
   noteableDataMock,
   individualNote,
 } from '../mock_data';
+
+const RESOLVED_NOTE = { resolvable: true, resolved: true };
+const UNRESOLVED_NOTE = { resolvable: true, resolved: false };
+const SYSTEM_NOTE = { resolvable: false, resolved: false };
+const WEIRD_NOTE = { resolvable: false, resolved: true };
 
 describe('Notes Store mutations', () => {
   describe('ADD_NEW_NOTE', () => {
@@ -174,11 +180,11 @@ describe('Notes Store mutations', () => {
           diff_file: {
             file_hash: 'a',
           },
-          truncated_diff_lines: ['a'],
+          truncated_diff_lines: [{ text: '+a', rich_text: '+<span>a</span>' }],
         },
       ]);
 
-      expect(state.discussions[0].truncated_diff_lines).toEqual(['a']);
+      expect(state.discussions[0].truncated_diff_lines).toEqual([{ rich_text: '<span>a</span>' }]);
     });
 
     it('adds empty truncated_diff_lines when not in discussion', () => {
@@ -297,6 +303,16 @@ describe('Notes Store mutations', () => {
 
       expect(state.discussions[0].expanded).toEqual(false);
     });
+
+    it('forces a discussions expanded state', () => {
+      const state = {
+        discussions: [{ ...discussionMock, expanded: false }],
+      };
+
+      mutations.TOGGLE_DISCUSSION(state, { discussionId: discussionMock.id, forceExpanded: true });
+
+      expect(state.discussions[0].expanded).toEqual(true);
+    });
   });
 
   describe('UPDATE_NOTE', () => {
@@ -310,6 +326,18 @@ describe('Notes Store mutations', () => {
       mutations.UPDATE_NOTE(state, updated);
 
       expect(state.discussions[0].notes[0].note).toEqual('Foo');
+    });
+
+    it('transforms an individual note to discussion', () => {
+      const state = {
+        discussions: [individualNote],
+      };
+
+      const transformedNote = { ...individualNote.notes[0], type: DISCUSSION_NOTE };
+
+      mutations.UPDATE_NOTE(state, transformedNote);
+
+      expect(state.discussions[0].individual_note).toEqual(false);
     });
   });
 
@@ -405,9 +433,12 @@ describe('Notes Store mutations', () => {
         ],
       };
 
-      mutations.SET_DISCUSSION_DIFF_LINES(state, { discussionId: 1, diffLines: ['test'] });
+      mutations.SET_DISCUSSION_DIFF_LINES(state, {
+        discussionId: 1,
+        diffLines: [{ text: '+a', rich_text: '+<span>a</span>' }],
+      });
 
-      expect(state.discussions[0].truncated_diff_lines).toEqual(['test']);
+      expect(state.discussions[0].truncated_diff_lines).toEqual([{ rich_text: '<span>a</span>' }]);
     });
 
     it('keeps reactivity of discussion', () => {
@@ -420,7 +451,10 @@ describe('Notes Store mutations', () => {
       ]);
       const discussion = state.discussions[0];
 
-      mutations.SET_DISCUSSION_DIFF_LINES(state, { discussionId: 1, diffLines: ['test'] });
+      mutations.SET_DISCUSSION_DIFF_LINES(state, {
+        discussionId: 1,
+        diffLines: [{ rich_text: '<span>a</span>' }],
+      });
 
       discussion.expanded = true;
 
@@ -435,6 +469,103 @@ describe('Notes Store mutations', () => {
       mutations.DISABLE_COMMENTS(state, true);
 
       expect(state.commentsDisabled).toEqual(true);
+    });
+  });
+
+  describe('UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS', () => {
+    it('with unresolvable discussions, updates state', () => {
+      const state = {
+        discussions: [
+          { individual_note: false, resolvable: true, notes: [UNRESOLVED_NOTE] },
+          { individual_note: true, resolvable: true, notes: [UNRESOLVED_NOTE] },
+          { individual_note: false, resolvable: false, notes: [UNRESOLVED_NOTE] },
+        ],
+      };
+
+      mutations.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS(state);
+
+      expect(state).toEqual(
+        jasmine.objectContaining({
+          resolvableDiscussionsCount: 1,
+          unresolvedDiscussionsCount: 1,
+          hasUnresolvedDiscussions: false,
+        }),
+      );
+    });
+
+    it('with resolvable discussions, updates state', () => {
+      const state = {
+        discussions: [
+          {
+            individual_note: false,
+            resolvable: true,
+            notes: [RESOLVED_NOTE, SYSTEM_NOTE, RESOLVED_NOTE],
+          },
+          {
+            individual_note: false,
+            resolvable: true,
+            notes: [RESOLVED_NOTE, SYSTEM_NOTE, WEIRD_NOTE],
+          },
+          {
+            individual_note: false,
+            resolvable: true,
+            notes: [SYSTEM_NOTE, RESOLVED_NOTE, WEIRD_NOTE, UNRESOLVED_NOTE],
+          },
+          {
+            individual_note: false,
+            resolvable: true,
+            notes: [UNRESOLVED_NOTE],
+          },
+        ],
+      };
+
+      mutations.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS(state);
+
+      expect(state).toEqual(
+        jasmine.objectContaining({
+          resolvableDiscussionsCount: 4,
+          unresolvedDiscussionsCount: 2,
+          hasUnresolvedDiscussions: true,
+        }),
+      );
+    });
+  });
+
+  describe('CONVERT_TO_DISCUSSION', () => {
+    let discussion;
+    let state;
+
+    beforeEach(() => {
+      discussion = {
+        id: 42,
+        individual_note: true,
+      };
+      state = { convertedDisscussionIds: [] };
+    });
+
+    it('adds a discussion to convertedDisscussionIds', () => {
+      mutations.CONVERT_TO_DISCUSSION(state, discussion.id);
+
+      expect(state.convertedDisscussionIds).toContain(discussion.id);
+    });
+  });
+
+  describe('REMOVE_CONVERTED_DISCUSSION', () => {
+    let discussion;
+    let state;
+
+    beforeEach(() => {
+      discussion = {
+        id: 42,
+        individual_note: true,
+      };
+      state = { convertedDisscussionIds: [41, 42] };
+    });
+
+    it('removes a discussion from convertedDisscussionIds', () => {
+      mutations.REMOVE_CONVERTED_DISCUSSION(state, discussion.id);
+
+      expect(state.convertedDisscussionIds).not.toContain(discussion.id);
     });
   });
 });

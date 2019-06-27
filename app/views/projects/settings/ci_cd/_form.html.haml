@@ -26,10 +26,18 @@
 
         %hr
         .form-group
+          = f.fields_for :ci_cd_settings_attributes, @project.ci_cd_settings do |form|
+            = form.label :default_git_depth, _('Git shallow clone'), class: 'label-bold'
+            = form.number_field :default_git_depth, { class: 'form-control', min: 0, max: 1000 }
+            %p.form-text.text-muted
+              = _('The number of changes to be fetched from GitLab when cloning a repository. This can speed up Pipelines execution. Keep empty or set to 0 to disable shallow clone by default and make GitLab CI fetch all branches and tags each time.')
+
+        %hr
+        .form-group
           = f.label :build_timeout_human_readable, _('Timeout'), class: 'label-bold'
           = f.text_field :build_timeout_human_readable, class: 'form-control'
           %p.form-text.text-muted
-            = _("Per job. If a job passes this threshold, it will be marked as failed")
+            = _('If any job surpasses this timeout threshold, it will be marked as failed. Human readable time input language is accepted like "1 hour". Values without specification represent seconds.')
             = link_to icon('question-circle'), help_page_path('user/project/pipelines/settings', anchor: 'timeout'), target: '_blank'
 
         %hr
@@ -102,8 +110,14 @@
                 tap --coverage-report=text-summary (NodeJS) -
                 %code ^Statements\s*:\s*([^%]+)
               %li
+                nyc npm test (NodeJS) -
+                %code All files[^|]*\|[^|]*\s+([\d\.]+)
+              %li
                 excoveralls (Elixir) -
                 %code \[TOTAL\]\s+(\d+\.\d+)%
+              %li
+                mix test --cover (Elixir) -
+                %code \d+.\d+\%\s+\|\s+Total
               %li
                 JaCoCo (Java/Kotlin)
                 %code Total.*?([0-9]{1,3})%

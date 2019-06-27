@@ -47,8 +47,8 @@ module NavHelper
     class_names
   end
 
-  def show_separator?
-    Gitlab::Sherlock.enabled? || can?(current_user, :read_instance_statistics)
+  def has_extra_nav_icons?
+    Gitlab::Sherlock.enabled? || can?(current_user, :read_instance_statistics) || current_user.admin?
   end
 
   def page_has_markdown?
@@ -56,6 +56,14 @@ module NavHelper
       current_path?('projects/merge_requests/conflicts#show') ||
       current_path?('issues#show') ||
       current_path?('milestones#show')
+  end
+
+  def admin_monitoring_nav_links
+    %w(system_info background_jobs logs health_check requests_profiles)
+  end
+
+  def group_issues_sub_menu_items
+    %w(groups#issues labels#index milestones#index boards#index boards#show)
   end
 
   private

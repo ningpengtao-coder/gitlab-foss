@@ -4,10 +4,17 @@ module API
   class Settings < Grape::API
     before { authenticated_as_admin! }
 
+    helpers Helpers::SettingsHelpers
+
     helpers do
       def current_settings
         @current_setting ||=
           (ApplicationSetting.current_without_cache || ApplicationSetting.create_from_defaults)
+      end
+
+      def filter_attributes_using_license(attrs)
+        # This method will be redefined in EE.
+        attrs
       end
     end
 
@@ -29,13 +36,10 @@ module API
       given akismet_enabled: ->(val) { val } do
         requires :akismet_api_key, type: String, desc: 'Generate API key at http://www.akismet.com'
       end
-      optional :clientside_sentry_enabled, type: Boolean, desc: 'Sentry can also be used for reporting and logging clientside exceptions. https://sentry.io/for/javascript/'
-      given clientside_sentry_enabled: ->(val) { val } do
-        requires :clientside_sentry_dsn, type: String, desc: 'Clientside Sentry Data Source Name'
-      end
       optional :container_registry_token_expire_delay, type: Integer, desc: 'Authorization token duration (minutes)'
       optional :default_artifacts_expire_in, type: String, desc: "Set the default expiration time for each job's artifacts"
-      optional :default_branch_protection, type: Integer, values: [0, 1, 2], desc: 'Determine if developers can push to master'
+      optional :default_project_creation, type: Integer, values: ::Gitlab::Access.project_creation_values, desc: 'Determine if developers can create projects in the group'
+      optional :default_branch_protection, type: Integer, values: ::Gitlab::Access.protection_values, desc: 'Determine if developers can push to master'
       optional :default_group_visibility, type: String, values: Gitlab::VisibilityLevel.string_values, desc: 'The default group visibility'
       optional :default_project_visibility, type: String, values: Gitlab::VisibilityLevel.string_values, desc: 'The default project visibility'
       optional :default_projects_limit, type: Integer, desc: 'The maximum number of personal projects'
@@ -106,10 +110,6 @@ module API
       end
       optional :restricted_visibility_levels, type: Array[String], desc: 'Selected levels cannot be used by non-admin users for groups, projects or snippets. If the public level is restricted, user profiles are only visible to logged in users.'
       optional :send_user_confirmation_email, type: Boolean, desc: 'Send confirmation email on sign-up'
-      optional :sentry_enabled, type: Boolean, desc: 'Sentry is an error reporting and logging tool which is currently not shipped with GitLab, get it here: https://getsentry.com'
-      given sentry_enabled: ->(val) { val } do
-        requires :sentry_dsn, type: String, desc: 'Sentry Data Source Name'
-      end
       optional :session_expire_delay, type: Integer, desc: 'Session duration in minutes. GitLab restart is required to apply changes.'
       optional :shared_runners_enabled, type: Boolean, desc: 'Enable shared runners for new projects'
       given shared_runners_enabled: ->(val) { val } do
@@ -121,6 +121,7 @@ module API
       optional :terminal_max_session_time, type: Integer, desc: 'Maximum time for web terminal websocket connection (in seconds). Set to 0 for unlimited time.'
       optional :usage_ping_enabled, type: Boolean, desc: 'Every week GitLab will report license usage back to GitLab, Inc.'
       optional :instance_statistics_visibility_private, type: Boolean, desc: 'When set to `true` Instance statistics will only be available to admins'
+      optional :local_markdown_version, type: Integer, desc: "Local markdown version, increase this value when any cached markdown should be invalidated"
 
       ApplicationSetting::SUPPORTED_KEY_TYPES.each do |type|
         optional :"#{type}_key_restriction",
@@ -129,10 +130,10 @@ module API
                  desc: "Restrictions on the complexity of uploaded #{type.upcase} keys. A value of #{ApplicationSetting::FORBIDDEN_KEY_VALUE} disables all #{type.upcase} keys."
       end
 
-      optional_attributes = ::ApplicationSettingsHelper.visible_attributes << :performance_bar_allowed_group_id
+      use :optional_params_ee
 
-      optional(*optional_attributes)
-      at_least_one_of(*optional_attributes)
+      optional(*Helpers::SettingsHelpers.optional_attributes)
+      at_least_one_of(*Helpers::SettingsHelpers.optional_attributes)
     end
     put "application/settings" do
       attrs = declared_params(include_missing: false)
@@ -154,6 +155,8 @@ module API
       elsif attrs.has_key?(:password_authentication_enabled)
         attrs[:password_authentication_enabled_for_web] = attrs.delete(:password_authentication_enabled)
       end
+
+      attrs = filter_attributes_using_license(attrs)
 
       if ApplicationSettings::UpdateService.new(current_settings, current_user, attrs).execute
         present current_settings, with: Entities::ApplicationSetting

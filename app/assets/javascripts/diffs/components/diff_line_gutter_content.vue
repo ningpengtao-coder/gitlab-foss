@@ -72,13 +72,18 @@ export default {
       diffFiles: state => state.diffs.diffFiles,
     }),
     ...mapGetters(['isLoggedIn']),
+    lineCode() {
+      return (
+        this.line.line_code ||
+        (this.line.left && this.line.line.left.line_code) ||
+        (this.line.right && this.line.right.line_code)
+      );
+    },
     lineHref() {
       return `#${this.line.line_code || ''}`;
     },
     shouldShowCommentButton() {
       return (
-        this.isLoggedIn &&
-        this.showCommentButton &&
         this.isHover &&
         !this.isMatchLine &&
         !this.isContextLine &&
@@ -95,11 +100,14 @@ export default {
       }
       return this.showCommentButton && this.hasDiscussions;
     },
+    shouldRenderCommentButton() {
+      return this.isLoggedIn && this.showCommentButton;
+    },
   },
   methods: {
-    ...mapActions('diffs', ['loadMoreLines', 'showCommentForm']),
+    ...mapActions('diffs', ['loadMoreLines', 'showCommentForm', 'setHighlightedRow']),
     handleCommentButton() {
-      this.showCommentForm({ lineCode: this.line.line_code });
+      this.showCommentForm({ lineCode: this.line.line_code, fileHash: this.fileHash });
     },
     handleLoadMoreLines() {
       if (this.isRequesting) {
@@ -160,7 +168,8 @@ export default {
     >
     <template v-else>
       <button
-        v-if="shouldShowCommentButton"
+        v-if="shouldRenderCommentButton"
+        v-show="shouldShowCommentButton"
         type="button"
         class="add-diff-note js-add-diff-note-button qa-diff-comment"
         title="Add a comment to this line"
@@ -168,7 +177,13 @@ export default {
       >
         <icon :size="12" name="comment" />
       </button>
-      <a v-if="lineNumber" :data-linenumber="lineNumber" :href="lineHref"> </a>
+      <a
+        v-if="lineNumber"
+        :data-linenumber="lineNumber"
+        :href="lineHref"
+        @click="setHighlightedRow(lineCode)"
+      >
+      </a>
       <diff-gutter-avatars v-if="shouldShowAvatarsOnGutter" :discussions="line.discussions" />
     </template>
   </div>

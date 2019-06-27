@@ -15,7 +15,7 @@
     word-wrap: break-word;
 
     &::after {
-      content: " ";
+      content: ' ';
       display: table;
       clear: both;
     }
@@ -133,7 +133,6 @@ ul.content-list {
 
     .description {
       @include str-truncated;
-      color: $gl-text-color-secondary;
     }
 
     .controls {
@@ -156,6 +155,12 @@ ul.content-list {
         margin-top: 3px;
         margin-bottom: 4px;
 
+        &.btn-ldap-override {
+          @include media-breakpoint-up(sm) {
+            margin-bottom: 0;
+          }
+        }
+
         &.has-tooltip,
         &:last-child {
           margin-right: 0;
@@ -167,15 +172,7 @@ ul.content-list {
       }
 
       .no-comments {
-        opacity: .5;
-      }
-    }
-
-    .member-controls {
-      float: none;
-
-      @include media-breakpoint-up(sm) {
-        float: right;
+        opacity: 0.5;
       }
     }
 
@@ -196,8 +193,6 @@ ul.content-list {
 // Content list using flexbox
 .flex-list {
   .flex-row {
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
     align-items: center;
     white-space: nowrap;

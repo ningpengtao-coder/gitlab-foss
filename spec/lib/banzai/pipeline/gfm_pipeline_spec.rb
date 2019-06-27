@@ -104,5 +104,40 @@ describe Banzai::Pipeline::GfmPipeline do
 
       expect(output).to include("src=\"test%20image.png\"")
     end
+
+    it 'sanitizes the fixed link' do
+      markdown_xss = "[xss](javascript: alert%28document.domain%29)"
+      output = described_class.to_html(markdown_xss, project: project)
+
+      expect(output).not_to include("javascript")
+
+      markdown_xss = "<invalidtag>\n[xss](javascript:alert%28document.domain%29)"
+      output = described_class.to_html(markdown_xss, project: project)
+
+      expect(output).not_to include("javascript")
+    end
+  end
+
+  describe 'emoji in references' do
+    set(:project) { create(:project, :public) }
+    let(:emoji) { '💯' }
+
+    it 'renders a label reference with emoji inside' do
+      create(:label, project: project, name: emoji)
+
+      output = described_class.to_html("#{Label.reference_prefix}\"#{emoji}\"", project: project)
+
+      expect(output).to include(emoji)
+      expect(output).to include(Gitlab::Routing.url_helpers.project_issues_path(project, label_name: emoji))
+    end
+
+    it 'renders a milestone reference with emoji inside' do
+      milestone = create(:milestone, project: project, title: emoji)
+
+      output = described_class.to_html("#{Milestone.reference_prefix}\"#{emoji}\"", project: project)
+
+      expect(output).to include(emoji)
+      expect(output).to include(Gitlab::Routing.url_helpers.milestone_path(milestone))
+    end
   end
 end

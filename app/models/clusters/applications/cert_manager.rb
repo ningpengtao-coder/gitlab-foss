@@ -2,8 +2,8 @@
 
 module Clusters
   module Applications
-    class CertManager < ActiveRecord::Base
-      VERSION = 'v0.5.0'.freeze
+    class CertManager < ApplicationRecord
+      VERSION = 'v0.5.2'.freeze
 
       self.table_name = 'clusters_applications_cert_managers'
 
@@ -14,10 +14,20 @@ module Clusters
 
       default_value_for :version, VERSION
 
+      default_value_for :email do |cert_manager|
+        cert_manager.cluster&.user&.email
+      end
+
       validates :email, presence: true
 
       def chart
         'stable/cert-manager'
+      end
+
+      # We will implement this in future MRs.
+      # Need to reverse postinstall step
+      def allowed_to_uninstall?
+        false
       end
 
       def install_command

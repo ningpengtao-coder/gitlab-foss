@@ -1,31 +1,40 @@
 import Vue from 'vue';
 import { mapActions } from 'vuex';
+import _ from 'underscore';
 import Translate from '~/vue_shared/translate';
 import ide from './components/ide.vue';
 import store from './stores';
 import router from './ide_router';
 import { parseBoolean } from '../lib/utils/common_utils';
+import { resetServiceWorkersPublicPath } from '../lib/utils/webpack';
 
 Vue.use(Translate);
+
+/**
+ * Function that receives the default store and returns an extended one.
+ * @callback extendStoreCallback
+ * @param {Vuex.Store} store
+ * @param {Element} el
+ */
 
 /**
  * Initialize the IDE on the given element.
  *
  * @param {Element} el - The element that will contain the IDE.
  * @param {Object} options - Extra options for the IDE (Used by EE).
- * @param {(e:Element) => Object} options.extraInitialData -
- *   Function that returns extra properties to seed initial data.
  * @param {Component} options.rootComponent -
  *   Component that overrides the root component.
+ * @param {extendStoreCallback} options.extendStore -
+ *   Function that receives the default store and returns an extended one.
  */
 export function initIde(el, options = {}) {
   if (!el) return null;
 
-  const { extraInitialData = () => ({}), rootComponent = ide } = options;
+  const { rootComponent = ide, extendStore = _.identity } = options;
 
   return new Vue({
     el,
-    store,
+    store: extendStore(store, el),
     router,
     created() {
       this.setEmptyStateSvgs({
@@ -41,7 +50,6 @@ export function initIde(el, options = {}) {
       });
       this.setInitialData({
         clientsidePreviewEnabled: parseBoolean(el.dataset.clientsidePreviewEnabled),
-        ...extraInitialData(el),
       });
     },
     methods: {
@@ -51,16 +59,6 @@ export function initIde(el, options = {}) {
       return createElement(rootComponent);
     },
   });
-}
-
-// tell webpack to load assets from origin so that web workers don't break
-export function resetServiceWorkersPublicPath() {
-  // __webpack_public_path__ is a global variable that can be used to adjust
-  // the webpack publicPath setting at runtime.
-  // see: https://webpack.js.org/guides/public-path/
-  const relativeRootPath = (gon && gon.relative_url_root) || '';
-  const webpackAssetPath = `${relativeRootPath}/assets/webpack/`;
-  __webpack_public_path__ = webpackAssetPath; // eslint-disable-line camelcase
 }
 
 /**

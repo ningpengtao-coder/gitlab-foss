@@ -1,7 +1,7 @@
 require_relative '../support/helpers/test_env'
 
 FactoryBot.define do
-  PAGES_ACCESS_LEVEL_SCHEMA_VERSION = 20180423204600
+  PAGES_ACCESS_LEVEL_SCHEMA_VERSION ||= 20180423204600
 
   # Project without repository
   #
@@ -30,6 +30,8 @@ FactoryBot.define do
       # we can't assign the delegated `#ci_cd_settings` attributes directly, as the
       # `#ci_cd_settings` relation needs to be created first
       group_runners_enabled nil
+      import_status nil
+      import_jid nil
     end
 
     after(:create) do |project, evaluator|
@@ -64,6 +66,13 @@ FactoryBot.define do
 
       # assign the delegated `#ci_cd_settings` attributes after create
       project.reload.group_runners_enabled = evaluator.group_runners_enabled unless evaluator.group_runners_enabled.nil?
+
+      if evaluator.import_status
+        import_state = project.import_state || project.build_import_state
+        import_state.status = evaluator.import_status
+        import_state.jid = evaluator.import_jid
+        import_state.save
+      end
     end
 
     trait :public do
@@ -251,6 +260,7 @@ FactoryBot.define do
     trait(:merge_requests_enabled)  { merge_requests_access_level ProjectFeature::ENABLED }
     trait(:merge_requests_disabled) { merge_requests_access_level ProjectFeature::DISABLED }
     trait(:merge_requests_private)  { merge_requests_access_level ProjectFeature::PRIVATE }
+    trait(:merge_requests_public)   { merge_requests_access_level ProjectFeature::PUBLIC }
     trait(:repository_enabled)      { repository_access_level ProjectFeature::ENABLED }
     trait(:repository_disabled)     { repository_access_level ProjectFeature::DISABLED }
     trait(:repository_private)      { repository_access_level ProjectFeature::PRIVATE }
@@ -261,6 +271,10 @@ FactoryBot.define do
 
     trait :auto_devops do
       association :auto_devops, factory: :project_auto_devops
+    end
+
+    trait :auto_devops_disabled do
+      association :auto_devops, factory: [:project_auto_devops, :disabled]
     end
   end
 
@@ -304,6 +318,20 @@ FactoryBot.define do
     end
   end
 
+  factory :youtrack_project, parent: :project do
+    has_external_issue_tracker true
+
+    after :create do |project|
+      project.create_youtrack_service(
+        active: true,
+        properties: {
+          'project_url' => 'http://youtrack/projects/project_guid_in_youtrack',
+          'issues_url' => 'http://youtrack/issues/:id'
+        }
+      )
+    end
+  end
+
   factory :jira_project, parent: :project do
     has_external_issue_tracker true
     jira_service
@@ -311,6 +339,10 @@ FactoryBot.define do
 
   factory :kubernetes_project, parent: :project do
     kubernetes_service
+  end
+
+  factory :mock_deployment_project, parent: :project do
+    mock_deployment_service
   end
 
   factory :prometheus_project, parent: :project do

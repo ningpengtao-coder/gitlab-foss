@@ -1,10 +1,6 @@
 /**
  * Note Form
  */
-.comment-btn {
-  @extend .btn-success;
-}
-
 .diff-file .diff-content {
   tr.line_holder:hover > td .line_note_link {
     opacity: 1;
@@ -62,7 +58,8 @@
     border: 1px solid $border-color;
     border-radius: $border-radius-base;
     transition: border-color ease-in-out 0.15s,
-                box-shadow ease-in-out 0.15s;
+      box-shadow ease-in-out 0.15s;
+    background-color: $white-light;
 
     &.is-focused {
       @extend .form-control:focus;
@@ -76,7 +73,7 @@
     &.is-dropzone-hover {
       border-color: $green-500;
       box-shadow: 0 0 2px $black-transparent,
-                  0 0 4px $green-500-focus;
+        0 0 4px $green-500-focus;
 
       .comment-toolbar,
       .nav-links {
@@ -88,9 +85,7 @@
 
 .md-header .nav-links {
   display: flex;
-  display: -webkit-flex;
   flex-flow: row wrap;
-  -webkit-flex-flow: row wrap;
   width: 100%;
 
   .float-right {
@@ -108,6 +103,11 @@
   padding: 3px 12px;
   margin: auto;
   align-items: center;
+
+  a {
+    color: $orange-600;
+    text-decoration: underline;
+  }
 
   .icon {
     margin-right: $issuable-warning-icon-margin;
@@ -151,7 +151,7 @@
   }
 
   .sidebar-item-value & {
-    fill: $theme-gray-700;
+    fill: $gray-700;
   }
 }
 
@@ -174,11 +174,21 @@
 
 .discussion-form {
   background-color: $white-light;
+
+  @include media-breakpoint-down(xs) {
+    .user-avatar-link {
+      display: none;
+    }
+
+    .note-edit-form {
+      margin-left: 0;
+    }
+  }
 }
 
 table {
   .discussion-form-container {
-    padding: $gl-padding-top $gl-padding $gl-padding;
+    padding: $gl-padding;
   }
 }
 
@@ -237,14 +247,27 @@ table {
 }
 
 .discussion-body,
-.diff-file {
+.diff-file,
+.commit-diff {
   .discussion-reply-holder {
-    background-color: $white-light;
-    padding: 10px 16px;
+    background-color: $gray-light;
     border-radius: 0 0 3px 3px;
+    padding: $gl-padding;
+    border-top: 1px solid $gray-100;
+
+    + .new-note {
+      background-color: $gray-light;
+      border-top: 1px solid $gray-100;
+    }
 
     &.is-replying {
       padding-bottom: $gl-padding;
+    }
+
+    .user-avatar-link {
+      img {
+        margin-top: -3px;
+      }
     }
   }
 }
@@ -253,7 +276,6 @@ table {
   @include media-breakpoint-up(sm) {
     display: flex;
   }
-
 
   .discussion-actions {
     display: table;
@@ -275,8 +297,10 @@ table {
     }
   }
 
-  .btn {
-    width: 100%;
+  @include media-breakpoint-down(xs) {
+    .btn {
+      width: 100%;
+    }
   }
 
   .btn-text-field {
@@ -338,7 +362,7 @@ table {
 .toolbar-button-icon {
   position: relative;
   top: 1px;
-  margin-right: 3px;
+  margin-right: $gl-padding-4;
   color: inherit;
   font-size: 16px;
 }
@@ -384,7 +408,7 @@ table {
 }
 
 .comment-type-dropdown {
-  .comment-btn {
+  .btn-success {
     width: auto;
   }
 
@@ -415,7 +439,7 @@ table {
     width: 100%;
     margin-bottom: 10px;
 
-    .comment-btn {
+    .btn-success {
       flex-grow: 1;
       flex-shrink: 0;
       width: auto;
@@ -446,7 +470,7 @@ table {
 .uploading-error-message {
   @include media-breakpoint-down(xs) {
     &::after {
-      content: "\a";
+      content: '\a';
       white-space: pre;
     }
   }
@@ -465,6 +489,15 @@ table {
   border: 0;
   font-size: 14px;
   line-height: 16px;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+
+    .text-attach-file {
+      text-decoration: underline;
+    }
+  }
 }
 
 .markdown-selector {

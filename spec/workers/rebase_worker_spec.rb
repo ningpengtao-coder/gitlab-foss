@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe RebaseWorker, '#perform' do
@@ -19,7 +21,7 @@ describe RebaseWorker, '#perform' do
       expect(MergeRequests::RebaseService)
         .to receive(:new).with(forked_project, merge_request.author).and_call_original
 
-      subject.perform(merge_request, merge_request.author)
+      subject.perform(merge_request.id, merge_request.author.id)
     end
   end
 end

@@ -4,6 +4,8 @@ class Projects::RefsController < Projects::ApplicationController
   include ExtractsPath
   include TreeHelper
 
+  around_action :allow_gitaly_ref_name_caching, only: [:logs_tree]
+
   before_action :require_non_empty_project
   before_action :validate_ref_id
   before_action :assign_ref_vars
@@ -53,6 +55,7 @@ class Projects::RefsController < Projects::ApplicationController
       format.html { render_404 }
       format.json do
         response.headers["More-Logs-Url"] = @more_log_url if summary.more?
+        response.headers["More-Logs-Offset"] = summary.next_offset if summary.more?
         render json: @logs
       end
 

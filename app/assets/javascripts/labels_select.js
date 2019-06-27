@@ -4,14 +4,14 @@
 
 import $ from 'jquery';
 import _ from 'underscore';
-import { sprintf, __ } from './locale';
+import { sprintf, s__, __ } from './locale';
 import axios from './lib/utils/axios_utils';
 import IssuableBulkUpdateActions from './issuable_bulk_update_actions';
-import DropdownUtils from './filtered_search/dropdown_utils';
 import CreateLabelDropdown from './create_label';
 import flash from './flash';
 import ModalStore from './boards/stores/modal_store';
 import boardsStore from './boards/stores/boards_store';
+import { isEE, isScopedLabel } from '~/lib/utils/common_utils';
 
 export default class LabelsSelect {
   constructor(els, options = {}) {
@@ -87,8 +87,9 @@ export default class LabelsSelect {
           return this.value;
         })
         .get();
+      const scopedLabels = $dropdown.data('scopedLabels');
+      const scopedLabelsDocumentationLink = $dropdown.data('scopedLabelsDocumentationLink');
       const { handleClick } = options;
-
       $sidebarLabelTooltip.tooltip();
 
       if ($dropdown.closest('.dropdown').find('.dropdown-new-label').length) {
@@ -133,10 +134,51 @@ export default class LabelsSelect {
               template = LabelsSelect.getLabelTemplate({
                 labels: data.labels,
                 issueUpdateURL,
+                enableScopedLabels: scopedLabels,
+                scopedLabelsDocumentationLink,
               });
               labelCount = data.labels.length;
+
+              // EE Specific
+              if (isEE) {
+                /**
+                 * For Scoped labels, the last label selected with the
+                 * same key will be applied to the current issueable.
+                 *
+                 * If these are the labels - priority::1, priority::2; and if
+                 * we apply them in the same order, only priority::2 will stick
+                 * with the issuable.
+                 *
+                 * In the current dropdown implementation, we keep track of all
+                 * the labels selected via a hidden DOM element. Since a User
+                 * can select priority::1 and priority::2 at the same time, the
+                 * DOM will have 2 hidden input and the dropdown will show both
+                 * the items selected but in reality server only applied
+                 * priority::2.
+                 *
+                 * We find all the labels then find all the labels server accepted
+                 * and then remove the excess ones.
+                 */
+                const toRemoveIds = Array.from(
+                  $form.find(`input[type="hidden"][name="${fieldName}"]`),
+                )
+                  .map(el => el.value)
+                  .map(Number);
+
+                data.labels.forEach(label => {
+                  const index = toRemoveIds.indexOf(label.id);
+                  toRemoveIds.splice(index, 1);
+                });
+
+                toRemoveIds.forEach(id => {
+                  $form
+                    .find(`input[type="hidden"][name="${fieldName}"][value="${id}"]`)
+                    .last()
+                    .remove();
+                });
+              }
             } else {
-              template = '<span class="no-value">None</span>';
+              template = `<span class="no-value">${__('None')}</span>`;
             }
             $value.removeAttr('style').html(template);
             $sidebarCollapsedValue.text(labelCount);
@@ -148,7 +190,9 @@ export default class LabelsSelect {
 
               if (labelTitles.length > 5) {
                 labelTitles = labelTitles.slice(0, 5);
-                labelTitles.push('and ' + (data.labels.length - 5) + ' more');
+                labelTitles.push(
+                  sprintf(s__('Labels|and %{count} more'), { count: data.labels.length - 5 }),
+                );
               }
 
               labelTooltipTitle = labelTitles.join(', ');
@@ -171,35 +215,19 @@ export default class LabelsSelect {
           axios
             .get(labelUrl)
             .then(res => {
-              let data = _.chain(res.data)
-                .groupBy(function(label) {
-                  return label.title;
-                })
-                .map(function(label) {
-                  var color;
-                  color = _.map(label, function(dup) {
-                    return dup.color;
-                  });
-                  return {
-                    id: label[0].id,
-                    title: label[0].title,
-                    color: color,
-                    duplicate: color.length > 1,
-                  };
-                })
-                .value();
+              let { data } = res;
               if ($dropdown.hasClass('js-extra-options')) {
                 var extraData = [];
                 if (showNo) {
                   extraData.unshift({
                     id: 0,
-                    title: 'No Label',
+                    title: __('No Label'),
                   });
                 }
                 if (showAny) {
                   extraData.unshift({
                     isAny: true,
-                    title: 'Any Label',
+                    title: __('Any Label'),
                   });
                 }
                 if (extraData.length) {
@@ -216,8 +244,8 @@ export default class LabelsSelect {
             .catch(() => flash(__('Error fetching labels.')));
         },
         renderRow: function(label, instance) {
-          var $a,
-            $li,
+          var linkEl,
+            listItemEl,
             color,
             colorEl,
             indeterminate,
@@ -226,12 +254,11 @@ export default class LabelsSelect {
             spacing,
             i,
             marked,
-            dropdownName,
             dropdownValue;
-          $li = $('<li>');
-          $a = $('<a href="#">');
+
           selectedClass = [];
           removesAll = label.id <= 0 || label.id == null;
+
           if ($dropdown.hasClass('js-filter-bulk-update')) {
             indeterminate = $dropdown.data('indeterminate') || [];
             marked = $dropdown.data('marked') || [];
@@ -250,7 +277,6 @@ export default class LabelsSelect {
             }
           } else {
             if (this.id(label)) {
-              dropdownName = $dropdown.data('fieldName');
               dropdownValue = this.id(label)
                 .toString()
                 .replace(/'/g, "\\'");
@@ -258,7 +284,7 @@ export default class LabelsSelect {
               if (
                 $form.find(
                   "input[type='hidden'][name='" +
-                    dropdownName +
+                    this.fieldName +
                     "'][value='" +
                     dropdownValue +
                     "']",
@@ -268,30 +294,34 @@ export default class LabelsSelect {
               }
             }
 
-            if ($dropdown.hasClass('js-multiselect') && removesAll) {
+            if (this.multiSelect && removesAll) {
               selectedClass.push('dropdown-clear-active');
             }
           }
-          if (label.duplicate) {
-            color = DropdownUtils.duplicateLabelColor(label.color);
-          } else {
-            if (label.color != null) {
-              [color] = label.color;
-            }
-          }
-          if (color) {
-            colorEl = "<span class='dropdown-label-box' style='background: " + color + "'></span>";
+
+          if (label.color) {
+            colorEl =
+              "<span class='dropdown-label-box' style='background: " + label.color + "'></span>";
           } else {
             colorEl = '';
           }
+
+          linkEl = document.createElement('a');
+          linkEl.href = '#';
+
           // We need to identify which items are actually labels
           if (label.id) {
             selectedClass.push('label-item');
-            $a.attr('data-label-id', label.id);
+            linkEl.dataset.labelId = label.id;
           }
-          $a.addClass(selectedClass.join(' ')).html(`${colorEl} ${_.escape(label.title)}`);
-          // Return generated html
-          return $li.html($a).prop('outerHTML');
+
+          linkEl.className = selectedClass.join(' ');
+          linkEl.innerHTML = `${colorEl} ${_.escape(label.title)}`;
+
+          listItemEl = document.createElement('li');
+          listItemEl.appendChild(linkEl);
+
+          return listItemEl;
         },
         search: {
           fields: ['title'],
@@ -313,7 +343,7 @@ export default class LabelsSelect {
 
           if (selected && selected.id === 0) {
             this.selected = [];
-            return 'No Label';
+            return __('No Label');
           } else if (isSelected) {
             this.selected.push(title);
           } else if (!isSelected && title) {
@@ -373,6 +403,7 @@ export default class LabelsSelect {
             } else {
               if (!$dropdown.hasClass('js-filter-bulk-update')) {
                 saveLabelData();
+                $dropdown.data('glDropdown').clearMenu();
               }
             }
           }
@@ -435,7 +466,7 @@ export default class LabelsSelect {
                 new ListLabel({
                   id: label.id,
                   title: label.title,
-                  color: label.color[0],
+                  color: label.color,
                   textColor: '#fff',
                 }),
               );
@@ -486,19 +517,60 @@ export default class LabelsSelect {
     // so best approach is to use traditional way of
     // concatenation
     // see: http://2ality.com/2016/05/template-literal-whitespace.html#joining-arrays
-    const tpl = _.template(
+
+    const labelTemplate = _.template(
       [
-        '<% _.each(labels, function(label){ %>',
         '<a href="<%- issueUpdateURL.slice(0, issueUpdateURL.lastIndexOf("/")) %>?label_name[]=<%- encodeURIComponent(label.title) %>">',
-        '<span class="badge label has-tooltip color-label" title="<%- label.description %>" style="background-color: <%- label.color %>; color: <%- label.text_color %>;">',
+        '<span class="badge label has-tooltip color-label" <%= linkAttrs %> title="<%= tooltipTitleTemplate({ label, isScopedLabel, enableScopedLabels, escapeStr }) %>" style="background-color: <%= escapeStr(label.color) %>; color: <%= escapeStr(label.text_color) %>;">',
         '<%- label.title %>',
         '</span>',
         '</a>',
+      ].join(''),
+    );
+
+    const infoIconTemplate = _.template(
+      [
+        '<a href="<%= scopedLabelsDocumentationLink %>" class="label scoped-label" target="_blank" rel="noopener">',
+        '<i class="fa fa-question-circle" style="background-color: <%= escapeStr(label.color) %>; color: <%= escapeStr(label.text_color) %>;"></i>',
+        '</a>',
+      ].join(''),
+    );
+
+    const tooltipTitleTemplate = _.template(
+      [
+        '<% if (isScopedLabel(label) && enableScopedLabels) { %>',
+        "<span class='font-weight-bold scoped-label-tooltip-title'>Scoped label</span>",
+        '<br />',
+        '<%= escapeStr(label.description) %>',
+        '<% } else { %>',
+        '<%= escapeStr(label.description) %>',
+        '<% } %>',
+      ].join(''),
+    );
+
+    const tpl = _.template(
+      [
+        '<% _.each(labels, function(label){ %>',
+        '<% if (isScopedLabel(label) && enableScopedLabels) { %>',
+        '<span class="d-inline-block position-relative scoped-label-wrapper">',
+        '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
+        '<%= infoIconTemplate({ label, scopedLabelsDocumentationLink, escapeStr }) %>',
+        '</span>',
+        '<% } else { %>',
+        '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, tooltipTitleTemplate, escapeStr, linkAttrs: "" }) %>',
+        '<% } %>',
         '<% }); %>',
       ].join(''),
     );
 
-    return tpl(tplData);
+    return tpl({
+      ...tplData,
+      labelTemplate,
+      infoIconTemplate,
+      tooltipTitleTemplate,
+      isScopedLabel,
+      escapeStr: _.escape,
+    });
   }
 
   bindEvents() {
@@ -509,7 +581,7 @@ export default class LabelsSelect {
     if ($('.selected-issuable:checked').length) {
       return;
     }
-    return $('.issues-bulk-update .labels-filter .dropdown-toggle-text').text('Label');
+    return $('.issues-bulk-update .labels-filter .dropdown-toggle-text').text(__('Label'));
   }
   // eslint-disable-next-line class-methods-use-this
   enableBulkLabelDropdown() {

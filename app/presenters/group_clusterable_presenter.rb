@@ -14,6 +14,11 @@ class GroupClusterablePresenter < ClusterablePresenter
     install_applications_group_cluster_path(clusterable, cluster, application)
   end
 
+  override :update_applications_cluster_path
+  def update_applications_cluster_path(cluster, application)
+    update_applications_group_cluster_path(clusterable, cluster, application)
+  end
+
   override :cluster_path
   def cluster_path(cluster, params = {})
     group_cluster_path(clusterable, cluster, params)
@@ -31,6 +36,6 @@ class GroupClusterablePresenter < ClusterablePresenter
 
   override :learn_more_link
   def learn_more_link
-    link_to(s_('ClusterIntegration|Learn more about group Kubernetes clusters'), help_page_path('user/project/clusters/index'), target: '_blank', rel: 'noopener noreferrer')
+    link_to(s_('ClusterIntegration|Learn more about group Kubernetes clusters'), help_page_path('user/group/clusters/index'), target: '_blank', rel: 'noopener noreferrer')
   end
 end

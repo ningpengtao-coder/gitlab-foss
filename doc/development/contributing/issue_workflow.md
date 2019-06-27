@@ -6,8 +6,8 @@ scheduling into milestones. Labelling is a task for everyone.
 
 Most issues will have labels for at least one of the following:
 
-- Type: ~"feature proposal", ~bug, ~customer, etc.
-- Subject: ~wiki, ~"container registry", ~ldap, ~api, ~frontend, etc.
+- Type: ~feature, ~bug, ~customer, etc.
+- Subject: ~wiki, ~"Container Registry", ~ldap, ~api, ~frontend, etc.
 - Team: ~Plan, ~Manage, ~Quality, etc.
 - Stage: ~"devops:plan", ~"devops:create", etc.
 - Release Scoping: ~Deliverable, ~Stretch, ~"Next Patch Release"
@@ -20,15 +20,15 @@ All labels, their meaning and priority are defined on the
 If you come across an issue that has none of these, and you're allowed to set
 labels, you can _always_ add the team and type, and often also the subject.
 
-[milestones-page]: https://gitlab.com/gitlab-org/gitlab-ce/milestones
+[milestones-page]: https://gitlab.com/groups/gitlab-org/-/milestones
 
 ## Type labels
 
 Type labels are very important. They define what kind of issue this is. Every
 issue should have one or more.
 
-Examples of type labels are ~"feature proposal", ~bug, ~customer, ~security,
-and ~"direction".
+Examples of type labels are ~feature, ~bug, ~customer, ~security,
+and ~direction.
 
 A number of type labels have a priority assigned to them, which automatically
 makes them float to the top, depending on their importance.
@@ -44,7 +44,7 @@ Subject labels are labels that define what area or feature of GitLab this issue
 hits. They are not always necessary, but very convenient.
 
 Examples of subject labels are ~wiki, ~ldap, ~api,
-~issues, ~"merge requests", ~labels, and ~"container registry".
+~issues, ~"merge requests", ~labels, and ~"Container Registry".
 
 If you are an expert in a particular area, it makes it easier to find issues to
 work on. You can also subscribe to those labels to receive an email each time an
@@ -62,12 +62,16 @@ The current team labels are:
 
 - ~Configure
 - ~Create
+- ~Defend
 - ~Distribution
 - ~Documentation
+- ~Ecosystem
 - ~Geo
 - ~Gitaly
+- ~Growth
 - ~Manage
-- ~Monitoring
+- ~Memory
+- ~Monitor
 - ~Plan
 - ~Quality
 - ~Release
@@ -90,18 +94,21 @@ Stage labels specify which [DevOps stage][devops-stages] the issue belongs to.
 
 The current stage labels are:
 
-- ~"devops:manage"
-- ~"devops:plan"
-- ~"devops:create"
-- ~"devops:verify"
-- ~"devops:package"
-- ~"devops:release"
-- ~"devops:configure"
-- ~"devops:monitor"
-- ~"devops:secure"
+- ~"devops::manage"
+- ~"devops::plan"
+- ~"devops::create"
+- ~"devops::verify"
+- ~"devops::package"
+- ~"devops::release"
+- ~"devops::configure"
+- ~"devops::monitor"
+- ~"devops::secure"
+- ~"devops::defend"
+- ~"devops::growth"
+- ~"devops::enablement"
 
-These labels should be mutually exclusive. If an issue belongs to multiple
-stages, the most relevant should be used.
+These labels are [scoped labels](../../user/project/labels.md#scoped-labels-premium)
+and thus are mutually exclusive.
 
 They differ from the [Team labels](#team-labels) because teams may work on
 issues outside their stage.
@@ -116,6 +123,25 @@ The Stage labels are used to generate the [direction pages][direction-pages] aut
 
 [devops-stages]: https://about.gitlab.com/direction/#devops-stages
 [direction-pages]: https://about.gitlab.com/direction/
+
+## Group labels
+
+Group labels specify which [groups][structure-groups] the issue belongs to.
+
+Examples include:
+
+- ~"group::control"
+- ~"group::editor"
+
+These labels are [scoped labels](../../user/project/labels.md#scoped-labels-premium)
+and thus are mutually exclusive.
+
+Groups are nested beneath a particular stage, so only one stage label and one group label
+can be applied to a single issue. You can find the groups listed in the
+[Product Categories pages][product-categories].
+
+[structure-groups]: https://about.gitlab.com/company/team/structure/#groups
+[product-categories]: https://about.gitlab.com/handbook/product/categories/
 
 ## Release Scoping labels
 
@@ -139,44 +165,44 @@ or ~"Stretch". Any open issue for a previous milestone should be labeled
 
 Priority labels help us define the time a ~bug fix should be completed. Priority determines how quickly the defect turnaround time must be.
 If there are multiple defects, the priority decides which defect has to be fixed immediately versus later.
-This label documents the planned timeline & urgency which is used to measure against our actual SLA on delivering ~bug fixes.
+This label documents the planned timeline & urgency which is used to measure against our target SLO on delivering ~bug fixes.
 
-| Label | Meaning         | Defect SLA (applies only to ~bug and ~security defects)                                                    |
+| Label | Meaning         | Target SLO (applies only to ~bug and ~security defects)                                                    |
 |-------|-----------------|----------------------------------------------------------------------------|
 | ~P1   | Urgent Priority | The current release + potentially immediate hotfix to GitLab.com (30 days) |
 | ~P2   | High Priority   | The next release (60 days)                                                 |
 | ~P3   | Medium Priority | Within the next 3 releases (approx one quarter or 90 days)                 |
 | ~P4   | Low Priority    | Anything outside the next 3 releases (more than one quarter or 120 days)   |
 
-If an issue seems to fall between two priority labels, assign it to the higher-
-priority label.
-
 ## Severity labels
 
 Severity labels help us clearly communicate the impact of a ~bug on users.
+There can be multiple facets of the impact. The below is a guideline.
 
-| Label | Meaning           | Impact on Functionality                               | Example |
-|-------|-------------------|-------------------------------------------------------|---------|
-| ~S1   | Blocker           | Outage, broken feature with no workaround             | Unable to create an issue. Data corruption/loss. Security breach. |
-| ~S2   | Critical Severity | Broken Feature, workaround too complex & unacceptable | Can push commits, but only via the command line. |
-| ~S3   | Major Severity    | Broken Feature, workaround acceptable                 | Can create merge requests only from the Merge Requests page, not through the Issue. |
-| ~S4   | Low Severity      | Functionality inconvenience or cosmetic issue         | Label colors are incorrect / not being displayed. |
+| Label | Meaning           | Functionality                                         | Affected Users                   | GitLab.com Availability                            | Performance Degradation      |
+|-------|-------------------|-------------------------------------------------------|----------------------------------|----------------------------------------------------|------------------------------|
+| ~S1   | Blocker           | Unusable feature with no workaround, user is blocked  | Impacts 50% or more of users     | Outage, Significant impact on all of GitLab.com    |                                                       |
+| ~S2   | Critical Severity | Broken Feature, workaround too complex & unacceptable | Impacts between 25%-50% of users | Significant impact on large portions of GitLab.com | Degradation is guaranteed to occur in the near future |
+| ~S3   | Major Severity    | Broken feature with an acceptable workaround          | Impacts up to 25% of users       | Limited impact on important portions of GitLab.com | Degradation is likely to occur in the near future     |
+| ~S4   | Low Severity      | Functionality inconvenience or cosmetic issue         | Impacts less than 5% of users    | Minor impact on GitLab.com                         | Degradation _may_ occur but it's not likely           |
 
-If an issue seems to fall between two severity labels, even taking the
-[severity impact guidance](#severity-impact-guidance) into account, assign
-it to the higher-severity label.
+If a bug seems to fall between two severity labels, assign it to the higher-severity label.
 
-### Severity impact guidance
-
-Severity levels can be applied further depending on the facet of the impact; e.g. Affected customers, GitLab.com availability, performance and etc. The below is a guideline.
-
-| Severity | Affected Customers/Users                                            | GitLab.com Availability                            |  Performance Degradation     |
-|----------|---------------------------------------------------------------------|----------------------------------------------------|------------------------------|
-| ~S1      | >50% users affected (possible company extinction level event)       | Significant impact on all of GitLab.com            |                              |
-| ~S2      | Many users or multiple paid customers affected (but not apocalyptic)| Significant impact on large portions of GitLab.com | Degradation is guaranteed to occur in the near future |
-| ~S3      | A few users or a single paid customer affected                      | Limited impact on important portions of GitLab.com | Degradation is likely to occur in the near future     |
-| ~S4      | No paid users/customer affected, or expected to in the near future  | Minor impact on GitLab.com                         | Degradation _may_ occur but it's not likely           |
-
+* Example(s) of ~S1
+  * Data corruption/loss. 
+  * Security breach.
+  * Unable to create an issue or merge request. 
+  * Unable to add a comment or discussion to the issue or merge request.
+* Example(s) of ~S2
+  * Cannot submit changes through the web IDE but the commandline works.
+  * A status widget on the merge request page is not working but information can be seen in the test pipeline page.
+* Example(s) of ~S3
+  * Can create merge requests only from the Merge Requests list view, not from an Issue page.
+  * Status is not updated in real time and needs a page refresh.
+* Example(s) of ~S4
+  * Label colors are incorrect.
+  * UI elements are not fully aligned.
+  
 ## Label for community contributors
 
 Issues that are beneficial to our users, 'nice to haves', that we currently do
@@ -199,8 +225,8 @@ different way.
 We add the ~"Accepting merge requests" label to:
 
 - Low priority ~bug issues (i.e. we do not add it to the bugs that we want to
-solve in the ~"Next Patch Release")
-- Small ~"feature proposal"
+  solve in the ~"Next Patch Release")
+- Small ~feature
 - Small ~"technical debt" issues
 
 After adding the ~"Accepting merge requests" label, we try to estimate the
@@ -259,10 +285,10 @@ For feature proposals for EE, open an issue on the
 [issue tracker of EE][ee-tracker].
 
 In order to help track the feature proposals, we have created a
-[`feature proposal`][fpl] label. For the time being, users that are not members
+[`feature`][fl] label. For the time being, users that are not members
 of the project cannot add labels. You can instead ask one of the [core team]
-members to add the label ~"feature proposal" to the issue or add the following
-code snippet right after your description in a new line: `~"feature proposal"`.
+members to add the label ~feature to the issue or add the following
+code snippet right after your description in a new line: `~feature`.
 
 Please keep feature proposals as small and simple as possible, complex ones
 might be edited to make them small and simple.
@@ -276,7 +302,7 @@ need to ask one of the [core team] members to add the label, if you do not have 
 If you want to create something yourself, consider opening an issue first to
 discuss whether it is interesting to include this in GitLab.
 
-[fpl]: https://gitlab.com/gitlab-org/gitlab-ce/issues?label_name=feature+proposal
+[fl]: https://gitlab.com/gitlab-org/gitlab-ce/issues?label_name=feature
 
 ## Issue tracker guidelines
 
@@ -300,17 +326,17 @@ below will make it easy to manage this, without unnecessary overhead.
 
 1. Set weight for any issue at the earliest possible convenience
 1. If you don't agree with a set weight, discuss with other developers until
-consensus is reached about the weight
+   consensus is reached about the weight
 1. Issue weights are an abstract measurement of complexity of the issue. Do not
-relate issue weight directly to time. This is called [anchoring](https://en.wikipedia.org/wiki/Anchoring)
-and something you want to avoid.
+   relate issue weight directly to time. This is called [anchoring](https://en.wikipedia.org/wiki/Anchoring)
+   and something you want to avoid.
 1. Something that has a weight of 1 (or no weight) is really small and simple.
-Something that is 9 is rewriting a large fundamental part of GitLab,
-which might lead to many hard problems to solve. Changing some text in GitLab
-is probably 1, adding a new Git Hook maybe 4 or 5, big features 7-9.
+   Something that is 9 is rewriting a large fundamental part of GitLab,
+   which might lead to many hard problems to solve. Changing some text in GitLab
+   is probably 1, adding a new Git Hook maybe 4 or 5, big features 7-9.
 1. If something is very large, it should probably be split up in multiple
-issues or chunks. You can simply not set the weight of a parent issue and set
-weights to children issues.
+   issues or chunks. You can simply not set the weight of a parent issue and set
+   weights to children issues.
 
 ## Regression issues
 
@@ -336,13 +362,14 @@ addressed.
 
 In order to track things that can be improved in GitLab's codebase,
 we use the ~"technical debt" label in [GitLab's issue tracker][ce-tracker].
-For user experience improvements, we use the ~"UX debt" label.
+For missed user experience requirements, we use the ~"UX debt" label.
 
 These labels should be added to issues that describe things that can be improved,
 shortcuts that have been taken, features that need additional attention, and all
 other things that have been left behind due to high velocity of development.
 For example, code that needs refactoring should use the ~"technical debt" label,
-user experience refinements should use the ~"UX debt" label.
+something that didn't ship according to our Design System guidelines should
+use the ~"UX debt" label.
 
 Everyone can create an issue, though you may need to ask for adding a specific
 label, if you do not have permissions to do it by yourself. Additional labels

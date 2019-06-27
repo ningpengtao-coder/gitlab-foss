@@ -8,19 +8,22 @@ to simplify the setup and execution of a mature & modern software development li
 
 ## Overview
 
-NOTE: **Enabled by default:**
-Starting with GitLab 11.3, the Auto DevOps pipeline is enabled by default for all
-projects. If it has not been explicitly enabled for the project, Auto DevOps will be automatically
-disabled on the first pipeline failure. Your project will continue to use an alternative
-[CI/CD configuration file](../../ci/yaml/README.md) if one is found. A GitLab
-administrator can [change this setting](../../user/admin_area/settings/continuous_integration.html#auto-devops)
-in the admin area.
-
 With Auto DevOps, the software development process becomes easier to set up
 as every project can have a complete workflow from verification to monitoring
 with minimal configuration. Just push your code and GitLab takes
 care of everything else. This makes it easier to start new projects and brings
 consistency to how applications are set up throughout a company.
+
+For an introduction to Auto DevOps, watch [AutoDevOps in GitLab 11.0](https://youtu.be/0Tc0YYBxqi4).
+
+## Enabled by default
+
+Starting with GitLab 11.3, the Auto DevOps pipeline is enabled by default for all
+projects. If it has not been explicitly enabled for the project, Auto DevOps will be automatically
+disabled on the first pipeline failure. Your project will continue to use an alternative
+[CI/CD configuration file](../../ci/yaml/README.md) if one is found. A GitLab
+administrator can [change this setting](../../user/admin_area/settings/continuous_integration.md#auto-devops-core-only)
+in the admin area.
 
 ## Quick start
 
@@ -58,15 +61,15 @@ project in a simple and automatic way:
 
 1. [Auto Build](#auto-build)
 1. [Auto Test](#auto-test)
-1. [Auto Code Quality](#auto-code-quality) **[STARTER]**
-1. [Auto SAST (Static Application Security Testing)](#auto-sast) **[ULTIMATE]**
-1. [Auto Dependency Scanning](#auto-dependency-scanning) **[ULTIMATE]**
-1. [Auto License Management](#auto-license-management) **[ULTIMATE]**
-1. [Auto Container Scanning](#auto-container-scanning)
+1. [Auto Code Quality](#auto-code-quality-starter) **[STARTER]**
+1. [Auto SAST (Static Application Security Testing)](#auto-sast-ultimate) **[ULTIMATE]**
+1. [Auto Dependency Scanning](#auto-dependency-scanning-ultimate) **[ULTIMATE]**
+1. [Auto License Management](#auto-license-management-ultimate) **[ULTIMATE]**
+1. [Auto Container Scanning](#auto-container-scanning-ultimate) **[ULTIMATE]**
 1. [Auto Review Apps](#auto-review-apps)
-1. [Auto DAST (Dynamic Application Security Testing)](#auto-dast) **[ULTIMATE]**
+1. [Auto DAST (Dynamic Application Security Testing)](#auto-dast-ultimate) **[ULTIMATE]**
 1. [Auto Deploy](#auto-deploy)
-1. [Auto Browser Performance Testing](#auto-browser-performance-testing) **[PREMIUM]**
+1. [Auto Browser Performance Testing](#auto-browser-performance-testing-premium) **[PREMIUM]**
 1. [Auto Monitoring](#auto-monitoring)
 
 As Auto DevOps relies on many different components, it's good to have a basic
@@ -114,13 +117,12 @@ To make full use of Auto DevOps, you will need:
    will need Prometheus installed somewhere (inside or outside your cluster) and
    configured to scrape your Kubernetes cluster. To get response metrics
    (in addition to system metrics), you need to
-   [configure Prometheus to monitor NGINX](../../user/project/integrations/prometheus_library/nginx_ingress.md#configuring-prometheus-to-monitor-for-nginx-ingress-metrics).
+   [configure Prometheus to monitor NGINX](../../user/project/integrations/prometheus_library/nginx_ingress.md#configuring-nginx-ingress-monitoring).
    The [Prometheus service](../../user/project/integrations/prometheus.md)
    integration needs to be enabled for the project, or enabled as a
    [default service template](../../user/project/integrations/services_templates.md)
    for the entire GitLab installation.
 
-NOTE: **Note:**
 If you do not have Kubernetes or Prometheus installed, then Auto Review Apps,
 Auto Deploy, and Auto Monitoring will be silently skipped.
 
@@ -128,11 +130,19 @@ Auto Deploy, and Auto Monitoring will be silently skipped.
 
 The Auto DevOps base domain is required if you want to make use of [Auto
 Review Apps](#auto-review-apps) and [Auto Deploy](#auto-deploy). It can be defined
-in three places:
+in any of the following places:
 
-- either under the project's CI/CD settings while [enabling Auto DevOps](#enabling-auto-devops)
+- either under the cluster's settings, whether for [projects](../../user/project/clusters/index.md#base-domain) or [groups](../../user/group/clusters/index.md#base-domain)
 - or in instance-wide settings in the **admin area > Settings** under the "Continuous Integration and Delivery" section
-- or at the project or group level as a variable: `AUTO_DEVOPS_DOMAIN` (required if you want to use [multiple clusters](#using-multiple-kubernetes-clusters))
+- or at the project level as a variable: `KUBE_INGRESS_BASE_DOMAIN`
+- or at the group level as a variable: `KUBE_INGRESS_BASE_DOMAIN`.
+
+The base domain variable `KUBE_INGRESS_BASE_DOMAIN` follows the same order of precedence
+as other environment [variables](../../ci/variables/README.md#priority-of-environment-variables).
+
+NOTE: **Note**
+`AUTO_DEVOPS_DOMAIN` environment variable is deprecated and
+[is scheduled to be removed](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959).
 
 A wildcard DNS A record matching the base domain(s) is required, for example,
 given a base domain of `example.com`, you'd need a DNS entry like:
@@ -153,11 +163,17 @@ Auto DevOps base domain to `1.2.3.4.nip.io`.
 Once set up, all requests will hit the load balancer, which in turn will route
 them to the Kubernetes pods that run your application(s).
 
+NOTE: **Note:**
+From GitLab 11.8, `KUBE_INGRESS_BASE_DOMAIN` replaces `AUTO_DEVOPS_DOMAIN`.
+Support for `AUTO_DEVOPS_DOMAIN` was [removed in GitLab
+12.0](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959).
+
+
 ## Using multiple Kubernetes clusters **[PREMIUM]**
 
 When using Auto DevOps, you may want to deploy different environments to
 different Kubernetes clusters. This is possible due to the 1:1 connection that
-[exists between them](../../user/project/clusters/index.md#multiple-kubernetes-clusters).
+[exists between them](../../user/project/clusters/index.md#multiple-kubernetes-clusters-premium).
 
 In the [Auto DevOps template](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml)
 (used behind the scenes by Auto DevOps), there are currently 3 defined environment names that you need to know:
@@ -169,17 +185,17 @@ In the [Auto DevOps template](https://gitlab.com/gitlab-org/gitlab-ce/blob/maste
 Those environments are tied to jobs that use [Auto Deploy](#auto-deploy), so
 except for the environment scope, they would also need to have a different
 domain they would be deployed to. This is why you need to define a separate
-`AUTO_DEVOPS_DOMAIN` variable for all the above
-[based on the environment](../../ci/variables/README.md#limiting-environment-scopes-of-variables).
+`KUBE_INGRESS_BASE_DOMAIN` variable for all the above
+[based on the environment](../../ci/variables/README.md#limiting-environment-scopes-of-environment-variables-premium).
 
 The following table is an example of how the three different clusters would
 be configured.
 
-| Cluster name | Cluster environment scope | `AUTO_DEVOPS_DOMAIN` variable value | Variable environment scope | Notes |
+| Cluster name | Cluster environment scope | `KUBE_INGRESS_BASE_DOMAIN` variable value | Variable environment scope | Notes |
 | ------------ | -------------- | ----------------------------- | ------------- | ------ |
 | review       |  `review/*`    | `review.example.com`  | `review/*`      | The review cluster which will run all [Review Apps](../../ci/review_apps/index.md). `*` is a wildcard, which means it will be used by every environment name starting with `review/`. |
 | staging      |  `staging`     | `staging.example.com` | `staging`       | (Optional) The staging cluster which will run the deployments of the staging environments. You need to [enable it first](#deploy-policy-for-staging-and-production-environments). |
-| production   |  `production`  | `example.com`         | `production`    | The production cluster which will run the deployments of the production environment. You can use [incremental rollouts](#incremental-rollout-to-production). |
+| production   |  `production`  | `example.com`         | `production`    | The production cluster which will run the deployments of the production environment. You can use [incremental rollouts](#incremental-rollout-to-production-premium). |
 
 To add a different cluster for each environment:
 
@@ -189,14 +205,11 @@ To add a different cluster for each environment:
     ![Auto DevOps multiple clusters](img/autodevops_multiple_clusters.png)
 
 1. After the clusters are created, navigate to each one and install Helm Tiller
-   and Ingress.
+   and Ingress. Wait for the Ingress IP address to be assigned.
 1. Make sure you have [configured your DNS](#auto-devops-base-domain) with the
    specified Auto DevOps domains.
-1. Navigate to your project's **Settings > CI/CD > Variables** and add
-   the `AUTO_DEVOPS_DOMAIN` variables with their respective environment
-   scope.
-
-    ![Auto DevOps domain variables](img/autodevops_domain_variables.png)
+1. Navigate to each cluster's page, through **Operations > Kubernetes**,
+   and add the domain based on its Ingress IP address.
 
 Now that all is configured, you can test your setup by creating a merge request
 and verifying that your app is deployed as a review app in the Kubernetes
@@ -214,14 +227,29 @@ can enable/disable Auto DevOps at either the project-level or instance-level.
 
 ### Enabling/disabling Auto DevOps at the instance-level (Administrators only)
 
+Even when disabled at the instance level, group owners and project maintainers can still enable
+Auto DevOps at the group and project level, respectively.
+
 1. Go to **Admin area > Settings > Continuous Integration and Deployment**.
 1. Toggle the checkbox labeled **Default to Auto DevOps pipeline for all projects**.
 1. If enabling, optionally set up the Auto DevOps [base domain](#auto-devops-base-domain) which will be used for Auto Deploy and Auto Review Apps.
 1. Click **Save changes** for the changes to take effect.
 
-NOTE: **Note:**
-Even when disabled at the instance level, project maintainers are still able to enable
-Auto DevOps at the project level.
+### Enabling/disabling Auto DevOps at the group-level
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/52447) in GitLab 11.10.
+
+Only administrators and group owners can enable or disable Auto DevOps at the group level.
+
+To enable or disable Auto DevOps at the group-level:
+
+1. Go to group's **Settings > CI/CD > Auto DevOps** page.
+1. Toggle the **Default to Auto DevOps pipeline** checkbox (checked to enable, unchecked to disable).
+1. Click **Save changes** button for the changes to take effect.
+
+When enabling or disabling Auto DevOps at group-level, group configuration will be implicitly used for
+the subgroups and projects inside that group, unless Auto DevOps is specifically enabled or disabled on
+the subgroup or project.
 
 ### Enabling/disabling Auto DevOps at the project-level
 
@@ -236,16 +264,13 @@ If enabling, check that your project doesn't have a `.gitlab-ci.yml`, or if one 
 
 When the feature has been enabled, an Auto DevOps pipeline is triggered on the default branch.
 
-NOTE: **Note:**
-For GitLab versions 10.0 - 10.2, when enabling Auto DevOps, a pipeline needs to be
-manually triggered either by pushing a new commit to the repository or by visiting
-`https://example.gitlab.com/<username>/<project>/pipelines/new` and creating
-a new pipeline for your default branch, generally `master`.
+### Feature flag to enable for a percentage of projects
 
-NOTE: **Note:**
-There is also a feature flag to enable Auto DevOps to a percentage of projects
-which can be enabled from the console with
-`Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(10)`.
+There is also a feature flag to enable Auto DevOps by default to your chosen percentage of projects.
+
+This can be enabled from the console with the following, which uses the example of 10%:
+
+`Feature.get(:force_autodevops_on_by_default).enable_percentage_of_actors(10)`
 
 ### Deployment strategy
 
@@ -259,12 +284,12 @@ The available options are:
 - **Continuous deployment to production**: Enables [Auto Deploy](#auto-deploy)
   with `master` branch directly deployed to production.
 - **Continuous deployment to production using timed incremental rollout**: Sets the
-  [`INCREMENTAL_ROLLOUT_MODE`](#timed-incremental-rollout-to-production) variable
+  [`INCREMENTAL_ROLLOUT_MODE`](#timed-incremental-rollout-to-production-premium) variable
   to `timed`, and production deployment will be executed with a 5 minute delay between
   each increment in rollout.
 - **Automatic deployment to staging, manual deployment to production**: Sets the
   [`STAGING_ENABLED`](#deploy-policy-for-staging-and-production-environments) and
-  [`INCREMENTAL_ROLLOUT_MODE`](#incremental-rollout-to-production) variables
+  [`INCREMENTAL_ROLLOUT_MODE`](#incremental-rollout-to-production-premium) variables
   to `1` and `manual`. This means:
 
   - `master` branch is directly deployed to staging.
@@ -277,20 +302,44 @@ to understand how each one works.
 
 ### Auto Build
 
-Auto Build creates a build of the application in one of two ways:
-
-- If there is a `Dockerfile`, it will use `docker build` to create a Docker image.
-- Otherwise, it will use [Herokuish](https://github.com/gliderlabs/herokuish)
-  and [Heroku buildpacks](https://devcenter.heroku.com/articles/buildpacks)
-  to automatically detect and build the application into a Docker image.
+Auto Build creates a build of the application using an existing `Dockerfile` or
+Heroku buildpacks.
 
 Either way, the resulting Docker image is automatically pushed to the
-[Container Registry][container-registry] and tagged with the commit SHA.
+[Container Registry][container-registry] and tagged with the commit SHA or tag.
 
-CAUTION: **Important:**
+#### Auto Build using a Dockerfile
+
+If a project's repository contains a `Dockerfile`, Auto Build will use
+`docker build` to create a Docker image.
+
 If you are also using Auto Review Apps and Auto Deploy and choose to provide
 your own `Dockerfile`, make sure you expose your application to port
-`5000` as this is the port assumed by the default Helm chart.
+`5000` as this is the port assumed by the
+[default Helm chart](https://gitlab.com/gitlab-org/charts/auto-deploy-app).
+
+#### Auto Build using Heroku buildpacks
+
+Auto Build builds an application using a project's `Dockerfile` if present, or
+otherwise it will use [Herokuish](https://github.com/gliderlabs/herokuish)
+and [Heroku buildpacks](https://devcenter.heroku.com/articles/buildpacks)
+to automatically detect and build the application into a Docker image.
+
+Each buildpack requires certain files to be in your project's repository for
+Auto Build to successfully build your application. For example, the following
+files are required at the root of your application's repository, depending on
+the language:
+
+- A `Pipfile` or `requirements.txt` file for Python projects.
+- A `Gemfile` or `Gemfile.lock` file for Ruby projects.
+
+For the requirements of other languages and frameworks, read the
+[buildpacks docs](https://devcenter.heroku.com/articles/buildpacks#officially-supported-buildpacks).
+
+TIP: **Tip:**
+If Auto Build fails despite the project meeting the buildpack requirements, set
+a project variable `TRACE=true` to enable verbose logging, which may help to
+troubleshoot.
 
 ### Auto Test
 
@@ -302,7 +351,6 @@ frameworks are detected automatically, but if your language is not detected,
 you may succeed with a [custom buildpack](#custom-buildpacks). Check the
 [currently supported languages](#currently-supported-languages).
 
-NOTE: **Note:**
 Auto Test uses tests you already have in your application. If there are no
 tests, it's up to you to add them.
 
@@ -315,7 +363,7 @@ created, and is uploaded as an artifact which you can later download and check
 out.
 
 Any differences between the source and target branches are also
-[shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html).
+[shown in the merge request widget](../../user/project/merge_requests/code_quality.md).
 
 ### Auto SAST **[ULTIMATE]**
 
@@ -323,15 +371,14 @@ Any differences between the source and target branches are also
 
 Static Application Security Testing (SAST) uses the
 [SAST Docker image](https://gitlab.com/gitlab-org/security-products/sast) to run static
-analysis on the current code and checks for potential security issues. Once the
-report is created, it's uploaded as an artifact which you can later download and
+analysis on the current code and checks for potential security issues. The
+the Auto SAST stage will be skipped on licenses other than Ultimate and requires GitLab Runner 11.5 or above.
+
+Once the report is created, it's uploaded as an artifact which you can later download and
 check out.
 
-Any security warnings are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/sast.html).
-
-NOTE: **Note:**
-The Auto SAST stage will be skipped on licenses other than Ultimate.
+Any security warnings are also shown in the merge request widget. Read more how
+[SAST works](../../user/application_security/sast/index.md).
 
 ### Auto Dependency Scanning **[ULTIMATE]**
 
@@ -339,15 +386,16 @@ The Auto SAST stage will be skipped on licenses other than Ultimate.
 
 Dependency Scanning uses the
 [Dependency Scanning Docker image](https://gitlab.com/gitlab-org/security-products/dependency-scanning)
-to run analysis on the project dependencies and checks for potential security issues. Once the
+to run analysis on the project dependencies and checks for potential security issues.
+The Auto Dependency Scanning stage will be skipped on licenses other than Ultimate
+and requires GitLab Runner 11.5 or above.
+
+Once the
 report is created, it's uploaded as an artifact which you can later download and
 check out.
 
-Any security warnings are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/dependency_scanning.html).
-
-NOTE: **Note:**
-The Auto Dependency Scanning stage will be skipped on licenses other than Ultimate.
+Any security warnings are also shown in the merge request widget. Read more about
+[Dependency Scanning](../../user/application_security/dependency_scanning/index.md).
 
 ### Auto License Management **[ULTIMATE]**
 
@@ -355,45 +403,37 @@ The Auto Dependency Scanning stage will be skipped on licenses other than Ultima
 
 License Management uses the
 [License Management Docker image](https://gitlab.com/gitlab-org/security-products/license-management)
-to search the project dependencies for their license. Once the
+to search the project dependencies for their license. The Auto License Management stage
+will be skipped on licenses other than Ultimate.
+
+Once the
 report is created, it's uploaded as an artifact which you can later download and
 check out.
 
-Any licenses are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/license_management.html).
+Any licenses are also shown in the merge request widget. Read more how
+[License Management works](../../user/application_security/license_management/index.md).
 
-NOTE: **Note:**
-The Auto License Management stage will be skipped on licenses other than Ultimate.
-
-### Auto Container Scanning
+### Auto Container Scanning **[ULTIMATE]**
 
 > Introduced in GitLab 10.4.
 
 Vulnerability Static Analysis for containers uses
 [Clair](https://github.com/coreos/clair) to run static analysis on a
-Docker image and checks for potential security issues. Once the report is
+Docker image and checks for potential security issues. The Auto Container Scanning stage
+will be skipped on licenses other than Ultimate.
+
+Once the report is
 created, it's uploaded as an artifact which you can later download and
 check out.
 
-Any security warnings are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/container_scanning.html).
-
-NOTE: **Note:**
-The Auto Container Scanning stage will be skipped on licenses other than Ultimate.
+Any security warnings are also shown in the merge request widget. Read more how
+[Container Scanning works](../../user/application_security/container_scanning/index.md).
 
 ### Auto Review Apps
 
-NOTE: **Note:**
 This is an optional step, since many projects do not have a Kubernetes cluster
 available. If the [requirements](#requirements) are not met, the job will
 silently be skipped.
-
-CAUTION: **Caution:**
-Your apps should *not* be manipulated outside of Helm (using Kubernetes directly.)
-This can cause confusion with Helm not detecting the change, and subsequent
-deploys with Auto DevOps can undo your changes. Also, if you change something
-and want to undo it by deploying again, Helm may not detect that anything changed
-in the first place, and thus not realize that it needs to re-apply the old config.
 
 [Review Apps][review-app] are temporary application environments based on the
 branch's code so developers, designers, QA, product managers, and other
@@ -403,12 +443,30 @@ process. Auto Review Apps create a Review App for each branch.
 Auto Review Apps will deploy your app to your Kubernetes cluster only. When no cluster
 is available, no deployment will occur.
 
-The Review App will have a unique URL based on the project name, the branch
+The Review App will have a unique URL based on the project ID, the branch or tag
 name, and a unique number, combined with the Auto DevOps base domain. For
-example, `user-project-branch-1234.example.com`. A link to the Review App shows
-up in the merge request widget for easy discovery. When the branch is deleted,
+example, `13083-review-project-branch-123456.example.com`. A link to the Review App shows
+up in the merge request widget for easy discovery. When the branch or tag is deleted,
 for example after the merge request is merged, the Review App will automatically
 be deleted.
+
+Review apps are deployed using the
+[auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app) chart with
+Helm. The app will be deployed into the [Kubernetes
+namespace](../../user/project/clusters/index.md#deployment-variables)
+for the environment.
+
+Since GitLab 11.4, a [local
+Tiller](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22036) is
+used. Previous versions of GitLab had a Tiller installed in the project
+namespace.
+
+CAUTION: **Caution:**
+Your apps should *not* be manipulated outside of Helm (using Kubernetes directly).
+This can cause confusion with Helm not detecting the change and subsequent
+deploys with Auto DevOps can undo your changes. Also, if you change something
+and want to undo it by deploying again, Helm may not detect that anything changed
+in the first place, and thus not realize that it needs to re-apply the old config.
 
 ### Auto DAST **[ULTIMATE]**
 
@@ -417,14 +475,13 @@ be deleted.
 Dynamic Application Security Testing (DAST) uses the
 popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
 to perform an analysis on the current code and checks for potential security
-issues. Once the report is created, it's uploaded as an artifact which you can
+issues. The Auto DAST stage will be skipped on licenses other than Ultimate.
+
+Once the report is created, it's uploaded as an artifact which you can
 later download and check out.
 
-Any security warnings are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/dast.html).
-
-NOTE: **Note:**
-The Auto DAST stage will be skipped on licenses other than Ultimate.
+Any security warnings are also shown in the merge request widget. Read how
+[DAST works](../../user/application_security/dast/index.md).
 
 ### Auto Browser Performance Testing **[PREMIUM]**
 
@@ -439,21 +496,13 @@ Auto Browser Performance Testing utilizes the [Sitespeed.io container](https://h
 ```
 
 Any performance differences between the source and target branches are also
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/browser_performance_testing.html).
+[shown in the merge request widget](../../user/project/merge_requests/browser_performance_testing.md).
 
 ### Auto Deploy
 
-NOTE: **Note:**
 This is an optional step, since many projects do not have a Kubernetes cluster
 available. If the [requirements](#requirements) are not met, the job will
 silently be skipped.
-
-CAUTION: **Caution:**
-Your apps should *not* be manipulated outside of Helm (using Kubernetes directly.)
-This can cause confusion with Helm not detecting the change, and subsequent
-deploys with Auto DevOps can undo your changes. Also, if you change something
-and want to undo it by deploying again, Helm may not detect that anything changed
-in the first place, and thus not realize that it needs to re-apply the old config.
 
 After a branch or merge request is merged into the project's default branch (usually
 `master`), Auto Deploy deploys the application to a `production` environment in
@@ -464,20 +513,42 @@ Auto Deploy doesn't include deployments to staging or canary by default, but the
 [Auto DevOps template] contains job definitions for these tasks if you want to
 enable them.
 
-You can make use of [environment variables](#helm-chart-variables) to automatically
+You can make use of [environment variables](#environment-variables) to automatically
 scale your pod replicas.
 
-It's important to note that when a project is deployed to a Kubernetes cluster,
-it relies on a Docker image that has been pushed to the
-[GitLab Container Registry](../../user/project/container_registry.md). Kubernetes
-fetches this image and uses it to run the application. If the project is public,
-the image can be accessed by Kubernetes without any authentication, allowing us
-to have deployments more usable. If the project is private/internal, the
-Registry requires credentials to pull the image. Currently, this is addressed
-by providing `CI_JOB_TOKEN` as the password that can be used, but this token will
-no longer be valid as soon as the deployment job finishes. This means that
-Kubernetes can run the application, but in case it should be restarted or
-executed somewhere else, it cannot be accessed again.
+Apps are deployed using the
+[auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app) chart with
+Helm. The app will be deployed into the [Kubernetes
+namespace](../../user/project/clusters/index.md#deployment-variables)
+for the environment.
+
+Since GitLab 11.4, a [local
+Tiller](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22036) is
+used. Previous versions of GitLab had a Tiller installed in the project
+namespace.
+
+CAUTION: **Caution:**
+Your apps should *not* be manipulated outside of Helm (using Kubernetes directly).
+This can cause confusion with Helm not detecting the change and subsequent
+deploys with Auto DevOps can undo your changes. Also, if you change something
+and want to undo it by deploying again, Helm may not detect that anything changed
+in the first place, and thus not realize that it needs to re-apply the old config.
+
+> [Introduced][ce-19507] in GitLab 11.0.
+
+For internal and private projects a [GitLab Deploy Token](../../user/project/deploy_tokens/index.md#gitlab-deploy-token)
+will be automatically created, when Auto DevOps is enabled and the Auto DevOps settings are saved. This Deploy Token
+can be used for permanent access to the registry. When the GitLab Deploy Token has been manually revoked, it won't be automatically created.
+
+If the GitLab Deploy Token cannot be found, `CI_REGISTRY_PASSWORD` is
+used. Note that `CI_REGISTRY_PASSWORD` is only valid during deployment.
+This means that Kubernetes will be able to successfully pull the
+container image during deployment but in cases where the image needs to
+be pulled again, e.g. after pod eviction, Kubernetes will fail to do so
+as it will be attempting to fetch the image using
+`CI_REGISTRY_PASSWORD`.
+
+#### Migrations
 
 > [Introduced][ce-21955] in GitLab 11.4
 
@@ -485,38 +556,33 @@ Database initialization and migrations for PostgreSQL can be configured to run
 within the application pod by setting the project variables `DB_INITIALIZE` and
 `DB_MIGRATE` respectively.
 
-If present, `DB_INITIALIZE` will be run as a shell command within an application pod as a helm
-post-install hook. Note that this means that if any deploy succeeds,
+If present, `DB_INITIALIZE` will be run as a shell command within an
+application pod as a helm post-install hook. As some applications will
+not run without a successful database initialization step, GitLab will
+deploy the first release without the application deployment and only the
+database initialization step. After the database initialization completes,
+GitLab will deploy a second release with the application deployment as
+normal.
+
+Note that a post-install hook means that if any deploy succeeds,
 `DB_INITIALIZE` will not be processed thereafter.
 
 If present, `DB_MIGRATE` will be run as a shell command within an application pod as
 a helm pre-upgrade hook.
 
-For example, in a Rails application:
+For example, in a Rails application in an image built with
+[Herokuish](https://github.com/gliderlabs/herokuish):
 
-* `DB_INITIALIZE` can be set to `cd /app && RAILS_ENV=production
-  bin/setup`
-* `DB_MIGRATE` can be set to `cd /app && RAILS_ENV=production bin/update`
+- `DB_INITIALIZE` can be set to `RAILS_ENV=production /bin/herokuish procfile exec bin/rails db:setup`
+- `DB_MIGRATE` can be set to `RAILS_ENV=production /bin/herokuish procfile exec bin/rails db:migrate`
 
-NOTE: **Note:**
-The `/app` path is the directory of your project inside the docker image
-as [configured by
-Herokuish](https://github.com/gliderlabs/herokuish#paths)
-
-> [Introduced][ce-19507] in GitLab 11.0.
-
-For internal and private projects a [GitLab Deploy Token](../../user/project/deploy_tokens/index.md###gitlab-deploy-token)
-will be automatically created, when Auto DevOps is enabled and the Auto DevOps settings are saved. This Deploy Token
-can be used for permanent access to the registry.
-
-Note: **Note**
-When the GitLab Deploy Token has been manually revoked, it won't be automatically created.
+Unless you have a `Dockerfile` in your repo, your image is built with
+Herokuish, and you must prefix commands run in these images with `/bin/herokuish
+procfile exec` to replicate the environment where your application will run.
 
 ### Auto Monitoring
 
-NOTE: **Note:**
-Check the [requirements](#requirements) for Auto Monitoring to make this stage
-work.
+See the [requirements](#requirements) for Auto Monitoring to enable this stage.
 
 Once your application is deployed, Auto Monitoring makes it possible to monitor
 your application's server and response metrics right out of the box. Auto
@@ -533,7 +599,7 @@ The metrics include:
 
 In order to make use of monitoring you need to:
 
-1. [Deploy Prometheus](../../user/project/integrations/prometheus.md#configuring-your-own-prometheus-server-within-kubernetes) into your Kubernetes cluster
+1. [Deploy Prometheus](../../user/project/integrations/prometheus.md) into your Kubernetes cluster
 1. If you would like response metrics, ensure you are running at least version
    0.9.0 of NGINX Ingress and
    [enable Prometheus metrics](https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/customization/custom-vts-metrics-prometheus/nginx-vts-metrics-conf.yaml).
@@ -551,7 +617,7 @@ To view the metrics, open the
 While Auto DevOps provides great defaults to get you started, you can customize
 almost everything to fit your needs; from custom [buildpacks](#custom-buildpacks),
 to [`Dockerfile`s](#custom-dockerfile), [Helm charts](#custom-helm-chart), or
-even copying the complete [CI/CD configuration](#customizing-gitlab-ci-yml)
+even copying the complete [CI/CD configuration](#customizing-gitlab-ciyml)
 into your project to enable staging and canary deployments, and more.
 
 ### Custom buildpacks
@@ -584,10 +650,15 @@ repo or by specifying a project variable:
 
 - **Bundled chart** - If your project has a `./chart` directory with a `Chart.yaml`
   file in it, Auto DevOps will detect the chart and use it instead of the [default
-  one](https://gitlab.com/charts/auto-deploy-app).
+  one](https://gitlab.com/gitlab-org/charts/auto-deploy-app).
   This can be a great way to control exactly how your application is deployed.
-- **Project variable** - Create a [project variable](../../ci/variables/README.md#variables)
-  `AUTO_DEVOPS_CHART` with the URL of a custom chart to use.
+- **Project variable** - Create a [project variable](../../ci/variables/README.md#gitlab-cicd-environment-variables)
+  `AUTO_DEVOPS_CHART` with the URL of a custom chart to use or create two project variables `AUTO_DEVOPS_CHART_REPOSITORY` with the URL of a custom chart repository and `AUTO_DEVOPS_CHART` with the path to the chart.
+
+### Custom Helm chart per environment **[PREMIUM]**
+
+You can specify the use of a custom Helm chart per environment by scoping the environment variable
+to the desired environment. See [Limiting environment scopes of variables](../../ci/variables/README.md#limiting-environment-scopes-of-environment-variables-premium).
 
 ### Customizing `.gitlab-ci.yml`
 
@@ -611,6 +682,21 @@ renaming `.staging` to `staging`. Then make sure to uncomment the `when` key of
 the `production` job to turn it into a manual action instead of deploying
 automatically.
 
+### Using components of Auto-DevOps
+
+If you only require a subset of the features offered by Auto-DevOps, you can include
+individual Auto-DevOps jobs into your own `.gitlab-ci.yml`.
+
+For example, to make use of [Auto Build](#auto-build), you can add the following to
+your `.gitlab-ci.yml`:
+
+```yaml
+include:
+  - template: Jobs/Build.gitlab-ci.yml
+```
+
+Consult the [Auto DevOps template] for information on available jobs.
+
 ### PostgreSQL database support
 
 In order to support applications that require a database,
@@ -631,44 +717,110 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 
 | **Variable**                 | **Description**                                                                                                                                                                                                               |
 | ------------                 | ---------------                                                                                                                                                                                                               |
-| `AUTO_DEVOPS_DOMAIN`         | The [Auto DevOps domain](#auto-devops-domain); by default set automatically by the [Auto DevOps setting](#enabling-auto-devops).                                                                                              |
-| `AUTO_DEVOPS_CHART`          | The Helm Chart used to deploy your apps; defaults to the one [provided by GitLab](https://gitlab.com/charts/auto-deploy-app).                                                             |
+| `AUTO_DEVOPS_CHART`          | The Helm Chart used to deploy your apps; defaults to the one [provided by GitLab](https://gitlab.com/gitlab-org/charts/auto-deploy-app).                                                             |
+| `AUTO_DEVOPS_CHART_REPOSITORY` | The Helm Chart repository used to search for charts; defaults to `https://charts.gitlab.io`. |
+| `AUTO_DEVOPS_CHART_REPOSITORY_NAME` | From Gitlab 11.11, this variable can be used to set the name of the helm repository; defaults to "gitlab" |
+| `AUTO_DEVOPS_CHART_REPOSITORY_USERNAME` | From Gitlab 11.11, this variable can be used to set a username to connect to the helm repository. Defaults to no credentials. (Also set AUTO_DEVOPS_CHART_REPOSITORY_PASSWORD) |
+| `AUTO_DEVOPS_CHART_REPOSITORY_PASSWORD` | From Gitlab 11.11, this variable can be used to set a password to connect to the helm repository. Defaults to no credentials. (Also set AUTO_DEVOPS_CHART_REPOSITORY_USERNAME) |
 | `REPLICAS`                   | The number of replicas to deploy; defaults to 1.                                                                                                                                                                              |
-| `PRODUCTION_REPLICAS`        | The number of replicas to deploy in the production environment. This takes precedence over `REPLICAS`; defaults to 1.                                                                                                         |
-| `CANARY_REPLICAS`            | The number of canary replicas to deploy for [Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html); defaults to 1                                                                              |
-| `CANARY_PRODUCTION_REPLICAS` | The number of canary replicas to deploy for [Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html) in the production environment. This takes precedence over `CANARY_REPLICAS`; defaults to 1  |
+| `PRODUCTION_REPLICAS`        | The number of replicas to deploy in the production environment. Takes precedence over `REPLICAS` and defaults to 1. For zero downtime upgrades, set to 2 or greater.                                |
+| `CANARY_REPLICAS`            | The number of canary replicas to deploy for [Canary Deployments](../../user/project/canary_deployments.md); defaults to 1                                                                              |
+| `CANARY_PRODUCTION_REPLICAS` | The number of canary replicas to deploy for [Canary Deployments](../../user/project/canary_deployments.md) in the production environment. This takes precedence over `CANARY_REPLICAS`; defaults to 1  |
+| `ADDITIONAL_HOSTS`           | Fully qualified domain names specified as a comma-separated list that are added to the ingress hosts.                                                                                                                         |
+| `<ENVIRONMENT>_ADDITIONAL_HOSTS` | For a specific environment, the fully qualified domain names specified as a comma-separated list that are added to the ingress hosts. This takes precedence over `ADDITIONAL_HOSTS`.                                      |
 | `POSTGRES_ENABLED`           | Whether PostgreSQL is enabled; defaults to `"true"`. Set to `false` to disable the automatic deployment of PostgreSQL.                                                                                                        |
 | `POSTGRES_USER`              | The PostgreSQL user; defaults to `user`. Set it to use a custom username.                                                                                                                                                     |
 | `POSTGRES_PASSWORD`          | The PostgreSQL password; defaults to `testing-password`. Set it to use a custom password.                                                                                                                                     |
-| `POSTGRES_DB`                | The PostgreSQL database name; defaults to the value of [`$CI_ENVIRONMENT_SLUG`](../../ci/variables/README.md#predefined-variables-environment-variables). Set it to use a custom database name.                               |
+| `POSTGRES_DB`                | The PostgreSQL database name; defaults to the value of [`$CI_ENVIRONMENT_SLUG`](../../ci/variables/README.md#predefined-environment-variables). Set it to use a custom database name.                               |
+| `POSTGRES_VERSION`           | Tag for the [`postgres` Docker image](https://hub.docker.com/_/postgres) to use. Defaults to `9.6.2`. |
 | `BUILDPACK_URL`              | The buildpack's full URL. It can point to either Git repositories or a tarball URL. For Git repositories, it is possible to point to a specific `ref`, for example `https://github.com/heroku/heroku-buildpack-ruby.git#v142` |
 | `SAST_CONFIDENCE_LEVEL`      | The minimum confidence level of security issues you want to be reported; `1` for Low, `2` for Medium, `3` for High; defaults to `3`.|
 | `DEP_SCAN_DISABLE_REMOTE_CHECKS` | Whether remote Dependency Scanning checks are disabled; defaults to `"false"`. Set to `"true"` to disable checks that send data to GitLab central servers. [Read more about remote checks](https://gitlab.com/gitlab-org/security-products/dependency-scanning#remote-checks).|
 | `DB_INITIALIZE`              | From GitLab 11.4, this variable can be used to specify the command to run to initialize the application's PostgreSQL database. It runs inside the application pod. |
 | `DB_MIGRATE`                 | From GitLab 11.4, this variable can be used to specify the command to run to migrate the application's PostgreSQL database. It runs inside the application pod. |
 | `STAGING_ENABLED`            | From GitLab 10.8, this variable can be used to define a [deploy policy for staging and production environments](#deploy-policy-for-staging-and-production-environments). |
-| `CANARY_ENABLED`             | From GitLab 11.0, this variable can be used to define a [deploy policy for canary environments](#deploy-policy-for-canary-environments). |
-| `INCREMENTAL_ROLLOUT_MODE`| From GitLab 11.4, this variable, if present, can be used to enable an [incremental rollout](#incremental-rollout-to-production) of your application for the production environment.<br/>Set to: <ul><li>`manual`, for manual deployment jobs.</li><li>`timed`, for automatic rollout deployments with a 5 minute delay each one.</li></ul> |
+| `CANARY_ENABLED`             | From GitLab 11.0, this variable can be used to define a [deploy policy for canary environments](#deploy-policy-for-canary-environments-premium). |
+| `INCREMENTAL_ROLLOUT_MODE`| From GitLab 11.4, this variable, if present, can be used to enable an [incremental rollout](#incremental-rollout-to-production-premium) of your application for the production environment.<br/>Set to: <ul><li>`manual`, for manual deployment jobs.</li><li>`timed`, for automatic rollout deployments with a 5 minute delay each one.</li></ul> |
 | `TEST_DISABLED`              | From GitLab 11.0, this variable can be used to disable the `test` job. If the variable is present, the job will not be created. |
 | `CODE_QUALITY_DISABLED`       | From GitLab 11.0, this variable can be used to disable the `codequality` job. If the variable is present, the job will not be created. |
+| `LICENSE_MANAGEMENT_DISABLED` | From GitLab 11.0, this variable can be used to disable the `license_management` job. If the variable is present, the job will not be created. |
 | `SAST_DISABLED`              | From GitLab 11.0, this variable can be used to disable the `sast` job. If the variable is present, the job will not be created. |
 | `DEPENDENCY_SCANNING_DISABLED` | From GitLab 11.0, this variable can be used to disable the `dependency_scanning` job. If the variable is present, the job will not be created. |
 | `CONTAINER_SCANNING_DISABLED` | From GitLab 11.0, this variable can be used to disable the `sast:container` job. If the variable is present, the job will not be created. |
 | `REVIEW_DISABLED`            | From GitLab 11.0, this variable can be used to disable the `review` and the manual `review:stop` job. If the variable is present, these jobs will not be created. |
 | `DAST_DISABLED`              | From GitLab 11.0, this variable can be used to disable the `dast` job. If the variable is present, the job will not be created. |
 | `PERFORMANCE_DISABLED`       | From GitLab 11.0, this variable can be used to disable the `performance` job. If the variable is present, the job will not be created. |
-| `OLD_REPORTS_DISABLED`       | From GitLab 11.5, this variable can be used to disable the `sast` job. If the variable is present, the job will not be created. |
-| `NEW_REPORTS_DISABLED`       | From GitLab 11.5, this variable can be used to disable the `sast_dashboard` job. If the variable is present, the job will not be created. |
+| `K8S_SECRET_*`               | From GitLab 11.7, any variable prefixed with [`K8S_SECRET_`](#application-secret-variables) will be made available by Auto DevOps as environment variables to the deployed application. |
+| `KUBE_INGRESS_BASE_DOMAIN`   | From GitLab 11.8, this variable can be used to set a domain per cluster. See [cluster domains](../../user/project/clusters/index.md#base-domain) for more information. |
+| `ROLLOUT_RESOURCE_TYPE`     | From GitLab 11.9, this variable allows specification of the resource type being deployed when using a custom helm chart. Default value is `deployment`. |
+| `ROLLOUT_STATUS_DISABLED`   | From GitLab 12.0, this variable allows to disable rollout status check because it doesn't support all resource types, for example, `cronjob`. |
+| `HELM_UPGRADE_EXTRA_ARGS`   | From GitLab 11.11, this variable allows extra arguments in `helm` commands when deploying the application. Note that using quotes will not prevent word splitting. |
 
 TIP: **Tip:**
 Set up the replica variables using a
-[project variable](../../ci/variables/README.md#variables)
+[project variable](../../ci/variables/README.md#gitlab-cicd-environment-variables)
 and scale your application by just redeploying it!
 
 CAUTION: **Caution:**
 You should *not* scale your application using Kubernetes directly. This can
 cause confusion with Helm not detecting the change, and subsequent deploys with
 Auto DevOps can undo your changes.
+
+#### Application secret variables
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/49056) in GitLab 11.7.
+
+Some applications need to define secret variables that are
+accessible by the deployed application. Auto DevOps detects variables where the key starts with
+`K8S_SECRET_` and make these prefixed variables available to the
+deployed application, as environment variables.
+
+To configure your application variables:
+
+1. Go to your project's **Settings > CI/CD**, then expand the section
+   called **Variables**.
+
+2. Create a CI Variable, ensuring the key is prefixed with
+   `K8S_SECRET_`. For example, you can create a variable with key
+`K8S_SECRET_RAILS_MASTER_KEY`.
+
+3. Run an Auto Devops pipeline either by manually creating a new
+   pipeline or by pushing a code change to GitLab.
+
+Auto DevOps pipelines will take your application secret variables to
+populate a Kubernetes secret. This secret is unique per environment.
+When deploying your application, the secret is loaded as environment
+variables in the container running the application. Following the
+example above, you can see the secret below containing the
+`RAILS_MASTER_KEY` variable.
+
+```sh
+$ kubectl get secret production-secret -n minimal-ruby-app-54 -o yaml
+apiVersion: v1
+data:
+  RAILS_MASTER_KEY: MTIzNC10ZXN0
+kind: Secret
+metadata:
+  creationTimestamp: 2018-12-20T01:48:26Z
+  name: production-secret
+  namespace: minimal-ruby-app-54
+  resourceVersion: "429422"
+  selfLink: /api/v1/namespaces/minimal-ruby-app-54/secrets/production-secret
+  uid: 57ac2bfd-03f9-11e9-b812-42010a9400e4
+type: Opaque
+```
+
+Environment variables are generally considered immutable in a Kubernetes
+pod. Therefore, if you update an application secret without changing any
+code then manually create a new pipeline, you will find that any running
+application pods will not have the updated secrets. In this case, you
+can either push a code update to GitLab to force the Kubernetes
+Deployment to recreate pods or manually delete running pods to
+cause Kubernetes to create new pods with updated secrets.
+
+NOTE: **Note:**
+Variables with multiline values are not currently supported due to
+limitations with the current Auto DevOps scripting environment.
 
 #### Advanced replica variables setup
 
@@ -749,7 +901,7 @@ you when you're ready to manually deploy to production.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ci-yml/merge_requests/171)
 in GitLab 11.0.
 
-A [canary environment](https://docs.gitlab.com/ee/user/project/canary_deployments.html) can be used
+A [canary environment](../../user/project/canary_deployments.md) can be used
 before any changes are deployed to production.
 
 If `CANARY_ENABLED` is defined in your project (e.g., set `CANARY_ENABLED` to
@@ -773,7 +925,7 @@ increasing the rollout up to 100%.
 
 If `INCREMENTAL_ROLLOUT_MODE` is set to `manual` in your project, then instead
 of the standard `production` job, 4 different
-[manual jobs](../../ci/pipelines.md#manual-actions-from-the-pipeline-graph)
+[manual jobs](../../ci/pipelines.md#manual-actions-from-pipeline-graphs)
 will be created:
 
 1. `rollout 10%`
@@ -790,7 +942,7 @@ required to go from `10%` to `100%`, you can jump to whatever job you want.
 You can also scale down by running a lower percentage job, just before hitting
 `100%`. Once you get to `100%`, you cannot scale down, and you'd have to roll
 back by redeploying the old version using the
-[rollback button](../../ci/environments.md#rolling-back-changes) in the
+[rollback button](../../ci/environments.md#retrying-and-rolling-back) in the
 environment page.
 
 Below, you can see how the pipeline will look if the rollout or staging
@@ -825,7 +977,7 @@ TIP: **Tip:**
 You can also set this inside your [project's settings](#deployment-strategy).
 
 This configuration based on
-[incremental rollout to production](#incremental-rollout-to-production).
+[incremental rollout to production](#incremental-rollout-to-production-premium).
 
 Everything behaves the same way, except:
 
@@ -838,8 +990,7 @@ Everything behaves the same way, except:
 
 ## Currently supported languages
 
-NOTE: **Note:**
-Not all buildpacks support Auto Test yet, as it's a relatively new
+Note that not all buildpacks support Auto Test yet, as it's a relatively new
 enhancement. All of Heroku's [officially supported
 languages](https://devcenter.heroku.com/articles/heroku-ci#currently-supported-languages)
 support it, and some third-party buildpacks as well e.g., Go, Node, Java, PHP,
@@ -894,6 +1045,9 @@ planned for a subsequent release.
   buildpack](#custom-buildpacks).
 - Auto Test may fail because of a mismatch between testing frameworks. In this
   case, you may need to customize your `.gitlab-ci.yml` with your test commands.
+- Auto Deploy will fail if GitLab can not create a Kubernetes namespace and
+  service account for your project. For help debugging this issue, see
+  [Troubleshooting failed deployment jobs](../../user/project/clusters/index.md#troubleshooting-failed-deployment-jobs).
 
 ### Disable the banner instance wide
 
@@ -926,3 +1080,7 @@ curl --data "value=true" --header "PRIVATE-TOKEN: personal_access_token" https:/
 [ee]: https://about.gitlab.com/pricing/
 [ce-21955]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21955
 [ce-19507]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/19507
+
+## Development guides
+
+Configuring [GDK for Auto DevOps](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/auto_devops.md).

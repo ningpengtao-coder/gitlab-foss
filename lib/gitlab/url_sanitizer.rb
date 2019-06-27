@@ -14,6 +14,7 @@ module Gitlab
 
     def self.valid?(url)
       return false unless url.present?
+      return false unless url.is_a?(String)
 
       uri = Addressable::URI.parse(url.strip)
 
@@ -44,6 +45,10 @@ module Gitlab
 
     def credentials
       @credentials ||= { user: @url.user.presence, password: @url.password.presence }
+    end
+
+    def user
+      credentials[:user]
     end
 
     def full_url

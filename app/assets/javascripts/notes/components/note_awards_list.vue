@@ -1,9 +1,9 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import Flash from '../../flash';
 import { glEmojiTag } from '../../emoji';
-import tooltip from '../../vue_shared/directives/tooltip';
 
 export default {
   components: {
@@ -170,14 +170,13 @@ export default {
         v-tooltip
         :class="getAwardClassBindings(awardList)"
         :title="awardTitle(awardList)"
-        class="btn award-control"
         data-boundary="viewport"
-        data-placement="bottom"
+        class="btn award-control"
         type="button"
-        @click="handleAward(awardName);"
+        @click="handleAward(awardName)"
       >
         <span v-html="getAwardHTML(awardName)"></span>
-        <span class="award-control-text js-counter"> {{ awardList.length }} </span>
+        <span class="award-control-text js-counter">{{ awardList.length }}</span>
       </button>
       <div v-if="canAwardEmoji" class="award-menu-holder">
         <button
@@ -187,17 +186,16 @@ export default {
           title="Add reaction"
           aria-label="Add reaction"
           data-boundary="viewport"
-          data-placement="bottom"
           type="button"
         >
           <span class="award-control-icon award-control-icon-neutral">
-            <icon name="emoji_slightly_smiling_face" />
+            <icon name="slight-smile" />
           </span>
           <span class="award-control-icon award-control-icon-positive">
-            <icon name="emoji_smiley" />
+            <icon name="smiley" />
           </span>
           <span class="award-control-icon award-control-icon-super-positive">
-            <icon name="emoji_smiley" />
+            <icon name="smiley" />
           </span>
           <i
             aria-hidden="true"

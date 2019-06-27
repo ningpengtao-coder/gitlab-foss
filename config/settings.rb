@@ -1,5 +1,11 @@
 require 'settingslogic'
 
+# We can not use `Rails.root` here, as this file might be loaded without the
+# full Rails environment being loaded. We can not use `require_relative` either,
+# as Rails uses `load` for `require_dependency` (used when loading the Rails
+# environment). This could then lead to this file being loaded twice.
+require_dependency File.expand_path('../lib/gitlab', __dir__)
+
 class Settings < Settingslogic
   source ENV.fetch('GITLAB_CONFIG') { Pathname.new(File.expand_path('..', __dir__)).join('config/gitlab.yml') }
   namespace ENV.fetch('GITLAB_ENV') { Rails.env }
@@ -93,6 +99,14 @@ class Settings < Settingslogic
     # We have to truncate the string to 32 bytes for a 256-bit cipher.
     def attr_encrypted_db_key_base_truncated
       Gitlab::Application.secrets.db_key_base[0..31]
+    end
+
+    def attr_encrypted_db_key_base_32
+      Gitlab::Utils.ensure_utf8_size(attr_encrypted_db_key_base, bytes: 32.bytes)
+    end
+
+    def attr_encrypted_db_key_base_12
+      Gitlab::Utils.ensure_utf8_size(attr_encrypted_db_key_base, bytes: 12.bytes)
     end
 
     # This should be used for :per_attribute_salt_and_iv mode. There is no

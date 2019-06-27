@@ -4,14 +4,10 @@ comments: false
 
 # Merge conflicts
 
-----------
-
 - Happen often
 - Learning to fix conflicts is hard
 - Practice makes perfect
 - Force push after fixing conflicts. Be careful!
-
-----------
 
 ## Merge conflicts
 
@@ -26,11 +22,9 @@ comments: false
 1. Force push the changes.
 1. Finally continue with the Merge Request.
 
-----------
-
 ## Commands
 
-```
+```sh
 git checkout -b conflicts_branch
 
 # vi conflicts.rb
@@ -49,7 +43,7 @@ git push origin master
 
 Create a merge request on the GitLab web UI. You'll see a conflict warning.
 
-```
+```sh
 git checkout conflicts_branch
 git fetch
 git rebase master
@@ -65,10 +59,10 @@ git rebase --continue
 # need to force push so that our remote branch is restructured
 git push origin conflicts_branch -f
 ```
-----------
 
 ## Note
-* When to use 'git merge' and when to use 'git rebase'
-* Rebase when updating your branch with master
-* Merge when bringing changes from feature to master
-* Reference: https://www.atlassian.com/git/tutorials/merging-vs-rebasing/
+
+- When to use 'git merge' and when to use 'git rebase'
+- Rebase when updating your branch with master
+- Merge when bringing changes from feature to master
+- Reference: <https://www.atlassian.com/git/tutorials/merging-vs-rebasing/>

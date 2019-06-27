@@ -57,6 +57,9 @@ export default {
     },
   },
   computed: {
+    boundary() {
+      return this.dropdownLength === 1 ? 'viewport' : 'scrollParent';
+    },
     status() {
       return this.job && this.job.status ? this.job.status : {};
     },
@@ -84,10 +87,6 @@ export default {
 
       return textBuilder.join(' ');
     },
-
-    tooltipBoundary() {
-      return this.dropdownLength < 5 ? 'viewport' : null;
-    },
     /**
      * Verifies if the provided job has an action path
      *
@@ -108,18 +107,18 @@ export default {
   <div class="ci-job-component">
     <gl-link
       v-if="status.has_details"
-      v-gl-tooltip="{ boundary: tooltipBoundary }"
+      v-gl-tooltip="{ boundary, placement: 'bottom' }"
       :href="status.details_path"
       :title="tooltipText"
       :class="cssClassJobName"
-      class="js-pipeline-graph-job-link"
+      class="js-pipeline-graph-job-link qa-job-link"
     >
       <job-name-component :name="job.name" :status="job.status" />
     </gl-link>
 
     <div
       v-else
-      v-gl-tooltip
+      v-gl-tooltip="{ boundary, placement: 'bottom' }"
       :title="tooltipText"
       :class="cssClassJobName"
       class="js-job-component-tooltip non-details-job-component"

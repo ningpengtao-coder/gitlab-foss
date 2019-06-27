@@ -120,7 +120,7 @@ describe 'Environment' do
             end
 
             it 'does show a play button' do
-              expect(page).to have_link(action.name.humanize)
+              expect(page).to have_link(action.name)
             end
 
             it 'does allow to play manual action', :js do
@@ -128,7 +128,7 @@ describe 'Environment' do
 
               find('button.dropdown').click
 
-              expect { click_link(action.name.humanize) }
+              expect { click_link(action.name) }
                 .not_to change { Ci::Pipeline.count }
 
               wait_for_all_requests
@@ -140,7 +140,7 @@ describe 'Environment' do
 
           context 'when user has no ability to trigger a deployment' do
             it 'does not show a play button' do
-              expect(page).not_to have_link(action.name.humanize)
+              expect(page).not_to have_link(action.name)
             end
           end
 
@@ -155,18 +155,27 @@ describe 'Environment' do
           end
 
           context 'with terminal' do
-            shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
+            context 'when user configured kubernetes from CI/CD > Clusters' do
+              let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+              let(:project) { cluster.project }
+
               context 'for project maintainer' do
                 let(:role) { :maintainer }
 
-                it 'it shows the terminal button' do
+                it 'shows the terminal button' do
                   expect(page).to have_terminal_button
                 end
 
                 context 'web terminal', :js do
                   before do
-                    # Stub #terminals as it causes js-enabled feature specs to render the page incorrectly
-                    allow_any_instance_of(Environment).to receive(:terminals) { nil }
+                    # Stub #terminals as it causes js-enabled feature specs to
+                    # render the page incorrectly
+                    #
+                    # In EE we have to stub EE::Environment since it overwrites
+                    # the "terminals" method.
+                    allow_any_instance_of(defined?(EE) ? EE::Environment : Environment)
+                      .to receive(:terminals) { nil }
+
                     visit terminal_project_environment_path(project, environment)
                   end
 
@@ -184,19 +193,6 @@ describe 'Environment' do
                   expect(page).not_to have_terminal_button
                 end
               end
-            end
-
-            context 'when user configured kubernetes from Integration > Kubernetes' do
-              let(:project) { create(:kubernetes_project, :test_repo) }
-
-              it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-            end
-
-            context 'when user configured kubernetes from CI/CD > Clusters' do
-              let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-              let(:project) { cluster.project }
-
-              it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
             end
           end
 
@@ -313,7 +309,7 @@ describe 'Environment' do
 
       yield
 
-      GitPushService.new(project, user, params).execute
+      Git::BranchPushService.new(project, user, params).execute
     end
   end
 

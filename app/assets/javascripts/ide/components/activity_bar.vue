@@ -45,7 +45,7 @@ export default {
           data-placement="right"
           type="button"
           class="ide-sidebar-link js-ide-edit-mode"
-          @click.prevent="changedActivityView($event, $options.activityBarViews.edit);"
+          @click.prevent="changedActivityView($event, $options.activityBarViews.edit)"
         >
           <icon name="code" />
         </button>
@@ -62,7 +62,7 @@ export default {
           data-placement="right"
           type="button"
           class="ide-sidebar-link js-ide-review-mode"
-          @click.prevent="changedActivityView($event, $options.activityBarViews.review);"
+          @click.prevent="changedActivityView($event, $options.activityBarViews.review)"
         >
           <icon name="file-modified" />
         </button>
@@ -78,8 +78,8 @@ export default {
           data-container="body"
           data-placement="right"
           type="button"
-          class="ide-sidebar-link js-ide-commit-mode"
-          @click.prevent="changedActivityView($event, $options.activityBarViews.commit);"
+          class="ide-sidebar-link js-ide-commit-mode qa-commit-mode-tab"
+          @click.prevent="changedActivityView($event, $options.activityBarViews.commit)"
         >
           <icon name="commit" />
         </button>

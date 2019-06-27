@@ -5,11 +5,11 @@ shared_examples_for 'common trace features' do
     end
 
     it "returns formatted html" do
-      expect(trace.html).to eq("12<br>34")
+      expect(trace.html).to eq("<span class=\"\">12<br/><span class=\"\">34</span></span>")
     end
 
     it "returns last line of formatted html" do
-      expect(trace.html(last_lines: 1)).to eq("34")
+      expect(trace.html(last_lines: 1)).to eq("<span class=\"\">34</span>")
     end
   end
 
@@ -180,10 +180,9 @@ shared_examples_for 'common trace features' do
     end
 
     context 'runners token' do
-      let(:token) { 'my_secret_token' }
+      let(:token) { build.project.runners_token }
 
       before do
-        build.project.update(runners_token: token)
         trace.set(token)
       end
 
@@ -193,10 +192,9 @@ shared_examples_for 'common trace features' do
     end
 
     context 'hides build token' do
-      let(:token) { 'my_secret_token' }
+      let(:token) { build.token }
 
       before do
-        build.update(token: token)
         trace.set(token)
       end
 
@@ -331,14 +329,6 @@ shared_examples_for 'trace with disabled live trace feature' do
       it_behaves_like 'read successfully with IO'
     end
 
-    context 'when current_path (with project_ci_id) exists' do
-      before do
-        expect(trace).to receive(:deprecated_path) { expand_fixture_path('trace/sample_trace') }
-      end
-
-      it_behaves_like 'read successfully with IO'
-    end
-
     context 'when db trace exists' do
       before do
         build.send(:write_attribute, :trace, "data")
@@ -395,37 +385,6 @@ shared_examples_for 'trace with disabled live trace feature' do
       it "can be erased" do
         trace.erase!
         expect(trace.exist?).to be(false)
-      end
-    end
-
-    context 'deprecated path' do
-      let(:path) { trace.send(:deprecated_path) }
-
-      context 'with valid ci_id' do
-        before do
-          build.project.update(ci_id: 1000)
-
-          FileUtils.mkdir_p(File.dirname(path))
-
-          File.open(path, "w") do |file|
-            file.write("data")
-          end
-        end
-
-        it "trace exist" do
-          expect(trace.exist?).to be(true)
-        end
-
-        it "can be erased" do
-          trace.erase!
-          expect(trace.exist?).to be(false)
-        end
-      end
-
-      context 'without valid ci_id' do
-        it "does not return deprecated path" do
-          expect(path).to be_nil
-        end
       end
     end
 

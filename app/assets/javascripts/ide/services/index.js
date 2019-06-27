@@ -40,20 +40,29 @@ export default {
   getProjectData(namespace, project) {
     return Api.project(`${namespace}/${project}`);
   },
+  getProjectMergeRequests(projectId, params = {}) {
+    return Api.projectMergeRequests(projectId, params);
+  },
   getProjectMergeRequestData(projectId, mergeRequestId, params = {}) {
-    return Api.mergeRequest(projectId, mergeRequestId, params);
+    return Api.projectMergeRequest(projectId, mergeRequestId, params);
   },
   getProjectMergeRequestChanges(projectId, mergeRequestId) {
-    return Api.mergeRequestChanges(projectId, mergeRequestId);
+    return Api.projectMergeRequestChanges(projectId, mergeRequestId);
   },
   getProjectMergeRequestVersions(projectId, mergeRequestId) {
-    return Api.mergeRequestVersions(projectId, mergeRequestId);
+    return Api.projectMergeRequestVersions(projectId, mergeRequestId);
   },
   getBranchData(projectId, currentBranchId) {
     return Api.branchSingle(projectId, currentBranchId);
   },
   commit(projectId, payload) {
-    return Api.commitMultiple(projectId, payload);
+    // Currently the `commit` endpoint does not support `start_sha` so we
+    // have to make the request in the FE. This is not ideal and will be
+    // resolved soon. https://gitlab.com/gitlab-org/gitlab-ce/issues/59023
+    const { branch, start_sha: ref } = payload;
+    const branchPromise = ref ? Api.createBranch(projectId, { ref, branch }) : Promise.resolve();
+
+    return branchPromise.then(() => Api.commitMultiple(projectId, payload));
   },
   getFiles(projectUrl, branchId) {
     const url = `${projectUrl}/files/${branchId}`;

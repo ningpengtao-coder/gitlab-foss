@@ -21,7 +21,19 @@ module Ci
         trigger: 3,
         schedule: 4,
         api: 5,
-        external: 6
+        external: 6,
+        chat: 8,
+        merge_request_event: 10
+      }
+    end
+
+    # Returns the `Hash` to use for creating the `config_sources` enum for
+    # `Ci::Pipeline`.
+    def self.config_sources
+      {
+        unknown_source: nil,
+        repository_source: 1,
+        auto_devops_source: 2
       }
     end
   end

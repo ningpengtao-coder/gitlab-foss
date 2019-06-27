@@ -1,6 +1,6 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
-import { n__, __ } from '~/locale';
+import { n__, __, sprintf } from '~/locale';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
@@ -34,14 +34,13 @@ export default {
       required: false,
       default: false,
     },
+    baseVersionPath: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   computed: {
-    baseVersion() {
-      return {
-        name: 'hii',
-        versionIndex: -1,
-      };
-    },
     targetVersions() {
       if (this.mergeRequestVersion) {
         return this.otherVersions;
@@ -55,13 +54,12 @@ export default {
   },
   methods: {
     commitsText(version) {
-      return n__(
-        `${version.commits_count} commit,`,
-        `${version.commits_count} commits,`,
-        version.commits_count,
-      );
+      return n__(`%d commit,`, `%d commits,`, version.commits_count);
     },
     href(version) {
+      if (this.isBase(version)) {
+        return this.baseVersionPath;
+      }
       if (this.showCommitCount) {
         return version.version_path;
       }
@@ -74,7 +72,7 @@ export default {
       if (this.targetBranch && (this.isBase(version) || !version)) {
         return this.targetBranch.branchName;
       }
-      return `version ${version.version_index}`;
+      return sprintf(__(`version %{versionIndex}`), { versionIndex: version.version_index });
     },
     isActive(version) {
       if (!version) {
@@ -123,13 +121,13 @@ export default {
               <div>
                 <strong>
                   {{ versionName(version) }}
-                  <template v-if="isBase(version)">
-                    (base)
-                  </template>
+                  <template v-if="isBase(version)">{{
+                    s__('DiffsCompareBaseBranch|(base)')
+                  }}</template>
                 </strong>
               </div>
               <div>
-                <small class="commit-sha"> {{ version.truncated_commit_sha }} </small>
+                <small class="commit-sha"> {{ version.short_commit_sha }} </small>
               </div>
               <div>
                 <small>
@@ -139,7 +137,7 @@ export default {
                   <time-ago
                     v-if="version.created_at"
                     :time="version.created_at"
-                    class="js-timeago js-timeago-render"
+                    class="js-timeago"
                   />
                 </small>
               </div>

@@ -56,9 +56,12 @@ export default {
       return `${noteData.author.name}: ${note}`;
     },
     toggleDiscussions() {
+      const forceExpanded = this.discussions.some(discussion => !discussion.expanded);
+
       this.discussions.forEach(discussion => {
         this.toggleDiscussion({
           discussionId: discussion.id,
+          forceExpanded,
         });
       });
     },
@@ -71,7 +74,7 @@ export default {
     <button
       v-if="discussionsExpanded"
       type="button"
-      aria-label="Show comments"
+      :aria-label="__('Show comments')"
       class="diff-notes-collapse js-diff-comment-avatar js-diff-comment-button"
       @click="toggleDiscussions"
     >
@@ -83,7 +86,6 @@ export default {
         :key="note.id"
         :img-src="note.author.avatar_url"
         :tooltip-text="getTooltipText(note)"
-        :size="19"
         class="diff-comment-avatar js-diff-comment-avatar"
         @click.native="toggleDiscussions"
       />

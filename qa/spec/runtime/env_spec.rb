@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 describe QA::Runtime::Env do
-  include Support::StubENV
+  include Helpers::StubENV
 
   shared_examples 'boolean method' do |**kwargs|
     it_behaves_like 'boolean method with parameter', kwargs
@@ -90,13 +90,13 @@ describe QA::Runtime::Env do
       described_class.instance_variable_set(:@personal_access_token, nil)
     end
 
-    context 'when PERSONAL_ACCESS_TOKEN is set' do
+    context 'when GITLAB_QA_ACCESS_TOKEN is set' do
       before do
-        stub_env('PERSONAL_ACCESS_TOKEN', 'a_token')
+        stub_env('GITLAB_QA_ACCESS_TOKEN', 'a_token_too')
       end
 
       it 'returns specified token from env' do
-        expect(described_class.personal_access_token).to eq 'a_token'
+        expect(described_class.personal_access_token).to eq 'a_token_too'
       end
     end
 
@@ -168,6 +168,30 @@ describe QA::Runtime::Env do
     end
   end
 
+  describe '.knapsack?' do
+    it 'returns true if KNAPSACK_GENERATE_REPORT is defined' do
+      stub_env('KNAPSACK_GENERATE_REPORT', 'true')
+
+      expect(described_class.knapsack?).to be_truthy
+    end
+
+    it 'returns true if KNAPSACK_REPORT_PATH is defined' do
+      stub_env('KNAPSACK_REPORT_PATH', '/a/path')
+
+      expect(described_class.knapsack?).to be_truthy
+    end
+
+    it 'returns true if KNAPSACK_TEST_FILE_PATTERN is defined' do
+      stub_env('KNAPSACK_TEST_FILE_PATTERN', '/a/**/pattern')
+
+      expect(described_class.knapsack?).to be_truthy
+    end
+
+    it 'returns false if neither KNAPSACK_GENERATE_REPORT nor KNAPSACK_REPORT_PATH nor KNAPSACK_TEST_FILE_PATTERN are defined' do
+      expect(described_class.knapsack?).to be_falsey
+    end
+  end
+
   describe '.require_github_access_token!' do
     it 'raises ArgumentError if GITHUB_ACCESS_TOKEN is not defined' do
       stub_env('GITHUB_ACCESS_TOKEN', nil)
@@ -203,8 +227,73 @@ describe QA::Runtime::Env do
       env_key: 'QA_CAN_TEST_GIT_PROTOCOL_V2',
       default: true
 
+    it_behaves_like 'boolean method with parameter',
+      method: :can_test?,
+      param: :admin,
+      env_key: 'QA_CAN_TEST_ADMIN_FEATURES',
+      default: true
+
     it 'raises ArgumentError if feature is unknown' do
       expect { described_class.can_test? :foo }.to raise_error(ArgumentError, 'Unknown feature "foo"')
+    end
+  end
+
+  describe 'remote grid credentials' do
+    it 'is blank if username is empty' do
+      stub_env('QA_REMOTE_GRID_USERNAME', nil)
+
+      expect(described_class.send(:remote_grid_credentials)).to eq('')
+    end
+
+    it 'throws ArgumentError if GRID_ACCESS_KEY is not specified with USERNAME' do
+      stub_env('QA_REMOTE_GRID_USERNAME', 'foo')
+
+      expect { described_class.send(:remote_grid_credentials) }.to raise_error(ArgumentError, 'Please provide an access key for user "foo"')
+    end
+
+    it 'returns a user:key@ combination when all args are satiated' do
+      stub_env('QA_REMOTE_GRID_USERNAME', 'foo')
+      stub_env('QA_REMOTE_GRID_ACCESS_KEY', 'bar')
+
+      expect(described_class.send(:remote_grid_credentials)).to eq('foo:bar@')
+    end
+  end
+
+  describe '.remote_grid_protocol' do
+    it 'defaults protocol to http' do
+      stub_env('QA_REMOTE_GRID_PROTOCOL', nil)
+      expect(described_class.remote_grid_protocol).to eq('http')
+    end
+  end
+
+  describe '.remote_grid' do
+    it 'is falsey if QA_REMOTE_GRID is not set' do
+      expect(described_class.remote_grid).to be_falsey
+    end
+
+    it 'accepts https protocol' do
+      stub_env('QA_REMOTE_GRID', 'localhost:4444')
+      stub_env('QA_REMOTE_GRID_PROTOCOL', 'https')
+
+      expect(described_class.remote_grid).to eq('https://localhost:4444/wd/hub')
+    end
+
+    context 'with credentials' do
+      it 'has a grid of http://user:key@grid/wd/hub' do
+        stub_env('QA_REMOTE_GRID_USERNAME', 'foo')
+        stub_env('QA_REMOTE_GRID_ACCESS_KEY', 'bar')
+        stub_env('QA_REMOTE_GRID', 'localhost:4444')
+
+        expect(described_class.remote_grid).to eq('http://foo:bar@localhost:4444/wd/hub')
+      end
+    end
+
+    context 'without credentials' do
+      it 'has a grid of http://grid/wd/hub' do
+        stub_env('QA_REMOTE_GRID', 'localhost:4444')
+
+        expect(described_class.remote_grid).to eq('http://localhost:4444/wd/hub')
+      end
     end
   end
 end

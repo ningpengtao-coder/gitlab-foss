@@ -56,14 +56,15 @@ export default class MilestoneSelect {
       const $value = $block.find('.value');
       const $loading = $block.find('.block-loading').fadeOut();
       selectedMilestoneDefault = showAny ? '' : null;
-      selectedMilestoneDefault = showNo && defaultNo ? 'No Milestone' : selectedMilestoneDefault;
+      selectedMilestoneDefault =
+        showNo && defaultNo ? __('No Milestone') : selectedMilestoneDefault;
       selectedMilestone = $dropdown.data('selected') || selectedMilestoneDefault;
 
       if (issueUpdateURL) {
         milestoneLinkTemplate = _.template(
           '<a href="<%- web_url %>" class="bold has-tooltip" data-container="body" title="<%- remaining %>"><%- title %></a>',
         );
-        milestoneLinkNoneTemplate = '<span class="no-value">None</span>';
+        milestoneLinkNoneTemplate = `<span class="no-value">${__('None')}</span>`;
       }
       return $dropdown.glDropdown({
         showMenuAbove: showMenuAbove,
@@ -74,28 +75,28 @@ export default class MilestoneSelect {
               extraOptions.push({
                 id: null,
                 name: null,
-                title: 'Any Milestone',
+                title: __('Any Milestone'),
               });
             }
             if (showNo) {
               extraOptions.push({
                 id: -1,
-                name: 'No Milestone',
-                title: 'No Milestone',
+                name: __('No Milestone'),
+                title: __('No Milestone'),
               });
             }
             if (showUpcoming) {
               extraOptions.push({
                 id: -2,
                 name: '#upcoming',
-                title: 'Upcoming',
+                title: __('Upcoming'),
               });
             }
             if (showStarted) {
               extraOptions.push({
                 id: -3,
                 name: '#started',
-                title: 'Started',
+                title: __('Started'),
               });
             }
             if (extraOptions.length) {
@@ -155,7 +156,7 @@ export default class MilestoneSelect {
           const { $el, e } = clickEvent;
           let selected = clickEvent.selectedObj;
 
-          let data, boardsStore;
+          let data, modalStoreFilter;
           if (!selected) return;
 
           if (options.handleClick) {
@@ -179,11 +180,11 @@ export default class MilestoneSelect {
           }
 
           if ($dropdown.closest('.add-issues-modal').length) {
-            boardsStore = ModalStore.store.filter;
+            modalStoreFilter = ModalStore.store.filter;
           }
 
-          if (boardsStore) {
-            boardsStore[$dropdown.data('fieldName')] = selected.name;
+          if (modalStoreFilter) {
+            modalStoreFilter[$dropdown.data('fieldName')] = selected.name;
             e.preventDefault();
           } else if ($dropdown.hasClass('js-filter-submit') && (isIssueIndex || isMRIndex)) {
             return Issuable.filterResults($dropdown.closest('form'));

@@ -13,7 +13,6 @@ Available `RAILS_ENV`
  - `development` (this is your main GDK db)
  - `test` (used for tests like rspec)
 
-
 ## Nuke everything and start over
 
 If you just want to delete everything and start over with an empty DB (~1 minute):
@@ -36,7 +35,6 @@ If your test DB is giving you problems, it is safe to nuke it because it doesn't
  - `bundle exec rake db:migrate:up VERSION=20170926203418 RAILS_ENV=development`: Set up a migration
  - `bundle exec rake db:migrate:redo VERSION=20170926203418 RAILS_ENV=development`: Re-run a specific migration
 
-
 ## Manually access the database
 
 Access the database via one of these commands (they all get you to the same place)
@@ -54,12 +52,11 @@ bundle exec rails db RAILS_ENV=development
  - `SELECT * FROM schema_migrations WHERE version = '20170926203418';`: Check if a migration was run
  - `DELETE FROM schema_migrations WHERE version = '20170926203418';`: Manually remove a migration
 
-
 ## FAQ
 
 ### `ActiveRecord::PendingMigrationError` with Spring
 
-When running specs with the [Spring preloader](./rake_tasks.md#speed-up-tests-rake-tasks-and-migrations),
+When running specs with the [Spring preloader](rake_tasks.md#speed-up-tests-rake-tasks-and-migrations),
 the test database can get into a corrupted state. Trying to run the migration or
 dropping/resetting the test database has no effect.
 

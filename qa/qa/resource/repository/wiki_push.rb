@@ -24,11 +24,16 @@ module QA
           @repository_http_uri ||= begin
             wiki.visit!
             Page::Project::Wiki::Show.act do
-              go_to_clone_repository
+              click_clone_repository
               choose_repository_clone_http
               repository_location.uri
             end
           end
+        end
+
+        def fabricate!
+          super
+          wiki.visit!
         end
       end
     end

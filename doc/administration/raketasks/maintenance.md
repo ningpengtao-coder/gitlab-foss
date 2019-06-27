@@ -60,8 +60,9 @@ Runs the following rake tasks:
 It will check that each component was set up according to the installation guide and suggest fixes for issues found.
 
 You may also have a look at our Troubleshooting Guides:
+
 - [Troubleshooting Guide (GitLab)](http://docs.gitlab.com/ee/README.html#troubleshooting)
-- [Troubleshooting Guide (Omnibus Gitlab)](http://docs.gitlab.com/omnibus/README.html#troubleshooting)
+- [Troubleshooting Guide (Omnibus Gitlab)](https://docs.gitlab.com/omnibus/README.html#troubleshooting)
 
 **Omnibus Installation**
 
@@ -202,25 +203,6 @@ sudo gitlab-rake gitlab:track_deployment
 ```
 cd /home/git/gitlab
 sudo -u git -H bundle exec rake gitlab:track_deployment RAILS_ENV=production
-```
-
-## Create or repair repository hooks symlink
-
-If the GitLab shell hooks directory location changes or another circumstance
-leads to the hooks symlink becoming missing or invalid, run this Rake task
-to create or repair the symlinks.
-
-**Omnibus Installation**
-
-```
-sudo gitlab-rake gitlab:shell:create_hooks
-```
-
-**Source Installation**
-
-```
-cd /home/git/gitlab
-sudo -u git -H bundle exec rake gitlab:shell:create_hooks RAILS_ENV=production
 ```
 
 ## Check TCP connectivity to a remote site

@@ -1,9 +1,18 @@
+import _ from 'underscore';
 import $ from 'jquery';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import * as webLinks from 'xterm/lib/addons/webLinks/webLinks';
+import { canScrollUp, canScrollDown } from '~/lib/utils/dom_utils';
+import { __ } from '~/locale';
+
+const SCROLL_MARGIN = 5;
+
+Terminal.applyAddon(fit);
+Terminal.applyAddon(webLinks);
 
 export default class GLTerminal {
-  constructor(options = {}) {
+  constructor(element, options = {}) {
     this.options = Object.assign(
       {},
       {
@@ -13,7 +22,8 @@ export default class GLTerminal {
       options,
     );
 
-    this.container = document.querySelector(options.selector);
+    this.container = element;
+    this.onDispose = [];
 
     this.setSocketUrl();
     this.createTerminal();
@@ -34,8 +44,6 @@ export default class GLTerminal {
   }
 
   createTerminal() {
-    Terminal.applyAddon(fit);
-
     this.terminal = new Terminal(this.options);
 
     this.socket = new WebSocket(this.socketUrl, ['terminal.gitlab.com']);
@@ -43,6 +51,7 @@ export default class GLTerminal {
 
     this.terminal.open(this.container);
     this.terminal.fit();
+    this.terminal.webLinksInit();
     this.terminal.focus();
 
     this.socket.onopen = () => {
@@ -70,6 +79,51 @@ export default class GLTerminal {
   }
 
   handleSocketFailure() {
-    this.terminal.write('\r\nConnection failure');
+    this.terminal.write('\r\n');
+    this.terminal.write(__('Connection failure'));
+  }
+
+  addScrollListener(onScrollLimit) {
+    const viewport = this.container.querySelector('.xterm-viewport');
+    const listener = _.throttle(() => {
+      onScrollLimit({
+        canScrollUp: canScrollUp(viewport, SCROLL_MARGIN),
+        canScrollDown: canScrollDown(viewport, SCROLL_MARGIN),
+      });
+    });
+
+    this.onDispose.push(() => viewport.removeEventListener('scroll', listener));
+    viewport.addEventListener('scroll', listener);
+
+    // don't forget to initialize value before scroll!
+    listener({ target: viewport });
+  }
+
+  disable() {
+    this.terminal.setOption('cursorBlink', false);
+    this.terminal.setOption('theme', { foreground: '#707070' });
+    this.terminal.setOption('disableStdin', true);
+    this.socket.close();
+  }
+
+  dispose() {
+    this.terminal.off('data');
+    this.terminal.dispose();
+    this.socket.close();
+
+    this.onDispose.forEach(fn => fn());
+    this.onDispose.length = 0;
+  }
+
+  scrollToTop() {
+    this.terminal.scrollToTop();
+  }
+
+  scrollToBottom() {
+    this.terminal.scrollToBottom();
+  }
+
+  fit() {
+    this.terminal.fit();
   }
 }

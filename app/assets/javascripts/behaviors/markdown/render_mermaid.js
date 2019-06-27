@@ -1,4 +1,5 @@
 import flash from '~/flash';
+import { sprintf, __ } from '../../locale';
 
 // Renders diagrams and flowcharts from text using Mermaid in any element with the
 // `js-render-mermaid` class.
@@ -14,6 +15,9 @@ import flash from '~/flash';
 // </pre>
 //
 
+// This is an arbitrary number; Can be iterated upon when suitable.
+const MAX_CHAR_LIMIT = 5000;
+
 export default function renderMermaid($els) {
   if (!$els.length) return;
 
@@ -26,16 +30,42 @@ export default function renderMermaid($els) {
         },
         // mermaidAPI options
         theme: 'neutral',
+        flowchart: {
+          htmlLabels: false,
+        },
       });
 
       $els.each((i, el) => {
         const source = el.textContent;
+
+        /**
+         * Restrict the rendering to a certain amount of character to
+         * prevent mermaidjs from hanging up the entire thread and
+         * causing a DoS.
+         */
+        if (source && source.length > MAX_CHAR_LIMIT) {
+          el.textContent = sprintf(
+            __(
+              'Cannot render the image. Maximum character count (%{charLimit}) has been exceeded.',
+            ),
+            { charLimit: MAX_CHAR_LIMIT },
+          );
+          return;
+        }
 
         // Remove any extra spans added by the backend syntax highlighting.
         Object.assign(el, { textContent: source });
 
         mermaid.init(undefined, el, id => {
           const svg = document.getElementById(id);
+
+          // As of https://github.com/knsv/mermaid/commit/57b780a0d,
+          // Mermaid will make two init callbacks:one to initialize the
+          // flow charts, and another to initialize the Gannt charts.
+          // Guard against an error caused by double initialization.
+          if (svg.classList.contains('mermaid')) {
+            return;
+          }
 
           svg.classList.add('mermaid');
 

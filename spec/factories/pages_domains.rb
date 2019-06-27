@@ -41,6 +41,14 @@ nNp/xedE1YxutQ==
       enabled_until nil
     end
 
+    trait :scheduled_for_removal do
+      remove_at { 1.day.from_now }
+    end
+
+    trait :should_be_removed do
+      remove_at { 1.day.ago }
+    end
+
     trait :unverified do
       verified_at nil
     end
@@ -171,6 +179,11 @@ Hq9LkWn6WP4EHsesHyslgTQZF8C7kVLTbLn2noLnOE+Mp3vcWlZxl3Yk6aZMhKS+
 Iy6oRpHaCF/2obZdIdgf9rlyz0fkqyHJc9GkioSoOhJZxEV2SgAkap8yS0sX2tJ9
 ZDXgrA==
 -----END CERTIFICATE-----'
+    end
+
+    trait :letsencrypt do
+      auto_ssl_enabled { true }
+      certificate_source { :gitlab_provided }
     end
   end
 end

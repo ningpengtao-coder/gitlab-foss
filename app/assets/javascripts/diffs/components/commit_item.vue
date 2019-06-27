@@ -5,6 +5,7 @@ import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import CIIcon from '~/vue_shared/components/ci_icon.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import CommitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
+import initUserPopovers from '../../user_popovers';
 
 /**
  * CommitItem
@@ -35,19 +36,31 @@ export default {
     },
   },
   computed: {
+    author() {
+      return this.commit.author || {};
+    },
     authorName() {
-      return (this.commit.author && this.commit.author.name) || this.commit.author_name;
+      return this.author.name || this.commit.author_name;
+    },
+    authorClass() {
+      return this.author.name ? 'js-user-link' : '';
+    },
+    authorId() {
+      return this.author.id ? this.author.id : '';
     },
     authorUrl() {
-      return (
-        (this.commit.author && this.commit.author.web_url) || `mailto:${this.commit.author_email}`
-      );
+      // TODO: when the vue i18n rules are merged need to disable @gitlab/i18n/no-non-i18n-strings
+      // name: 'mailto:' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
+      return this.author.web_url || `mailto:${this.commit.author_email}`;
     },
     authorAvatar() {
-      return (
-        (this.commit.author && this.commit.author.avatar_url) || this.commit.author_gravatar_url
-      );
+      return this.author.avatar_url || this.commit.author_gravatar_url;
     },
+  },
+  created() {
+    this.$nextTick(() => {
+      initUserPopovers(this.$el.querySelectorAll('.js-user-link'));
+    });
   },
 };
 </script>
@@ -58,7 +71,7 @@ export default {
       :link-href="authorUrl"
       :img-src="authorAvatar"
       :img-alt="authorName"
-      :img-size="36"
+      :img-size="40"
       class="avatar-cell d-none d-sm-block"
     />
     <div class="commit-detail flex-list">
@@ -69,7 +82,7 @@ export default {
           v-html="commit.title_html"
         ></a>
 
-        <span class="commit-row-message d-block d-sm-none"> &middot; {{ commit.short_id }} </span>
+        <span class="commit-row-message d-block d-sm-none">&middot; {{ commit.short_id }}</span>
 
         <button
           v-if="commit.description_html"
@@ -80,8 +93,14 @@ export default {
           <icon :size="12" name="ellipsis_h" />
         </button>
 
-        <div class="commiter">
-          <a :href="authorUrl" v-text="authorName"></a> {{ s__('CommitWidget|authored') }}
+        <div class="committer">
+          <a
+            :href="authorUrl"
+            :class="authorClass"
+            :data-user-id="authorId"
+            v-text="authorName"
+          ></a>
+          {{ s__('CommitWidget|authored') }}
           <time-ago-tooltip :time="commit.authored_date" />
         </div>
 
@@ -96,9 +115,10 @@ export default {
         <commit-pipeline-status
           v-if="commit.pipeline_status_path"
           :endpoint="commit.pipeline_status_path"
+          class="d-inline-flex"
         />
         <div class="commit-sha-group">
-          <div class="label label-monospace" v-text="commit.short_id"></div>
+          <div class="label label-monospace monospace" v-text="commit.short_id"></div>
           <clipboard-button
             :text="commit.id"
             :title="__('Copy commit SHA to clipboard')"

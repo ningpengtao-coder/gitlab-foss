@@ -77,6 +77,9 @@ Or:
 hello = _("Hello world!")
 ```
 
+NOTE: **Note:** Messages in the API (`lib/api/` or `app/graphql`) do
+not need to be externalised.
+
 ### HAML files
 
 Given the following content in HAML:
@@ -174,7 +177,7 @@ For example use `%{created_at}` in Ruby but `%{createdAt}` in JavaScript.
     # => When size == 2: 'There are 2 mice.'
     ```
 
-    Avoid using `%d` or count variables in sigular strings. This allows more natural translation in some languages.
+    Avoid using `%d` or count variables in singular strings. This allows more natural translation in some languages.
 
 - In JavaScript:
 
@@ -195,6 +198,7 @@ For example use `%{created_at}` in Ruby but `%{createdAt}` in JavaScript.
 
 Sometimes you need to add some context to the text that you want to translate
 (if the word occurs in a sentence and/or the word is ambiguous).
+Namespaces should be PascalCase.
 
 - In Ruby/HAML:
 
@@ -211,7 +215,7 @@ Sometimes you need to add some context to the text that you want to translate
     ```
 
 Note: The namespace should be removed from the translation. See the [translation
-guidelines for more details](./translation.md#namespaced-strings).
+guidelines for more details](translation.md#namespaced-strings).
 
 ### Dates / times
 
@@ -227,6 +231,16 @@ console.log(dateFormat.format(new Date('2063-04-05'))) // April 5, 2063
 This makes use of [`Intl.DateTimeFormat`].
 
 [`Intl.DateTimeFormat`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat
+
+- In Ruby/HAML, we have two ways of adding format to dates and times:
+
+  1. **Through the `l` helper**, i.e. `l(active_session.created_at, format: :short)`. We have some predefined formats for
+  [dates](https://gitlab.com/gitlab-org/gitlab-ce/blob/v11.7.0/config/locales/en.yml#L54) and [times](https://gitlab.com/gitlab-org/gitlab-ce/blob/v11.7.0/config/locales/en.yml#L261).
+  If you need to add a new format, because other parts of the code could benefit from it,
+  you'll need to add it to [en.yml](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/locales/en.yml) file.
+  1. **Through `strftime`**, i.e. `milestone.start_date.strftime('%b %-d')`. We use `strftime` in case none of the formats
+  defined on [en.yml](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/locales/en.yml) matches the date/time
+  specifications we need, and if there is no need to add it as a new format because is very particular (i.e. it's only used in a single view).
 
 ## Best practices
 
@@ -290,7 +304,7 @@ file in. Once the changes are on master, they will be picked up by
 [Crowdin](http://translate.gitlab.com) and be presented for translation.
 
 If there are merge conflicts in the `gitlab.pot` file, you can delete the file
-and regenerate it using the same command. Confirm that you are not deleting any strings accidentally by looking over the diff.
+and regenerate it using the same command.
 
 ### Validating PO files
 
@@ -321,7 +335,7 @@ Errors in `locale/zh_HK/gitlab.po`:
     Syntax error in msgstr
     Syntax error in message_line
     There should be only whitespace until the end of line after the double quote character of a message text.
-    Parseing result before error: '{:msgid=>["", "You are going to remove %{project_name_with_namespace}.\\n", "Removed project CANNOT be restored!\\n", "Are you ABSOLUTELY sure?"]}'
+    Parsing result before error: '{:msgid=>["", "You are going to remove %{project_name_with_namespace}.\\n", "Removed project CANNOT be restored!\\n", "Are you ABSOLUTELY sure?"]}'
     SimplePoParser filtered backtrace: SimplePoParser::ParserError
 Errors in `locale/zh_TW/gitlab.po`:
   1 pipeline

@@ -3,25 +3,18 @@
 module QA
   context 'Create' do
     describe 'Git clone over HTTP', :ldap_no_tls do
-      let(:location) do
-        Page::Project::Show.act do
-          choose_repository_clone_http
-          repository_location
-        end
-      end
-
-      before do
+      before(:all) do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.act { sign_in_using_credentials }
+        Page::Main::Login.perform(&:sign_in_using_credentials)
 
-        project = Resource::Project.fabricate! do |scenario|
+        @project = Resource::Project.fabricate! do |scenario|
           scenario.name = 'project-with-code'
           scenario.description = 'project for git clone tests'
         end
-        project.visit!
+        @project.visit!
 
         Git::Repository.perform do |repository|
-          repository.uri = location.uri
+          repository.uri = @project.repository_http_location.uri
           repository.use_default_credentials
 
           repository.act do
@@ -32,14 +25,15 @@ module QA
             push_changes
           end
         end
+        @project.wait_for_push_new_branch
       end
 
       it 'user performs a deep clone' do
         Git::Repository.perform do |repository|
-          repository.uri = location.uri
+          repository.uri = @project.repository_http_location.uri
           repository.use_default_credentials
 
-          repository.act { clone }
+          repository.clone
 
           expect(repository.commits.size).to eq 2
         end
@@ -47,10 +41,10 @@ module QA
 
       it 'user performs a shallow clone' do
         Git::Repository.perform do |repository|
-          repository.uri = location.uri
+          repository.uri = @project.repository_http_location.uri
           repository.use_default_credentials
 
-          repository.act { shallow_clone }
+          repository.shallow_clone
 
           expect(repository.commits.size).to eq 1
           expect(repository.commits.first).to include 'Add Readme'

@@ -1,5 +1,7 @@
 <script>
-import { GlTooltipDirective } from '@gitlab/ui';
+import _ from 'underscore';
+import { GlTooltipDirective, GlLink } from '@gitlab/ui';
+import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import UserAvatarLink from './user_avatar/user_avatar_link.vue';
 import Icon from '../../vue_shared/components/icon.vue';
 
@@ -10,6 +12,8 @@ export default {
   components: {
     UserAvatarLink,
     Icon,
+    GlLink,
+    TooltipOnTruncate,
   },
   props: {
     /**
@@ -33,6 +37,27 @@ export default {
       required: false,
       default: () => ({}),
     },
+
+    /**
+     * If provided, is used the render the MR IID and link
+     * in place of the branch name.  Must contains the
+     * following properties:
+     *   - iid (number)
+     *   - path (non-empty string)
+     *
+     * May optionally contain the following properties:
+     *   - title (string): used in a tooltip if provided
+     *
+     * Any additional properties are ignored.
+     */
+    mergeRequestRef: {
+      type: Object,
+      required: false,
+      default: undefined,
+      validator: ref =>
+        _.isUndefined(ref) || (_.isFinite(ref.iid) && _.isString(ref.path) && !_.isEmpty(ref.path)),
+    },
+
     /**
      * Used to link to the commit sha.
      */
@@ -70,7 +95,11 @@ export default {
       required: false,
       default: () => ({}),
     },
-    showBranch: {
+
+    /**
+     * Indicates whether or not to show the branch/MR ref info
+     */
+    showRefInfo: {
       type: Boolean,
       required: false,
       default: true,
@@ -78,14 +107,12 @@ export default {
   },
   computed: {
     /**
-     * Used to verify if all the properties needed to render the commit
-     * ref section were provided.
-     *
-     * @returns {Boolean}
+     * Determines if we shoud render the ref info section based
      */
-    hasCommitRef() {
-      return this.commitRef && this.commitRef.name && this.commitRef.ref_url;
+    shouldShowRefInfo() {
+      return this.showRefInfo && (this.commitRef || this.mergeRequestRef);
     },
+
     /**
      * Used to verify if all the properties needed to render the commit
      * author section were provided.
@@ -108,22 +135,39 @@ export default {
 };
 </script>
 <template>
-  <div class="branch-commit">
-    <template v-if="hasCommitRef && showBranch">
+  <div class="branch-commit cgray">
+    <template v-if="shouldShowRefInfo">
       <div class="icon-container">
-        <i v-if="tag" class="fa fa-tag" aria-hidden="true"> </i> <icon v-if="!tag" name="fork" />
+        <icon v-if="tag" name="tag" />
+        <icon v-else-if="mergeRequestRef" name="git-merge" />
+        <icon v-else name="branch" />
       </div>
 
-      <a v-gl-tooltip :href="commitRef.ref_url" :title="commitRef.name" class="ref-name">
+      <gl-link
+        v-if="mergeRequestRef"
+        v-gl-tooltip
+        :href="mergeRequestRef.path"
+        :title="mergeRequestRef.title"
+        class="ref-name"
+      >
+        {{ mergeRequestRef.iid }}
+      </gl-link>
+      <gl-link
+        v-else
+        v-gl-tooltip
+        :href="commitRef.ref_url"
+        :title="commitRef.name"
+        class="ref-name"
+      >
         {{ commitRef.name }}
-      </a>
+      </gl-link>
     </template>
     <icon name="commit" class="commit-icon js-commit-icon" />
 
-    <a :href="commitUrl" class="commit-sha"> {{ shortSha }} </a>
+    <gl-link :href="commitUrl" class="commit-sha mr-0"> {{ shortSha }} </gl-link>
 
     <div class="commit-title flex-truncate-parent">
-      <span v-if="title" class="flex-truncate-child">
+      <tooltip-on-truncate v-if="title" class="flex-truncate-child" :title="title">
         <user-avatar-link
           v-if="hasAuthor"
           :link-href="author.path"
@@ -132,8 +176,10 @@ export default {
           :tooltip-text="author.username"
           class="avatar-image-container"
         />
-        <a :href="commitUrl" class="commit-row-message"> {{ title }} </a>
-      </span>
+        <gl-link :href="commitUrl" class="commit-row-message cgray">
+          {{ title }}
+        </gl-link>
+      </tooltip-on-truncate>
       <span v-else> Can't find HEAD commit for this branch </span>
     </div>
   </div>

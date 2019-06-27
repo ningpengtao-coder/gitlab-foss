@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require 'securerandom'
+
 module Clusters
   module Applications
-    class Jupyter < ActiveRecord::Base
-      VERSION = 'v0.6'.freeze
+    class Jupyter < ApplicationRecord
+      VERSION = '0.9-174bbd5'.freeze
 
       self.table_name = 'clusters_applications_jupyter'
 
@@ -18,8 +20,10 @@ module Clusters
 
       def set_initial_status
         return unless not_installable?
+        return unless cluster&.application_ingress_available?
 
-        if cluster&.application_ingress_available? && cluster.application_ingress.external_ip
+        ingress = cluster.application_ingress
+        if ingress.external_ip || ingress.external_hostname
           self.status = 'installable'
         end
       end
@@ -34,6 +38,12 @@ module Clusters
 
       def values
         content_values.to_yaml
+      end
+
+      # Will be addressed in future MRs
+      # We need to investigate and document what will be permanently deleted.
+      def allowed_to_uninstall?
+        false
       end
 
       def install_command
@@ -51,12 +61,20 @@ module Clusters
         "http://#{hostname}/hub/oauth_callback"
       end
 
+      def oauth_scopes
+        'api read_repository write_repository'
+      end
+
       private
 
       def specification
         {
           "ingress" => {
-            "hosts" => [hostname]
+            "hosts" => [hostname],
+            "tls" => [{
+              "hosts" => [hostname],
+              "secretName" => "jupyter-cert"
+            }]
           },
           "hub" => {
             "extraEnv" => {
@@ -68,22 +86,39 @@ module Clusters
             "secretToken" => secret_token
           },
           "auth" => {
+            "state" => {
+              "cryptoKey" => crypto_key
+            },
             "gitlab" => {
               "clientId" => oauth_application.uid,
               "clientSecret" => oauth_application.secret,
-              "callbackUrl" => callback_url
+              "callbackUrl" => callback_url,
+              "gitlabProjectIdWhitelist" => [project_id]
             }
           },
           "singleuser" => {
             "extraEnv" => {
-              "GITLAB_CLUSTER_ID" => cluster.id
+              "GITLAB_CLUSTER_ID" => cluster.id.to_s,
+              "GITLAB_HOST" => gitlab_host
             }
           }
         }
       end
 
+      def crypto_key
+        @crypto_key ||= SecureRandom.hex(32)
+      end
+
+      def project_id
+        cluster&.project&.id
+      end
+
       def gitlab_url
         Gitlab.config.gitlab.url
+      end
+
+      def gitlab_host
+        Gitlab.config.gitlab.host
       end
 
       def content_values

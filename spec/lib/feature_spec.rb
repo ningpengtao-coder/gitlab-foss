@@ -31,12 +31,19 @@ describe Feature do
       expect(described_class.persisted_names).to be_empty
     end
 
-    it 'caches the feature names when request store is active', :request_store do
+    it 'caches the feature names when request store is active',
+       :request_store, :use_clean_rails_memory_store_caching do
       Feature::FlipperFeature.create!(key: 'foo')
 
       expect(Feature::FlipperFeature)
         .to receive(:feature_names)
         .once
+        .and_call_original
+
+      expect(Rails.cache)
+        .to receive(:fetch)
+        .once
+        .with('flipper:persisted_names', expires_in: 1.minute)
         .and_call_original
 
       2.times do
@@ -180,6 +187,21 @@ describe Feature do
       described_class.enable(:enabled_feature_flag)
 
       expect(described_class.disabled?(:enabled_feature_flag)).to be_falsey
+    end
+  end
+
+  describe Feature::Target do
+    describe '#targets' do
+      let(:project) { create(:project) }
+      let(:group) { create(:group) }
+      let(:user_name) { project.owner.username }
+
+      subject { described_class.new(user: user_name, project: project.full_path, group: group.full_path) }
+
+      it 'returns all found targets' do
+        expect(subject.targets).to be_an(Array)
+        expect(subject.targets).to eq([project.owner, project, group])
+      end
     end
   end
 end

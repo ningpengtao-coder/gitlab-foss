@@ -10,11 +10,24 @@ module QA
       # The environment variables used to indicate if the environment under test
       # supports the given feature
       SUPPORTED_FEATURES = {
-        git_protocol_v2: 'QA_CAN_TEST_GIT_PROTOCOL_V2'
+        git_protocol_v2: 'QA_CAN_TEST_GIT_PROTOCOL_V2',
+        admin: 'QA_CAN_TEST_ADMIN_FEATURES'
       }.freeze
 
       def supported_features
         SUPPORTED_FEATURES
+      end
+
+      def admin_password
+        ENV['GITLAB_ADMIN_PASSWORD']
+      end
+
+      def admin_username
+        ENV['GITLAB_ADMIN_USERNAME']
+      end
+
+      def admin_personal_access_token
+        ENV['GITLAB_QA_ADMIN_ACCESS_TOKEN']
       end
 
       def debug?
@@ -30,6 +43,11 @@ module QA
         enabled?(ENV['CHROME_HEADLESS'])
       end
 
+      # set to 'true' to have Chrome use a fixed profile directory
+      def reuse_chrome_profile?
+        enabled?(ENV['CHROME_REUSE_PROFILE'], default: false)
+      end
+
       def accept_insecure_certs?
         enabled?(ENV['ACCEPT_INSECURE_CERTS'])
       end
@@ -38,13 +56,45 @@ module QA
         ENV['CI'] || ENV['CI_SERVER']
       end
 
+      def qa_cookies
+        ENV['QA_COOKIES'] && ENV['QA_COOKIES'].split(';')
+      end
+
       def signup_disabled?
         enabled?(ENV['SIGNUP_DISABLED'], default: false)
       end
 
       # specifies token that can be used for the api
       def personal_access_token
-        @personal_access_token ||= ENV['PERSONAL_ACCESS_TOKEN']
+        @personal_access_token ||= ENV['GITLAB_QA_ACCESS_TOKEN']
+      end
+
+      def remote_grid
+        # if username specified, password/auth token is required
+        # can be
+        # - "http://user:pass@somehost.com/wd/hub"
+        # - "https://user:pass@somehost.com:443/wd/hub"
+        # - "http://localhost:4444/wd/hub"
+
+        return if (ENV['QA_REMOTE_GRID'] || '').empty?
+
+        "#{remote_grid_protocol}://#{remote_grid_credentials}#{ENV['QA_REMOTE_GRID']}/wd/hub"
+      end
+
+      def remote_grid_username
+        ENV['QA_REMOTE_GRID_USERNAME']
+      end
+
+      def remote_grid_access_key
+        ENV['QA_REMOTE_GRID_ACCESS_KEY']
+      end
+
+      def remote_grid_protocol
+        ENV['QA_REMOTE_GRID_PROTOCOL'] || 'http'
+      end
+
+      def browser
+        ENV['QA_BROWSER'].nil? ? :chrome : ENV['QA_BROWSER'].to_sym
       end
 
       def user_username
@@ -55,12 +105,12 @@ module QA
         ENV['GITLAB_PASSWORD']
       end
 
-      def admin_username
-        ENV['GITLAB_ADMIN_USERNAME']
+      def github_username
+        ENV['GITHUB_USERNAME']
       end
 
-      def admin_password
-        ENV['GITLAB_ADMIN_PASSWORD']
+      def github_password
+        ENV['GITHUB_PASSWORD']
       end
 
       def forker?
@@ -89,6 +139,10 @@ module QA
 
       def gitlab_qa_password_2
         ENV['GITLAB_QA_PASSWORD_2']
+      end
+
+      def knapsack?
+        !!(ENV['KNAPSACK_GENERATE_REPORT'] || ENV['KNAPSACK_REPORT_PATH'] || ENV['KNAPSACK_TEST_FILE_PATTERN'])
       end
 
       def ldap_username
@@ -148,6 +202,16 @@ module QA
       end
 
       private
+
+      def remote_grid_credentials
+        if remote_grid_username
+          raise ArgumentError, %Q(Please provide an access key for user "#{remote_grid_username}") unless remote_grid_access_key
+
+          return "#{remote_grid_username}:#{remote_grid_access_key}@"
+        end
+
+        ''
+      end
 
       def enabled?(value, default: true)
         return default if value.nil?

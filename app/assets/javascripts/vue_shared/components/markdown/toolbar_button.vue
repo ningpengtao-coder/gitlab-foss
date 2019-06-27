@@ -37,6 +37,16 @@ export default {
       required: false,
       default: false,
     },
+    tagContent: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    cursorOffset: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
 };
 </script>
@@ -45,8 +55,10 @@ export default {
   <button
     v-gl-tooltip
     :data-md-tag="tag"
+    :data-md-cursor-offset="cursorOffset"
     :data-md-select="tagSelect"
     :data-md-block="tagBlock"
+    :data-md-tag-content="tagContent"
     :data-md-prepend="prepend"
     :title="buttonTitle"
     :aria-label="buttonTitle"
@@ -54,6 +66,7 @@ export default {
     class="toolbar-btn js-md"
     tabindex="-1"
     data-container="body"
+    @click="() => $emit('click')"
   >
     <icon :name="icon" />
   </button>

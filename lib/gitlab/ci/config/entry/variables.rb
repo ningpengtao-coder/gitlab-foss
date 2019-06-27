@@ -7,14 +7,14 @@ module Gitlab
         ##
         # Entry that represents environment variables.
         #
-        class Variables < Node
-          include Validatable
+        class Variables < ::Gitlab::Config::Entry::Node
+          include ::Gitlab::Config::Entry::Validatable
 
           validations do
             validates :config, variables: true
           end
 
-          def self.default
+          def self.default(**)
             {}
           end
 

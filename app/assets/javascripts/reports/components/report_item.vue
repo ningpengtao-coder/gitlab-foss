@@ -1,6 +1,6 @@
 <script>
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
-import { components, componentNames } from '~/reports/components/issue_body';
+import { components, componentNames } from 'ee_else_ce/reports/components/issue_body';
 
 export default {
   name: 'ReportItem',
@@ -24,17 +24,32 @@ export default {
       type: String,
       required: true,
     },
+    statusIconSize: {
+      type: Number,
+      required: false,
+      default: 32,
+    },
     isNew: {
       type: Boolean,
       required: false,
       default: false,
+    },
+    showReportSectionStatusIcon: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
 };
 </script>
 <template>
   <li :class="{ 'is-dismissed': issue.isDismissed }" class="report-block-list-issue">
-    <issue-status-icon :status="status" class="append-right-5" />
+    <issue-status-icon
+      v-if="showReportSectionStatusIcon"
+      :status="status"
+      :status-icon-size="statusIconSize"
+      class="append-right-5"
+    />
 
     <component :is="component" v-if="component" :issue="issue" :status="status" :is-new="isNew" />
   </li>

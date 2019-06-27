@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::BranchesController do
@@ -22,10 +24,12 @@ describe Projects::BranchesController do
         sign_in(user)
 
         post :create,
-          namespace_id: project.namespace,
-          project_id: project,
-          branch_name: branch,
-          ref: ref
+             params: {
+               namespace_id: project.namespace,
+               project_id: project,
+               branch_name: branch,
+               ref: ref
+             }
       end
 
       context "valid branch name, valid source" do
@@ -76,10 +80,12 @@ describe Projects::BranchesController do
 
       it 'redirects' do
         post :create,
-          namespace_id: project.namespace,
-          project_id: project,
-          branch_name: branch,
-          issue_iid: issue.iid
+             params: {
+               namespace_id: project.namespace,
+               project_id: project,
+               branch_name: branch,
+               issue_iid: issue.iid
+             }
 
         expect(subject)
           .to redirect_to("/#{project.full_path}/tree/1-feature-branch")
@@ -89,10 +95,12 @@ describe Projects::BranchesController do
         expect(SystemNoteService).to receive(:new_issue_branch).with(issue, project, user, "1-feature-branch")
 
         post :create,
-          namespace_id: project.namespace,
-          project_id: project,
-          branch_name: branch,
-          issue_iid: issue.iid
+             params: {
+               namespace_id: project.namespace,
+               project_id: project,
+               branch_name: branch,
+               issue_iid: issue.iid
+             }
       end
 
       context 'repository-less project' do
@@ -105,38 +113,14 @@ describe Projects::BranchesController do
           expect(SystemNoteService).to receive(:new_issue_branch).and_return(true)
 
           post :create,
-            namespace_id: project.namespace.to_param,
-            project_id: project.to_param,
-            branch_name: branch,
-            issue_iid: issue.iid
+               params: {
+                 namespace_id: project.namespace.to_param,
+                 project_id: project.to_param,
+                 branch_name: branch,
+                 issue_iid: issue.iid
+               }
 
           expect(response).to redirect_to project_tree_path(project, branch)
-        end
-
-        shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-          it 'redirects to autodeploy setup page' do
-            result = { status: :success, branch: double(name: branch) }
-
-            expect_any_instance_of(CreateBranchService).to receive(:execute).and_return(result)
-            expect(SystemNoteService).to receive(:new_issue_branch).and_return(true)
-
-            post :create,
-              namespace_id: project.namespace.to_param,
-              project_id: project.to_param,
-              branch_name: branch,
-              issue_iid: issue.iid
-
-            expect(response.location).to include(project_new_blob_path(project, branch))
-            expect(response).to have_gitlab_http_status(302)
-          end
-        end
-
-        context 'when user configured kubernetes from Integration > Kubernetes' do
-          before do
-            project.services << build(:kubernetes_service)
-          end
-
-          it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
         end
 
         context 'when user configured kubernetes from CI/CD > Clusters' do
@@ -144,7 +128,23 @@ describe Projects::BranchesController do
             create(:cluster, :provided_by_gcp, projects: [project])
           end
 
-          it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
+          it 'redirects to autodeploy setup page' do
+            result = { status: :success, branch: double(name: branch) }
+
+            expect_any_instance_of(CreateBranchService).to receive(:execute).and_return(result)
+            expect(SystemNoteService).to receive(:new_issue_branch).and_return(true)
+
+            post :create,
+                 params: {
+                   namespace_id: project.namespace.to_param,
+                   project_id: project.to_param,
+                   branch_name: branch,
+                   issue_iid: issue.iid
+                 }
+
+            expect(response.location).to include(project_new_blob_path(project, branch))
+            expect(response).to have_gitlab_http_status(302)
+          end
         end
 
         it 'redirects to autodeploy setup page' do
@@ -156,10 +156,12 @@ describe Projects::BranchesController do
           expect(SystemNoteService).to receive(:new_issue_branch).and_return(true)
 
           post :create,
-            namespace_id: project.namespace.to_param,
-            project_id: project.to_param,
-            branch_name: branch,
-            issue_iid: issue.iid
+               params: {
+                namespace_id: project.namespace.to_param,
+                project_id: project.to_param,
+                branch_name: branch,
+                issue_iid: issue.iid
+               }
 
           expect(response.location).to include(project_new_blob_path(project, branch))
           expect(response).to have_gitlab_http_status(302)
@@ -173,10 +175,12 @@ describe Projects::BranchesController do
           expect(SystemNoteService).not_to receive(:new_issue_branch)
 
           post :create,
-            namespace_id: project.namespace,
-            project_id: project,
-            branch_name: branch,
-            issue_iid: issue.iid
+               params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                branch_name: branch,
+                issue_iid: issue.iid
+               }
         end
       end
 
@@ -191,10 +195,12 @@ describe Projects::BranchesController do
           expect(SystemNoteService).not_to receive(:new_issue_branch)
 
           post :create,
-            namespace_id: project.namespace,
-            project_id: project,
-            branch_name: branch,
-            issue_iid: issue.iid
+               params: {
+                namespace_id: project.namespace,
+                project_id: project,
+                branch_name: branch,
+                issue_iid: issue.iid
+               }
         end
       end
     end
@@ -228,11 +234,14 @@ describe Projects::BranchesController do
     end
 
     def create_branch(name:, ref:)
-      post :create, namespace_id: project.namespace.to_param,
-                    project_id: project.to_param,
-                    branch_name: name,
-                    ref: ref,
-                    format: :json
+      post :create,
+           format: :json,
+           params: {
+             namespace_id: project.namespace.to_param,
+             project_id: project.to_param,
+             branch_name: name,
+             ref: ref
+           }
     end
   end
 
@@ -246,9 +255,11 @@ describe Projects::BranchesController do
     it 'returns 303' do
       post :destroy,
            format: :html,
-           id: 'foo/bar/baz',
-           namespace_id: project.namespace,
-           project_id: project
+           params: {
+             id: 'foo/bar/baz',
+             namespace_id: project.namespace,
+             project_id: project
+           }
 
       expect(response).to have_gitlab_http_status(303)
     end
@@ -261,10 +272,12 @@ describe Projects::BranchesController do
       sign_in(user)
 
       post :destroy,
-        format: format,
-        id: branch,
-        namespace_id: project.namespace,
-        project_id: project
+           format: format,
+           params: {
+             id: branch,
+             namespace_id: project.namespace,
+             project_id: project
+           }
     end
 
     context 'as JS' do
@@ -308,7 +321,7 @@ describe Projects::BranchesController do
         let(:branch) { "feature" }
 
         it 'returns JSON response with message' do
-          expect(json_response).to eql("message" => 'Branch was removed')
+          expect(json_response).to eql("message" => 'Branch was deleted')
         end
 
         it { expect(response).to have_gitlab_http_status(200) }
@@ -318,7 +331,7 @@ describe Projects::BranchesController do
         let(:branch) { "improve/awesome" }
 
         it 'returns JSON response with message' do
-          expect(json_response).to eql('message' => 'Branch was removed')
+          expect(json_response).to eql('message' => 'Branch was deleted')
         end
 
         it { expect(response).to have_gitlab_http_status(200) }
@@ -328,7 +341,7 @@ describe Projects::BranchesController do
         let(:branch) { 'improve%2Fawesome' }
 
         it 'returns JSON response with message' do
-          expect(json_response).to eql('message' => 'Branch was removed')
+          expect(json_response).to eql('message' => 'Branch was deleted')
         end
 
         it { expect(response).to have_gitlab_http_status(200) }
@@ -359,8 +372,10 @@ describe Projects::BranchesController do
   describe "DELETE destroy_all_merged" do
     def destroy_all_merged
       delete :destroy_all_merged,
-             namespace_id: project.namespace,
-             project_id: project
+             params: {
+               namespace_id: project.namespace,
+               project_id: project
+             }
     end
 
     context 'when user is allowed to push' do
@@ -404,10 +419,12 @@ describe Projects::BranchesController do
     context 'when rendering a JSON format' do
       it 'filters branches by name' do
         get :index,
-            namespace_id: project.namespace,
-            project_id: project,
             format: :json,
-            search: 'master'
+            params: {
+              namespace_id: project.namespace,
+              project_id: project,
+              search: 'master'
+            }
 
         parsed_response = JSON.parse(response.body)
 
@@ -423,10 +440,12 @@ describe Projects::BranchesController do
     context 'when cache is enabled yet cold', :request_store do
       it 'return with a status 200' do
         get :index,
-            namespace_id: project.namespace,
-            project_id: project,
-            state: 'all',
-            format: :html
+            format: :html,
+            params: {
+              namespace_id: project.namespace,
+              project_id: project,
+              state: 'all'
+            }
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -439,10 +458,12 @@ describe Projects::BranchesController do
 
       it 'return with a status 200' do
         get :index,
-            namespace_id: project.namespace,
-            project_id: project,
-            state: 'all',
-            format: :html
+            format: :html,
+            params: {
+              namespace_id: project.namespace,
+              project_id: project,
+              state: 'all'
+            }
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -451,30 +472,36 @@ describe Projects::BranchesController do
     context 'when deprecated sort/search/page parameters are specified' do
       it 'returns with a status 301 when sort specified' do
         get :index,
-            namespace_id: project.namespace,
-            project_id: project,
-            sort: 'updated_asc',
-            format: :html
+            format: :html,
+            params: {
+              namespace_id: project.namespace,
+              project_id: project,
+              sort: 'updated_asc'
+            }
 
         expect(response).to redirect_to project_branches_filtered_path(project, state: 'all')
       end
 
       it 'returns with a status 301 when search specified' do
         get :index,
-            namespace_id: project.namespace,
-            project_id: project,
-            search: 'feature',
-            format: :html
+            format: :html,
+            params: {
+              namespace_id: project.namespace,
+              project_id: project,
+              search: 'feature'
+            }
 
         expect(response).to redirect_to project_branches_filtered_path(project, state: 'all')
       end
 
       it 'returns with a status 301 when page specified' do
         get :index,
-            namespace_id: project.namespace,
-            project_id: project,
-            page: 2,
-            format: :html
+            format: :html,
+            params: {
+              namespace_id: project.namespace,
+              project_id: project,
+              page: 2
+            }
 
         expect(response).to redirect_to project_branches_filtered_path(project, state: 'all')
       end

@@ -30,7 +30,12 @@ class Feature
     end
 
     def persisted_names
-      Gitlab::SafeRequestStore[:flipper_persisted_names] ||= FlipperFeature.feature_names
+      Gitlab::SafeRequestStore[:flipper_persisted_names] ||=
+        begin
+          # We saw on GitLab.com, this database request was called 2300
+          # times/s. Let's cache it for a minute to avoid that load.
+          Rails.cache.fetch('flipper:persisted_names', expires_in: 1.minute) { FlipperFeature.feature_names }
+        end
     end
 
     def persisted?(feature)
@@ -100,6 +105,50 @@ class Feature
         active_record_adapter,
         Rails.cache,
         expires_in: 1.hour)
+    end
+  end
+
+  class Target
+    attr_reader :params
+
+    def initialize(params)
+      @params = params
+    end
+
+    def gate_specified?
+      %i(user project group feature_group).any? { |key| params.key?(key) }
+    end
+
+    def targets
+      [feature_group, user, project, group].compact
+    end
+
+    private
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def feature_group
+      return unless params.key?(:feature_group)
+
+      Feature.group(params[:feature_group])
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
+    def user
+      return unless params.key?(:user)
+
+      UserFinder.new(params[:user]).find_by_username!
+    end
+
+    def project
+      return unless params.key?(:project)
+
+      Project.find_by_full_path(params[:project])
+    end
+
+    def group
+      return unless params.key?(:group)
+
+      Group.find_by_full_path(params[:group])
     end
   end
 end

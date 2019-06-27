@@ -2,6 +2,8 @@
 
 module Projects
   class CreateService < BaseService
+    include ValidatesClassificationLabel
+
     def initialize(user, params)
       @current_user, @params = user, params.dup
       @skip_wiki = @params.delete(:skip_wiki)
@@ -9,7 +11,7 @@ module Projects
     end
 
     def execute
-      if @params[:template_name]&.present?
+      if @params[:template_name].present?
         return ::Projects::CreateFromTemplateService.new(current_user, params).execute
       end
 
@@ -44,6 +46,8 @@ module Projects
 
       relations_block&.call(@project)
       yield(@project) if block_given?
+
+      validate_classification_label(@project, :external_authorization_classification_label)
 
       # If the block added errors, don't try to save the project
       return @project if @project.errors.any?
@@ -85,6 +89,8 @@ module Projects
         @project.write_repository_config
         @project.create_wiki unless skip_wiki?
       end
+
+      @project.track_project_repository
 
       event_service.create_project(@project, current_user)
       system_hook_service.execute_hooks_for(@project, :create)
@@ -147,8 +153,8 @@ module Projects
       log_message << " Project ID: #{@project.id}" if @project&.id
       Rails.logger.error(log_message)
 
-      if @project
-        @project.mark_import_as_failed(message) if @project.persisted? && @project.import?
+      if @project && @project.persisted? && @project.import_state
+        @project.import_state.mark_as_failed(message)
       end
 
       @project
@@ -181,7 +187,7 @@ module Projects
 
     def import_schedule
       if @project.errors.empty?
-        @project.import_schedule if @project.import? && !@project.bare_repository_import?
+        @project.import_state.schedule if @project.import? && !@project.bare_repository_import?
       else
         fail(error: @project.errors.full_messages.join(', '))
       end

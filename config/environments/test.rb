@@ -11,7 +11,7 @@ Rails.application.configure do
   # and recreated between test runs. Don't rely on the data there!
 
   # Enabling caching of classes slows start-up time because all controllers
-  # are loaded at initalization, but it reduces memory and load because files
+  # are loaded at initialization, but it reduces memory and load because files
   # are not reloaded with every request. For example, caching is not necessary
   # for loading database migrations but useful for handling Knapsack specs.
   config.cache_classes = ENV['CACHE_CLASSES'] == 'true'
@@ -19,13 +19,8 @@ Rails.application.configure do
   # Configure static asset server for tests with Cache-Control for performance
   config.assets.compile = false if ENV['CI']
 
-  if Gitlab.rails5?
-    config.public_file_server.enabled = true
-    config.public_file_server.headers = { 'Cache-Control' => 'public, max-age=3600' }
-  else
-    config.serve_static_files = true
-    config.static_cache_control = "public, max-age=3600"
-  end
+  config.public_file_server.enabled = true
+  config.public_file_server.headers = { 'Cache-Control' => 'public, max-age=3600' }
 
   # Show full error reports and disable caching
   config.consider_all_requests_local       = true

@@ -78,12 +78,23 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
         expect(saved_project_json['releases']).not_to be_empty
       end
 
+      it 'has no author on releases' do
+        expect(saved_project_json['releases'].first['author']).to be_nil
+      end
+
+      it 'has the author ID on releases' do
+        expect(saved_project_json['releases'].first['author_id']).not_to be_nil
+      end
+
       it 'has issues' do
         expect(saved_project_json['issues']).not_to be_empty
       end
 
       it 'has issue comments' do
-        expect(saved_project_json['issues'].first['notes']).not_to be_empty
+        notes = saved_project_json['issues'].first['notes']
+
+        expect(notes).not_to be_empty
+        expect(notes.first['type']).to eq('DiscussionNote')
       end
 
       it 'has issue assignees' do
@@ -119,16 +130,16 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
       end
 
       it 'has pipeline stages' do
-        expect(saved_project_json.dig('pipelines', 0, 'stages')).not_to be_empty
+        expect(saved_project_json.dig('ci_pipelines', 0, 'stages')).not_to be_empty
       end
 
       it 'has pipeline statuses' do
-        expect(saved_project_json.dig('pipelines', 0, 'stages', 0, 'statuses')).not_to be_empty
+        expect(saved_project_json.dig('ci_pipelines', 0, 'stages', 0, 'statuses')).not_to be_empty
       end
 
       it 'has pipeline builds' do
         builds_count = saved_project_json
-          .dig('pipelines', 0, 'stages', 0, 'statuses')
+          .dig('ci_pipelines', 0, 'stages', 0, 'statuses')
           .count { |hash| hash['type'] == 'Ci::Build' }
 
         expect(builds_count).to eq(1)
@@ -142,11 +153,11 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
       end
 
       it 'has pipeline commits' do
-        expect(saved_project_json['pipelines']).not_to be_empty
+        expect(saved_project_json['ci_pipelines']).not_to be_empty
       end
 
       it 'has ci pipeline notes' do
-        expect(saved_project_json['pipelines'].first['notes']).not_to be_empty
+        expect(saved_project_json['ci_pipelines'].first['notes']).not_to be_empty
       end
 
       it 'has labels with no associations' do
@@ -291,7 +302,7 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
     create(:commit_status, project: project, pipeline: ci_build.pipeline)
 
     create(:milestone, project: project)
-    create(:note, noteable: issue, project: project)
+    create(:discussion_note, noteable: issue, project: project)
     create(:note, noteable: merge_request, project: project)
     create(:note, noteable: snippet, project: project)
     create(:note_on_commit,

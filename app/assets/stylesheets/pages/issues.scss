@@ -1,4 +1,18 @@
 .issues-list {
+  &.manual-ordering {
+    background-color: $gray-light;
+    border-radius: $border-radius-default;
+    padding: $gl-padding-8;
+
+    .issue {
+      background-color: $white-light;
+      margin-bottom: $gl-padding-8;
+      border-radius: $border-radius-default;
+      border: 1px solid $gray-100;
+      box-shadow: 0 1px 2px $issue-boards-card-shadow;
+    }
+  }
+
   .issue {
     padding: 10px 0 10px $gl-padding;
     position: relative;
@@ -58,8 +72,6 @@ form.edit-issue {
 }
 
 ul.related-merge-requests > li {
-  display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   align-items: center;
 
@@ -80,7 +92,6 @@ ul.related-merge-requests > li {
   }
 }
 
-.merge-requests-title,
 .related-branches-title {
   font-size: 16px;
   font-weight: $gl-font-weight-bold;
@@ -91,23 +102,16 @@ ul.related-merge-requests > li {
 }
 
 .merge-request-status {
-  font-size: 13px;
-  padding: 0 5px;
-  color: $white-light;
-  height: 20px;
-  border-radius: 3px;
-  line-height: 18px;
-
   &.merged {
-    background: $blue-500;
+    color: $blue-500;
   }
 
   &.closed {
-    background: $red-500;
+    color: $red-500;
   }
 
   &.open {
-    background: $green-500;
+    color: $green-500;
   }
 }
 
@@ -152,6 +156,19 @@ ul.related-merge-requests > li {
 .issue-form {
   .select2-container {
     width: 250px !important;
+  }
+}
+
+.issues-footer {
+  padding-top: $gl-padding;
+  padding-bottom: 37px;
+}
+
+.issues-nav-controls {
+  font-size: 0;
+
+  .btn-group:empty {
+    display: none;
   }
 }
 
@@ -255,8 +272,25 @@ ul.related-merge-requests > li {
   }
 }
 
-.discussion-reply-holder .note-edit-form {
-  display: block;
+.discussion-reply-holder {
+  .avatar-note-form-holder .note-edit-form {
+    display: block;
+    margin-left: $note-icon-gutter-width;
+
+    @include media-breakpoint-down(xs) {
+      margin-left: 0;
+    }
+  }
+}
+
+.issue-sort-dropdown {
+  .btn-group {
+    width: 100%;
+  }
+
+  .reverse-sort-btn {
+    color: $gl-text-color-secondary;
+  }
 }
 
 @include media-breakpoint-up(sm) {

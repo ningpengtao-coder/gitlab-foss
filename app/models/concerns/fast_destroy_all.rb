@@ -11,7 +11,7 @@
 # it is difficult to accomplish it.
 #
 # This module defines a format to use `delete_all` and delete associated external data.
-# Here is an exmaple
+# Here is an example
 #
 # Situation
 # - `Project` has many `Ci::BuildTraceChunk` through `Ci::Build`
@@ -70,13 +70,14 @@ module FastDestroyAll
 
   module Helpers
     extend ActiveSupport::Concern
+    include AfterCommitQueue
 
     class_methods do
       ##
       # This method is to be defined on models which have fast destroyable models as children,
       # and let us avoid to use `dependent: :destroy` hook
-      def use_fast_destroy(relation)
-        before_destroy(prepend: true) do
+      def use_fast_destroy(relation, opts = {})
+        set_callback :destroy, :before, opts.merge(prepend: true) do
           perform_fast_destroy(public_send(relation)) # rubocop:disable GitlabSecurity/PublicSend
         end
       end

@@ -79,7 +79,7 @@ module Gitlab
 
       def tree_entry(ref, path, limit = nil)
         if Pathname.new(path).cleanpath.to_s.start_with?('../')
-          # The TreeEntry RPC should return an empty reponse in this case but in
+          # The TreeEntry RPC should return an empty response in this case but in
           # Gitaly 0.107.0 and earlier we get an exception instead. This early return
           # saves us a Gitaly roundtrip while also avoiding the exception.
           return
@@ -150,6 +150,17 @@ module Gitlab
         GitalyClient.call(@repository.storage, :commit_service, :count_commits, request, timeout: GitalyClient.medium_timeout).count
       end
 
+      def diverging_commit_count(from, to, max_count:)
+        request = Gitaly::CountDivergingCommitsRequest.new(
+          repository: @gitaly_repo,
+          from: encode_binary(from),
+          to: encode_binary(to),
+          max_count: max_count
+        )
+        response = GitalyClient.call(@repository.storage, :commit_service, :count_diverging_commits, request, timeout: GitalyClient.medium_timeout)
+        [response.left_count, response.right_count]
+      end
+
       def list_last_commits_for_tree(revision, path, offset: 0, limit: 25)
         request = Gitaly::ListLastCommitsForTreeRequest.new(
           repository: @gitaly_repo,
@@ -163,7 +174,7 @@ module Gitlab
 
         response.each_with_object({}) do |gitaly_response, hsh|
           gitaly_response.commits.each do |commit_for_tree|
-            hsh[commit_for_tree.path] = Gitlab::Git::Commit.new(@repository, commit_for_tree.commit)
+            hsh[commit_for_tree.path_bytes] = Gitlab::Git::Commit.new(@repository, commit_for_tree.commit)
           end
         end
       end
@@ -260,26 +271,30 @@ module Gitlab
       end
 
       def find_commit(revision)
-        if Gitlab::SafeRequestStore.active?
-          # We don't use Gitlab::SafeRequestStore.fetch(key) { ... } directly
-          # because `revision` can be a branch name, so we can't use it as a key
-          # as it could point to another commit later on (happens a lot in
-          # tests).
-          key = {
-            storage: @gitaly_repo.storage_name,
-            relative_path: @gitaly_repo.relative_path,
-            commit_id: revision
-          }
-          return Gitlab::SafeRequestStore[key] if Gitlab::SafeRequestStore.exist?(key)
+        return call_find_commit(revision) unless Gitlab::SafeRequestStore.active?
 
-          commit = call_find_commit(revision)
-          return unless commit
+        # We don't use Gitlab::SafeRequestStore.fetch(key) { ... } directly
+        # because `revision` can be a branch name, so we can't use it as a key
+        # as it could point to another commit later on (happens a lot in
+        # tests).
+        key = {
+          storage: @gitaly_repo.storage_name,
+          relative_path: @gitaly_repo.relative_path,
+          commit_id: revision
+        }
+        return Gitlab::SafeRequestStore[key] if Gitlab::SafeRequestStore.exist?(key)
 
-          key[:commit_id] = commit.id
+        commit = call_find_commit(revision)
+
+        if GitalyClient.ref_name_caching_allowed?
           Gitlab::SafeRequestStore[key] = commit
-        else
-          call_find_commit(revision)
+          return commit
         end
+
+        return unless commit
+
+        key[:commit_id] = commit.id
+        Gitlab::SafeRequestStore[key] = commit
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

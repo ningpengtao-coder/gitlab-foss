@@ -1,10 +1,6 @@
 ---
-last_updated: 2018-11-19
-author: Marcia Ramos
-author_gitlab: marcia
-level: beginner
-article_type: user guide
-date: 2017-02-22
+last_updated: 2019-06-25
+type: concepts, reference, howto
 ---
 
 # GitLab Pages custom domains and SSL/TLS Certificates
@@ -19,14 +15,14 @@ To use one or more custom domain with your Pages site, there are two things
 you should consider first, which we'll cover in this guide:
 
 1. Either if you're adding a **root domain** or a **subdomain**, for which
-you'll need to set up [DNS records](#dns-records)
-1. Whether you want to add an [SSL/TLS certificate](#ssl-tls-certificates) or not
+   you'll need to set up [DNS records](#dns-records)
+1. Whether you want to add an [SSL/TLS certificate](#ssltls-certificates) or not
 
 To finish the association, you need to [add your domain to your project's Pages settings](#add-your-custom-domain-to-gitlab-pages-settings).
 
 Let's start from the beginning with [DNS records](#dns-records).
 If you already know how they work and want to skip the introduction to DNS,
-you may be interested in skipping it until the [TL;DR](#tl-dr) section below.
+you may be interested in skipping it until the [TL;DR](#tldr) section below.
 
 ### DNS Records
 
@@ -79,11 +75,14 @@ running on your instance).
 
 ![DNS A record pointing to GitLab.com Pages server](img/dns_add_new_a_record_example_updated_2018.png)
 
-NOTE: **Note:**
-Note that if you use your root domain for your GitLab Pages website **only**, and if
-your domain registrar supports this feature, you can add a DNS apex `CNAME`
-record instead of an `A` record. The main advantage of doing so is that when GitLab Pages
-IP on GitLab.com changes for whatever reason, you don't need to update your `A` record.
+CAUTION: **Caution:**
+Note that if you use your root domain for your GitLab Pages website
+**only**, and if your domain registrar supports this feature, you can
+add a DNS apex `CNAME` record instead of an `A` record. The main
+advantage of doing so is that when GitLab Pages IP on GitLab.com
+changes for whatever reason, you don't need to update your `A` record.
+There may be a few exceptions, but **this method is not recommended**
+as it most likely won't work if you set an `MX` record for your root domain.
 
 #### DNS CNAME record
 
@@ -93,7 +92,7 @@ you need to log into your domain's admin control panel and add a DNS
 `CNAME` record pointing your subdomain to your website URL
 (`namespace.gitlab.io`) address.
 
-Notice that, despite it's a user or project website, the `CNAME`
+Note that, whether it's a user or a project website, the `CNAME`
 should point to your Pages domain (`namespace.gitlab.io`),
 without any `/project-name`.
 
@@ -112,16 +111,20 @@ If using a [DNS A record](#dns-a-record), you can place the TXT record directly
 under the domain. If using a [DNS CNAME record](#dns-cname-record), the two record types won't
 co-exist, so you need to place the TXT record in a special subdomain of its own.
 
+If the domain cannot be verified for 7 days, it will be removed from the GitLab project.
+
 #### TL;DR
 
-If the domain has multiple uses (e.g., you host email on it as well):
+For root domains (`domain.com`), set a DNS `A` record and verify your
+domain's ownership with a TXT record:
 
 | From | DNS Record | To |
 | ---- | ---------- | -- |
 | domain.com | A | 35.185.44.232 |
 | domain.com | TXT | gitlab-pages-verification-code=00112233445566778899aabbccddeeff |
 
-If the domain is dedicated to GitLab Pages use and no other services run on it:
+For subdomains (`subdomain.domain.com`), set a DNS `CNAME` record and
+verify your domain's ownership with a TXT record:
 
 | From | DNS Record | To |
 | ---- | ---------- | -- |
@@ -131,20 +134,20 @@ If the domain is dedicated to GitLab Pages use and no other services run on it:
 > **Notes**:
 >
 > - **Do not** use a CNAME record if you want to point your
-`domain.com` to your GitLab Pages site. Use an `A` record instead.
+  `domain.com` to your GitLab Pages site. Use an `A` record instead.
 > - **Do not** add any special chars after the default Pages
-domain. E.g., **do not** point your `subdomain.domain.com` to
-`namespace.gitlab.io.` or `namespace.gitlab.io/`.
-> - GitLab Pages IP on GitLab.com [was changed](https://about.gitlab.com/2017/03/06/we-are-changing-the-ip-of-gitlab-pages-on-gitlab-com/) in 2017
+  domain. E.g., **do not** point your `subdomain.domain.com` to
+  `namespace.gitlab.io.` or `namespace.gitlab.io/`.
+> - GitLab Pages IP on GitLab.com [was changed](https://about.gitlab.com/2017/03/06/we-are-changing-the-ip-of-gitlab-pages-on-gitlab-com/) in 2017.
 > - GitLab Pages IP on GitLab.com [has been changed](https://about.gitlab.com/2018/07/19/gcp-move-update/#gitlab-pages-and-custom-domains)
-from `52.167.214.135` to `35.185.44.232` in 2018
+  from `52.167.214.135` to `35.185.44.232` in 2018.
 
 ### Add your custom domain to GitLab Pages settings
 
 Once you've set the DNS record, you'll need navigate to your project's
 **Setting > Pages** and click **+ New domain** to add your custom domain to
-GitLab Pages. You can choose whether to add an [SSL/TLS certificate](#ssl-tls-certificates)
-to make your website accessible under HTTPS or leave it blank. If don't add a certificate,
+GitLab Pages. You can choose whether to add an [SSL/TLS certificate](#ssltls-certificates)
+to make your website accessible under HTTPS or leave it blank. If you don't add a certificate,
 your site will be accessible only via HTTP:
 
 ![Add new domain](img/add_certificate_to_pages.png)
@@ -169,9 +172,6 @@ From that page, you can view, add, and remove them.
 Note that [DNS propagation may take some time (up to 24h)](http://www.inmotionhosting.com/support/domain-names/dns-nameserver-changes/domain-names-dns-changes),
 although it's usually a matter of minutes to complete. Until it does, verification
 will fail and attempts to visit your domain will respond with a 404.
-
-Read through the [general documentation on GitLab Pages](introduction.md#add-a-custom-domain-to-your-pages-website) to learn more about adding
-custom domains to GitLab Pages sites.
 
 ### Redirecting `www.domain.com` to `domain.com` with Cloudflare
 
@@ -199,7 +199,7 @@ Certificates are NOT required to add to your custom
 highly recommendable.
 
 Let's start with an introduction to the importance of HTTPS.
-Alternatively, jump ahead to [adding certificates to your project](#adding-certificates-to-your-project).
+Alternatively, jump ahead to [adding certificates to your project](#adding-certificates-to-pages).
 
 ### Why should I care about HTTPS?
 
@@ -234,71 +234,81 @@ reiterating the importance of HTTPS.
 
 ## Issuing Certificates
 
-GitLab Pages accepts [PEM](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx) certificates issued by
-[Certificate Authorities (CA)](https://en.wikipedia.org/wiki/Certificate_authority)
-and self-signed certificates. Of course,
-[you'd rather issue a certificate than generate a self-signed](https://en.wikipedia.org/wiki/Self-signed_certificate),
-for security reasons and for having browsers trusting your
-site's certificate.
+GitLab Pages accepts certificates provided in the [PEM](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx) format, issued by
+[Certificate Authorities (CAs)](https://en.wikipedia.org/wiki/Certificate_authority) or as
+[self-signed certificates](https://en.wikipedia.org/wiki/Self-signed_certificate). Note that [self-signed certificates are typically not used](https://securingtomorrow.mcafee.com/other-blogs/mcafee-labs/self-signed-certificates-secure-so-why-ban/)
+for public websites for security reasons and to ensure that browsers trust your site's certificate.
 
-There are several different kinds of certificates, each one
-with certain security level. A static personal website will
+There are various kinds of certificates, each one
+with a certain security level. A static personal website will
 not require the same security level as an online banking web app,
-for instance. There are a couple Certificate Authorities that
+for instance.
+
+There are some certificate authorities that
 offer free certificates, aiming to make the internet more secure
 to everyone. The most popular is [Let's Encrypt](https://letsencrypt.org/),
 which issues certificates trusted by most of browsers, it's open
-source, and free to use. Please read through this tutorial to
-understand [how to secure your GitLab Pages website with Let's Encrypt](https://about.gitlab.com/2016/04/11/tutorial-securing-your-gitlab-pages-with-tls-and-letsencrypt/).
+source, and free to use. See our tutorial on [how to secure your GitLab Pages website with Let's Encrypt](lets_encrypt_for_gitlab_pages.md).
 
-With the same popularity, there are [certificates issued by CloudFlare](https://www.cloudflare.com/ssl/),
+Similarly popular are [certificates issued by CloudFlare](https://www.cloudflare.com/ssl/),
 which also offers a [free CDN service](https://blog.cloudflare.com/cloudflares-free-cdn-and-you/).
-Their certs are valid up to 15 years. Read through the tutorial on
+Their certs are valid up to 15 years. See the tutorial on
 [how to add a CloudFlare Certificate to your GitLab Pages website](https://about.gitlab.com/2017/02/07/setting-up-gitlab-pages-with-cloudflare-certificates/).
 
-### Adding certificates to your project
+### Adding certificates to Pages
 
 Regardless the CA you choose, the steps to add your certificate to
 your Pages project are the same.
 
-### What do you need
+#### Requirements
 
 1. A PEM certificate
 1. An intermediate certificate
-1. A public key
+1. A private key
 
 ![Pages project - adding certificates](img/add_certificate_to_pages.png)
 
 These fields are found under your **Project**'s **Settings** > **Pages** > **New Domain**.
 
-### What's what?
+#### Certificate types
 
 - A PEM certificate is the certificate generated by the CA,
-which needs to be added to the field **Certificate (PEM)**.
+  which needs to be added to the field **Certificate (PEM)**.
 - An [intermediate certificate](https://en.wikipedia.org/wiki/Intermediate_certificate_authority) (aka "root certificate") is
-the part of the encryption keychain that identifies the CA.
-Usually it's combined with the PEM certificate, but there are
-some cases in which you need to add them manually.
-[CloudFlare certs](https://about.gitlab.com/2017/02/07/setting-up-gitlab-pages-with-cloudflare-certificates/)
-are one of these cases.
-- A public key is an encrypted key which validates
-your PEM against your domain.
+  the part of the encryption keychain that identifies the CA.
+  Usually it's combined with the PEM certificate, but there are
+  some cases in which you need to add them manually.
+  [CloudFlare certs](https://about.gitlab.com/2017/02/07/setting-up-gitlab-pages-with-cloudflare-certificates/)
+  are one of these cases.
+- A private key is an encrypted key which validates
+  your PEM against your domain.
 
-### Now what?
+#### Add the certificate to your project
 
-Now that you hopefully understand why you need all
-of this, it's simple:
+Once you've met the requirements:
 
-- Your PEM certificate needs to be added to the first field
+- Your PEM certificate needs to be added to the first field.
 - If your certificate is missing its intermediate, copy
-and paste the root certificate (usually available from your CA website)
-and paste it in the [same field as your PEM certificate](https://about.gitlab.com/2017/02/07/setting-up-gitlab-pages-with-cloudflare-certificates/),
-just jumping a line between them.
-- Copy your public key and paste it in the last field
+  and paste the root certificate (usually available from your CA website)
+  and paste it in the [same field as your PEM certificate](https://about.gitlab.com/2017/02/07/setting-up-gitlab-pages-with-cloudflare-certificates/),
+  just jumping a line between them.
+- Copy your private key and paste it in the last field.
 
->**Note:**
+NOTE: **Note:**
 **Do not** open certificates or encryption keys in
 regular text editors. Always use code editors (such as
 Sublime Text, Atom, Dreamweaver, Brackets, etc).
 
-_Read on about [Creating and Tweaking GitLab CI/CD for GitLab Pages](getting_started_part_four.md)_
+## Force HTTPS for GitLab Pages websites
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/28857) in GitLab 10.7.
+
+To make your website's visitors even more secure, you can choose to
+force HTTPS for GitLab Pages. By doing so, all attempts to visit your
+website via HTTP will be automatically redirected to HTTPS via 301.
+
+It works with both GitLab's default domain and with your custom
+domain (as long as you've set a valid certificate for it).
+
+To enable this setting, navigate to your project's **Settings > Pages**
+and tick the checkbox **Force HTTPS (requires valid certificates)**.

@@ -1,12 +1,11 @@
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import DiffTableCell from './diff_table_cell.vue';
 import {
   NEW_LINE_TYPE,
   OLD_LINE_TYPE,
   CONTEXT_LINE_TYPE,
   CONTEXT_LINE_CLASS_NAME,
-  PARALLEL_DIFF_VIEW_TYPE,
   LINE_POSITION_LEFT,
   LINE_POSITION_RIGHT,
 } from '../constants';
@@ -40,16 +39,21 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('diffs', ['isInlineView']),
+    ...mapState({
+      isHighlighted(state) {
+        return this.line.line_code !== null && this.line.line_code === state.diffs.highlightedRow;
+      },
+    }),
     isContextLine() {
       return this.line.type === CONTEXT_LINE_TYPE;
     },
     classNameMap() {
-      return {
-        [this.line.type]: this.line.type,
-        [CONTEXT_LINE_CLASS_NAME]: this.isContextLine,
-        [PARALLEL_DIFF_VIEW_TYPE]: this.isParallelView,
-      };
+      return [
+        this.line.type,
+        {
+          [CONTEXT_LINE_CLASS_NAME]: this.isContextLine,
+        },
+      ];
     },
     inlineRowId() {
       return this.line.line_code || `${this.fileHash}_${this.line.old_line}_${this.line.new_line}`;
@@ -91,6 +95,7 @@ export default {
       :is-bottom="isBottom"
       :is-hover="isHover"
       :show-comment-button="true"
+      :is-highlighted="isHighlighted"
       class="diff-line-num old_line"
     />
     <diff-table-cell
@@ -100,8 +105,18 @@ export default {
       :line-type="newLineType"
       :is-bottom="isBottom"
       :is-hover="isHover"
+      :is-highlighted="isHighlighted"
       class="diff-line-num new_line qa-new-diff-line"
     />
-    <td :class="line.type" class="line_content" v-html="line.rich_text"></td>
+    <td
+      :class="[
+        line.type,
+        {
+          hll: isHighlighted,
+        },
+      ]"
+      class="line_content"
+      v-html="line.rich_text"
+    ></td>
   </tr>
 </template>

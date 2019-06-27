@@ -4,54 +4,45 @@ comments: false
 
 # Getting Started
 
-----------
-
 ## Instantiating Repositories
 
-* Create a new repository by instantiating it through
+- Create a new repository by instantiating it through:
 
     ```bash
     git init
     ```
-* Copy an existing project by cloning the repository through
+- Copy an existing project by cloning the repository through:
 
     ```bash
     git clone <url>
     ```
 
-----------
-
 ## Central Repos
 
-* To instantiate a central repository a `--bare` flag is required.
-* Bare repositories don't allow file editing or committing changes.
-* Create a bare repo with
+- To instantiate a central repository a `--bare` flag is required.
+- Bare repositories don't allow file editing or committing changes.
+- Create a bare repo with:
 
     ```bash
     git init --bare project-name.git
     ```
 
-----------
-
 ## Instantiate workflow with clone
 
 1. Create a project in your user namespace.
-  - Choose to import from 'Any Repo by URL' and use <https://gitlab.com/gitlab-org/training-examples.git>.
+   - Choose to import from 'Any Repo by URL' and use <https://gitlab.com/gitlab-org/training-examples.git>.
 1. Create a '`Workspace`' directory in your home directory.
 1. Clone the '`training-examples`' project.
 
-----------
-
 ## Commands
 
-```
+```sh
 mkdir ~/workspace
 cd ~/workspace
 
 git clone git@gitlab.example.com:<username>/training-examples.git
 cd training-examples
 ```
-----------
 
 ## Git concepts
 
@@ -67,8 +58,6 @@ Files that have been modified but are not committed.
 
 Modified files that have been marked to go in the next commit.
 
-----------
-
 ## Committing Workflow
 
 1. Edit '`edit_this_file.rb`' in '`training-examples`'
@@ -79,11 +68,9 @@ Modified files that have been marked to go in the next commit.
 1. Push the commit to the remote
 1. View the git log
 
-----------
-
 ## Commands
 
-```
+```sh
 # Edit `edit_this_file.rb`
 git status
 git diff
@@ -93,9 +80,7 @@ git push origin master
 git log
 ```
 
-----------
-
 ## Note
 
-* git fetch vs pull
-* Pull is git fetch + git merge
+- git fetch vs pull
+- Pull is git fetch + git merge

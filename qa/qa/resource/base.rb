@@ -15,42 +15,6 @@ module QA
 
       def_delegators :evaluator, :attribute
 
-      def fabricate!(*_args)
-        raise NotImplementedError
-      end
-
-      def visit!
-        visit(web_url)
-      end
-
-      def populate(*attributes)
-        attributes.each(&method(:public_send))
-      end
-
-      private
-
-      def populate_attribute(name, block)
-        value = attribute_value(name, block)
-
-        raise NoValueError, "No value was computed for #{name} of #{self.class.name}." unless value
-
-        value
-      end
-
-      def attribute_value(name, block)
-        api_value = api_resource&.dig(name)
-
-        if api_value && block
-          log_having_both_api_result_and_block(name, api_value)
-        end
-
-        api_value || (block && instance_exec(&block))
-      end
-
-      def log_having_both_api_result_and_block(name, api_value)
-        QA::Runtime::Logger.info "<#{self.class}> Attribute #{name.inspect} has both API response `#{api_value}` and a block. API response will be picked. Block will be ignored."
-      end
-
       def self.fabricate!(*args, &prepare_block)
         fabricate_via_api!(*args, &prepare_block)
       rescue NotImplementedError
@@ -81,6 +45,46 @@ module QA
         do_fabricate!(resource: resource, prepare_block: prepare_block, parents: parents) do
           log_fabrication(:api, resource, parents, args) { resource.fabricate_via_api! }
         end
+      end
+
+      def fabricate!(*_args)
+        raise NotImplementedError
+      end
+
+      def visit!
+        visit(web_url)
+      end
+
+      def populate(*attributes)
+        attributes.each(&method(:public_send))
+      end
+
+      def wait(max: 60, interval: 0.1)
+        QA::Support::Waiter.wait(max: max, interval: interval)
+      end
+
+      private
+
+      def populate_attribute(name, block)
+        value = attribute_value(name, block)
+
+        raise NoValueError, "No value was computed for #{name} of #{self.class.name}." unless value
+
+        value
+      end
+
+      def attribute_value(name, block)
+        api_value = api_resource&.dig(name)
+
+        if api_value && block
+          log_having_both_api_result_and_block(name, api_value)
+        end
+
+        api_value || (block && instance_exec(&block))
+      end
+
+      def log_having_both_api_result_and_block(name, api_value)
+        QA::Runtime::Logger.info "<#{self.class}> Attribute #{name.inspect} has both API response `#{api_value}` and a block. API response will be picked. Block will be ignored."
       end
 
       def self.do_fabricate!(resource:, prepare_block:, parents: [])
@@ -116,27 +120,13 @@ module QA
       end
       private_class_method :evaluator
 
-      def self.dynamic_attributes
-        const_get(:DynamicAttributes)
-      rescue NameError
-        mod = const_set(:DynamicAttributes, Module.new)
-
-        include mod
-
-        mod
-      end
-
-      def self.attributes_names
-        dynamic_attributes.instance_methods(false).sort.grep_v(/=$/)
-      end
-
       class DSL
         def initialize(base)
           @base = base
         end
 
         def attribute(name, &block)
-          @base.dynamic_attributes.module_eval do
+          @base.module_eval do
             attr_writer(name)
 
             define_method(name) do

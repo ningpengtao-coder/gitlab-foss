@@ -6,11 +6,7 @@ module QA
       module Issue
         class Show < Page::Base
           include Page::Component::Issuable::Common
-
-          view 'app/views/shared/notes/_form.html.haml' do
-            element :new_note_form, 'new-note' # rubocop:disable QA/ElementWithPattern
-            element :new_note_form, 'attr: :note' # rubocop:disable QA/ElementWithPattern
-          end
+          include Page::Component::Note
 
           view 'app/assets/javascripts/notes/components/comment_form.vue' do
             element :comment_button
@@ -22,9 +18,29 @@ module QA
             element :filter_options
           end
 
+          view 'app/assets/javascripts/notes/components/noteable_note.vue' do
+            element :noteable_note_item
+          end
+
+          view 'app/helpers/dropdowns_helper.rb' do
+            element :dropdown_input_field
+          end
+
+          view 'app/views/shared/notes/_form.html.haml' do
+            element :new_note_form, 'new-note' # rubocop:disable QA/ElementWithPattern
+            element :new_note_form, 'attr: :note' # rubocop:disable QA/ElementWithPattern
+          end
+
+          view 'app/views/shared/issuable/_sidebar.html.haml' do
+            element :labels_block
+            element :edit_link_labels
+            element :dropdown_menu_labels
+          end
+
           # Adds a comment to an issue
           # attachment option should be an absolute path
-          def comment(text, attachment: nil)
+          def comment(text, attachment: nil, filter: :all_activities)
+            method("select_#{filter}_filter").call
             fill_element :comment_input, text
 
             unless attachment.nil?
@@ -35,19 +51,54 @@ module QA
             click_element :comment_button
           end
 
-          def select_comments_only_filter
-            click_element :discussion_filter
-            all_elements(:filter_options)[1].click
-          end
-
-          def select_history_only_filter
-            click_element :discussion_filter
-            all_elements(:filter_options).last.click
+          def has_comment?(comment_text)
+            wait(reload: false) do
+              has_element?(:noteable_note_item, text: comment_text)
+            end
           end
 
           def select_all_activities_filter
-            click_element :discussion_filter
-            all_elements(:filter_options).first.click
+            select_filter_with_text('Show all activity')
+          end
+
+          def select_comments_only_filter
+            select_filter_with_text('Show comments only')
+          end
+
+          def select_history_only_filter
+            select_filter_with_text('Show history only')
+          end
+
+          def select_labels_and_refresh(labels)
+            click_element(:edit_link_labels)
+
+            labels.each do |label|
+              within_element(:dropdown_menu_labels, text: label) do
+                send_keys_to_element(:dropdown_input_field, [label, :enter])
+              end
+            end
+
+            click_body
+
+            labels.each do |label|
+              has_element?(:labels_block, text: label)
+            end
+
+            refresh
+          end
+
+          def text_of_labels_block
+            find_element(:labels_block)
+          end
+
+          private
+
+          def select_filter_with_text(text)
+            retry_on_exception do
+              click_body
+              click_element :discussion_filter
+              find_element(:filter_options, text: text).click
+            end
           end
         end
       end

@@ -2,12 +2,19 @@
 
 class GroupsController < Groups::ApplicationController
   include API::Helpers::RelatedResourcesHelpers
-  include IssuesAction
-  include MergeRequestsAction
+  include IssuableCollectionsAction
   include ParamsBackwardCompatibility
   include PreviewMarkdown
+  include RecordUserLastActivity
+
+  before_action do
+    push_frontend_feature_flag(:manual_sorting)
+  end
 
   respond_to :html
+
+  prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
+  prepend_before_action(only: [:issues_calendar]) { authenticate_sessionless_user!(:ics) }
 
   before_action :authenticate_user!, only: [:new, :create]
   before_action :group, except: [:index, :new, :create]
@@ -55,11 +62,24 @@ class GroupsController < Groups::ApplicationController
 
   def show
     respond_to do |format|
-      format.html
+      format.html do
+        render_show_html
+      end
 
       format.atom do
-        load_events
-        render layout: 'xml.atom'
+        render_details_view_atom
+      end
+    end
+  end
+
+  def details
+    respond_to do |format|
+      format.html do
+        render_details_html
+      end
+
+      format.atom do
+        render_details_view_atom
       end
     end
   end
@@ -108,13 +128,26 @@ class GroupsController < Groups::ApplicationController
       flash[:notice] = "Group '#{@group.name}' was successfully transferred."
       redirect_to group_path(@group)
     else
-      flash.now[:alert] = service.error
-      render :edit
+      flash[:alert] = service.error
+      redirect_to edit_group_path(@group)
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
   protected
+
+  def render_show_html
+    render 'groups/show'
+  end
+
+  def render_details_html
+    render 'groups/show'
+  end
+
+  def render_details_view_atom
+    load_events
+    render layout: 'xml.atom', template: 'groups/show'
+  end
 
   # rubocop: disable CodeReuse/ActiveRecord
   def authorize_create_group!
@@ -158,7 +191,8 @@ class GroupsController < Groups::ApplicationController
       :create_chat_team,
       :chat_team_name,
       :require_two_factor_authentication,
-      :two_factor_grace_period
+      :two_factor_grace_period,
+      :project_creation_level
     ]
   end
 
@@ -175,8 +209,8 @@ class GroupsController < Groups::ApplicationController
                   .includes(:namespace)
 
     @events = EventCollection
-      .new(@projects, offset: params[:offset].to_i, filter: event_filter)
-      .to_a
+                .new(@projects, offset: params[:offset].to_i, filter: event_filter)
+                .to_a
 
     Events::RenderService
       .new(current_user)

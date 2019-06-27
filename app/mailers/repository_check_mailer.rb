@@ -2,6 +2,10 @@
 
 class RepositoryCheckMailer < BaseMailer
   # rubocop: disable CodeReuse/ActiveRecord
+  layout 'empty_mailer'
+
+  helper EmailsHelper
+
   def notify(failed_count)
     @message =
       if failed_count == 1
@@ -11,7 +15,7 @@ class RepositoryCheckMailer < BaseMailer
       end
 
     mail(
-      to: User.admins.pluck(:email),
+      to: User.admins.active.pluck(:email),
       subject: "GitLab Admin | #{@message}"
     )
   end

@@ -26,12 +26,7 @@ describe 'User updates wiki page' do
       end
 
       it 'updates a page that has a path', :js do
-        click_on('New page')
-
-        page.within('#modal-new-wiki') do
-          fill_in(:new_wiki_path, with: 'one/two/three-test')
-          click_on('Create page')
-        end
+        fill_in(:wiki_title, with: 'one/two/three-test')
 
         page.within '.wiki-form' do
           fill_in(:wiki_content, with: 'wiki content')
@@ -39,11 +34,11 @@ describe 'User updates wiki page' do
         end
 
         expect(current_path).to include('one/two/three-test')
-        expect(find('.wiki-pages')).to have_content('Three')
+        expect(find('.wiki-pages')).to have_content('three')
 
-        first(:link, text: 'Three').click
+        first(:link, text: 'three').click
 
-        expect(find('.nav-text')).to have_content('Three')
+        expect(find('.nav-text')).to have_content('three')
 
         click_on('Edit')
 

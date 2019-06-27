@@ -5,6 +5,8 @@ class SearchController < ApplicationController
   include SearchHelper
   include RendersCommits
 
+  around_action :allow_gitaly_ref_name_caching
+
   skip_before_action :authenticate_user!
   requires_cross_project_access if: -> do
     search_term_present = params[:search].present? || params[:term].present?
@@ -14,8 +16,6 @@ class SearchController < ApplicationController
   layout 'search'
 
   def show
-    search_service = SearchService.new(current_user, params)
-
     @project = search_service.project
     @group = search_service.group
 
@@ -29,6 +29,7 @@ class SearchController < ApplicationController
     @search_objects = search_service.search_objects
 
     render_commits if @scope == 'commits'
+    eager_load_user_status if @scope == 'users'
 
     check_single_commit_result
   end
@@ -52,6 +53,12 @@ class SearchController < ApplicationController
 
   def render_commits
     @search_objects = prepare_commits_for_rendering(@search_objects)
+  end
+
+  def eager_load_user_status
+    return if Feature.disabled?(:users_search, default_enabled: true)
+
+    @search_objects = @search_objects.eager_load(:status) # rubocop:disable CodeReuse/ActiveRecord
   end
 
   def check_single_commit_result

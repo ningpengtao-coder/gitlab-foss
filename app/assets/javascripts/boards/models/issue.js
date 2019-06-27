@@ -4,7 +4,8 @@
 /* global ListAssignee */
 
 import Vue from 'vue';
-import '~/vue_shared/models/label';
+import './label';
+import { isEE, convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import IssueProject from './project';
 import boardsStore from '../stores/boards_store';
 
@@ -28,7 +29,6 @@ class ListIssue {
     this.referencePath = obj.reference_path;
     this.path = obj.real_path;
     this.toggleSubscriptionEndpoint = obj.toggle_subscription_endpoint;
-    this.milestone_id = obj.milestone_id;
     this.project_id = obj.project_id;
     this.timeEstimate = obj.time_estimate;
     this.assignableLabelsEndpoint = obj.assignable_labels_endpoint;
@@ -39,6 +39,7 @@ class ListIssue {
 
     if (obj.milestone) {
       this.milestone = new ListMilestone(obj.milestone);
+      this.milestone_id = obj.milestone.id;
     }
 
     obj.labels.forEach(label => {
@@ -55,12 +56,12 @@ class ListIssue {
   }
 
   findLabel(findLabel) {
-    return this.labels.filter(label => label.title === findLabel.title)[0];
+    return this.labels.find(label => label.id === findLabel.id);
   }
 
   removeLabel(removeLabel) {
     if (removeLabel) {
-      this.labels = this.labels.filter(label => removeLabel.title !== label.title);
+      this.labels = this.labels.filter(label => removeLabel.id !== label.id);
     }
   }
 
@@ -75,7 +76,7 @@ class ListIssue {
   }
 
   findAssignee(findAssignee) {
-    return this.assignees.filter(assignee => assignee.id === findAssignee.id)[0];
+    return this.assignees.find(assignee => assignee.id === findAssignee.id);
   }
 
   removeAssignee(removeAssignee) {
@@ -86,6 +87,19 @@ class ListIssue {
 
   removeAllAssignees() {
     this.assignees = [];
+  }
+
+  addMilestone(milestone) {
+    const miletoneId = this.milestone ? this.milestone.id : null;
+    if (isEE && milestone.id !== miletoneId) {
+      this.milestone = new ListMilestone(milestone);
+    }
+  }
+
+  removeMilestone(removeMilestone) {
+    if (isEE && removeMilestone && removeMilestone.id === this.milestone.id) {
+      this.milestone = {};
+    }
   }
 
   getLists() {
@@ -119,7 +133,17 @@ class ListIssue {
     }
 
     const projectPath = this.project ? this.project.path : '';
-    return Vue.http.patch(`${this.path}.json`, data);
+    return Vue.http.patch(`${this.path}.json`, data).then(({ body = {} } = {}) => {
+      /**
+       * Since post implementation of Scoped labels, server can reject
+       * same key-ed labels. To keep the UI and server Model consistent,
+       * we're just assigning labels that server echo's back to us when we
+       * PATCH the said object.
+       */
+      if (body) {
+        this.labels = convertObjectPropsToCamelCase(body.labels, { deep: true });
+      }
+    });
   }
 }
 

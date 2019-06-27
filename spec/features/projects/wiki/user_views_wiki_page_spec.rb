@@ -22,12 +22,7 @@ describe 'User views a wiki page' do
       visit(project_wikis_path(project))
       click_link "Create your first page"
 
-      click_on('New page')
-
-      page.within('#modal-new-wiki') do
-        fill_in(:new_wiki_path, with: 'one/two/three-test')
-        click_on('Create page')
-      end
+      fill_in(:wiki_title, with: 'one/two/three-test')
 
       page.within('.wiki-form') do
         fill_in(:wiki_content, with: 'wiki content')
@@ -38,7 +33,7 @@ describe 'User views a wiki page' do
     it 'shows the history of a page that has a path', :js do
       expect(current_path).to include('one/two/three-test')
 
-      first(:link, text: 'Three').click
+      first(:link, text: 'three').click
       click_on('Page history')
 
       expect(current_path).to include('one/two/three-test')
@@ -50,11 +45,11 @@ describe 'User views a wiki page' do
 
     it 'shows an old version of a page', :js do
       expect(current_path).to include('one/two/three-test')
-      expect(find('.wiki-pages')).to have_content('Three')
+      expect(find('.wiki-pages')).to have_content('three')
 
-      first(:link, text: 'Three').click
+      first(:link, text: 'three').click
 
-      expect(find('.nav-text')).to have_content('Three')
+      expect(find('.nav-text')).to have_content('three')
 
       click_on('Edit')
 

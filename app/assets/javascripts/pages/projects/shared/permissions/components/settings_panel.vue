@@ -175,11 +175,6 @@ export default {
       if (value === 0) toggleHiddenClassBySelector('.merge-requests-feature', true);
       else if (oldValue === 0) toggleHiddenClassBySelector('.merge-requests-feature', false);
     },
-
-    buildsAccessLevel(value, oldValue) {
-      if (value === 0) toggleHiddenClassBySelector('.builds-feature', true);
-      else if (oldValue === 0) toggleHiddenClassBySelector('.builds-feature', false);
-    },
   },
 
   methods: {
@@ -325,8 +320,8 @@ export default {
       <project-setting-row
         v-if="pagesAvailable && pagesAccessControlEnabled"
         :help-path="pagesHelpPath"
-        label="Pages"
-        help-text="Static website for the project."
+        label="Pages access control"
+        help-text="Access control for the project's static website"
       >
         <project-feature-setting
           v-model="pagesAccessLevel"

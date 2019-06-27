@@ -27,6 +27,10 @@ module Gitlab
       config['adapter']
     end
 
+    def self.human_adapter_name
+      postgresql? ? 'PostgreSQL' : 'MySQL'
+    end
+
     def self.mysql?
       adapter_name.casecmp('mysql2').zero?
     end
@@ -76,7 +80,7 @@ module Gitlab
       postgresql? && version.to_f >= 9.4
     end
 
-    def self.pg_stat_wal_receiver_supported?
+    def self.postgresql_minimum_supported_version?
       postgresql? && version.to_f >= 9.6
     end
 
@@ -96,6 +100,10 @@ module Gitlab
 
     def self.pg_last_wal_replay_lsn
       Gitlab::Database.postgresql_9_or_less? ? 'pg_last_xlog_replay_location' : 'pg_last_wal_replay_lsn'
+    end
+
+    def self.pg_last_xact_replay_timestamp
+      'pg_last_xact_replay_timestamp'
     end
 
     def self.nulls_last_order(field, direction = 'ASC')
@@ -226,20 +234,15 @@ module Gitlab
     def self.connection
       ActiveRecord::Base.connection
     end
+    private_class_method :connection
 
     def self.cached_column_exists?(table_name, column_name)
       connection.schema_cache.columns_hash(table_name).has_key?(column_name.to_s)
     end
 
     def self.cached_table_exists?(table_name)
-      if Gitlab.rails5?
-        connection.schema_cache.data_source_exists?(table_name)
-      else
-        connection.schema_cache.table_exists?(table_name)
-      end
+      connection.schema_cache.data_source_exists?(table_name)
     end
-
-    private_class_method :connection
 
     def self.database_version
       row = connection.execute("SELECT VERSION()").first
@@ -268,5 +271,20 @@ module Gitlab
         end
       end
     end
+
+    # inside_transaction? will return true if the caller is running within a transaction. Handles special cases
+    # when running inside a test environment, in which the entire test is running with a DatabaseCleaner transaction
+    def self.inside_transaction?
+      ActiveRecord::Base.connection.open_transactions > open_transactions_baseline
+    end
+
+    def self.open_transactions_baseline
+      if ::Rails.env.test?
+        return DatabaseCleaner.connections.count { |conn| conn.strategy.is_a?(DatabaseCleaner::ActiveRecord::Transaction) }
+      end
+
+      0
+    end
+    private_class_method :open_transactions_baseline
   end
 end

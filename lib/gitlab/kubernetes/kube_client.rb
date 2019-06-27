@@ -46,6 +46,7 @@ module Gitlab
         :create_secret,
         :create_service_account,
         :update_config_map,
+        :update_secret,
         :update_service_account,
         to: :core_client
 
@@ -75,12 +76,79 @@ module Gitlab
 
       attr_reader :api_prefix, :kubeclient_options
 
+      # We disable redirects through 'http_max_redirects: 0',
+      # so that KubeClient does not follow redirects and
+      # expose internal services.
       def initialize(api_prefix, **kubeclient_options)
         @api_prefix = api_prefix
-        @kubeclient_options = kubeclient_options
+        @kubeclient_options = kubeclient_options.merge(http_max_redirects: 0)
+
+        validate_url!
+      end
+
+      def create_or_update_cluster_role_binding(resource)
+        if cluster_role_binding_exists?(resource)
+          update_cluster_role_binding(resource)
+        else
+          create_cluster_role_binding(resource)
+        end
+      end
+
+      def create_or_update_role_binding(resource)
+        if role_binding_exists?(resource)
+          update_role_binding(resource)
+        else
+          create_role_binding(resource)
+        end
+      end
+
+      def create_or_update_service_account(resource)
+        if service_account_exists?(resource)
+          update_service_account(resource)
+        else
+          create_service_account(resource)
+        end
+      end
+
+      def create_or_update_secret(resource)
+        if secret_exists?(resource)
+          update_secret(resource)
+        else
+          create_secret(resource)
+        end
       end
 
       private
+
+      def validate_url!
+        return if Gitlab::CurrentSettings.allow_local_requests_from_hooks_and_services?
+
+        Gitlab::UrlBlocker.validate!(api_prefix, allow_local_network: false)
+      end
+
+      def cluster_role_binding_exists?(resource)
+        get_cluster_role_binding(resource.metadata.name)
+      rescue ::Kubeclient::ResourceNotFoundError
+        false
+      end
+
+      def role_binding_exists?(resource)
+        get_role_binding(resource.metadata.name, resource.metadata.namespace)
+      rescue ::Kubeclient::ResourceNotFoundError
+        false
+      end
+
+      def service_account_exists?(resource)
+        get_service_account(resource.metadata.name, resource.metadata.namespace)
+      rescue ::Kubeclient::ResourceNotFoundError
+        false
+      end
+
+      def secret_exists?(resource)
+        get_secret(resource.metadata.name, resource.metadata.namespace)
+      rescue ::Kubeclient::ResourceNotFoundError
+        false
+      end
 
       def build_kubeclient(api_group, api_version)
         ::Kubeclient::Client.new(

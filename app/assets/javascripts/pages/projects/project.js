@@ -13,6 +13,9 @@ export default class Project {
     const $cloneOptions = $('ul.clone-options-dropdown');
     const $projectCloneField = $('#project_clone');
     const $cloneBtnLabel = $('.js-git-clone-holder .js-clone-dropdown-label');
+    const mobileCloneField = document.querySelector(
+      '.js-mobile-git-clone .js-clone-dropdown-label',
+    );
 
     const selectedCloneOption = $cloneBtnLabel.text().trim();
     if (selectedCloneOption.length > 0) {
@@ -36,7 +39,16 @@ export default class Project {
         $label.text(activeText);
       });
 
-      $projectCloneField.val(url);
+      $('#modal-geo-info').data({
+        cloneUrlSecondary: $this.attr('href'),
+        cloneUrlPrimary: $this.data('primaryUrl') || '',
+      });
+
+      if (mobileCloneField) {
+        mobileCloneField.dataset.clipboardText = url;
+      } else {
+        $projectCloneField.val(url);
+      }
       $('.js-git-empty .js-clone').text(url);
     });
     // Ref switcher
@@ -59,6 +71,13 @@ export default class Project {
         .parents('.no-password-message')
         .remove();
       return e.preventDefault();
+    });
+    $('.hide-shared-runner-limit-message').on('click', function(e) {
+      var $alert = $(this).parents('.shared-runner-quota-message');
+      var scope = $alert.data('scope');
+      Cookies.set('hide_shared_runner_quota_message', 'false', { path: scope });
+      $alert.remove();
+      e.preventDefault();
     });
     $('.hide-auto-devops-implicitly-enabled-banner').on('click', function(e) {
       const projectId = $(this).data('project-id');

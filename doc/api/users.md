@@ -2,6 +2,8 @@
 
 ## List users
 
+Active users = Total accounts - Blocked users
+
 Get a list of users.
 
 This function takes pagination parameters `page` and `per_page` to restrict the list of users.
@@ -33,7 +35,7 @@ GET /users
 ]
 ```
 
-You can also search for users by email or username with: `/users?search=John`
+You can also search for users by name or primary email using `?search=`. For example. `/users?search=John`.
 
 In addition, you can lookup users by username:
 
@@ -256,7 +258,9 @@ Parameters:
   "can_create_project": true,
   "two_factor_enabled": true,
   "external": false,
-  "private_profile": false
+  "private_profile": false,
+  "shared_runners_minutes_limit": 133
+  "extra_shared_runners_minutes_limit": 133
 }
 ```
 
@@ -268,7 +272,14 @@ GET /users/:id?with_custom_attributes=true
 
 ## User creation
 
-Creates a new user. Note only administrators can create new users. Either `password` or `reset_password` should be specified (`reset_password` takes priority). If `reset_password` is `false`, then `password` is required.
+Creates a new user. Note only administrators can create new
+users. Either `password`, `reset_password`, or `force_random_password`
+must be specified. If `reset_password` and `force_random_password` are
+both `false`, then `password` is required.
+
+Note that `force_random_password` and `reset_password` take priority
+over `password`. In addition, `reset_password` and
+`force_random_password` can be used together.
 
 ```
 POST /users
@@ -276,28 +287,32 @@ POST /users
 
 Parameters:
 
-- `email` (required)             - Email
-- `password` (optional)          - Password
-- `reset_password` (optional)    - Send user password reset link - true or false(default)
-- `username` (required)          - Username
-- `name` (required)              - Name
-- `skype` (optional)             - Skype ID
-- `linkedin` (optional)          - LinkedIn
-- `twitter` (optional)           - Twitter account
-- `website_url` (optional)       - Website URL
-- `organization` (optional)      - Organization name
-- `projects_limit` (optional)    - Number of projects user can create
-- `extern_uid` (optional)        - External UID
-- `provider` (optional)          - External provider name
-- `bio` (optional)               - User's biography
-- `location` (optional)          - User's location
-- `public_email` (optional)      - The public email of the user
-- `admin` (optional)             - User is admin - true or false (default)
-- `can_create_group` (optional)  - User can create groups - true or false
-- `skip_confirmation` (optional) - Skip confirmation - true or false (default)
-- `external` (optional)          - Flags the user as external - true or false(default)
-- `avatar` (optional)            - Image file for user's avatar
-- `private_profile` (optional)   - User's profile is private - true or false
+- `email` (required)                 - Email
+- `password` (optional)              - Password
+- `reset_password` (optional)        - Send user password reset link - true or false (default)
+- `force_random_password` (optional) - Set user password to a random value - true or false (default)
+- `username` (required)              - Username
+- `name` (required)                  - Name
+- `skype` (optional)                 - Skype ID
+- `linkedin` (optional)              - LinkedIn
+- `twitter` (optional)               - Twitter account
+- `website_url` (optional)           - Website URL
+- `organization` (optional)          - Organization name
+- `projects_limit` (optional)        - Number of projects user can create
+- `extern_uid` (optional)            - External UID
+- `provider` (optional)              - External provider name
+- `group_id_for_saml` (optional)     - ID of group where SAML has been configured
+- `bio` (optional)                   - User's biography
+- `location` (optional)              - User's location
+- `public_email` (optional)          - The public email of the user
+- `admin` (optional)                 - User is admin - true or false (default)
+- `can_create_group` (optional)      - User can create groups - true or false
+- `skip_confirmation` (optional)     - Skip confirmation - true or false (default)
+- `external` (optional)              - Flags the user as external - true or false(default)
+- `avatar` (optional)                - Image file for user's avatar
+- `private_profile` (optional)       - User's profile is private - true or false
+- `shared_runners_minutes_limit` (optional) - Pipeline minutes quota for this user
+- `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user
 
 ## User modification
 
@@ -321,6 +336,7 @@ Parameters:
 - `projects_limit`                 - Limit projects each user can create
 - `extern_uid`                     - External UID
 - `provider`                       - External provider name
+- `group_id_for_saml` (optional)   - ID of group where SAML has been configured
 - `bio`                            - User's biography
 - `location` (optional)            - User's location
 - `public_email` (optional)        - The public email of the user
@@ -328,6 +344,8 @@ Parameters:
 - `can_create_group` (optional)    - User can create groups - true or false
 - `skip_reconfirmation` (optional) - Skip reconfirmation - true or false (default)
 - `external` (optional)            - Flags the user as external - true or false(default)
+- `shared_runners_minutes_limit` (optional) - Pipeline minutes quota for this user
+- `extra_shared_runners_minutes_limit` (optional) - Extra pipeline minutes quota for this user
 - `avatar` (optional)              - Image file for user's avatar
 - `private_profile` (optional)     - User's profile is private - true or false
 
@@ -458,7 +476,7 @@ GET /user/status
 ```
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/user/status"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/user/status"
 ```
 
 Example response:
@@ -513,7 +531,7 @@ PUT /user/status
 When both parameters `emoji` and `message` are empty, the status will be cleared.
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" --data "emoji=coffee" --data "message=I crave coffee" https://gitlab.example.com/api/v4/user/status
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "emoji=coffee" --data "message=I crave coffee" https://gitlab.example.com/api/v4/user/status
 ```
 
 Example responses
@@ -679,7 +697,7 @@ GET /user/gpg_keys
 ```
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/user/gpg_keys
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/user/gpg_keys
 ```
 
 Example response:
@@ -709,7 +727,7 @@ Parameters:
 | `key_id`  | integer | yes   | The ID of the GPG key |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/user/gpg_keys/1
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/user/gpg_keys/1
 ```
 
 Example response:
@@ -737,7 +755,7 @@ Parameters:
 | key       | string | yes    | The new GPG key |
 
 ```bash
-curl --data "key=-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\r\nxsBNBFV..."  --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/user/gpg_keys
+curl --data "key=-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\r\nxsBNBFV..."  --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/user/gpg_keys
 ```
 
 Example response:
@@ -767,7 +785,7 @@ Parameters:
 | `key_id`  | integer | yes   | The ID of the GPG key |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/user/gpg_keys/1
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/user/gpg_keys/1
 ```
 
 Returns `204 No Content` on success, or `404 Not found` if the key cannot be found.
@@ -787,7 +805,7 @@ Parameters:
 | `id`      | integer | yes   | The ID of the user |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/2/gpg_keys
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/2/gpg_keys
 ```
 
 Example response:
@@ -818,7 +836,7 @@ Parameters:
 | `key_id`  | integer | yes   | The ID of the GPG key |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/2/gpg_keys/1
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/2/gpg_keys/1
 ```
 
 Example response:
@@ -847,7 +865,7 @@ Parameters:
 | `key_id`  | integer | yes   | The ID of the GPG key |
 
 ```bash
-curl --data "key=-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\r\nxsBNBFV..."  --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/2/gpg_keys
+curl --data "key=-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\r\nxsBNBFV..."  --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/2/gpg_keys
 ```
 
 Example response:
@@ -878,7 +896,7 @@ Parameters:
 | `key_id`  | integer | yes   | The ID of the GPG key |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/2/gpg_keys/1
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/2/gpg_keys/1
 ```
 
 ## List emails
@@ -1043,7 +1061,6 @@ Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
 
 Please refer to the [Events API documentation](events.md#get-user-contribution-events)
 
-
 ## Get all impersonation tokens of a user
 
 > Requires admin permissions.
@@ -1063,7 +1080,7 @@ Parameters:
 | `state`   | string  | no | filter tokens based on state (`all`, `active`, `inactive`) |
 
 ```
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/42/impersonation_tokens
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/42/impersonation_tokens
 ```
 
 Example response:
@@ -1115,7 +1132,7 @@ Parameters:
 | `impersonation_token_id` | integer | yes | The ID of the impersonation token |
 
 ```
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/42/impersonation_tokens/2
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/42/impersonation_tokens/2
 ```
 
 Example response:
@@ -1150,8 +1167,6 @@ settings page.
 POST /users/:user_id/impersonation_tokens
 ```
 
-Parameters:
-
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `user_id` | integer | yes | The ID of the user |
@@ -1160,7 +1175,7 @@ Parameters:
 | `scopes` | array    | yes | The array of scopes of the impersonation token (`api`, `read_user`) |
 
 ```
-curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" --data "name=mytoken" --data "expires_at=2017-04-04" --data "scopes[]=api" https://gitlab.example.com/api/v4/users/42/impersonation_tokens
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --data "name=mytoken" --data "expires_at=2017-04-04" --data "scopes[]=api" https://gitlab.example.com/api/v4/users/42/impersonation_tokens
 ```
 
 Example response:
@@ -1192,7 +1207,7 @@ DELETE /users/:user_id/impersonation_tokens/:impersonation_token_id
 ```
 
 ```
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/users/42/impersonation_tokens/1
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/users/42/impersonation_tokens/1
 ```
 
 Parameters:
@@ -1212,6 +1227,7 @@ The activities that update the timestamp are:
 
   - Git HTTP/SSH activities (such as clone, push)
   - User logging in into GitLab
+  - User visiting pages related to Dashboards, Projects, Issues and Merge Requests ([introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/54947) in GitLab 11.8)
 
 By default, it shows the activity for all users in the last 6 months, but this can be
 amended by using the `from` parameter.
@@ -1227,7 +1243,7 @@ Parameters:
 | `from` | string | no | Date string in the format YEAR-MONTH-DAY, e.g. `2016-03-11`. Defaults to 6 months ago. |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/user/activities
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/user/activities
 ```
 
 Example response:

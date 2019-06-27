@@ -4,11 +4,13 @@ class Dashboard::TodosController < Dashboard::ApplicationController
   include ActionView::Helpers::NumberHelper
 
   before_action :authorize_read_project!, only: :index
+  before_action :authorize_read_group!, only: :index
   before_action :find_todos, only: [:index, :destroy_all]
 
   def index
     @sort = params[:sort]
     @todos = @todos.page(params[:page])
+    @todos = @todos.with_entity_associations
 
     return if redirect_out_of_range(@todos)
   end
@@ -20,7 +22,7 @@ class Dashboard::TodosController < Dashboard::ApplicationController
       format.html do
         redirect_to dashboard_todos_path,
                     status: 302,
-                    notice: 'Todo was successfully marked as done.'
+                    notice: _('Todo was successfully marked as done.')
       end
       format.js { head :ok }
       format.json { render json: todos_counts }
@@ -31,7 +33,7 @@ class Dashboard::TodosController < Dashboard::ApplicationController
     updated_ids = TodoService.new.mark_todos_as_done(@todos, current_user)
 
     respond_to do |format|
-      format.html { redirect_to dashboard_todos_path, status: 302, notice: 'All todos were marked as done.' }
+      format.html { redirect_to dashboard_todos_path, status: 302, notice: _('All todos were marked as done.') }
       format.js { head :ok }
       format.json { render json: todos_counts.merge(updated_ids: updated_ids) }
     end
@@ -57,6 +59,15 @@ class Dashboard::TodosController < Dashboard::ApplicationController
     if project_id.present?
       project = Project.find(project_id)
       render_404 unless can?(current_user, :read_project, project)
+    end
+  end
+
+  def authorize_read_group!
+    group_id = params[:group_id]
+
+    if group_id.present?
+      group = Group.find(group_id)
+      render_404 unless can?(current_user, :read_group, group)
     end
   end
 

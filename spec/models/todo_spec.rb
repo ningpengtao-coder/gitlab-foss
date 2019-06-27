@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Todo do
@@ -236,7 +238,8 @@ describe Todo do
 
       create(:todo, target: create(:merge_request))
 
-      expect(described_class.for_target(todo.target)).to eq([todo])
+      expect(described_class.for_type(Issue.name).for_target(todo.target))
+        .to contain_exactly(todo)
     end
   end
 

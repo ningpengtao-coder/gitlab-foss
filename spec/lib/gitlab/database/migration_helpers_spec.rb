@@ -214,6 +214,23 @@ describe Gitlab::Database::MigrationHelpers do
           model.add_concurrent_foreign_key(:projects, :users, column: :user_id)
         end
 
+        it 'allows the use of a custom key name' do
+          expect(model).to receive(:add_foreign_key).with(
+            :projects,
+            :users,
+            column: :user_id,
+            on_delete: :cascade,
+            name: :foo
+          )
+
+          model.add_concurrent_foreign_key(
+            :projects,
+            :users,
+            column: :user_id,
+            name: :foo
+          )
+        end
+
         it 'does not create a foreign key if it exists already' do
           expect(model).to receive(:foreign_key_exists?).with(:projects, :users, column: :user_id).and_return(true)
           expect(model).not_to receive(:add_foreign_key)
@@ -256,6 +273,16 @@ describe Gitlab::Database::MigrationHelpers do
           expect(model).to receive(:execute).with(/VALIDATE CONSTRAINT/)
 
           model.add_concurrent_foreign_key(:projects, :users, column: :user_id)
+        end
+
+        it 'allows the use of a custom key name' do
+          expect(model).to receive(:disable_statement_timeout).and_call_original
+          expect(model).to receive(:execute).with(/statement_timeout/)
+          expect(model).to receive(:execute).ordered.with(/NOT VALID/)
+          expect(model).to receive(:execute).ordered.with(/VALIDATE CONSTRAINT.+foo/)
+          expect(model).to receive(:execute).with(/RESET ALL/)
+
+          model.add_concurrent_foreign_key(:projects, :users, column: :user_id, name: :foo)
         end
       end
     end
@@ -434,9 +461,9 @@ describe Gitlab::Database::MigrationHelpers do
       end
 
       it 'updates all the rows in a table' do
-        model.update_column_in_batches(:projects, :import_error, 'foo')
+        model.update_column_in_batches(:projects, :description_html, 'foo')
 
-        expect(Project.where(import_error: 'foo').count).to eq(5)
+        expect(Project.where(description_html: 'foo').count).to eq(5)
       end
 
       it 'updates boolean values correctly' do
@@ -1338,12 +1365,7 @@ describe Gitlab::Database::MigrationHelpers do
   end
 
   describe '#index_exists_by_name?' do
-    # TODO: remove rails5-only after removing rails4 tests
-    # rails 4 can not handle multiple indexes on the same column set if
-    # index was added by 't.index' - t.index is used by default in schema.rb in
-    # rails 5. Let's run this test only in rails 5 env:
-    # see https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21492#note_113602758
-    it 'returns true if an index exists', :rails5 do
+    it 'returns true if an index exists' do
       expect(model.index_exists_by_name?(:projects, 'index_projects_on_path'))
         .to be_truthy
     end

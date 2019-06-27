@@ -127,6 +127,42 @@ Everything in `lib/api`.
 
 Everything that resides in `app/services`.
 
+#### ServiceResponse
+
+Service classes usually have an `execute` method, which can return a
+`ServiceResponse`. You can use `ServiceResponse.success` and
+`ServiceResponse.error` to return a response in `execute` method.
+
+In a successful case:
+
+``` ruby
+response = ServiceResponse.success(message: 'Branch was deleted')
+
+response.success? # => true
+response.error? # => false
+response.status # => :success
+response.message # => 'Branch was deleted'
+```
+
+In a failed case:
+
+``` ruby
+response = ServiceResponse.error(message: 'Unsupported operation')
+
+response.success? # => false
+response.error? # => true
+response.status # => :error
+response.message # => 'Unsupported operation'
+```
+
+An additional payload can also be attached:
+
+``` ruby
+response = ServiceResponse.success(payload: { issue: issue })
+
+response.payload[:issue] # => issue
+```
+
 ### Finders
 
 Everything in `app/finders`, typically used for retrieving data from a database.
@@ -149,11 +185,11 @@ typically in JSON.
 These are class methods defined by _GitLab itself_, including the following
 methods provided by Active Record:
 
-* `find`
-* `find_by_id`
-* `delete_all`
-* `destroy`
-* `destroy_all`
+- `find`
+- `find_by_id`
+- `delete_all`
+- `destroy`
+- `destroy_all`
 
 Any other methods such as `find_by(some_column: X)` are not included, and
 instead fall under the "Active Record" abstraction.
@@ -163,10 +199,10 @@ instead fall under the "Active Record" abstraction.
 Instance methods defined on Active Record models by _GitLab itself_. Methods
 provided by Active Record are not included, except for the following methods:
 
-* `save`
-* `update`
-* `destroy`
-* `delete`
+- `save`
+- `update`
+- `destroy`
+- `delete`
 
 ### Active Record
 

@@ -13,6 +13,11 @@ export default {
       type: Array,
       required: true,
     },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     shouldCollapseDiscussions: {
       type: Boolean,
       required: false,
@@ -22,6 +27,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   methods: {
@@ -58,7 +68,7 @@ export default {
             }"
             type="button"
             class="js-diff-notes-toggle"
-            @click="toggleDiscussion({ discussionId: discussion.id });"
+            @click="toggleDiscussion({ discussionId: discussion.id })"
           >
             <icon v-if="discussion.expanded" name="collapse" class="collapse-icon" />
             <template v-else>
@@ -72,6 +82,8 @@ export default {
           :render-diff-file="false"
           :always-expanded="true"
           :discussions-by-diff-order="true"
+          :line="line"
+          :help-page-path="helpPagePath"
           @noteDeleted="deleteNoteHandler"
         >
           <span v-if="renderAvatarBadge" slot="avatar-badge" class="badge badge-pill">

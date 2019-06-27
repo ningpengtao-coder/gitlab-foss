@@ -16,14 +16,15 @@ module EnforcesTwoFactorAuthentication
   end
 
   def check_two_factor_requirement
-    if two_factor_authentication_required? && current_user && !current_user.two_factor_enabled? && !skip_two_factor?
+    if two_factor_authentication_required? && current_user && !current_user.temp_oauth_email? && !current_user.two_factor_enabled? && !skip_two_factor?
       redirect_to profile_two_factor_auth_path
     end
   end
 
   def two_factor_authentication_required?
     Gitlab::CurrentSettings.require_two_factor_authentication? ||
-      current_user.try(:require_two_factor_authentication_from_group?)
+      current_user.try(:require_two_factor_authentication_from_group?) ||
+      current_user.try(:ultraauth_user?)
   end
 
   # rubocop: disable CodeReuse/ActiveRecord

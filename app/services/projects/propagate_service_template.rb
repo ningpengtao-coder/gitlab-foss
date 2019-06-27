@@ -24,7 +24,7 @@ module Projects
 
     def propagate_projects_with_template
       loop do
-        batch = project_ids_batch
+        batch = Project.uncached { project_ids_batch }
 
         bulk_create_from_template(batch) unless batch.empty?
 
@@ -80,7 +80,7 @@ module Projects
             value = value.is_a?(Hash) ? value.to_json : value
 
             service_hash[ActiveRecord::Base.connection.quote_column_name(key)] =
-              ActiveRecord::Base.sanitize(value)
+              ActiveRecord::Base.connection.quote(value)
           end
         end
     end

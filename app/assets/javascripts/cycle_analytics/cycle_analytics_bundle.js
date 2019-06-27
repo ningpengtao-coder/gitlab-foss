@@ -5,13 +5,13 @@ import Flash from '../flash';
 import Translate from '../vue_shared/translate';
 import banner from './components/banner.vue';
 import stageCodeComponent from './components/stage_code_component.vue';
-import stagePlanComponent from './components/stage_plan_component.vue';
 import stageComponent from './components/stage_component.vue';
 import stageReviewComponent from './components/stage_review_component.vue';
 import stageStagingComponent from './components/stage_staging_component.vue';
 import stageTestComponent from './components/stage_test_component.vue';
 import CycleAnalyticsService from './cycle_analytics_service';
 import CycleAnalyticsStore from './cycle_analytics_store';
+import { __ } from '~/locale';
 
 Vue.use(Translate);
 
@@ -25,7 +25,7 @@ export default () => {
     components: {
       banner,
       'stage-issue-component': stageComponent,
-      'stage-plan-component': stagePlanComponent,
+      'stage-plan-component': stageComponent,
       'stage-code-component': stageCodeComponent,
       'stage-test-component': stageTestComponent,
       'stage-review-component': stageReviewComponent,
@@ -61,7 +61,7 @@ export default () => {
     methods: {
       handleError() {
         this.store.setErrorState(true);
-        return new Flash('There was an error while fetching cycle analytics data.');
+        return new Flash(__('There was an error while fetching cycle analytics data.'));
       },
       initDropdown() {
         const $dropdown = $('.js-ca-dropdown');

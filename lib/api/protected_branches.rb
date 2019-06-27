@@ -4,14 +4,16 @@ module API
   class ProtectedBranches < Grape::API
     include PaginationParams
 
-    BRANCH_ENDPOINT_REQUIREMENTS = API::PROJECT_ENDPOINT_REQUIREMENTS.merge(name: API::NO_SLASH_URL_PART_REGEX)
+    BRANCH_ENDPOINT_REQUIREMENTS = API::NAMESPACE_OR_PROJECT_REQUIREMENTS.merge(name: API::NO_SLASH_URL_PART_REGEX)
 
     before { authorize_admin_project }
+
+    helpers Helpers::ProtectedBranchesHelpers
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc "Get a project's protected branches" do
         success Entities::ProtectedBranch
       end
@@ -51,6 +53,8 @@ module API
         optional :merge_access_level, type: Integer,
                                       values: ProtectedBranch::MergeAccessLevel.allowed_access_levels,
                                       desc: 'Access levels allowed to merge (defaults: `40`, maintainer access level)'
+
+        use :optional_params_ee
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post ':id/protected_branches' do

@@ -1,3 +1,7 @@
+---
+type: howto, reference
+---
+
 # GitLab and SSH keys
 
 Git is a distributed version control system, which means you can work locally
@@ -19,7 +23,7 @@ comes pre-installed on GNU/Linux and macOS, but not on Windows.
 Depending on your Windows version, there are different methods to work with
 SSH keys.
 
-### Installing the SSH client for Windows 10
+### Windows 10: Windows Subsystem for Linux
 
 Starting with Windows 10, you can
 [install the Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
@@ -27,10 +31,10 @@ where you can run Linux distributions directly on Windows, without the overhead
 of a virtual machine. Once installed and set up, you'll have the Git and SSH
 clients at your disposal.
 
-### Installing the SSH client for Windows 8.1 and Windows 7
+### Windows 10, 8.1, and 7: Git for Windows
 
 The easiest way to install Git and the SSH client on Windows 8.1 and Windows 7
-is [Git for Windows](https://gitforwindows.org). It provides a BASH
+is [Git for Windows](https://gitforwindows.org). It provides a Bash
 emulation (Git Bash) used for running Git from the command line and the
 `ssh-keygen` command that is useful to create SSH keys as you'll learn below.
 
@@ -50,22 +54,26 @@ more information, you can read this
 We'll focus on ED25519 and RSA and here.
 
 NOTE: **Note:**
-As an admin, you can restrict
-[which keys should be permitted and their minimum length](../security/ssh_keys_restrictions.md).
+As an admin, you can [restrict which keys should be permitted and their minimum length](../security/ssh_keys_restrictions.md).
 By default, all keys are permitted, which is also the case for
 [GitLab.com](../user/gitlab_com/index.md#ssh-host-keys-fingerprints).
 
-## ED25519 SSH keys
+### ED25519 SSH keys
 
 Following [best practices](https://linux-audit.com/using-ed25519-openssh-keys-instead-of-dsa-rsa-ecdsa/),
 you should always favor [ED25519](https://ed25519.cr.yp.to/) SSH keys, since they
 are more secure and have better performance over the other types.
 
-They were introduced in OpenSSH 6.5, so any modern OS should include the
-option to create them. If for any reason your OS or the GitLab instance you
-interact with doesn't support this, you can fallback to RSA.
+ED25519 SSH keys were introduced in OpenSSH 6.5, 
+so any modern OS should include the option to create them. 
+If for any reason your OS or the GitLab instance you interact with doesn't 
+support ED25519, you can fallback to RSA.
 
-## RSA SSH keys
+NOTE: **Note:**
+Omnibus does not ship with OpenSSH, so it uses the version on your GitLab server. If using 
+Omnibus, ensure the version of OpenSSH installed is version 6.5 or newer if you want to use ED25519 SSH keys.
+
+### RSA SSH keys
 
 RSA keys are the most common ones and therefore the most compatible with
 servers that may have an old OpenSSH version. Use them if the GitLab server
@@ -91,9 +99,8 @@ ssh-keygen -o -f ~/.ssh/id_rsa
 
 ## Generating a new SSH key pair
 
-Before creating an SSH key pair, make sure to read about the
-[different types of keys](#types-of-ssh-keys-and-which-to-choose) to understand
-their differences.
+Before creating an SSH key pair, make sure to understand the
+[different types of keys](#types-of-ssh-keys-and-which-to-choose).
 
 To create a new SSH key pair:
 
@@ -114,7 +121,8 @@ To create a new SSH key pair:
     and want to tell which is which. It is optional.
 
 1. Next, you will be prompted to input a file path to save your SSH key pair to.
-   If you don't already have an SSH key pair, use the suggested path by pressing
+   If you don't already have an SSH key pair and aren't generating a [deploy key](#deploy-keys),
+   use the suggested path by pressing
    <kbd>Enter</kbd>. Using the suggested path will normally allow your SSH client
    to automatically use the SSH key pair with no additional configuration.
 
@@ -128,7 +136,7 @@ To create a new SSH key pair:
    <kbd>Enter</kbd> twice.
 
     If, in any case, you want to add or change the password of your SSH key pair,
-    you can use the `-p`flag:
+    you can use the `-p` flag:
 
     ```
     ssh-keygen -p -o -f <keyname>
@@ -165,12 +173,13 @@ Now, it's time to add the newly created public key to your GitLab account.
     NOTE: **Note:**
     If you opted to create an RSA key, the name might differ.
 
-1. Add your public SSH key to your GitLab account by clicking your avatar
-   in the upper right corner and selecting **Settings**. From there on,
-   navigate to **SSH Keys** and paste your public key in the "Key" section.
-   If you created the key with a comment, this will appear under "Title".
-   If not, give your key an identifiable title like _Work Laptop_ or
-   _Home Workstation_, and click **Add key**.
+1. Add your **public** SSH key to your GitLab account by:
+   1. Clicking your avatar in the upper right corner and selecting **Settings**.
+   1. Navigating to **SSH Keys** and pasting your **public** key in the **Key** field. If you:
+
+      - Created the key with a comment, this will appear in the **Title** field.
+      - Created the key without a comment, give your key an identifiable title like _Work Laptop_ or _Home Workstation_.
+   1. Click the **Add key** button.
 
     NOTE: **Note:**
     If you manually copied your public SSH key make sure you copied the entire
@@ -185,7 +194,26 @@ your terminal (replacing `gitlab.com` with your GitLab's instance domain):
 ssh -T git@gitlab.com
 ```
 
-You should receive a _Welcome to GitLab, `@username`!_ message.
+The first time you connect to GitLab via SSH, you will be asked to verify the
+authenticity of the GitLab host you are connecting to.
+For example, when connecting to GitLab.com, answer `yes` to add GitLab.com to
+the list of trusted hosts:
+
+```
+The authenticity of host 'gitlab.com (35.231.145.151)' can't be established.
+ECDSA key fingerprint is SHA256:HbW3g8zUjNSksFbqTiUWPWg2Bq1x8xdGUrliXFzSnUw.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'gitlab.com' (ECDSA) to the list of known hosts.
+```
+
+NOTE: **Note:**
+For GitLab.com, consult the
+[SSH host keys fingerprints](../user/gitlab_com/index.md#ssh-host-keys-fingerprints),
+to make sure you're connecting to the correct server.
+
+Once added to the list of known hosts, you won't be asked to validate the
+authenticity of GitLab's host again. Run the above command once more, and
+you should only receive a _Welcome to GitLab, `@username`!_ message.
 
 If the welcome message doesn't appear, run SSH's verbose mode by replacing `-T`
 with `-vvvT` to understand where the error is.
@@ -227,6 +255,17 @@ Public SSH keys need to be unique to GitLab, as they will bind to your account.
 Your SSH key is the only identifier you'll have when pushing code via SSH,
 that's why it needs to uniquely map to a single user.
 
+## Per-repository SSH keys
+
+If you want to use different keys depending on the repository you are working
+on, you can issue the following command while inside your repository:
+
+```sh
+git config core.sshCommand "ssh -o IdentitiesOnly=yes -i ~/.ssh/private-key-filename-for-this-repository -F /dev/null"
+```
+
+This will not use the SSH Agent and requires at least Git 2.10.
+
 ## Deploy keys
 
 ### Per-repository deploy keys
@@ -239,7 +278,8 @@ Integration (CI) server. By using deploy keys, you don't have to set up a
 dummy user account.
 
 If you are a project maintainer or owner, you can add a deploy key in the
-project settings under the section 'Repository'. Specify a title for the new
+project's **Settings > Repository** page by expanding the
+**Deploy Keys** section. Specify a title for the new
 deploy key and paste a public SSH key. After this, the machine that uses
 the corresponding private SSH key has read-only or read-write (if enabled)
 access to the project.
@@ -273,7 +313,7 @@ who needs to know and configure the private key.
 GitLab administrators set up Global Deploy keys in the Admin area under the
 section **Deploy Keys**. Ensure keys have a meaningful title as that will be
 the primary way for project maintainers and owners to identify the correct Global
-Deploy key to add.  For instance, if the key gives access to a SaaS CI instance,
+Deploy key to add. For instance, if the key gives access to a SaaS CI instance,
 use the name of that service in the key name if that is all it is used for.
 When creating Global Shared Deploy keys, give some thought to the granularity
 of keys - they could be of very narrow usage such as just a specific service or
@@ -281,8 +321,8 @@ of broader usage for something like "Anywhere you need to give read access to
 your repository".
 
 Once a GitLab administrator adds the Global Deployment key, project maintainers
-and owners can add it in project's **Settings > Repository** section by expanding the
-**Deploy Key** section and clicking **Enable** next to the appropriate key listed
+and owners can add it in project's **Settings > Repository** page by expanding the
+**Deploy Keys** section and clicking **Enable** next to the appropriate key listed
 under **Public deploy keys available to any project**.
 
 NOTE: **Note:**
@@ -299,7 +339,7 @@ not implicitly give any access just by setting them up.
 
 ### Eclipse
 
-How to add your SSH key to Eclipse: https://wiki.eclipse.org/EGit/User_Guide#Eclipse_SSH_Configuration
+If you are using [EGit](https://www.eclipse.org/egit/), you can [add your SSH key to Eclipse](https://wiki.eclipse.org/EGit/User_Guide#Eclipse_SSH_Configuration).
 
 ## SSH on the GitLab server
 

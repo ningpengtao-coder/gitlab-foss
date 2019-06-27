@@ -1,13 +1,12 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import { GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import { pluralize } from '../../lib/utils/text_utility';
 import discussionNavigation from '../mixins/discussion_navigation';
-import tooltip from '../../vue_shared/directives/tooltip';
 
 export default {
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   components: {
     Icon,
@@ -17,9 +16,9 @@ export default {
     ...mapGetters([
       'getUserData',
       'getNoteableData',
-      'discussionCount',
+      'resolvableDiscussionsCount',
       'firstUnresolvedDiscussionId',
-      'resolvedDiscussionCount',
+      'unresolvedDiscussionsCount',
     ]),
     isLoggedIn() {
       return this.getUserData.id;
@@ -27,14 +26,14 @@ export default {
     hasNextButton() {
       return this.isLoggedIn && !this.allResolved;
     },
-    countText() {
-      return pluralize('discussion', this.discussionCount);
-    },
     allResolved() {
-      return this.resolvedDiscussionCount === this.discussionCount;
+      return this.unresolvedDiscussionsCount === 0;
     },
     resolveAllDiscussionsIssuePath() {
       return this.getNoteableData.create_issue_to_resolve_discussions_path;
+    },
+    resolvedDiscussionsCount() {
+      return this.resolvableDiscussionsCount - this.unresolvedDiscussionsCount;
     },
   },
   methods: {
@@ -50,36 +49,39 @@ export default {
 </script>
 
 <template>
-  <div v-if="discussionCount > 0" class="line-resolve-all-container prepend-top-8">
-    <div>
+  <div v-if="resolvableDiscussionsCount > 0" class="line-resolve-all-container full-width-mobile">
+    <div class="full-width-mobile d-flex d-sm-block">
       <div :class="{ 'has-next-btn': hasNextButton }" class="line-resolve-all">
         <span
           :class="{ 'is-active': allResolved }"
           class="line-resolve-btn is-disabled"
           type="button"
         >
-          <icon name="check-circle" />
+          <icon :name="allResolved ? 'check-circle-filled' : 'check-circle'" />
         </span>
         <span class="line-resolve-text">
-          {{ resolvedDiscussionCount }}/{{ discussionCount }} {{ countText }} resolved
+          {{ resolvedDiscussionsCount }}/{{ resolvableDiscussionsCount }}
+          {{ n__('discussion resolved', 'discussions resolved', resolvableDiscussionsCount) }}
         </span>
       </div>
-      <div v-if="resolveAllDiscussionsIssuePath && !allResolved" class="btn-group" role="group">
+      <div
+        v-if="resolveAllDiscussionsIssuePath && !allResolved"
+        class="btn-group btn-group-sm"
+        role="group"
+      >
         <a
-          v-tooltip
+          v-gl-tooltip
           :href="resolveAllDiscussionsIssuePath"
           :title="s__('Resolve all discussions in new issue')"
-          data-container="body"
           class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
         >
           <icon name="issue-new" />
         </a>
       </div>
-      <div v-if="isLoggedIn && !allResolved" class="btn-group" role="group">
+      <div v-if="isLoggedIn && !allResolved" class="btn-group btn-group-sm" role="group">
         <button
-          v-tooltip
+          v-gl-tooltip
           title="Jump to first unresolved discussion"
-          data-container="body"
           class="btn btn-default discussion-next-btn"
           @click="jumpToFirstUnresolvedDiscussion"
         >

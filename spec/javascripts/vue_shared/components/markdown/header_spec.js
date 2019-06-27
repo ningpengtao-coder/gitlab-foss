@@ -22,6 +22,7 @@ describe('Markdown field header component', () => {
       'Add bold text',
       'Add italic text',
       'Insert a quote',
+      'Insert suggestion',
       'Insert code',
       'Add a link',
       'Add a bullet list',
@@ -92,5 +93,19 @@ describe('Markdown field header component', () => {
     expect(vm.mdTable).toEqual(
       '| header | header |\n| ------ | ------ |\n| cell | cell |\n| cell | cell |',
     );
+  });
+
+  it('renders suggestion template', () => {
+    vm.lineContent = 'Some content';
+
+    expect(vm.mdSuggestion).toEqual('```suggestion:-0+0\n{text}\n```');
+  });
+
+  it('does not render suggestion button if `canSuggest` is set to false', () => {
+    vm.canSuggest = false;
+
+    Vue.nextTick(() => {
+      expect(vm.$el.querySelector('.qa-suggestion-btn')).toBe(null);
+    });
   });
 });

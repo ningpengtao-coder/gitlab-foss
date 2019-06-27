@@ -6,12 +6,13 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import Cookies from 'js-cookie';
 
-import '~/vue_shared/models/label';
-import '~/vue_shared/models/assignee';
+import '~/boards/models/label';
+import '~/boards/models/assignee';
 import '~/boards/models/issue';
 import '~/boards/models/list';
 import '~/boards/services/board_service';
 import boardsStore from '~/boards/stores/boards_store';
+import eventHub from '~/boards/eventhub';
 import { listObj, listObjDuplicate, boardsMockInterceptor, mockBoardService } from './mock_data';
 
 describe('Store', () => {
@@ -44,6 +45,48 @@ describe('Store', () => {
     expect(boardsStore.state.lists.length).toBe(0);
   });
 
+  describe('addList', () => {
+    it('sorts by position', () => {
+      boardsStore.addList({ position: 2 });
+      boardsStore.addList({ position: 1 });
+
+      expect(boardsStore.state.lists[0].position).toBe(1);
+    });
+  });
+
+  describe('toggleFilter', () => {
+    const dummyFilter = 'x=42';
+    let updateTokensSpy;
+
+    beforeEach(() => {
+      updateTokensSpy = jasmine.createSpy('updateTokens');
+      eventHub.$once('updateTokens', updateTokensSpy);
+
+      // prevent using window.history
+      spyOn(boardsStore, 'updateFiltersUrl').and.callFake(() => {});
+    });
+
+    it('adds the filter if it is not present', () => {
+      boardsStore.filter.path = 'something';
+
+      boardsStore.toggleFilter(dummyFilter);
+
+      expect(boardsStore.filter.path).toEqual(`something&${dummyFilter}`);
+      expect(updateTokensSpy).toHaveBeenCalled();
+      expect(boardsStore.updateFiltersUrl).toHaveBeenCalled();
+    });
+
+    it('removes the filter if it is present', () => {
+      boardsStore.filter.path = `something&${dummyFilter}`;
+
+      boardsStore.toggleFilter(dummyFilter);
+
+      expect(boardsStore.filter.path).toEqual('something');
+      expect(updateTokensSpy).toHaveBeenCalled();
+      expect(boardsStore.updateFiltersUrl).toHaveBeenCalled();
+    });
+  });
+
   describe('lists', () => {
     it('creates new list without persisting to DB', () => {
       boardsStore.addList(listObj);
@@ -63,6 +106,13 @@ describe('Store', () => {
       const list = boardsStore.findList('type', 'label');
 
       expect(list).toBeDefined();
+    });
+
+    it('finds list by label ID', () => {
+      boardsStore.addList(listObj);
+      const list = boardsStore.findListByLabelId(listObj.label.id);
+
+      expect(list.id).toBe(listObj.id);
     });
 
     it('gets issue when new list added', done => {
@@ -259,6 +309,60 @@ describe('Store', () => {
 
         done();
       });
+    });
+  });
+
+  describe('setListDetail', () => {
+    it('sets the list detail', () => {
+      boardsStore.detail.list = 'not a list';
+
+      const dummyValue = 'new list';
+      boardsStore.setListDetail(dummyValue);
+
+      expect(boardsStore.detail.list).toEqual(dummyValue);
+    });
+  });
+
+  describe('clearDetailIssue', () => {
+    it('resets issue details', () => {
+      boardsStore.detail.issue = 'something';
+
+      boardsStore.clearDetailIssue();
+
+      expect(boardsStore.detail.issue).toEqual({});
+    });
+  });
+
+  describe('setIssueDetail', () => {
+    it('sets issue details', () => {
+      boardsStore.detail.issue = 'some details';
+
+      const dummyValue = 'new details';
+      boardsStore.setIssueDetail(dummyValue);
+
+      expect(boardsStore.detail.issue).toEqual(dummyValue);
+    });
+  });
+
+  describe('startMoving', () => {
+    it('stores list and issue', () => {
+      const dummyIssue = 'some issue';
+      const dummyList = 'some list';
+
+      boardsStore.startMoving(dummyList, dummyIssue);
+
+      expect(boardsStore.moving.issue).toEqual(dummyIssue);
+      expect(boardsStore.moving.list).toEqual(dummyList);
+    });
+  });
+
+  describe('setTimeTrackingLimitToHours', () => {
+    it('sets the timeTracking.LimitToHours option', () => {
+      boardsStore.timeTracking.limitToHours = false;
+
+      boardsStore.setTimeTrackingLimitToHours('true');
+
+      expect(boardsStore.timeTracking.limitToHours).toEqual(true);
     });
   });
 });

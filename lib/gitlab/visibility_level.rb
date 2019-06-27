@@ -75,8 +75,8 @@ module Gitlab
         user.admin? || allowed_level?(level.to_i)
       end
 
+      # Level should be a numeric value, e.g. `20`
       # Return true if the specified level is allowed for the current user.
-      # Level should be a numeric value, e.g. `20`.
       def allowed_level?(level)
         valid_level?(level) && non_restricted_level?(level)
       end
@@ -137,6 +137,19 @@ module Gitlab
 
     def visibility=(level)
       self[visibility_level_field] = Gitlab::VisibilityLevel.level_value(level)
+    end
+
+    def visibility_attribute_present?(attributes)
+      visibility_level_attributes.each do |attr|
+        return true if attributes[attr].present?
+      end
+
+      false
+    end
+
+    def visibility_level_attributes
+      [visibility_level_field, visibility_level_field.to_s,
+       :visibility, 'visibility']
     end
   end
 end

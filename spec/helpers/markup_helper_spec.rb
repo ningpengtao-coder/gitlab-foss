@@ -78,7 +78,8 @@ describe MarkupHelper do
     let(:link)    { '/commits/0a1b2c3d' }
     let(:issues)  { create_list(:issue, 2, project: project) }
 
-    it 'handles references nested in links with all the text' do
+    # Clean the cache to make sure the title is re-rendered from the stubbed one
+    it 'handles references nested in links with all the text', :clean_gitlab_redis_cache do
       allow(commit).to receive(:title).and_return("This should finally fix #{issues[0].to_reference} and #{issues[1].to_reference} for real")
 
       actual = helper.link_to_markdown_field(commit, :title, link)
@@ -212,17 +213,6 @@ describe MarkupHelper do
       helper.render_wiki_content(@wiki)
     end
 
-    it 'uses Wiki pipeline for markdown files with RedCarpet if feature disabled' do
-      stub_feature_flags(commonmark_for_repositories: false)
-      allow(@wiki).to receive(:format).and_return(:markdown)
-
-      expect(helper).to receive(:markdown_unsafe).with('wiki content',
-        pipeline: :wiki, project: project, project_wiki: @wiki, page_slug: "nested/page",
-        issuable_state_filter_enabled: true, markdown_engine: :redcarpet)
-
-      helper.render_wiki_content(@wiki)
-    end
-
     it "uses Asciidoctor for asciidoc files" do
       allow(@wiki).to receive(:format).and_return(:asciidoc)
 
@@ -272,16 +262,6 @@ describe MarkupHelper do
 
     it 'defaults to CommonMark' do
       expect(helper.markup('foo.md', 'x^2')).to include('x^2')
-    end
-
-    it 'honors markdown_engine for RedCarpet' do
-      expect(helper.markup('foo.md', 'x^2', { markdown_engine: :redcarpet })).to include('x<sup>2</sup>')
-    end
-
-    it 'uses RedCarpet if feature disabled' do
-      stub_feature_flags(commonmark_for_repositories: false)
-
-      expect(helper.markup('foo.md', 'x^2', { markdown_engine: :redcarpet })).to include('x<sup>2</sup>')
     end
   end
 

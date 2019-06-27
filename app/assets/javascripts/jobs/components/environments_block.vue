@@ -86,9 +86,7 @@ export default {
         return sprintf(
           '%{startLink}%{name}%{endLink}',
           {
-            startLink: `<a href="${
-              this.deploymentStatus.environment.environment_path
-            }" class="js-environment-link">`,
+            startLink: `<a href="${this.deploymentStatus.environment.environment_path}" class="js-environment-link">`,
             name: _.escape(this.deploymentStatus.environment.name),
             endLink: '</a>',
           },
@@ -128,7 +126,7 @@ export default {
 };
 </script>
 <template>
-  <div class="prepend-top-default js-environment-container">
+  <div class="prepend-top-default append-bottom-default js-environment-container">
     <div class="environment-information">
       <ci-icon :status="iconStatus" />
       <p class="inline append-bottom-0" v-html="environment"></p>

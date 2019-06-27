@@ -29,7 +29,7 @@ export default {
     // The text input is editable when there's a custom interval, or when it's
     // a preset interval and the user clicks the 'custom' radio button
     isEditable() {
-      return !!(this.customInputEnabled || !this.intervalIsPreset);
+      return Boolean(this.customInputEnabled || !this.intervalIsPreset);
     },
   },
   watch: {
@@ -70,7 +70,7 @@ export default {
         :checked="isEditable"
         class="label-bold"
         type="radio"
-        @click="toggleCustomInput(true);"
+        @click="toggleCustomInput(true)"
       />
 
       <label for="custom"> {{ s__('PipelineSheduleIntervalPattern|Custom') }} </label>
@@ -88,7 +88,7 @@ export default {
         :value="cronIntervalPresets.everyDay"
         class="label-bold"
         type="radio"
-        @click="toggleCustomInput(false);"
+        @click="toggleCustomInput(false)"
       />
 
       <label class="label-bold" for="every-day"> {{ __('Every day (at 4:00am)') }} </label>
@@ -102,7 +102,7 @@ export default {
         :value="cronIntervalPresets.everyWeek"
         class="label-bold"
         type="radio"
-        @click="toggleCustomInput(false);"
+        @click="toggleCustomInput(false)"
       />
 
       <label class="label-bold" for="every-week">
@@ -118,7 +118,7 @@ export default {
         :value="cronIntervalPresets.everyMonth"
         class="label-bold"
         type="radio"
-        @click="toggleCustomInput(false);"
+        @click="toggleCustomInput(false)"
       />
 
       <label class="label-bold" for="every-month">

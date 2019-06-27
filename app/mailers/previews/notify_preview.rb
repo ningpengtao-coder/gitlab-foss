@@ -76,6 +76,10 @@ class NotifyPreview < ActionMailer::Preview
     Notify.changed_milestone_issue_email(user.id, issue.id, milestone, user.id)
   end
 
+  def import_issues_csv_email
+    Notify.import_issues_csv_email(user, project, { success: 3, errors: [5, 6, 7], valid_file: true })
+  end
+
   def closed_merge_request_email
     Notify.closed_merge_request_email(user.id, issue.id, user.id).message
   end
@@ -145,6 +149,10 @@ class NotifyPreview < ActionMailer::Preview
     Notify.autodevops_disabled_email(pipeline, user.email).message
   end
 
+  def remote_mirror_update_failed_email
+    Notify.remote_mirror_update_failed_email(remote_mirror.id, user.id).message
+  end
+
   private
 
   def project
@@ -165,6 +173,10 @@ class NotifyPreview < ActionMailer::Preview
 
   def pipeline
     @pipeline = Ci::Pipeline.last
+  end
+
+  def remote_mirror
+    @remote_mirror ||= RemoteMirror.last
   end
 
   def user

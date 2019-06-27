@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Projects::TransferService do
@@ -62,6 +64,15 @@ describe Projects::TransferService do
 
       expect(rugged_config['gitlab.fullpath']).to eq "#{group.full_path}/#{project.path}"
     end
+
+    it 'updates storage location' do
+      transfer_project(project, user, group)
+
+      expect(project.project_repository).to have_attributes(
+        disk_path: "#{group.full_path}/#{project.path}",
+        shard_name: project.repository_storage
+      )
+    end
   end
 
   context 'when transfer fails' do
@@ -113,6 +124,17 @@ describe Projects::TransferService do
         expect(service).not_to receive(:execute_system_hooks)
       end
     end
+
+    it 'does not update storage location' do
+      create(:project_repository, project: project)
+
+      attempt_project_transfer
+
+      expect(project.project_repository).to have_attributes(
+        disk_path: project.disk_path,
+        shard_name: project.repository_storage
+      )
+    end
   end
 
   context 'namespace -> no namespace' do
@@ -155,7 +177,7 @@ describe Projects::TransferService do
     before do
       group.add_owner(user)
 
-      unless gitlab_shell.create_repository(repository_storage, "#{group.full_path}/#{project.path}")
+      unless gitlab_shell.create_repository(repository_storage, "#{group.full_path}/#{project.path}", project.full_path)
         raise 'failed to add repository'
       end
 

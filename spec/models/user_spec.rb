@@ -1,8 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe User do
   include ProjectForksHelper
   include TermsHelper
+
+  it_behaves_like 'having unique enum values'
 
   describe 'modules' do
     subject { described_class }
@@ -43,6 +47,7 @@ describe User do
     it { is_expected.to have_many(:uploads) }
     it { is_expected.to have_many(:reported_abuse_reports).dependent(:destroy).class_name('AbuseReport') }
     it { is_expected.to have_many(:custom_attributes).class_name('UserCustomAttribute') }
+    it { is_expected.to have_many(:releases).dependent(:nullify) }
 
     describe "#abuse_report" do
       let(:current_user) { create(:user) }
@@ -93,6 +98,11 @@ describe User do
   end
 
   describe 'validations' do
+    describe 'name' do
+      it { is_expected.to validate_presence_of(:name) }
+      it { is_expected.to validate_length_of(:name).is_at_most(128) }
+    end
+
     describe 'username' do
       it 'validates presence' do
         expect(subject).to validate_presence_of(:username)
@@ -657,6 +667,68 @@ describe User do
     end
   end
 
+  describe '#highest_role' do
+    let(:user) { create(:user) }
+
+    let(:group) { create(:group) }
+
+    it 'returns NO_ACCESS if none has been set' do
+      expect(user.highest_role).to eq(Gitlab::Access::NO_ACCESS)
+    end
+
+    it 'returns MAINTAINER if user is maintainer of a project' do
+      create(:project, group: group) do |project|
+        project.add_maintainer(user)
+      end
+
+      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
+    end
+
+    it 'returns the highest role if user is member of multiple projects' do
+      create(:project, group: group) do |project|
+        project.add_maintainer(user)
+      end
+
+      create(:project, group: group) do |project|
+        project.add_developer(user)
+      end
+
+      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
+    end
+
+    it 'returns MAINTAINER if user is maintainer of a group' do
+      create(:group) do |group|
+        group.add_user(user, GroupMember::MAINTAINER)
+      end
+
+      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
+    end
+
+    it 'returns the highest role if user is member of multiple groups' do
+      create(:group) do |group|
+        group.add_user(user, GroupMember::MAINTAINER)
+      end
+
+      create(:group) do |group|
+        group.add_user(user, GroupMember::DEVELOPER)
+      end
+
+      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
+    end
+
+    it 'returns the highest role if user is member of multiple groups and projects' do
+      create(:group) do |group|
+        group.add_user(user, GroupMember::DEVELOPER)
+      end
+
+      create(:project, group: group) do |project|
+        project.add_maintainer(user)
+      end
+
+      expect(user.highest_role).to eq(Gitlab::Access::MAINTAINER)
+    end
+  end
+
   describe '#update_tracked_fields!', :clean_gitlab_redis_shared_state do
     let(:request) { OpenStruct.new(remote_ip: "127.0.0.1") }
     let(:user) { create(:user) }
@@ -922,6 +994,21 @@ describe User do
           expect(user.manageable_groups).to contain_exactly(group, subgroup)
         end
       end
+
+      describe '#manageable_groups_with_routes' do
+        it 'eager loads routes from manageable groups' do
+          control_count =
+            ActiveRecord::QueryRecorder.new(skip_cached: false) do
+              user.manageable_groups_with_routes.map(&:route)
+            end.count
+
+          create(:group, parent: subgroup)
+
+          expect do
+            user.manageable_groups_with_routes.map(&:route)
+          end.not_to exceed_all_query_limit(control_count)
+        end
+      end
     end
   end
 
@@ -958,43 +1045,43 @@ describe User do
     end
   end
 
-  describe '.filter' do
+  describe '.filter_items' do
     let(:user) { double }
 
     it 'filters by active users by default' do
       expect(described_class).to receive(:active).and_return([user])
 
-      expect(described_class.filter(nil)).to include user
+      expect(described_class.filter_items(nil)).to include user
     end
 
     it 'filters by admins' do
       expect(described_class).to receive(:admins).and_return([user])
 
-      expect(described_class.filter('admins')).to include user
+      expect(described_class.filter_items('admins')).to include user
     end
 
     it 'filters by blocked' do
       expect(described_class).to receive(:blocked).and_return([user])
 
-      expect(described_class.filter('blocked')).to include user
+      expect(described_class.filter_items('blocked')).to include user
     end
 
     it 'filters by two_factor_disabled' do
       expect(described_class).to receive(:without_two_factor).and_return([user])
 
-      expect(described_class.filter('two_factor_disabled')).to include user
+      expect(described_class.filter_items('two_factor_disabled')).to include user
     end
 
     it 'filters by two_factor_enabled' do
       expect(described_class).to receive(:with_two_factor).and_return([user])
 
-      expect(described_class.filter('two_factor_enabled')).to include user
+      expect(described_class.filter_items('two_factor_enabled')).to include user
     end
 
     it 'filters by wop' do
       expect(described_class).to receive(:without_projects).and_return([user])
 
-      expect(described_class.filter('wop')).to include user
+      expect(described_class.filter_items('wop')).to include user
     end
   end
 
@@ -1682,6 +1769,26 @@ describe User do
     end
   end
 
+  describe '#ultraauth_user?' do
+    it 'is true if provider is ultraauth' do
+      user = create(:omniauth_user, provider: 'ultraauth')
+
+      expect(user.ultraauth_user?).to be_truthy
+    end
+
+    it 'is false with othe provider' do
+      user = create(:omniauth_user, provider: 'not-ultraauth')
+
+      expect(user.ultraauth_user?).to be_falsey
+    end
+
+    it 'is false if no extern_uid is provided' do
+      user = create(:omniauth_user, extern_uid: nil)
+
+      expect(user.ldap_user?).to be_falsey
+    end
+  end
+
   describe '#full_website_url' do
     let(:user) { create(:user) }
 
@@ -1963,7 +2070,7 @@ describe User do
 
     subject { user.membership_groups }
 
-    if Group.supports_nested_groups?
+    if Group.supports_nested_objects?
       it { is_expected.to contain_exactly parent_group, child_group }
     else
       it { is_expected.to contain_exactly parent_group }
@@ -1993,6 +2100,33 @@ describe User do
 
       expect(subject).to include(accessible)
       expect(subject).not_to include(other)
+    end
+
+    context 'with min_access_level' do
+      let!(:user) { create(:user) }
+      let!(:project) { create(:project, :private, namespace: user.namespace) }
+
+      before do
+        project.add_developer(user)
+      end
+
+      subject { Project.where("EXISTS (?)", user.authorizations_for_projects(min_access_level: min_access_level)) }
+
+      context 'when developer access' do
+        let(:min_access_level) { Gitlab::Access::DEVELOPER }
+
+        it 'includes projects a user has access to' do
+          expect(subject).to include(project)
+        end
+      end
+
+      context 'when owner access' do
+        let(:min_access_level) { Gitlab::Access::OWNER }
+
+        it 'does not include projects with higher access level' do
+          expect(subject).not_to include(project)
+        end
+      end
     end
   end
 
@@ -2323,11 +2457,11 @@ describe User do
 
     context 'user is member of all groups' do
       before do
-        group.add_owner(user)
-        nested_group_1.add_owner(user)
-        nested_group_1_1.add_owner(user)
-        nested_group_2.add_owner(user)
-        nested_group_2_1.add_owner(user)
+        group.add_reporter(user)
+        nested_group_1.add_developer(user)
+        nested_group_1_1.add_maintainer(user)
+        nested_group_2.add_developer(user)
+        nested_group_2_1.add_maintainer(user)
       end
 
       it 'returns all groups' do
@@ -2344,7 +2478,7 @@ describe User do
         group.add_owner(user)
       end
 
-      if Group.supports_nested_groups?
+      if Group.supports_nested_objects?
         it 'returns all groups' do
           is_expected.to match_array [
             group,
@@ -2541,9 +2675,9 @@ describe User do
       end
     end
 
-    context 'with 2FA requirement on nested parent group', :nested_groups do
+    context 'with 2FA requirement from expanded groups', :nested_groups do
       let!(:group1) { create :group, require_two_factor_authentication: true }
-      let!(:group1a) { create :group, require_two_factor_authentication: false, parent: group1 }
+      let!(:group1a) { create :group, parent: group1 }
 
       before do
         group1a.add_user(user, GroupMember::OWNER)
@@ -2568,6 +2702,27 @@ describe User do
 
       it 'requires 2FA' do
         expect(user.require_two_factor_authentication_from_group).to be true
+      end
+    end
+
+    context "with 2FA requirement from shared project's group" do
+      let!(:group1) { create :group, require_two_factor_authentication: true }
+      let!(:group2) { create :group }
+      let(:shared_project) { create(:project, namespace: group1) }
+
+      before do
+        shared_project.project_group_links.create!(
+          group: group2,
+          group_access: ProjectGroupLink.default_access
+        )
+
+        group2.add_user(user, GroupMember::OWNER)
+      end
+
+      it 'does not require 2FA' do
+        user.update_two_factor_requirement
+
+        expect(user.require_two_factor_authentication_from_group).to be false
       end
     end
 
@@ -2672,6 +2827,12 @@ describe User do
 
       expect(user.allow_password_authentication_for_web?).to be_falsey
     end
+
+    it 'returns false for ultraauth user' do
+      user = create(:omniauth_user, provider: 'ultraauth')
+
+      expect(user.allow_password_authentication_for_web?).to be_falsey
+    end
   end
 
   describe '#allow_password_authentication_for_git?' do
@@ -2694,6 +2855,12 @@ describe User do
 
       expect(user.allow_password_authentication_for_git?).to be_falsey
     end
+
+    it 'returns false for ultraauth user' do
+      user = create(:omniauth_user, provider: 'ultraauth')
+
+      expect(user.allow_password_authentication_for_git?).to be_falsey
+    end
   end
 
   describe '#assigned_open_merge_requests_count' do
@@ -2702,9 +2869,9 @@ describe User do
       project = create(:project, :public)
       archived_project = create(:project, :public, :archived)
 
-      create(:merge_request, source_project: project, author: user, assignee: user)
-      create(:merge_request, :closed, source_project: project, author: user, assignee: user)
-      create(:merge_request, source_project: archived_project, author: user, assignee: user)
+      create(:merge_request, source_project: project, author: user, assignees: [user])
+      create(:merge_request, :closed, source_project: project, author: user, assignees: [user])
+      create(:merge_request, source_project: archived_project, author: user, assignees: [user])
 
       expect(user.assigned_open_merge_requests_count(force: true)).to eq 1
     end
@@ -3229,7 +3396,7 @@ describe User do
   end
 
   context 'with uploads' do
-    it_behaves_like 'model with mounted uploader', false do
+    it_behaves_like 'model with uploads', false do
       let(:model_object) { create(:user, :with_avatar) }
       let(:upload_attribute) { :avatar }
       let(:uploader_class) { AttachmentUploader }

@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-describe Environment do
+describe Environment, :use_clean_rails_memory_store_caching do
+  include ReactiveCachingHelpers
+
   let(:project) { create(:project, :stubbed_repository) }
   subject(:environment) { create(:environment, project: project) }
 
-  it { is_expected.to belong_to(:project) }
+  it { is_expected.to be_kind_of(ReactiveCaching) }
+
+  it { is_expected.to belong_to(:project).required }
   it { is_expected.to have_many(:deployments) }
 
   it { is_expected.to delegate_method(:stop_action).to(:last_deployment) }
@@ -38,6 +44,76 @@ describe Environment do
       expect(environment).to receive(:expire_etag_cache)
 
       environment.stop
+    end
+  end
+
+  describe '.for_name_like' do
+    subject { project.environments.for_name_like(query, limit: limit) }
+
+    let!(:environment) { create(:environment, name: 'production', project: project) }
+    let(:query) { 'pro' }
+    let(:limit) { 5 }
+
+    it 'returns a found name' do
+      is_expected.to include(environment)
+    end
+
+    context 'when query is production' do
+      let(:query) { 'production' }
+
+      it 'returns a found name' do
+        is_expected.to include(environment)
+      end
+    end
+
+    context 'when query is productionA' do
+      let(:query) { 'productionA' }
+
+      it 'returns empty array' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when query is empty' do
+      let(:query) { '' }
+
+      it 'returns a found name' do
+        is_expected.to include(environment)
+      end
+    end
+
+    context 'when query is nil' do
+      let(:query) { }
+
+      it 'raises an error' do
+        expect { subject }.to raise_error(NoMethodError)
+      end
+    end
+
+    context 'when query is partially matched in the middle of environment name' do
+      let(:query) { 'duction' }
+
+      it 'returns empty array' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when query contains a wildcard character' do
+      let(:query) { 'produc%' }
+
+      it 'prevents wildcard injection' do
+        is_expected.to be_empty
+      end
+    end
+  end
+
+  describe '.pluck_names' do
+    subject { described_class.pluck_names }
+
+    let!(:environment) { create(:environment, name: 'production', project: project) }
+
+    it 'plucks names' do
+      is_expected.to eq(%w[production])
     end
   end
 
@@ -90,6 +166,28 @@ describe Environment do
 
       it 'returns an environment name' do
         expect(environment.folder_name).to eq 'production'
+      end
+    end
+  end
+
+  describe '#name_without_type' do
+    context 'when it is inside a folder' do
+      subject(:environment) do
+        create(:environment, name: 'staging/review-1')
+      end
+
+      it 'returns name without folder' do
+        expect(environment.name_without_type).to eq 'review-1'
+      end
+    end
+
+    context 'when the environment if a top-level item itself' do
+      subject(:environment) do
+        create(:environment, name: 'production')
+      end
+
+      it 'returns full name' do
+        expect(environment.name_without_type).to eq 'production'
       end
     end
   end
@@ -421,28 +519,18 @@ describe Environment do
 
     context 'when the environment is available' do
       context 'with a deployment service' do
-        shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-          context 'and a deployment' do
-            let!(:deployment) { create(:deployment, :success, environment: environment) }
-            it { is_expected.to be_truthy }
-          end
-
-          context 'but no deployments' do
-            it { is_expected.to be_falsy }
-          end
-        end
-
-        context 'when user configured kubernetes from Integration > Kubernetes' do
-          let(:project) { create(:kubernetes_project) }
-
-          it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-        end
-
         context 'when user configured kubernetes from CI/CD > Clusters' do
           let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
           let(:project) { cluster.project }
 
-          it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
+          context 'with deployment' do
+            let!(:deployment) { create(:deployment, :success, environment: environment) }
+            it { is_expected.to be_truthy }
+          end
+
+          context 'without deployments' do
+            it { is_expected.to be_falsy }
+          end
         end
       end
 
@@ -452,8 +540,6 @@ describe Environment do
     end
 
     context 'when the environment is unavailable' do
-      let(:project) { create(:kubernetes_project) }
-
       before do
         environment.stop
       end
@@ -491,38 +577,61 @@ describe Environment do
   describe '#terminals' do
     subject { environment.terminals }
 
-    context 'when the environment has terminals' do
-      before do
-        allow(environment).to receive(:has_terminals?).and_return(true)
-      end
-
-      shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-        it 'returns the terminals from the deployment service' do
-          expect(project.deployment_platform)
-            .to receive(:terminals).with(environment)
-            .and_return(:fake_terminals)
-
-          is_expected.to eq(:fake_terminals)
-        end
-      end
-
-      context 'when user configured kubernetes from Integration > Kubernetes' do
-        let(:project) { create(:kubernetes_project) }
-
-        it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-      end
-
-      context 'when user configured kubernetes from CI/CD > Clusters' do
-        let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-        let(:project) { cluster.project }
-
-        it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-      end
+    before do
+      allow(environment).to receive(:deployment_platform).and_return(double)
     end
 
-    context 'when the environment does not have terminals' do
+    context 'reactive cache is empty' do
+      before do
+        stub_reactive_cache(environment, nil)
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'reactive cache has pod data' do
+      let(:cache_data) { Hash(pods: %w(pod1 pod2)) }
+
+      before do
+        stub_reactive_cache(environment, cache_data)
+      end
+
+      it 'retrieves terminals from the deployment platform' do
+        expect(environment.deployment_platform)
+          .to receive(:terminals).with(environment, cache_data)
+          .and_return(:fake_terminals)
+
+        is_expected.to eq(:fake_terminals)
+      end
+    end
+  end
+
+  describe '#calculate_reactive_cache' do
+    let(:cluster) { create(:cluster, :project, :provided_by_user) }
+    let(:project) { cluster.project }
+    let(:environment) { create(:environment, project: project) }
+    let!(:deployment) { create(:deployment, :success, environment: environment) }
+
+    subject { environment.calculate_reactive_cache }
+
+    it 'returns cache data from the deployment platform' do
+      expect(environment.deployment_platform).to receive(:calculate_reactive_cache_for)
+        .with(environment).and_return(pods: %w(pod1 pod2))
+
+      is_expected.to eq(pods: %w(pod1 pod2))
+    end
+
+    context 'environment does not have terminals available' do
       before do
         allow(environment).to receive(:has_terminals?).and_return(false)
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'project is pending deletion' do
+      before do
+        allow(environment.project).to receive(:pending_delete?).and_return(true)
       end
 
       it { is_expected.to be_nil }
@@ -591,7 +700,8 @@ describe Environment do
 
   describe '#additional_metrics' do
     let(:project) { create(:prometheus_project) }
-    subject { environment.additional_metrics }
+    let(:metric_params) { [] }
+    subject { environment.additional_metrics(*metric_params) }
 
     context 'when the environment has additional metrics' do
       before do
@@ -599,11 +709,25 @@ describe Environment do
       end
 
       it 'returns the additional metrics from the deployment service' do
-        expect(environment.prometheus_adapter).to receive(:query)
-                                                .with(:additional_metrics_environment, environment)
-                                                .and_return(:fake_metrics)
+        expect(environment.prometheus_adapter)
+          .to receive(:query)
+          .with(:additional_metrics_environment, environment)
+          .and_return(:fake_metrics)
 
         is_expected.to eq(:fake_metrics)
+      end
+
+      context 'when time window arguments are provided' do
+        let(:metric_params) { [1552642245.067, Time.now] }
+
+        it 'queries with the expected parameters' do
+          expect(environment.prometheus_adapter)
+            .to receive(:query)
+            .with(:additional_metrics_environment, environment, *metric_params.map(&:to_f))
+            .and_return(:fake_metrics)
+
+          is_expected.to eq(:fake_metrics)
+        end
       end
     end
 

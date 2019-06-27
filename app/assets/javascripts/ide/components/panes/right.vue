@@ -105,7 +105,7 @@ export default {
         :key="tabView.name"
         class="h-100"
       >
-        <component :is="tabView.name" />
+        <component :is="tabView.component || tabView.name" />
       </div>
     </resizable-panel>
     <nav class="ide-activity-bar">
@@ -122,7 +122,7 @@ export default {
             data-placement="left"
             class="ide-sidebar-link is-right"
             type="button"
-            @click="clickTab($event, tab);"
+            @click="clickTab($event, tab)"
           >
             <icon :size="16" :name="tab.icon" />
           </button>

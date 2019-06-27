@@ -47,6 +47,13 @@ module Gitlab
         response.size
       end
 
+      def get_object_directory_size
+        request = Gitaly::GetObjectDirectorySizeRequest.new(repository: @gitaly_repo)
+        response = GitalyClient.call(@storage, :repository_service, :get_object_directory_size, request, timeout: GitalyClient.medium_timeout)
+
+        response.size
+      end
+
       def apply_gitattributes(revision)
         request = Gitaly::ApplyGitattributesRequest.new(repository: @gitaly_repo, revision: encode_binary(revision))
         GitalyClient.call(@storage, :repository_service, :apply_gitattributes, request, timeout: GitalyClient.fast_timeout)
@@ -190,7 +197,7 @@ module Gitlab
 
       def fsck
         request = Gitaly::FsckRequest.new(repository: @gitaly_repo)
-        response = GitalyClient.call(@storage, :repository_service, :fsck, request)
+        response = GitalyClient.call(@storage, :repository_service, :fsck, request, timeout: GitalyClient.no_timeout)
 
         if response.error.empty?
           return "", 0
@@ -326,10 +333,38 @@ module Gitlab
 
       def search_files_by_content(ref, query)
         request = Gitaly::SearchFilesByContentRequest.new(repository: @gitaly_repo, ref: ref, query: query)
-        GitalyClient.call(@storage, :repository_service, :search_files_by_content, request).flat_map(&:matches)
+        response = GitalyClient.call(@storage, :repository_service, :search_files_by_content, request)
+
+        search_results_from_response(response)
+      end
+
+      def disconnect_alternates
+        request = Gitaly::DisconnectGitAlternatesRequest.new(
+          repository: @gitaly_repo
+        )
+
+        GitalyClient.call(@storage, :object_pool_service, :disconnect_git_alternates, request)
       end
 
       private
+
+      def search_results_from_response(gitaly_response)
+        matches = []
+        current_match = +""
+
+        gitaly_response.each do |message|
+          next if message.nil?
+
+          current_match << message.match_data
+
+          if message.end_of_match
+            matches << current_match
+            current_match = +""
+          end
+        end
+
+        matches
+      end
 
       def gitaly_fetch_stream_to_file(save_path, rpc_name, request_class, timeout)
         request = request_class.new(repository: @gitaly_repo)

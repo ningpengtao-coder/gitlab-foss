@@ -142,7 +142,7 @@ export default {
 
     Object.assign(state.entries[file.path], {
       raw: file.content,
-      changed: !!changedFile,
+      changed: Boolean(changedFile),
       staged: false,
       prevPath: '',
       moved: false,
@@ -206,28 +206,28 @@ export default {
       }
     }
   },
-  [types.RENAME_ENTRY](state, { path, name, entryPath = null }) {
+  [types.RENAME_ENTRY](state, { path, name, entryPath = null, parentPath }) {
     const oldEntry = state.entries[entryPath || path];
-    const nameRegex =
-      !entryPath && oldEntry.type === 'blob'
-        ? new RegExp(`${oldEntry.name}$`)
-        : new RegExp(`^${path}`);
-    const newPath = oldEntry.path.replace(nameRegex, name);
-    const parentPath = oldEntry.parentPath ? oldEntry.parentPath.replace(nameRegex, name) : '';
+    const slashedParentPath = parentPath ? `${parentPath}/` : '';
+    const newPath = entryPath
+      ? `${slashedParentPath}${oldEntry.name}`
+      : `${slashedParentPath}${name}`;
 
-    state.entries[newPath] = {
+    Vue.set(state.entries, newPath, {
       ...oldEntry,
       id: newPath,
-      key: `${name}-${oldEntry.type}-${oldEntry.id}`,
+      key: `${newPath}-${oldEntry.type}-${oldEntry.path}`,
       path: newPath,
       name: entryPath ? oldEntry.name : name,
       tempFile: true,
       prevPath: oldEntry.tempFile ? null : oldEntry.path,
       url: oldEntry.url.replace(new RegExp(`${oldEntry.path}/?$`), newPath),
       tree: [],
-      parentPath,
       raw: '',
-    };
+      opened: false,
+      parentPath,
+    });
+
     oldEntry.moved = true;
     oldEntry.movedPath = newPath;
 
@@ -242,10 +242,6 @@ export default {
       state.changedFiles = state.changedFiles.concat(newEntry);
     }
 
-    if (state.entries[newPath].opened) {
-      state.openFiles.push(state.entries[newPath]);
-    }
-
     if (oldEntry.tempFile) {
       const filterMethod = f => f.path !== oldEntry.path;
 
@@ -256,6 +252,7 @@ export default {
       Vue.delete(state.entries, oldEntry.path);
     }
   },
+
   ...projectMutations,
   ...mergeRequestMutation,
   ...fileMutations,

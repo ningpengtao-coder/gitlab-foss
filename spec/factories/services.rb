@@ -24,6 +24,14 @@ FactoryBot.define do
       api_url: 'https://kubernetes.example.com',
       token: 'a' * 40
     })
+
+    skip_deprecation_validation true
+  end
+
+  factory :mock_deployment_service do
+    project
+    type 'MockDeploymentService'
+    active true
   end
 
   factory :prometheus_service do

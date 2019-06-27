@@ -30,6 +30,9 @@ export default {
     showLoading() {
       return !this.currentTree || this.currentTree.loading;
     },
+    actualTreeList() {
+      return this.currentTree.tree.filter(entry => !entry.moved);
+    },
   },
   mounted() {
     this.updateViewer(this.viewerType);
@@ -54,14 +57,17 @@ export default {
         <slot name="header"></slot>
       </header>
       <div class="ide-tree-body h-100">
-        <file-row
-          v-for="file in currentTree.tree"
-          :key="file.key"
-          :file="file"
-          :level="0"
-          :extra-component="$options.FileRowExtra"
-          @toggleTreeOpen="toggleTreeOpen"
-        />
+        <template v-if="actualTreeList.length">
+          <file-row
+            v-for="file in actualTreeList"
+            :key="file.key"
+            :file="file"
+            :level="0"
+            :extra-component="$options.FileRowExtra"
+            @toggleTreeOpen="toggleTreeOpen"
+          />
+        </template>
+        <div v-else class="file-row">{{ __('No files') }}</div>
       </div>
     </template>
   </div>

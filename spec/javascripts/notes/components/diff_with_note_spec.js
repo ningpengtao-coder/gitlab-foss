@@ -17,7 +17,7 @@ describe('diff_with_note', () => {
   };
   const selectors = {
     get container() {
-      return vm.$refs.fileHolder;
+      return vm.$el;
     },
     get diffTable() {
       return this.container.querySelector('.diff-content table');
@@ -47,6 +47,19 @@ describe('diff_with_note', () => {
       vm = mountComponentWithStore(Component, { props, store });
     });
 
+    it('removes trailing "+" char', () => {
+      const richText = vm.$el.querySelectorAll('.line_holder')[4].querySelector('.line_content')
+        .textContent[0];
+
+      expect(richText).not.toEqual('+');
+    });
+
+    it('removes trailing "-" char', () => {
+      const richText = vm.$el.querySelector('#LC13').parentNode.textContent[0];
+
+      expect(richText).not.toEqual('-');
+    });
+
     it('shows text diff', () => {
       expect(selectors.container).toHaveClass('text-file');
       expect(selectors.diffTable).toExist();
@@ -70,7 +83,6 @@ describe('diff_with_note', () => {
     it('shows image diff', () => {
       vm = mountComponentWithStore(Component, { props, store });
 
-      expect(selectors.container).toHaveClass('js-image-file');
       expect(selectors.diffTable).not.toExist();
     });
   });

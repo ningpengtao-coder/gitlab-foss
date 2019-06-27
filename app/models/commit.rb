@@ -11,7 +11,9 @@ class Commit
   include Mentionable
   include Referable
   include StaticModel
+  include Presentable
   include ::Gitlab::Utils::StrongMemoize
+  include CacheMarkdownField
 
   attr_mentionable :safe_message, pipeline: :single_line
 
@@ -36,13 +38,9 @@ class Commit
   # Used by GFM to match and present link extensions on node texts and hrefs.
   LINK_EXTENSION_PATTERN = /(patch)/.freeze
 
-  def banzai_render_context(field)
-    pipeline = field == :description ? :commit_description : :single_line
-    context = { pipeline: pipeline, project: self.project }
-    context[:author] = self.author if self.author
-
-    context
-  end
+  cache_markdown_field :title, pipeline: :single_line
+  cache_markdown_field :full_title, pipeline: :single_line
+  cache_markdown_field :description, pipeline: :commit_description
 
   class << self
     def decorate(commits, project)
@@ -96,7 +94,7 @@ class Commit
     end
 
     def lazy(project, oid)
-      BatchLoader.for({ project: project, oid: oid }).batch do |items, loader|
+      BatchLoader.for({ project: project, oid: oid }).batch(replace_methods: false) do |items, loader|
         items_by_project = items.group_by { |i| i[:project] }
 
         items_by_project.each do |project, commit_ids|
@@ -177,7 +175,9 @@ class Commit
   def title
     return full_title if full_title.length < 100
 
-    full_title.truncate(81, separator: ' ', omission: '…')
+    # Use three dots instead of the ellipsis Unicode character because
+    # some clients show the raw Unicode value in the merge commit.
+    full_title.truncate(81, separator: ' ', omission: '...')
   end
 
   # Returns the full commits title
@@ -298,11 +298,13 @@ class Commit
   end
 
   def pipelines
-    project.pipelines.where(sha: sha)
+    project.ci_pipelines.where(sha: sha)
   end
 
   def last_pipeline
-    @last_pipeline ||= pipelines.last
+    strong_memoize(:last_pipeline) do
+      pipelines.last
+    end
   end
 
   def status(ref = nil)
@@ -312,7 +314,7 @@ class Commit
   end
 
   def status_for_project(ref, pipeline_project)
-    pipeline_project.pipelines.latest_status_per_commit(id, ref)[id]
+    pipeline_project.ci_pipelines.latest_status_per_commit(id, ref)[id]
   end
 
   def set_status_for_ref(ref, status)
@@ -374,7 +376,7 @@ class Commit
   end
 
   def merge_commit?
-    parents.size > 1
+    parent_ids.size > 1
   end
 
   def merged_merge_request(current_user)
@@ -465,6 +467,10 @@ class Commit
 
   def merged_merge_request?(user)
     !!merged_merge_request(user)
+  end
+
+  def cache_key
+    "commit:#{sha}"
   end
 
   private

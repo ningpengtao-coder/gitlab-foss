@@ -18,12 +18,12 @@ import UserOverviewBlock from './user_overview_block';
  *
  * <ul class="nav-links">
  *   <li class="activity-tab active">
- *     <a data-action="activity" data-target="#activity" data-toggle="tab" href="/u/username">
+ *     <a data-action="activity" data-target="#activity" data-toggle="tab" href="/username">
  *       Activity
  *     </a>
  *   </li>
  *   <li class="groups-tab">
- *     <a data-action="groups" data-target="#groups" data-toggle="tab" href="/u/username/groups">
+ *     <a data-action="groups" data-target="#groups" data-toggle="tab" href="/users/username/groups">
  *       Groups
  *     </a>
  *   </li>
@@ -91,6 +91,7 @@ export default class UserTabs {
     this.actions = Object.keys(this.loaded);
     this.bindEvents();
 
+    // TODO: refactor to make this configurable via constructor params with a default value of 'show'
     if (this.action === 'show') {
       this.action = this.defaultAction;
     }
@@ -151,8 +152,10 @@ export default class UserTabs {
   loadTab(action, endpoint) {
     this.toggleLoading(true);
 
+    const params = action === 'projects' ? { skip_namespace: true } : {};
+
     return axios
-      .get(endpoint)
+      .get(endpoint, { params })
       .then(({ data }) => {
         const tabSelector = `div#${action}`;
         this.$parentEl.find(tabSelector).html(data.html);
@@ -188,7 +191,7 @@ export default class UserTabs {
       requestParams: { limit: 10 },
     });
     UserTabs.renderMostRecentBlocks('#js-overview .projects-block', {
-      requestParams: { limit: 10, skip_pagination: true },
+      requestParams: { limit: 10, skip_pagination: true, skip_namespace: true, compact_mode: true },
     });
 
     this.loaded.overview = true;
@@ -206,6 +209,8 @@ export default class UserTabs {
 
   loadActivityCalendar() {
     const $calendarWrap = this.$parentEl.find('.tab-pane.active .user-calendar');
+    if (!$calendarWrap.length) return;
+
     const calendarPath = $calendarWrap.data('calendarPath');
 
     AjaxCache.retrieve(calendarPath)
@@ -217,7 +222,7 @@ export default class UserTabs {
     const monthsAgo = UserTabs.getVisibleCalendarPeriod($calendarWrap);
     const calendarActivitiesPath = $calendarWrap.data('calendarActivitiesPath');
     const utcOffset = $calendarWrap.data('utcOffset');
-    const calendarHint = __('Issues, merge requests, pushes and comments.');
+    const calendarHint = __('Issues, merge requests, pushes, and comments.');
 
     $calendarWrap.html(CALENDAR_TEMPLATE);
 
@@ -230,7 +235,7 @@ export default class UserTabs {
       data,
       calendarActivitiesPath,
       utcOffset,
-      0,
+      gon.first_day_of_week,
       monthsAgo,
     );
   }

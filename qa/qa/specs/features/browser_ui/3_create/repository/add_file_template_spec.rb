@@ -7,7 +7,7 @@ module QA
 
       def login
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.act { sign_in_using_credentials }
+        Page::Main::Login.perform(&:sign_in_using_credentials)
       end
 
       before(:all) do
@@ -16,9 +16,10 @@ module QA
         @project = Resource::Project.fabricate! do |project|
           project.name = 'file-template-project'
           project.description = 'Add file templates via the Files view'
+          project.initialize_with_readme = true
         end
 
-        Page::Main::Menu.act { sign_out }
+        Page::Main::Menu.perform(&:sign_out)
       end
 
       templates = [
@@ -55,7 +56,7 @@ module QA
           login
           @project.visit!
 
-          Page::Project::Show.act { create_new_file! }
+          Page::Project::Show.perform(&:create_new_file!)
           Page::File::Form.perform do |page|
             page.select_template template[:file_name], template[:name]
           end

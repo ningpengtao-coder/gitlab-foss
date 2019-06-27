@@ -9,13 +9,13 @@ comments: false
 Create projects and groups.
 
 - [Create a new project](../gitlab-basics/create-project.md)
-- [Create a new group](../gitlab-basics/create-group.md)
+- [Create a new group](../user/group/index.md#create-a-new-group)
 
 ## Prioritize
 
 Create issues, labels, milestones, cast your vote, and review issues.
 
-- [Create a new issue](../user/project/issues/index.md#new-issue)
+- [Create an issue](../user/project/issues/create_new_issue.md)
 - [Assign labels to issues](../user/project/labels.md)
 - [Use milestones as an overview of your project's tracker](../user/project/milestones/index.md)
 - [Use voting to express your like/dislike to issues and merge requests](../workflow/award_emoji.md)
@@ -43,4 +43,4 @@ Install and update your GitLab installation.
 
 - [Install GitLab](https://about.gitlab.com/installation/)
 - [Update GitLab](https://about.gitlab.com/update/)
-- [Explore Omnibus GitLab configuration options](http://docs.gitlab.com/omnibus/settings/configuration.html)
+- [Explore Omnibus GitLab configuration options](https://docs.gitlab.com/omnibus/settings/configuration.html)

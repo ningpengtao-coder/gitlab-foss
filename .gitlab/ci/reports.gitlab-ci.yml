@@ -1,0 +1,26 @@
+include:
+  - template: Code-Quality.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+
+code_quality:
+  extends: .dedicated-no-docs
+  # gitlab-org runners set `privileged: false` but we need to have it set to true
+  # since we're using Docker in Docker
+  tags: []
+  before_script: []
+  cache: {}
+  dependencies: []
+
+sast:
+  extends: .dedicated-no-docs
+  before_script: []
+  tags: []
+  variables:
+    SAST_CONFIDENCE_LEVEL: 2
+    DOCKER_DRIVER: overlay2
+
+dependency_scanning:
+  before_script: []
+  tags: []
+  extends: .dedicated-no-docs

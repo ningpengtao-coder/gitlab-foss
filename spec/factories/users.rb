@@ -66,6 +66,16 @@ FactoryBot.define do
       end
     end
 
+    transient do
+      developer_projects []
+    end
+
+    after(:create) do |user, evaluator|
+      evaluator.developer_projects.each do |project|
+        project.add_developer(user)
+      end
+    end
+
     factory :omniauth_user do
       transient do
         extern_uid '123456'
@@ -73,11 +83,16 @@ FactoryBot.define do
       end
 
       after(:create) do |user, evaluator|
-        user.identities << create(
-          :identity,
+        identity_attrs = {
           provider: evaluator.provider,
           extern_uid: evaluator.extern_uid
-        )
+        }
+
+        if evaluator.respond_to?(:saml_provider)
+          identity_attrs[:saml_provider] = evaluator.saml_provider
+        end
+
+        user.identities << create(:identity, identity_attrs)
       end
     end
 

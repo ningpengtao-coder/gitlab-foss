@@ -68,6 +68,7 @@ GET /groups?statistics=true
     "statistics": {
       "storage_size" : 212,
       "repository_size" : 33,
+      "wiki_size" : 100,
       "lfs_objects_size" : 123,
       "job_artifacts_size" : 57
 
@@ -220,7 +221,7 @@ Parameters:
 | `with_projects` | boolean | no | Include details from projects that belong to the specified group (defaults to `true`). |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/4
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4
 ```
 
 Example response:
@@ -357,12 +358,14 @@ Example response:
         {
           "group_id": 4,
           "group_name": "Twitter",
+          "group_full_path": "twitter",
           "group_access_level": 30,
           "expires_at": null
         },
         {
           "group_id": 3,
           "group_name": "Gitlab Org",
+          "group_full_path": "gitlab-org",
           "group_access_level": 10,
           "expires_at": "2018-08-14"
         }
@@ -375,7 +378,7 @@ Example response:
 When adding the parameter `with_projects=false`, projects will not be returned.
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/4?with_projects=false
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4?with_projects=false
 ```
 
 Example response:
@@ -452,7 +455,7 @@ PUT /groups/:id
 | `file_template_project_id` | integer | no | **(Premium)** The ID of a project to load custom file templates from |
 
 ```bash
-curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/groups/5?name=Experimental"
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/5?name=Experimental"
 
 ```
 

@@ -5,12 +5,12 @@ module Gitlab
     class YamlProcessor
       ValidationError = Class.new(StandardError)
 
-      include Gitlab::Ci::Config::Entry::LegacyValidationHelpers
+      include Gitlab::Config::Entry::LegacyValidationHelpers
 
-      attr_reader :cache, :stages, :jobs
+      attr_reader :stages, :jobs
 
       def initialize(config, opts = {})
-        @ci_config = Gitlab::Ci::Config.new(config, opts)
+        @ci_config = Gitlab::Ci::Config.new(config, **opts)
         @config = @ci_config.to_hash
 
         unless @ci_config.valid?
@@ -33,8 +33,7 @@ module Gitlab
 
         { stage_idx: @stages.index(job[:stage]),
           stage: job[:stage],
-          commands: job[:commands],
-          tag_list: job[:tags] || [],
+          tag_list: job[:tags],
           name: job[:name].to_s,
           allow_failure: job[:ignore],
           when: job[:when] || 'on_success',
@@ -54,8 +53,9 @@ module Gitlab
             retry: job[:retry],
             parallel: job[:parallel],
             instance: job[:instance],
-            start_in: job[:start_in]
-          }.compact }
+            start_in: job[:start_in],
+            trigger: job[:trigger]
+          }.compact }.compact
       end
 
       def stage_builds_attributes(stage)
@@ -95,13 +95,8 @@ module Gitlab
         ##
         # Global config
         #
-        @before_script = @ci_config.before_script
-        @image = @ci_config.image
-        @after_script = @ci_config.after_script
-        @services = @ci_config.services
         @variables = @ci_config.variables
         @stages = @ci_config.stages
-        @cache = @ci_config.cache
 
         ##
         # Jobs

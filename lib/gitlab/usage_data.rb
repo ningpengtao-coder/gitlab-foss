@@ -2,6 +2,8 @@
 
 module Gitlab
   class UsageData
+    APPROXIMATE_COUNT_MODELS = [Label, MergeRequest, Note, Todo].freeze
+
     class << self
       def data(force_refresh: false)
         Rails.cache.fetch('usage_data', force: force_refresh, expires_in: 2.weeks) { uncached_data }
@@ -24,7 +26,7 @@ module Gitlab
           uuid: Gitlab::CurrentSettings.uuid,
           hostname: Gitlab.config.gitlab.host,
           version: Gitlab::VERSION,
-          installation_type: Gitlab::INSTALLATION_TYPE,
+          installation_type: installation_type,
           active_user_count: count(User.active),
           recorded_at: Time.now,
           edition: 'CE'
@@ -52,41 +54,54 @@ module Gitlab
             auto_devops_disabled: count(::ProjectAutoDevops.disabled),
             deploy_keys: count(DeployKey),
             deployments: count(Deployment),
+            successful_deployments: count(Deployment.success),
+            failed_deployments: count(Deployment.failed),
             environments: count(::Environment),
             clusters: count(::Clusters::Cluster),
             clusters_enabled: count(::Clusters::Cluster.enabled),
+            project_clusters_enabled: count(::Clusters::Cluster.enabled.project_type),
+            group_clusters_enabled: count(::Clusters::Cluster.enabled.group_type),
             clusters_disabled: count(::Clusters::Cluster.disabled),
+            project_clusters_disabled: count(::Clusters::Cluster.disabled.project_type),
+            group_clusters_disabled: count(::Clusters::Cluster.disabled.group_type),
             clusters_platforms_gke: count(::Clusters::Cluster.gcp_installed.enabled),
             clusters_platforms_user: count(::Clusters::Cluster.user_provided.enabled),
-            clusters_applications_helm: count(::Clusters::Applications::Helm.installed),
-            clusters_applications_ingress: count(::Clusters::Applications::Ingress.installed),
-            clusters_applications_cert_managers: count(::Clusters::Applications::CertManager.installed),
-            clusters_applications_prometheus: count(::Clusters::Applications::Prometheus.installed),
-            clusters_applications_runner: count(::Clusters::Applications::Runner.installed),
-            clusters_applications_knative: count(::Clusters::Applications::Knative.installed),
+            clusters_applications_helm: count(::Clusters::Applications::Helm.available),
+            clusters_applications_ingress: count(::Clusters::Applications::Ingress.available),
+            clusters_applications_cert_managers: count(::Clusters::Applications::CertManager.available),
+            clusters_applications_prometheus: count(::Clusters::Applications::Prometheus.available),
+            clusters_applications_runner: count(::Clusters::Applications::Runner.available),
+            clusters_applications_knative: count(::Clusters::Applications::Knative.available),
             in_review_folder: count(::Environment.in_review_folder),
             groups: count(Group),
             issues: count(Issue),
             keys: count(Key),
             label_lists: count(List.label),
-            labels: count(Label),
             lfs_objects: count(LfsObject),
-            merge_requests: count(MergeRequest),
             milestone_lists: count(List.milestone),
             milestones: count(Milestone),
-            notes: count(Note),
             pages_domains: count(PagesDomain),
+            pool_repositories: count(PoolRepository),
             projects: count(Project),
             projects_imported_from_github: count(Project.where(import_type: 'github')),
+            projects_with_repositories_enabled: count(ProjectFeature.where('repository_access_level > ?', ProjectFeature::DISABLED)),
+            projects_with_error_tracking_enabled: count(::ErrorTracking::ProjectErrorTrackingSetting.where(enabled: true)),
             protected_branches: count(ProtectedBranch),
             releases: count(Release),
             remote_mirrors: count(RemoteMirror),
             snippets: count(Snippet),
+            suggestions: count(Suggestion),
             todos: count(Todo),
             uploads: count(Upload),
             web_hooks: count(WebHook)
-          }.merge(services_usage)
-        }
+          }
+          .merge(services_usage)
+          .merge(approximate_counts)
+        }.tap do |data|
+          if Feature.enabled?(:group_overview_security_dashboard)
+            data[:counts][:user_preferences] = user_preferences_usage
+          end
+        end
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
@@ -103,9 +118,11 @@ module Gitlab
           container_registry_enabled: Gitlab.config.registry.enabled,
           gitlab_shared_runners_enabled: Gitlab.config.gitlab_ci.shared_runners_enabled,
           gravatar_enabled: Gitlab::CurrentSettings.gravatar_enabled?,
+          influxdb_metrics_enabled: Gitlab::Metrics.influx_metrics_enabled?,
           ldap_enabled: Gitlab.config.ldap.enabled,
           mattermost_enabled: Gitlab.config.mattermost.enabled,
           omniauth_enabled: Gitlab::Auth.omniauth_enabled?,
+          prometheus_metrics_enabled: Gitlab::Metrics.prometheus_metrics_enabled?,
           reply_by_email_enabled: Gitlab::IncomingEmail.enabled?,
           signup_enabled: Gitlab::CurrentSettings.allow_signup?
         }
@@ -119,8 +136,9 @@ module Gitlab
 
       def components_usage_data
         {
-          gitlab_pages: { enabled: Gitlab.config.pages.enabled, version: Gitlab::Pages::VERSION },
           git: { version: Gitlab::Git.version },
+          gitaly: { version: Gitaly::Server.all.first.server_version, servers: Gitaly::Server.count, filesystems: Gitaly::Server.filesystems },
+          gitlab_pages: { enabled: Gitlab.config.pages.enabled, version: Gitlab::Pages::VERSION },
           database: { adapter: Gitlab::Database.adapter_name, version: Gitlab::Database.version }
         }
       end
@@ -154,12 +172,34 @@ module Gitlab
         }
       end
 
+      def user_preferences_usage
+        {} # augmented in EE
+      end
+
       def count(relation, fallback: -1)
         relation.count
       rescue ActiveRecord::StatementInvalid
         fallback
       end
       # rubocop: enable CodeReuse/ActiveRecord
+
+      def approximate_counts
+        approx_counts = Gitlab::Database::Count.approximate_counts(APPROXIMATE_COUNT_MODELS)
+
+        APPROXIMATE_COUNT_MODELS.each_with_object({}) do |model, result|
+          key = model.name.underscore.pluralize.to_sym
+
+          result[key] = approx_counts[model] || -1
+        end
+      end
+
+      def installation_type
+        if Rails.env.production?
+          Gitlab::INSTALLATION_TYPE
+        else
+          "gitlab-development-kit"
+        end
+      end
     end
   end
 end

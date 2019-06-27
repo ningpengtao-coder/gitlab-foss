@@ -1,9 +1,13 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Service do
   describe "Associations" do
     it { is_expected.to belong_to :project }
     it { is_expected.to have_one :service_hook }
+    it { is_expected.to have_one :jira_tracker_data }
+    it { is_expected.to have_one :issue_tracker_data }
   end
 
   describe 'Validations' do
@@ -78,7 +82,7 @@ describe Service do
       context 'when template is invalid' do
         it 'sets service template to inactive when template is invalid' do
           project = create(:project)
-          template = KubernetesService.new(template: true, active: true)
+          template = build(:prometheus_service, template: true, active: true, properties: {})
           template.save(validate: false)
 
           service = described_class.build_from_template(project.id, template)
@@ -289,7 +293,7 @@ describe Service do
   describe "#deprecated?" do
     let(:project) { create(:project, :repository) }
 
-    it 'should return false by default' do
+    it 'returns false by default' do
       service = create(:service, project: project)
       expect(service.deprecated?).to be_falsy
     end
@@ -298,17 +302,17 @@ describe Service do
   describe "#deprecation_message" do
     let(:project) { create(:project, :repository) }
 
-    it 'should be empty by default' do
+    it 'is empty by default' do
       service = create(:service, project: project)
       expect(service.deprecation_message).to be_nil
     end
   end
 
   describe '.find_by_template' do
-    let!(:kubernetes_service) { create(:kubernetes_service, template: true) }
+    let!(:service) { create(:service, template: true) }
 
     it 'returns service template' do
-      expect(KubernetesService.find_by_template).to eq(kubernetes_service)
+      expect(described_class.find_by_template).to eq(service)
     end
   end
 

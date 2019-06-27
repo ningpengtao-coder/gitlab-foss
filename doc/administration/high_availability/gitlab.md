@@ -1,8 +1,4 @@
-# Configuring GitLab for HA
-
-Assuming you have already configured a [database](database.md), [Redis](redis.md), and [NFS](nfs.md), you can
-configure the GitLab application server(s) now. Complete the steps below
-for each GitLab application server in your environment.
+# Configuring GitLab Scaling and High Availability
 
 > **Note:** There is some additional configuration near the bottom for
   additional GitLab application servers. It's important to read and understand
@@ -58,6 +54,7 @@ for each GitLab application server in your environment.
 
     # Disable components that will not be on the GitLab application server
     roles ['application_role']
+    nginx['enable'] = true
 
     # PostgreSQL connection details
     gitlab_rails['db_adapter'] = 'postgresql'
@@ -69,7 +66,7 @@ for each GitLab application server in your environment.
     gitlab_rails['redis_port'] = '6379'
     gitlab_rails['redis_host'] = '10.1.0.6' # IP/hostname of Redis server
     gitlab_rails['redis_password'] = 'Redis Password'
-    
+
     # Ensure UIDs and GIDs match between servers for permissions via NFS
     user['uid'] = 9000
     user['gid'] = 9000
@@ -79,17 +76,22 @@ for each GitLab application server in your environment.
     registry['gid'] = 9002
     ```
 
+1. [Enable monitoring](#enable-monitoring)
+
     > **Note:** To maintain uniformity of links across HA clusters, the `external_url`
     on the first application server as well as the additional application
     servers should point to the external url that users will use to access GitLab.
     In a typical HA setup, this will be the url of the load balancer which will
     route traffic to all GitLab application servers in the HA cluster.
-    > 
+    >
     > **Note:** When you specify `https` in the `external_url`, as in the example
     above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
     certificates are not present, Nginx will fail to start. See
-    [Nginx documentation](http://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
+    [Nginx documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
     for more information.
+    >
+    > **Note:** It is best to set the `uid` and `gid`s prior to the initial reconfigure
+    of GitLab. Omnibus will not recursively `chown` directories if set after the initial reconfigure.
 
 ## First GitLab application server
 
@@ -108,8 +110,9 @@ Additional GitLab servers (servers configured **after** the first GitLab server)
 need some extra configuration.
 
 1. Configure shared secrets. These values can be obtained from the primary
-   GitLab server in `/etc/gitlab/gitlab-secrets.json`. Add these to
-   `/etc/gitlab/gitlab.rb` **prior to** running the first `reconfigure`.
+   GitLab server in `/etc/gitlab/gitlab-secrets.json`. Copy this file to the
+   secondary servers **prior to** running the first `reconfigure` in the steps
+   above.
 
     ```ruby
     gitlab_shell['secret_token'] = 'fbfb19c355066a9afb030992231c4a363357f77345edd0f2e772359e5be59b02538e1fa6cae8f93f7d23355341cea2b93600dab6d6c3edcdced558fc6d739860'
@@ -129,6 +132,47 @@ need some extra configuration.
 
 1. Run `sudo gitlab-ctl reconfigure` to compile the configuration.
 
+## Enable Monitoring
+
+> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/3786) in GitLab 12.0.
+
+If you enable Monitoring, it must be enabled on **all** GitLab servers.
+
+1. Make sure to collect [`CONSUL_SERVER_NODES`](database.md#consul-information), which are the IP addresses or DNS records of the Consul server nodes, for the next step. Note they are presented as `Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z`
+
+1. Create/edit `/etc/gitlab/gitlab.rb` and add the following configuration:
+
+   ```ruby
+   # Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+
+   # Replace placeholders
+   # Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z
+   # with the addresses of the Consul server nodes
+   consul['configuration'] = {
+      retry_join: %w(Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z),
+   }
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   gitlab_workhorse['prometheus_listen_addr'] = '0.0.0.0:9229'
+   sidekiq['listen_address'] = "0.0.0.0"
+   unicorn['listen'] = '0.0.0.0'
+
+   # Add the monitoring node's IP address to the monitoring whitelist and allow it to
+   # scrape the NGINX metrics. Replace placeholder `monitoring.gitlab.example.com` with
+   # the address and/or subnets gathered from the monitoring node(s).
+   gitlab_rails['monitoring_whitelist'] = ['monitoring.gitlab.example.com', '127.0.0.0/8']
+   nginx['status']['options']['allow'] = ['monitoring.gitlab.example.com', '127.0.0.0/8']
+   ```
+
+1. Run `sudo gitlab-ctl reconfigure` to compile the configuration.
+
+> **Warning:** After changing `unicorn['listen']` in `gitlab.rb`, and running `sudo gitlab-ctl reconfigure`,
+  it can take an extended period of time for unicorn to complete reloading after receiving a `HUP`.
+  For more information, see the [issue](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/4401).
+
 ## Troubleshooting
 
 - `mount: wrong fs type, bad option, bad superblock on`
@@ -141,6 +185,14 @@ This particular directory does not exist on the NFS server. Ensure
 the share is exported and exists on the NFS server and try to remount.
 
 ---
+
+## Upgrading GitLab HA
+
+GitLab HA installations can be upgraded with no downtime, but the
+upgrade process must be carefully coordinated to avoid failures. See the
+[Omnibus GitLab multi-node upgrade
+document](https://docs.gitlab.com/omnibus/update/#multi-node--ha-deployment)
+for more details.
 
 Read more on high-availability configuration:
 

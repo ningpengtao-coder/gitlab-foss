@@ -28,12 +28,20 @@
   background-color: $red-100;
   border-color: $red-200;
   color: $red-700;
+
+  a {
+    color: $red-700;
+  }
 }
 
 .bs-callout-warning {
   background-color: $orange-100;
   border-color: $orange-200;
-  color: $orange-700;
+  color: $orange-900;
+
+  a {
+    color: $orange-900;
+  }
 }
 
 .bs-callout-info {

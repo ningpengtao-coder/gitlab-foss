@@ -37,6 +37,10 @@ export default {
       required: false,
       default: '',
     },
+    limitToHours: {
+      type: Boolean,
+      default: false,
+    },
     rootPath: {
       type: String,
       required: true,
@@ -49,10 +53,10 @@ export default {
   },
   computed: {
     hasTimeSpent() {
-      return !!this.timeSpent;
+      return Boolean(this.timeSpent);
     },
     hasTimeEstimate() {
-      return !!this.timeEstimate;
+      return Boolean(this.timeEstimate);
     },
     showComparisonState() {
       return this.hasTimeEstimate && this.hasTimeSpent;
@@ -67,7 +71,7 @@ export default {
       return !this.hasTimeEstimate && !this.hasTimeSpent;
     },
     showHelpState() {
-      return !!this.showHelp;
+      return Boolean(this.showHelp);
     },
   },
   created() {
@@ -102,13 +106,13 @@ export default {
     />
     <div class="title hide-collapsed">
       {{ __('Time tracking') }}
-      <div v-if="!showHelpState" class="help-button float-right" @click="toggleHelpState(true);">
+      <div v-if="!showHelpState" class="help-button float-right" @click="toggleHelpState(true)">
         <i class="fa fa-question-circle" aria-hidden="true"> </i>
       </div>
       <div
         v-if="showHelpState"
         class="close-help-button float-right"
-        @click="toggleHelpState(false);"
+        @click="toggleHelpState(false)"
       >
         <i class="fa fa-close" aria-hidden="true"> </i>
       </div>
@@ -129,6 +133,7 @@ export default {
         :time-spent="timeSpent"
         :time-spent-human-readable="humanTimeSpent"
         :time-estimate-human-readable="humanTimeEstimate"
+        :limit-to-hours="limitToHours"
       />
       <transition name="help-state-toggle">
         <time-tracking-help-state v-if="showHelpState" :root-path="rootPath" />

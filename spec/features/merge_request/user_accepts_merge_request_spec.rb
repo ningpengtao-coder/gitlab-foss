@@ -15,8 +15,7 @@ describe 'User accepts a merge request', :js do
 
     click_button('Merge')
 
-    expect(page).to have_content("The changes were merged into #{merge_request.target_branch} with \
-                                 #{merge_request.short_merge_commit_sha}")
+    expect(page).to have_content("The changes were merged into #{merge_request.target_branch} with #{merge_request.short_merge_commit_sha}")
   end
 
   context 'with removing the source branch' do
@@ -25,7 +24,7 @@ describe 'User accepts a merge request', :js do
     end
 
     it 'accepts a merge request' do
-      check('Remove source branch')
+      check('Delete source branch')
       click_button('Merge')
 
       expect(page).to have_content('The changes were merged into')
@@ -60,7 +59,7 @@ describe 'User accepts a merge request', :js do
     end
 
     it 'accepts a merge request' do
-      check('Remove source branch')
+      check('Delete source branch')
       click_button('Merge')
 
       expect(page).to have_content('The changes were merged into')
@@ -80,8 +79,8 @@ describe 'User accepts a merge request', :js do
     end
 
     it 'accepts a merge request' do
-      click_button('Modify commit message')
-      fill_in('Commit message', with: 'wow such merge')
+      find('.js-mr-widget-commits-count').click
+      fill_in('merge-message-edit', with: 'wow such merge')
 
       click_button('Merge')
 

@@ -43,16 +43,17 @@ describe('Issue Due Date component', () => {
     date.setDate(date.getDate() + 5);
     vm = createComponent(date);
 
-    expect(vm.$el.querySelector('time').textContent.trim()).toEqual(dateFormat(date, 'dddd', true));
+    expect(vm.$el.querySelector('time').textContent.trim()).toEqual(dateFormat(date, 'dddd'));
   });
 
   it('should render month and day for other dates', () => {
     date.setDate(date.getDate() + 17);
     vm = createComponent(date);
+    const today = new Date();
+    const isDueInCurrentYear = today.getFullYear() === date.getFullYear();
+    const format = isDueInCurrentYear ? 'mmm d' : 'mmm d, yyyy';
 
-    expect(vm.$el.querySelector('time').textContent.trim()).toEqual(
-      dateFormat(date, 'mmm d', true),
-    );
+    expect(vm.$el.querySelector('time').textContent.trim()).toEqual(dateFormat(date, format));
   });
 
   it('should contain the correct `.text-danger` css class for overdue issue', () => {

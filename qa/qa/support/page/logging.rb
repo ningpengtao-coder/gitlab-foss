@@ -10,15 +10,11 @@ module QA
           super
         end
 
-        def wait(max: 60, time: 0.1, reload: true)
-          log("with wait: max #{max}; time #{time}; reload #{reload}")
-          now = Time.now
+        def wait(max: 60, interval: 0.1, reload: true)
+          log("next wait uses reload: #{reload}")
+          # Logging of wait start/end/duration is handled by QA::Support::Waiter
 
-          element = super
-
-          log("ended wait after #{Time.now - now} seconds")
-
-          element
+          super
         end
 
         def scroll_to(selector, text: nil)
@@ -37,8 +33,8 @@ module QA
           exists
         end
 
-        def find_element(name)
-          log("finding :#{name}")
+        def find_element(name, **kwargs)
+          log("finding :#{name} with args #{kwargs}")
 
           element = super
 
@@ -57,8 +53,11 @@ module QA
           elements
         end
 
-        def click_element(name)
-          log("clicking :#{name}")
+        def click_element(name, page = nil)
+          msg = ["clicking :#{name}"]
+          msg << ", expecting to be at #{page.class}" if page
+
+          log(msg.compact.join(' '))
 
           super
         end
@@ -71,15 +70,62 @@ module QA
           super
         end
 
-        def has_element?(name)
+        def select_element(name, value)
+          log(%Q(selecting "#{value}" in :#{name}))
+
+          super
+        end
+
+        def has_element?(name, **kwargs)
           found = super
 
-          log("has_element? :#{name} returned #{found}")
+          log_has_element_or_not('has_element?', name, found, **kwargs)
 
           found
         end
 
-        def within_element(name)
+        def has_no_element?(name, **kwargs)
+          found = super
+
+          log_has_element_or_not('has_no_element?', name, found, **kwargs)
+
+          found
+        end
+
+        def has_text?(text)
+          found = super
+
+          log(%Q{has_text?('#{text}') returned #{found}})
+
+          found
+        end
+
+        def has_no_text?(text)
+          found = super
+
+          log(%Q{has_no_text?('#{text}') returned #{found}})
+
+          found
+        end
+
+        def finished_loading?
+          log('waiting for loading to complete...')
+          now = Time.now
+
+          loaded = super
+
+          log("loading complete after #{Time.now - now} seconds")
+
+          loaded
+        end
+
+        def wait_for_animated_element(name)
+          log("waiting for animated element: #{name}")
+
+          super
+        end
+
+        def within_element(name, text: nil)
           log("within element :#{name}")
 
           element = super
@@ -89,10 +135,29 @@ module QA
           element
         end
 
+        def within_element_by_index(name, index)
+          log("within elements :#{name} at index #{index}")
+
+          element = super
+
+          log("end within elements :#{name} at index #{index}")
+
+          element
+        end
+
         private
 
         def log(msg)
           QA::Runtime::Logger.debug(msg)
+        end
+
+        def log_has_element_or_not(method, name, found, **kwargs)
+          msg = ["#{method} :#{name}"]
+          msg << %Q(with text "#{kwargs[:text]}") if kwargs[:text]
+          msg << "(wait: #{kwargs[:wait] || Capybara.default_max_wait_time})"
+          msg << "returned: #{found}"
+
+          log(msg.compact.join(' '))
         end
       end
     end

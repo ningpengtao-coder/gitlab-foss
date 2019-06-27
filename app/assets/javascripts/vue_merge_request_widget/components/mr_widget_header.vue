@@ -6,6 +6,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import clipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
+import MrWidgetIcon from './mr_widget_icon.vue';
 
 export default {
   name: 'MRWidgetHeader',
@@ -13,6 +14,7 @@ export default {
     Icon,
     clipboardButton,
     TooltipOnTruncate,
+    MrWidgetIcon,
   },
   directives: {
     tooltip,
@@ -76,7 +78,7 @@ export default {
 </script>
 <template>
   <div class="mr-source-target append-bottom-default">
-    <div class="git-merge-icon-container append-right-default"><icon name="git-merge" /></div>
+    <mr-widget-icon name="git-merge" />
     <div class="git-merge-container d-flex">
       <div class="normal">
         <strong>
@@ -107,33 +109,35 @@ export default {
         ></div>
       </div>
 
-      <div v-if="mr.isOpen" class="branch-actions d-flex">
-        <a
-          v-if="!mr.sourceBranchRemoved"
-          v-tooltip
-          :href="webIdePath"
-          :title="ideButtonTitle"
-          :class="{ disabled: !mr.canPushToSourceBranch }"
-          class="btn btn-default js-web-ide d-none d-md-inline-block append-right-8"
-          data-placement="bottom"
-          tabindex="0"
-          role="button"
-        >
-          {{ s__('mrWidget|Open in Web IDE') }}
-        </a>
-        <button
-          :disabled="mr.sourceBranchRemoved"
-          data-target="#modal_merge_info"
-          data-toggle="modal"
-          class="btn btn-default js-check-out-branch append-right-default"
-          type="button"
-        >
-          {{ s__('mrWidget|Check out branch') }}
-        </button>
+      <div class="branch-actions d-flex">
+        <template v-if="mr.isOpen">
+          <a
+            v-if="!mr.sourceBranchRemoved"
+            v-tooltip
+            :href="webIdePath"
+            :title="ideButtonTitle"
+            :class="{ disabled: !mr.canPushToSourceBranch }"
+            class="btn btn-default js-web-ide d-none d-md-inline-block append-right-8"
+            data-placement="bottom"
+            tabindex="0"
+            role="button"
+          >
+            {{ s__('mrWidget|Open in Web IDE') }}
+          </a>
+          <button
+            :disabled="mr.sourceBranchRemoved"
+            data-target="#modal_merge_info"
+            data-toggle="modal"
+            class="btn btn-default js-check-out-branch append-right-8"
+            type="button"
+          >
+            {{ s__('mrWidget|Check out branch') }}
+          </button>
+        </template>
         <span class="dropdown">
           <button
             type="button"
-            class="btn dropdown-toggle"
+            class="btn dropdown-toggle qa-dropdown-toggle"
             data-toggle="dropdown"
             aria-label="Download as"
             aria-haspopup="true"
@@ -143,12 +147,20 @@ export default {
           </button>
           <ul class="dropdown-menu dropdown-menu-right">
             <li>
-              <a :href="mr.emailPatchesPath" class="js-download-email-patches" download>
+              <a
+                :href="mr.emailPatchesPath"
+                class="js-download-email-patches qa-download-email-patches"
+                download
+              >
                 {{ s__('mrWidget|Email patches') }}
               </a>
             </li>
             <li>
-              <a :href="mr.plainDiffPath" class="js-download-plain-diff" download>
+              <a
+                :href="mr.plainDiffPath"
+                class="js-download-plain-diff qa-download-plain-diff"
+                download
+              >
                 {{ s__('mrWidget|Plain diff') }}
               </a>
             </li>

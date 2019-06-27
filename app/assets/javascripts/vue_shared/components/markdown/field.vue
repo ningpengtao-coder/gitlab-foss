@@ -1,17 +1,21 @@
 <script>
 import $ from 'jquery';
-import { s__ } from '~/locale';
+import _ from 'underscore';
+import { __ } from '~/locale';
+import { stripHtml } from '~/lib/utils/text_utility';
 import Flash from '../../../flash';
 import GLForm from '../../../gl_form';
 import markdownHeader from './header.vue';
 import markdownToolbar from './toolbar.vue';
 import icon from '../icon.vue';
+import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 
 export default {
   components: {
     markdownHeader,
     markdownToolbar,
     icon,
+    Suggestions,
   },
   props: {
     markdownPreviewPath: {
@@ -22,11 +26,6 @@ export default {
     markdownDocsPath: {
       type: String,
       required: true,
-    },
-    markdownVersion: {
-      type: Number,
-      required: false,
-      default: 0,
     },
     addSpacingClasses: {
       type: Boolean,
@@ -48,20 +47,76 @@ export default {
       required: false,
       default: true,
     },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    note: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    canSuggest: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    showSuggestPopover: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       markdownPreview: '',
       referencedCommands: '',
       referencedUsers: '',
+      hasSuggestion: false,
       markdownPreviewLoading: false,
       previewMarkdown: false,
+      suggestions: this.note.suggestions || [],
     };
   },
   computed: {
     shouldShowReferencedUsers() {
       const referencedUsersThreshold = 10;
       return this.referencedUsers.length >= referencedUsersThreshold;
+    },
+    lineContent() {
+      const [firstSuggestion] = this.suggestions;
+      if (firstSuggestion) {
+        return firstSuggestion.from_content;
+      }
+
+      if (this.line) {
+        const { rich_text: richText, text } = this.line;
+
+        if (text) {
+          return text;
+        }
+
+        return _.unescape(stripHtml(richText).replace(/\n/g, ''));
+      }
+
+      return '';
+    },
+    lineNumber() {
+      let lineNumber;
+      if (this.line) {
+        const { new_line: newLine, old_line: oldLine } = this.line;
+        lineNumber = newLine || oldLine;
+      }
+      return lineNumber;
+    },
+    lineType() {
+      return this.line ? this.line.type : '';
     },
   },
   mounted() {
@@ -99,11 +154,12 @@ export default {
 
       if (text) {
         this.markdownPreviewLoading = true;
+        this.markdownPreview = __('Loading…');
         this.$http
-          .post(this.versionedPreviewPath(), { text })
+          .post(this.markdownPreviewPath, { text })
           .then(resp => resp.json())
           .then(data => this.renderMarkdown(data))
-          .catch(() => new Flash(s__('Error loading markdown preview')));
+          .catch(() => new Flash(__('Error loading markdown preview')));
       } else {
         this.renderMarkdown();
       }
@@ -121,18 +177,13 @@ export default {
       if (data.references) {
         this.referencedCommands = data.references.commands;
         this.referencedUsers = data.references.users;
+        this.hasSuggestion = data.references.suggestions && data.references.suggestions.length;
+        this.suggestions = data.references.suggestions;
       }
 
-      this.$nextTick(() => {
-        $(this.$refs['markdown-preview']).renderGFM();
-      });
-    },
-
-    versionedPreviewPath() {
-      const { markdownPreviewPath, markdownVersion } = this;
-      return `${markdownPreviewPath}${
-        markdownPreviewPath.indexOf('?') === -1 ? '?' : '&'
-      }markdown_version=${markdownVersion}`;
+      this.$nextTick()
+        .then(() => $(this.$refs['markdown-preview']).renderGFM())
+        .catch(() => new Flash(__('Error rendering markdown preview')));
     },
   },
 };
@@ -142,12 +193,16 @@ export default {
   <div
     ref="gl-form"
     :class="{ 'prepend-top-default append-bottom-default': addSpacingClasses }"
-    class="md-area js-vue-markdown-field"
+    class="js-vue-markdown-field md-area position-relative"
   >
     <markdown-header
       :preview-markdown="previewMarkdown"
+      :line-content="lineContent"
+      :can-suggest="canSuggest"
+      :show-suggest-popover="showSuggestPopover"
       @preview-markdown="showPreviewTab"
       @write-markdown="showWriteTab"
+      @handleSuggestDismissed="() => $emit('handleSuggestDismissed')"
     />
     <div v-show="!previewMarkdown" class="md-write-holder">
       <div class="zen-backdrop">
@@ -162,17 +217,39 @@ export default {
         />
       </div>
     </div>
-    <div v-show="previewMarkdown" class="md md-preview-holder md-preview js-vue-md-preview">
-      <div ref="markdown-preview" v-html="markdownPreview"></div>
-      <span v-if="markdownPreviewLoading"> Loading... </span>
-    </div>
+    <template v-if="hasSuggestion">
+      <div
+        v-show="previewMarkdown"
+        ref="markdown-preview"
+        class="js-vue-md-preview md-preview-holder"
+      >
+        <suggestions
+          v-if="hasSuggestion"
+          :note-html="markdownPreview"
+          :from-line="lineNumber"
+          :from-content="lineContent"
+          :line-type="lineType"
+          :disabled="true"
+          :suggestions="suggestions"
+          :help-page-path="helpPagePath"
+        />
+      </div>
+    </template>
+    <template v-else>
+      <div
+        v-show="previewMarkdown"
+        ref="markdown-preview"
+        class="js-vue-md-preview md md-preview-holder"
+        v-html="markdownPreview"
+      ></div>
+    </template>
     <template v-if="previewMarkdown && !markdownPreviewLoading">
       <div v-if="referencedCommands" class="referenced-commands" v-html="referencedCommands"></div>
       <div v-if="shouldShowReferencedUsers" class="referenced-users">
         <span>
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"> </i> You are about to add
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> You are about to add
           <strong>
-            <span class="js-referenced-users-count"> {{ referencedUsers.length }} </span>
+            <span class="js-referenced-users-count">{{ referencedUsers.length }}</span>
           </strong>
           people to the discussion. Proceed with caution.
         </span>

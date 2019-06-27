@@ -5,12 +5,6 @@ require 'rails/all'
 Bundler.require(:default, Rails.env)
 
 module Gitlab
-  # This method is used for smooth upgrading from the current Rails 4.x to Rails 5.0.
-  # https://gitlab.com/gitlab-org/gitlab-ce/issues/14286
-  def self.rails5?
-    !%w[0 false].include?(ENV["RAILS5"])
-  end
-
   class Application < Rails::Application
     require_dependency Rails.root.join('lib/gitlab/redis/wrapper')
     require_dependency Rails.root.join('lib/gitlab/redis/cache')
@@ -25,9 +19,6 @@ module Gitlab
     # to make sure that all connections have NO_ZERO_DATE
     # setting disabled
     require_dependency Rails.root.join('lib/mysql_zero_date')
-
-    # This can be removed when we drop support for rails 4
-    require_dependency Rails.root.join('lib/rails4_migration_version')
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -55,6 +46,19 @@ module Gitlab
                                      #{config.root}/app/graphql/mutations/concerns])
 
     config.generators.templates.push("#{config.root}/generator_templates")
+
+    ee_paths = config.eager_load_paths.each_with_object([]) do |path, memo|
+      ee_path = config.root.join('ee', Pathname.new(path).relative_path_from(config.root))
+      memo << ee_path.to_s if ee_path.exist?
+    end
+
+    # Eager load should load CE first
+    config.eager_load_paths.push(*ee_paths)
+    config.helpers_paths.push "#{config.root}/ee/app/helpers"
+
+    # Other than Ruby modules we load EE first
+    config.paths['lib/tasks'].unshift "#{config.root}/ee/lib/tasks"
+    config.paths['app/views'].unshift "#{config.root}/ee/app/views"
 
     # Rake tasks ignore the eager loading settings, so we need to set the
     # autoload paths explicitly
@@ -86,7 +90,7 @@ module Gitlab
     # namespaces/users.
     # https://github.com/rails/rails/blob/5-0-stable/actioncable/lib/action_cable.rb#L38
     # Please change this value when configuring ActionCable for real usage.
-    config.action_cable.mount_path = "/-/cable" if rails5?
+    config.action_cable.mount_path = "/-/cable"
 
     # Configure sensitive parameters which will be filtered from the log file.
     #
@@ -103,7 +107,11 @@ module Gitlab
     # - Webhook URLs (:hook)
     # - Sentry DSN (:sentry_dsn)
     # - File content from Web Editor (:content)
-    config.filter_parameters += [/token$/, /password/, /secret/, /key$/]
+    # - Jira shared secret (:sharedSecret)
+    #
+    # NOTE: It is **IMPORTANT** to also update gitlab-workhorse's filter when adding parameters here to not
+    #       introduce another security vulnerability: https://gitlab.com/gitlab-org/gitlab-workhorse/issues/182
+    config.filter_parameters += [/token$/, /password/, /secret/, /key$/, /^note$/, /^text$/]
     config.filter_parameters += %i(
       certificate
       encrypted_key
@@ -114,6 +122,7 @@ module Gitlab
       trace
       variables
       content
+      sharedSecret
     )
 
     # Enable escaping HTML in JSON.
@@ -151,9 +160,13 @@ module Gitlab
     config.assets.precompile << "locale/**/app.js"
     config.assets.precompile << "emoji_sprites.css"
     config.assets.precompile << "errors.css"
+    config.assets.precompile << "csslab.css"
+
+    config.assets.precompile << "highlight/themes/*.css"
 
     # Import gitlab-svgs directly from vendored directory
     config.assets.paths << "#{config.root}/node_modules/@gitlab/svgs/dist"
+    config.assets.paths << "#{config.root}/node_modules"
     config.assets.precompile << "icons.svg"
     config.assets.precompile << "icons.json"
     config.assets.precompile << "illustrations/*.svg"
@@ -162,10 +175,25 @@ module Gitlab
     config.assets.paths << "#{config.root}/node_modules/xterm/src/"
     config.assets.precompile << "xterm.css"
 
+    %w[images javascripts stylesheets].each do |path|
+      config.assets.paths << "#{config.root}/ee/app/assets/#{path}"
+      config.assets.precompile << "jira_connect.js"
+      config.assets.precompile << "pages/jira_connect.css"
+    end
+
+    config.assets.paths << "#{config.root}/vendor/assets/javascripts/"
+    config.assets.precompile << "snowplow/sp.js"
+
+    # Compile non-JS/CSS assets in the ee/app/assets folder by default
+    # Mimic sprockets-rails default: https://github.com/rails/sprockets-rails/blob/v3.2.1/lib/sprockets/railtie.rb#L84-L87
+    LOOSE_EE_APP_ASSETS = lambda do |logical_path, filename|
+      filename.start_with?(config.root.join("ee/app/assets").to_s) &&
+        !['.js', '.css', ''].include?(File.extname(logical_path))
+    end
+    config.assets.precompile << LOOSE_EE_APP_ASSETS
+
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
-
-    config.action_view.sanitized_allowed_protocols = %w(smb)
 
     # Nokogiri is significantly faster and uses less memory than REXML
     ActiveSupport::XmlMini.backend = 'Nokogiri'
@@ -208,8 +236,6 @@ module Gitlab
     end
 
     config.cache_store = :redis_store, caching_config_hash
-
-    config.active_record.raise_in_transactional_callbacks = true unless rails5?
 
     config.active_job.queue_adapter = :sidekiq
 

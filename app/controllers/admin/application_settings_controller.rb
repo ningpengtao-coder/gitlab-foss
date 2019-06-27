@@ -2,58 +2,23 @@
 
 class Admin::ApplicationSettingsController < Admin::ApplicationController
   include InternalRedirect
+
   before_action :set_application_setting
+  before_action :whitelist_query_limiting, only: [:usage_data]
+
+  VALID_SETTING_PANELS = %w(show integrations repository templates
+                            ci_cd reporting metrics_and_profiling
+                            network geo preferences).freeze
 
   def show
   end
 
-  def integrations
-  end
-
-  def repository
-  end
-
-  def templates
-  end
-
-  def ci_cd
-  end
-
-  def reporting
-  end
-
-  def metrics_and_profiling
-  end
-
-  def network
-  end
-
-  def geo
-  end
-
-  def preferences
+  (VALID_SETTING_PANELS - %w(show)).each do |action|
+    define_method(action) { perform_update if submitted? }
   end
 
   def update
-    successful = ApplicationSettings::UpdateService
-      .new(@application_setting, current_user, application_setting_params)
-      .execute
-
-    if recheck_user_consent?
-      session[:ask_for_usage_stats_consent] = current_user.requires_usage_stats_consent?
-    end
-
-    redirect_path = referer_path(request) || admin_application_settings_path
-
-    respond_to do |format|
-      if successful
-        format.json { head :ok }
-        format.html { redirect_to redirect_path, notice: 'Application settings saved successfully' }
-      else
-        format.json { head :bad_request }
-        format.html { render :show }
-      end
-    end
+    perform_update
   end
 
   def usage_data
@@ -70,14 +35,14 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   def reset_registration_token
     @application_setting.reset_runners_registration_token!
 
-    flash[:notice] = 'New runners registration token has been generated!'
+    flash[:notice] = _('New runners registration token has been generated!')
     redirect_to admin_runners_path
   end
 
   def reset_health_check_token
     @application_setting.reset_health_check_access_token!
-    flash[:notice] = 'New health check access token has been generated!'
-    redirect_to :back
+    flash[:notice] = _('New health check access token has been generated!')
+    redirect_back_or_default
   end
 
   def clear_repository_check_states
@@ -85,14 +50,25 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
     redirect_to(
       admin_application_settings_path,
-      notice: 'Started asynchronous removal of all repository check states.'
+      notice: _('Started asynchronous removal of all repository check states.')
     )
+  end
+
+  # Getting ToS url requires `directory` api call to Let's Encrypt
+  # which could result in 500 error/slow rendering on settings page
+  # Because of that we use separate controller action
+  def lets_encrypt_terms_of_service
+    redirect_to ::Gitlab::LetsEncrypt.terms_of_service_url
   end
 
   private
 
   def set_application_setting
     @application_setting = Gitlab::CurrentSettings.current_application_settings
+  end
+
+  def whitelist_query_limiting
+    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/63107')
   end
 
   def application_setting_params
@@ -124,12 +100,56 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   end
 
   def visible_application_setting_attributes
-    ApplicationSettingsHelper.visible_attributes + [
+    [
+      *::ApplicationSettingsHelper.visible_attributes,
+      *::ApplicationSettingsHelper.external_authorization_service_attributes,
+      *lets_encrypt_visible_attributes,
       :domain_blacklist_file,
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
       repository_storages: [],
       restricted_visibility_levels: []
+    ]
+  end
+
+  def submitted?
+    request.patch?
+  end
+
+  def perform_update
+    successful = ApplicationSettings::UpdateService
+      .new(@application_setting, current_user, application_setting_params)
+      .execute
+
+    if recheck_user_consent?
+      session[:ask_for_usage_stats_consent] = current_user.requires_usage_stats_consent?
+    end
+
+    redirect_path = referer_path(request) || admin_application_settings_path
+
+    respond_to do |format|
+      if successful
+        format.json { head :ok }
+        format.html { redirect_to redirect_path, notice: _('Application settings saved successfully') }
+      else
+        format.json { head :bad_request }
+        format.html { render_update_error }
+      end
+    end
+  end
+
+  def render_update_error
+    action = VALID_SETTING_PANELS.include?(action_name) ? action_name : :show
+
+    render action
+  end
+
+  def lets_encrypt_visible_attributes
+    return [] unless Feature.enabled?(:pages_auto_ssl)
+
+    [
+      :lets_encrypt_notification_email,
+      :lets_encrypt_terms_of_service_accepted
     ]
   end
 end

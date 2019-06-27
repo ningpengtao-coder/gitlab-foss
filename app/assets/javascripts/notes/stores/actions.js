@@ -11,13 +11,19 @@ import * as constants from '../constants';
 import service from '../services/notes_service';
 import loadAwardsHandler from '../../awards_handler';
 import sidebarTimeTrackingEventHub from '../../sidebar/event_hub';
-import { isInViewport, scrollToElement } from '../../lib/utils/common_utils';
+import { isInViewport, scrollToElement, isInMRPage } from '../../lib/utils/common_utils';
 import mrWidgetEventHub from '../../vue_merge_request_widget/event_hub';
 import { __ } from '~/locale';
 
 let eTagPoll;
 
-export const expandDiscussion = ({ commit }, data) => commit(types.EXPAND_DISCUSSION, data);
+export const expandDiscussion = ({ commit, dispatch }, data) => {
+  if (data.discussionId) {
+    dispatch('diffs/renderFileForDiscussionId', data.discussionId, { root: true });
+  }
+
+  commit(types.EXPAND_DISCUSSION, data);
+};
 
 export const collapseDiscussion = ({ commit }, data) => commit(types.COLLAPSE_DISCUSSION, data);
 
@@ -39,12 +45,13 @@ export const setNotesFetchedState = ({ commit }, state) =>
 
 export const toggleDiscussion = ({ commit }, data) => commit(types.TOGGLE_DISCUSSION, data);
 
-export const fetchDiscussions = ({ commit }, { path, filter }) =>
+export const fetchDiscussions = ({ commit, dispatch }, { path, filter }) =>
   service
     .fetchDiscussions(path, filter)
     .then(res => res.json())
     .then(discussions => {
       commit(types.SET_INITIAL_DISCUSSIONS, discussions);
+      dispatch('updateResolvableDiscussonsCounts');
     });
 
 export const updateDiscussion = ({ commit, state }, discussion) => {
@@ -53,11 +60,18 @@ export const updateDiscussion = ({ commit, state }, discussion) => {
   return utils.findNoteObjectById(state.discussions, discussion.id);
 };
 
-export const deleteNote = ({ commit, dispatch }, note) =>
+export const deleteNote = ({ commit, dispatch, state }, note) =>
   service.deleteNote(note.path).then(() => {
+    const discussion = state.discussions.find(({ id }) => id === note.discussion_id);
+
     commit(types.DELETE_NOTE, note);
 
     dispatch('updateMergeRequestWidget');
+    dispatch('updateResolvableDiscussonsCounts');
+
+    if (isInMRPage()) {
+      dispatch('diffs/removeDiscussionsFromDiff', discussion);
+    }
   });
 
 export const updateNote = ({ commit, dispatch }, { endpoint, note }) =>
@@ -69,12 +83,44 @@ export const updateNote = ({ commit, dispatch }, { endpoint, note }) =>
       dispatch('startTaskList');
     });
 
-export const replyToDiscussion = ({ commit }, { endpoint, data }) =>
+export const updateOrCreateNotes = ({ commit, state, getters, dispatch }, notes) => {
+  const { notesById } = getters;
+
+  notes.forEach(note => {
+    if (notesById[note.id]) {
+      commit(types.UPDATE_NOTE, note);
+    } else if (note.type === constants.DISCUSSION_NOTE || note.type === constants.DIFF_NOTE) {
+      const discussion = utils.findNoteObjectById(state.discussions, note.discussion_id);
+
+      if (discussion) {
+        commit(types.ADD_NEW_REPLY_TO_DISCUSSION, note);
+      } else if (note.type === constants.DIFF_NOTE) {
+        dispatch('fetchDiscussions', { path: state.notesData.discussionsPath });
+      } else {
+        commit(types.ADD_NEW_NOTE, note);
+      }
+    } else {
+      commit(types.ADD_NEW_NOTE, note);
+    }
+  });
+};
+
+export const replyToDiscussion = ({ commit, state, getters, dispatch }, { endpoint, data }) =>
   service
     .replyToDiscussion(endpoint, data)
     .then(res => res.json())
     .then(res => {
-      commit(types.ADD_NEW_REPLY_TO_DISCUSSION, res);
+      if (res.discussion) {
+        commit(types.UPDATE_DISCUSSION, res.discussion);
+
+        updateOrCreateNotes({ commit, state, getters, dispatch }, res.discussion.notes);
+
+        dispatch('updateMergeRequestWidget');
+        dispatch('startTaskList');
+        dispatch('updateResolvableDiscussonsCounts');
+      } else {
+        commit(types.ADD_NEW_REPLY_TO_DISCUSSION, res);
+      }
 
       return res;
     });
@@ -89,11 +135,29 @@ export const createNewNote = ({ commit, dispatch }, { endpoint, data }) =>
 
         dispatch('updateMergeRequestWidget');
         dispatch('startTaskList');
+        dispatch('updateResolvableDiscussonsCounts');
       }
       return res;
     });
 
 export const removePlaceholderNotes = ({ commit }) => commit(types.REMOVE_PLACEHOLDER_NOTES);
+
+export const resolveDiscussion = ({ state, dispatch, getters }, { discussionId }) => {
+  const discussion = utils.findNoteObjectById(state.discussions, discussionId);
+  const isResolved = getters.isDiscussionResolved(discussionId);
+
+  if (!discussion) {
+    return Promise.reject();
+  } else if (isResolved) {
+    return Promise.resolve();
+  }
+
+  return dispatch('toggleResolveNote', {
+    endpoint: discussion.resolve_path,
+    isResolved,
+    discussion: true,
+  });
+};
 
 export const toggleResolveNote = ({ commit, dispatch }, { endpoint, isResolved, discussion }) =>
   service
@@ -103,6 +167,8 @@ export const toggleResolveNote = ({ commit, dispatch }, { endpoint, isResolved, 
       const mutationType = discussion ? types.UPDATE_DISCUSSION : types.UPDATE_NOTE;
 
       commit(mutationType, res);
+
+      dispatch('updateResolvableDiscussonsCounts');
 
       dispatch('updateMergeRequestWidget');
     });
@@ -202,11 +268,20 @@ export const saveNote = ({ commit, dispatch }, noteData) => {
     const { errors } = res;
     const commandsChanges = res.commands_changes;
 
-    if (hasQuickActions && errors && Object.keys(errors).length) {
-      eTagPoll.makeRequest();
+    if (errors && Object.keys(errors).length) {
+      /*
+       The following reply means that quick actions have been successfully applied:
 
-      $('.js-gfm-input').trigger('clear-commands-cache.atwho');
-      Flash('Commands applied', 'notice', noteData.flashContainer);
+       {"commands_changes":{},"valid":false,"errors":{"commands_only":["Commands applied"]}}
+       */
+      if (hasQuickActions) {
+        eTagPoll.makeRequest();
+
+        $('.js-gfm-input').trigger('clear-commands-cache.atwho');
+        Flash(__('Commands applied'), 'notice', noteData.flashContainer);
+      } else {
+        throw new Error(__('Failed to save comment!'));
+      }
     }
 
     if (commandsChanges) {
@@ -220,7 +295,7 @@ export const saveNote = ({ commit, dispatch }, noteData) => {
           })
           .catch(() => {
             Flash(
-              'Something went wrong while adding your award. Please try again.',
+              __('Something went wrong while adding your award. Please try again.'),
               'alert',
               noteData.flashContainer,
             );
@@ -245,25 +320,7 @@ export const saveNote = ({ commit, dispatch }, noteData) => {
 
 const pollSuccessCallBack = (resp, commit, state, getters, dispatch) => {
   if (resp.notes && resp.notes.length) {
-    const { notesById } = getters;
-
-    resp.notes.forEach(note => {
-      if (notesById[note.id]) {
-        commit(types.UPDATE_NOTE, note);
-      } else if (note.type === constants.DISCUSSION_NOTE || note.type === constants.DIFF_NOTE) {
-        const discussion = utils.findNoteObjectById(state.discussions, note.discussion_id);
-
-        if (discussion) {
-          commit(types.ADD_NEW_REPLY_TO_DISCUSSION, note);
-        } else if (note.type === constants.DIFF_NOTE) {
-          dispatch('fetchDiscussions', { path: state.notesData.discussionsPath });
-        } else {
-          commit(types.ADD_NEW_NOTE, note);
-        }
-      } else {
-        commit(types.ADD_NEW_NOTE, note);
-      }
-    });
+    updateOrCreateNotes({ commit, state, getters, dispatch }, resp.notes);
 
     dispatch('startTaskList');
   }
@@ -280,7 +337,7 @@ export const poll = ({ commit, state, getters, dispatch }) => {
     data: state,
     successCallback: resp =>
       resp.json().then(data => pollSuccessCallBack(data, commit, state, getters, dispatch)),
-    errorCallback: () => Flash('Something went wrong while fetching latest comments.'),
+    errorCallback: () => Flash(__('Something went wrong while fetching latest comments.')),
   });
 
   if (!Visibility.hidden()) {
@@ -316,7 +373,7 @@ export const fetchData = ({ commit, state, getters }) => {
     .poll(requestData)
     .then(resp => resp.json)
     .then(data => pollSuccessCallBack(data, commit, state, getters))
-    .catch(() => Flash('Something went wrong while fetching latest comments.'));
+    .catch(() => Flash(__('Something went wrong while fetching latest comments.')));
 };
 
 export const toggleAward = ({ commit, getters }, { awardName, noteId }) => {
@@ -384,6 +441,32 @@ export const startTaskList = ({ dispatch }) =>
         onSuccess: () => dispatch('startTaskList'),
       }),
   );
+
+export const updateResolvableDiscussonsCounts = ({ commit }) =>
+  commit(types.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS);
+
+export const submitSuggestion = (
+  { commit, dispatch },
+  { discussionId, noteId, suggestionId, flashContainer },
+) =>
+  service
+    .applySuggestion(suggestionId)
+    .then(() => commit(types.APPLY_SUGGESTION, { discussionId, noteId, suggestionId }))
+    .then(() => dispatch('resolveDiscussion', { discussionId }).catch(() => {}))
+    .catch(err => {
+      const defaultMessage = __(
+        'Something went wrong while applying the suggestion. Please try again.',
+      );
+      const flashMessage = err.response.data ? `${err.response.data.message}.` : defaultMessage;
+
+      Flash(__(flashMessage), 'alert', flashContainer);
+    });
+
+export const convertToDiscussion = ({ commit }, noteId) =>
+  commit(types.CONVERT_TO_DISCUSSION, noteId);
+
+export const removeConvertedDiscussion = ({ commit }, noteId) =>
+  commit(types.REMOVE_CONVERTED_DISCUSSION, noteId);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
