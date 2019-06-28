@@ -244,7 +244,7 @@ export default {
               v-if="hasDownvotes"
               v-gl-tooltip
               class="issuable-downvotes d-none d-sm-block"
-              :title="__('Upvotes')"
+              :title="__('Downvotes')"
             >
               <icon name="thumb-down" class="align-text-bottom" />
               {{ issue.downvotes }}
