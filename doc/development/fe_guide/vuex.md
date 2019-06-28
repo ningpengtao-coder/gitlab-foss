@@ -37,7 +37,7 @@ import state from './state';
 
 Vue.use(Vuex);
 
-export const createStore = () => new Vuex.Store({
+export default const createStore = () => new Vuex.Store({
   actions,
   getters,
   mutations,
