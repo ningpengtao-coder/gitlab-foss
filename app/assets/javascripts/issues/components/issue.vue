@@ -75,6 +75,18 @@ export default {
     assigneesToRender() {
       return this.issue.assignees.filter((assignee, index) => index < MAX_ASSIGNEES_RENDER);
     },
+    hasRelatedMergeRequests() {
+      return this.issue.merge_requests_count > 0;
+    },
+    hasUpvotes() {
+      return this.issue.upvotes > 0;
+    },
+    hasDownvotes() {
+      return this.issue.downvotes > 0;
+    },
+    hasComments() {
+      return this.issue.note_count < 0;
+    },
   },
   methods: {
     getAvatarTitle(assignee) {
@@ -209,7 +221,7 @@ export default {
               </span>
             </li>
             <li
-              v-if="issue.merge_requests_count > 0"
+              v-if="hasRelatedMergeRequests"
               v-gl-tooltip
               class="issuable-mr d-none d-sm-block"
               :title="__('Related merge requests')"
@@ -219,7 +231,7 @@ export default {
             </li>
 
             <li
-              v-if="issue.upvotes > 0"
+              v-if="hasUpvotes"
               v-gl-tooltip
               class="issuable-upvotes d-none d-sm-block"
               :title="__('Upvotes')"
@@ -229,7 +241,7 @@ export default {
             </li>
 
             <li
-              v-if="issue.downvotes > 0"
+              v-if="hasDownvotes"
               v-gl-tooltip
               class="issuable-downvotes d-none d-sm-block"
               :title="__('Upvotes')"
@@ -242,7 +254,7 @@ export default {
               <a
                 v-gl-tooltip
                 :href="issueCommentsURL"
-                :class="{ 'no-comments': issue.note_count < 0 }"
+                :class="{ 'no-comments': hasComments }"
                 :title="__('Comments')"
               >
                 <icon name="comments" class="align-text-bottom" />
