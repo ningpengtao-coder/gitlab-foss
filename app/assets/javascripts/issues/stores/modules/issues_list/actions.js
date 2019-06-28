@@ -61,7 +61,7 @@ export const setBulkUpdateState = ({ commit }, value) => {
 export const fetchIssues = ({ commit, dispatch, getters }, endpoint) => {
   dispatch('setLoadingState', true);
 
-  // we always update state form the window.location
+  // we always update state from the window.location
   // as it may not be avaliable in our store
   const [currentState] = getParameterValues('state');
 
