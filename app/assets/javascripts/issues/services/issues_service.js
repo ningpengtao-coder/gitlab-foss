@@ -6,7 +6,7 @@ export default {
       params: {
         ...filters,
         state,
-        with_labels_details: true, // esures we more details for labels
+        with_labels_details: true, // ensures we more details for labels
       },
     });
   },
