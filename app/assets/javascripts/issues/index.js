@@ -12,7 +12,7 @@ export default () => {
   if (!el) return null;
 
   const { endpoint, canUpdate, createPath } = el.dataset;
-  const canBulkUpdate = canUpdate === 'true';
+  const canBulkUpdate = Boolean(canUpdate);
 
   // Set default filters from URL
   store.dispatch('issuesList/setFilters', window.location.search);
