@@ -304,7 +304,7 @@ Parameters:
 Example request:
 
 ```sh
-curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/snippets/public?per_page=2&page=1
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/snippets/public?per_page=2&page=1"
 ```
 
 Example response:
