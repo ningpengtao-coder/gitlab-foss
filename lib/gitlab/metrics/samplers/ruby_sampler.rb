@@ -38,6 +38,8 @@ module Gitlab
             metrics[key] = ::Gitlab::Metrics.gauge(with_prefix(:gc_stat, key), to_doc_string(key), labels, :livesum)
           end
 
+          metrics[:process_start_time_seconds].set(labels.merge(worker_label), Time.now.to_i)
+
           metrics
         end
 
@@ -47,7 +49,6 @@ module Gitlab
           metrics[:file_descriptors].set(labels.merge(worker_label), System.file_descriptor_count)
           metrics[:process_cpu_seconds_total].set(labels.merge(worker_label), ::Gitlab::Metrics::System.cpu_time)
           metrics[:process_max_fds].set(labels.merge(worker_label), ::Gitlab::Metrics::System.max_open_file_descriptors)
-          metrics[:process_start_time_seconds].set(labels.merge(worker_label), ::Gitlab::Metrics::System.process_start_time)
           set_memory_usage_metrics
           sample_gc
 
