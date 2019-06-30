@@ -67,6 +67,7 @@ docs lint:
     - cd /tmp/gitlab-docs
     # Lint Markdown
     # https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md
+    # MD034 is not enabled because tooling fails with false positives.
     - bundle exec mdl content/$DOCS_GITLAB_REPO_SUFFIX/**/*.md --rules \
         MD004,MD032
     # Build HTML from Markdown
