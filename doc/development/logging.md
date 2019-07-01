@@ -30,8 +30,8 @@ Completed 200 OK in 166ms (Views: 117.4ms | ActiveRecord: 27.2ms)
 These logs suffer from a number of problems:
 
 1. They often lack timestamps or other contextual information (e.g. project ID, user)
-2. They may span multiple lines, which make them hard to find via Elasticsearch.
-3. They lack a common structure, which make them hard to parse by log
+1. They may span multiple lines, which make them hard to find via Elasticsearch.
+1. They lack a common structure, which make them hard to parse by log
    forwarders, such as Logstash or Fluentd. This also makes them hard to
    search.
 
@@ -67,8 +67,8 @@ importer progresses. Here's what to do:
    make it easy for people to search pertinent logs in one place. For
    example, `geo.log` contains all logs pertaining to GitLab Geo.
    To create a new file:
-    1. Choose a filename (e.g. `importer_json.log`).
-    1. Create a new subclass of `Gitlab::JsonLogger`:
+   1. Choose a filename (e.g. `importer_json.log`).
+   1. Create a new subclass of `Gitlab::JsonLogger`:
 
         ```ruby
         module Gitlab
@@ -82,7 +82,7 @@ importer progresses. Here's what to do:
         end
         ```
 
-    1. In your class where you want to log, you might initialize the logger as an instance variable:
+   1. In your class where you want to log, you might initialize the logger as an instance variable:
 
         ```ruby
         attr_accessor :logger

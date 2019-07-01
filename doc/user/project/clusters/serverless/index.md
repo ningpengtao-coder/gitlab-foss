@@ -196,7 +196,7 @@ Follow these steps to deploy a function using the Node.js runtime to your Knativ
     from **Apply a template** dropdown when editing the `.gitlab-ci.yml` file through
     the user interface.
 
-2. `serverless.yml`: this file contains the metadata for your functions,
+1. `serverless.yml`: this file contains the metadata for your functions,
    such as name, runtime, and environment.
 
    It must be included at the root of your repository.
@@ -282,7 +282,7 @@ The sample function can now be triggered from any HTTP client using a simple `PO
       --data '{"GitLab":"FaaS"}' \
       http://functions-echo.functions-1.functions.example.com/
       ```
-  2. Using a web-based tool (ie. postman, restlet, etc)
+  1. Using a web-based tool (ie. postman, restlet, etc)
 
       ![function execution](img/function-execution.png)
 

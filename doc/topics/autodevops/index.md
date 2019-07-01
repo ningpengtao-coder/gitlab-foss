@@ -109,10 +109,10 @@ To make full use of Auto DevOps, you will need:
    To enable deployments, you will need Kubernetes 1.5+. You need a [Kubernetes cluster][kubernetes-clusters]
    for the project, or a Kubernetes [default service template](../../user/project/integrations/services_templates.md)
    for the entire GitLab installation.
-    1. **A load balancer** - You can use NGINX ingress by deploying it to your
-       Kubernetes cluster using the
-       [`nginx-ingress`](https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress)
-       Helm chart.
+   1. **A load balancer** - You can use NGINX ingress by deploying it to your
+      Kubernetes cluster using the
+      [`nginx-ingress`](https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress)
+      Helm chart.
 1. **Prometheus** (needed for Auto Monitoring) - To enable Auto Monitoring, you
    will need Prometheus installed somewhere (inside or outside your cluster) and
    configured to scrape your Kubernetes cluster. To get response metrics
@@ -202,7 +202,7 @@ To add a different cluster for each environment:
 1. Navigate to your project's **Operations > Kubernetes** and create the Kubernetes clusters
    with their respective environment scope as described from the table above.
 
-    ![Auto DevOps multiple clusters](img/autodevops_multiple_clusters.png)
+   ![Auto DevOps multiple clusters](img/autodevops_multiple_clusters.png)
 
 1. After the clusters are created, navigate to each one and install Helm Tiller
    and Ingress. Wait for the Ingress IP address to be assigned.
@@ -787,11 +787,11 @@ To configure your application variables:
 1. Go to your project's **Settings > CI/CD**, then expand the section
    called **Variables**.
 
-2. Create a CI Variable, ensuring the key is prefixed with
+1. Create a CI Variable, ensuring the key is prefixed with
    `K8S_SECRET_`. For example, you can create a variable with key
 `K8S_SECRET_RAILS_MASTER_KEY`.
 
-3. Run an Auto Devops pipeline either by manually creating a new
+1. Run an Auto Devops pipeline either by manually creating a new
    pipeline or by pushing a code change to GitLab.
 
 Auto DevOps pipelines will take your application secret variables to

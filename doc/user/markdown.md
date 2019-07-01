@@ -1158,13 +1158,16 @@ Examples:
 + Or pluses
 ```
 
+<!-- Note that the lines below were all changed to 1. to maintain documentation standards -->
+<!-- but 2. and 4. would work fine in GitLab -->
+
 1. First ordered list item
-2. Another item
+1. Another item
    - Unordered sub-list.
 1. Actual numbers don't matter, just that it's a number
    1. Ordered sub-list
    1. Next ordered sub-list item
-4. And another item.
+1. And another item.
 
 * Unordered lists can use asterisks
 - Or minuses
@@ -1182,14 +1185,14 @@ Example:
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 ```
 
 1. First ordered list item
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 
 ---
 
@@ -1203,14 +1206,14 @@ Example:
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 ```
 
 1. First ordered list item
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 
 ### Superscripts / Subscripts
 

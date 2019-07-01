@@ -79,11 +79,11 @@ at the Rails application level in SQL.
 In conclusion, we need three things for effective object deduplication
 across a collection of GitLab project repositories at the Git level:
 
-1.  A pool repository must exist.
-2.  The participating project repositories must be linked to the pool
-    repository via their respective `objects/info/alternates` files.
-3.  The pool repository must contain Git object data common to the
-    participating project repositories.
+1. A pool repository must exist.
+1. The participating project repositories must be linked to the pool
+   repository via their respective `objects/info/alternates` files.
+1. The pool repository must contain Git object data common to the
+   participating project repositories.
 
 ### Deduplication factor
 
