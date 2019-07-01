@@ -156,7 +156,7 @@ If no namespaces or projects are selected, no Elasticsearch indexing will take p
 CAUTION: **Warning**:
 If you have already indexed your instance, you will have to regenerate the index in order to delete all existing data
 for filtering to work correctly. To do this run the rake tasks `gitlab:elastic:create_empty_index` and
-`gitlab:elastic:clear_index_status` Afterwards, removing a namespace or a project from the list will delete the data
+`gitlab:elastic:clear_index_status`. Afterwards, removing a namespace or a project from the list will delete the data
 from the Elasticsearch index as expected.
 
 ## Disabling Elasticsearch
