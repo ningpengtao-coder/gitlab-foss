@@ -32,6 +32,9 @@ export default () => {
     mounted() {
       filteredSearch.setup();
     },
+    created() {
+      this.dataset = this.$options.el.dataset;
+    },
     render(createElement) {
       return createElement('issues-app', {
         props: {
@@ -41,6 +44,8 @@ export default () => {
           canBulkUpdate,
           issuableIndex,
           filteredSearch,
+          emptyStateSvgPath: this.dataset.emptyStateSvgPath,
+          emptyStateLoadingDisabledSvgPath: this.dataset.emptyStateLoadingDisabledSvgPath,
         },
       });
     },

@@ -48,6 +48,14 @@ export default {
       type: Function,
       required: true,
     },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+    emptyStateLoadingDisabledSvgPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -170,5 +178,7 @@ export default {
     :button-path="createPath"
     :has-filters="hasFilters"
     :loading-disabled="isLoadingDisabled"
+    :svg-image-path="emptyStateSvgPath"
+    :svg-loading-disabled-image-path="emptyStateLoadingDisabledSvgPath"
   />
 </template>

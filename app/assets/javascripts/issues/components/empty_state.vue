@@ -1,6 +1,5 @@
 <script>
 import { GlEmptyState } from '@gitlab/ui';
-import { imagePath } from '~/lib/utils/common_utils';
 import { ISSUE_STATES } from '../constants';
 
 export default {
@@ -24,11 +23,17 @@ export default {
       type: Boolean,
       required: true,
     },
+    svgImagePath: {
+      type: String,
+      required: true,
+    },
+    svgLoadingDisabledImagePath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-      imagePath: imagePath('illustrations/issues.svg'),
-      loadingDisabledImage: imagePath('illustrations/issue-dashboard_results-without-filter.svg'),
       ISSUE_STATES,
     };
   },
@@ -39,13 +44,13 @@ export default {
   <gl-empty-state
     v-if="loadingDisabled"
     :title="__('Please select at least one filter to see results')"
-    :svg-path="loadingDisabledImage"
+    :svg-path="svgLoadingDisabledImagePath"
   />
   <gl-empty-state
     v-else-if="hasFilters"
     :title="__('Sorry, your filter produced no results')"
     :description="__('To widen your search, change or remove filters above')"
-    :svg-path="imagePath"
+    :svg-path="svgImagePath"
   />
   <gl-empty-state
     v-else-if="state === ISSUE_STATES.OPENED"
@@ -53,12 +58,12 @@ export default {
     :description="__('To keep this project going, create a new issue')"
     :primary-button-link="buttonPath"
     :primary-button-text="__('New issue')"
-    :svg-path="imagePath"
+    :svg-path="svgImagePath"
   />
   <gl-empty-state
     v-else-if="state === ISSUE_STATES.CLOSED"
     :title="__('There are no closed issues')"
-    :svg-path="imagePath"
+    :svg-path="svgImagePath"
   />
   <gl-empty-state
     v-else
@@ -68,6 +73,6 @@ export default {
         'The Issue Tracker is the place to add things that need to be improved or solved in a project. You can register or sign in to create issues for this project.',
       )
     "
-    :svg-path="imagePath"
+    :svg-path="svgImagePath"
   />
 </template>
