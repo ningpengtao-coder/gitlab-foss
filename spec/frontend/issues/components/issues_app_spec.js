@@ -29,6 +29,8 @@ describe('Issues app', () => {
       canBulkUpdate: true,
       issuableIndex: mockedIssuableIndex,
       filteredSearch: mockedFilteredSearch,
+      emptyStateSvgPath: '/',
+      emptyStateLoadingDisabledSvgPath: '/',
       ...props,
     };
 
@@ -59,7 +61,7 @@ describe('Issues app', () => {
       issues: null,
       isBulkUpdating: false,
       currentPage: 1,
-      totalItems: 0,
+      totalItems: 1,
     };
 
     actions = {
