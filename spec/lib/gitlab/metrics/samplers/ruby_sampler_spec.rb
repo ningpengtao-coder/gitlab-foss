@@ -8,12 +8,9 @@ describe Gitlab::Metrics::Samplers::RubySampler do
     allow(Gitlab::Metrics::NullMetric).to receive(:instance).and_return(null_metric)
   end
 
-  describe '#initialization' do
+  describe '#initialize' do
     it 'sets process_start_time_seconds' do
-      Timecop.freeze do
-        sampler = described_class.new(5)
-        expect(sampler.metrics[:process_start_time_seconds].get).to eq(Time.now.to_i)
-      end
+      expect(sampler.metrics[:process_start_time_seconds].get).to eq(Time.now.to_i)
     end
   end
 

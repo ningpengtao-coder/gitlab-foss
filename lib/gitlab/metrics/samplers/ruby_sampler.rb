@@ -6,6 +6,12 @@ module Gitlab
   module Metrics
     module Samplers
       class RubySampler < BaseSampler
+        def initialize(interval)
+          metrics[:process_start_time_seconds].set(labels.merge(worker_label), Time.now.to_i)
+
+          super(interval)
+        end
+
         def metrics
           @metrics ||= init_metrics
         end
@@ -37,8 +43,6 @@ module Gitlab
           GC.stat.keys.each do |key|
             metrics[key] = ::Gitlab::Metrics.gauge(with_prefix(:gc_stat, key), to_doc_string(key), labels, :livesum)
           end
-
-          metrics[:process_start_time_seconds].set(labels.merge(worker_label), Time.now.to_i)
 
           metrics
         end
