@@ -1,9 +1,9 @@
 %li
   %span.text-secondary-500
     - if @show_children
-      = icon('folder-open inverse', base: 'circle')
+      = sprite_icon('folder-open', size: 16)
     - else
-      = icon('folder inverse', base: 'circle')
+      = sprite_icon('folder-o', size: 16)
 
   = link_to wiki_dir.slug, project_wiki_dir_path(@project, wiki_dir)
   - unless @show_children

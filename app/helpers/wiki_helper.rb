@@ -70,11 +70,11 @@ module WikiHelper
 
   def wiki_show_children_title(show_children)
     if show_children == 'tree'
-      icon('folder-open', text: s_("Wiki|Grouped"))
+      sprite_icon_with_text('folder-open', s_("Wiki|Show folder contents"), size: 16)
     elsif show_children == 'hidden'
-      icon('folder', text: s_("Wiki|Hide folder contents"))
+      sprite_icon_with_text('folder-o', s_("Wiki|Hide folder contents"), size: 16)
     else
-      icon('clone', text: s_("Wiki|Show files separately"))
+      sprite_icon_with_text('list-bulleted', s_("Wiki|Show files separately"), size: 16)
     end
   end
 

@@ -20,7 +20,10 @@ describe Projects::WikisController do
   end
 
   describe 'GET #pages' do
-    subject { get :pages, params: { namespace_id: project.namespace, project_id: project, id: wiki_title } }
+    subject do
+      get :pages, params: { namespace_id: project.namespace, project_id: project, id: wiki_title }.merge(extra_params)
+    end
+    let(:extra_params) { {} }
 
     it 'does not load the pages content' do
       expect(controller).to receive(:load_wiki).and_return(project_wiki)
@@ -29,149 +32,46 @@ describe Projects::WikisController do
 
       subject
     end
-  end
 
-  describe 'GET #show_dir' do
-    subject { get :show_dir, params: { namespace_id: project.namespace, project_id: project, id: dir_slug } }
-
-    # TODO
-  end
-
-  describe 'GET #show' do
-    render_views
-
-    subject { get :show, params: { namespace_id: project.namespace, project_id: project, id: wiki_title } }
-
-    it 'limits the retrieved pages for the sidebar' do
-      expect(controller).to receive(:load_wiki).and_return(project_wiki)
-
-      # empty? call
-      expect(project_wiki).to receive(:list_pages).with(limit: 1).and_call_original
-      # Sidebar entries
-      expect(project_wiki).to receive(:list_pages).with(limit: 15).and_call_original
-
-      subject
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include(wiki_title)
-    end
-
-    context 'when page content encoding is invalid' do
-      it 'sets flash error' do
-        allow(controller).to receive(:valid_encoding?).and_return(false)
-
-        subject
-
-        expect(response).to have_http_status(:ok)
-        expect(flash[:notice]).to eq 'The content of this page is not encoded in UTF-8. Edits can only be made via the Git repository.'
-      end
-    end
-
-    context 'when page is a file' do
-      include WikiHelpers
-
-      let(:path) { upload_file_to_wiki(project, user, file_name) }
-
-      before do
-        get :show, params: { namespace_id: project.namespace, project_id: project, id: path }
-      end
-
-      context 'when file is an image' do
-        let(:file_name) { 'dk.png' }
-
-        it 'delivers the image' do
-          expect(response.headers['Content-Disposition']).to match(/^inline/)
-          expect(response.headers[Gitlab::Workhorse::DETECT_HEADER]).to eq "true"
+    shared_examples 'sorting-and-nesting' do |sort_key, default_nesting|
+      context "the user is sorting by #{sort_key}" do
+        let(:extra_params) { sort_params.merge(nesting_params) }
+        let(:sort_params) { { sort: sort_key } }
+        let(:nesting_params) { {} }
+        before do
+          subject
         end
 
-        context 'when file is a svg' do
-          let(:file_name) { 'unsanitized.svg' }
+        it "sets nesting to #{default_nesting} by default" do
+          expect(assigns :nesting).to eq default_nesting
+        end
 
-          it 'delivers the image' do
-            expect(response.headers['Content-Disposition']).to match(/^inline/)
-            expect(response.headers[Gitlab::Workhorse::DETECT_HEADER]).to eq "true"
+        it 'shows children by default' do
+          expect(assigns :show_children).to be true
+        end
+
+        %w[hidden tree flat].each do |nesting|
+          context "the user explicitly passes show_children = #{nesting}" do
+            let(:nesting_params) { { show_children: nesting } }
+
+            it 'sets nesting to the provided value' do
+              expect(assigns :nesting).to eq nesting
+            end
+          end
+        end
+
+        context 'the user wants children hidden' do
+          let(:nesting_params) { { show_children: 'hidden' } }
+
+          it 'hides children' do
+            expect(assigns :show_children).to be false
           end
         end
       end
-
-      context 'when file is a pdf' do
-        let(:file_name) { 'git-cheat-sheet.pdf' }
-
-        it 'sets the content type to sets the content response headers' do
-          expect(response.headers['Content-Disposition']).to match(/^inline/)
-          expect(response.headers[Gitlab::Workhorse::DETECT_HEADER]).to eq "true"
-        end
-      end
-    end
-  end
-
-  describe 'POST #preview_markdown' do
-    it 'renders json in a correct format' do
-      post :preview_markdown, params: { namespace_id: project.namespace, project_id: project, id: 'page/path', text: '*Markdown* text' }
-
-      expect(JSON.parse(response.body).keys).to match_array(%w(body references))
-    end
-  end
-
-  describe 'GET #edit' do
-    subject { get(:edit, params: { namespace_id: project.namespace, project_id: project, id: wiki_title }) }
-
-    context 'when page content encoding is invalid' do
-      it 'redirects to show' do
-        allow(controller).to receive(:valid_encoding?).and_return(false)
-
-        subject
-
-        expect(response).to redirect_to(project_wiki_path(project, project_wiki.list_pages.first))
-      end
     end
 
-    context 'when page content encoding is valid' do
-      render_views
-
-      it 'shows the edit page' do
-        subject
-
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to include('Edit Page')
-      end
-    end
-  end
-
-  describe 'PATCH #update' do
-    let(:new_title) { 'New title' }
-    let(:new_content) { 'New content' }
-    subject do
-      patch(:update,
-            params: {
-              namespace_id: project.namespace,
-              project_id: project,
-              id: wiki_title,
-              wiki: { title: new_title, content: new_content }
-            })
-    end
-
-    context 'when page content encoding is invalid' do
-      it 'redirects to show' do
-        allow(controller).to receive(:valid_encoding?).and_return(false)
-
-        subject
-        expect(response).to redirect_to(project_wiki_path(project, project_wiki.list_pages.first))
-      end
-    end
-
-    context 'when page content encoding is valid' do
-      render_views
-
-      it 'updates the page' do
-        subject
-
-        wiki_page = project_wiki.list_pages(load_content: true).first
-
-        expect(wiki_page.title).to eq new_title
-        expect(wiki_page.content).to eq new_content
-      end
-    end
+    include_examples 'sorting-and-nesting', 'created_at', 'flat'
+    include_examples 'sorting-and-nesting', 'title', 'tree'
   end
 
   def create_page(name, content)
