@@ -251,3 +251,30 @@ sudo gitlab-rake gitlab:exclusive_lease:clear[project_housekeeping:*]
 # to clear a lease for repository garbage collection in a specific project: (id=4)
 sudo gitlab-rake gitlab:exclusive_lease:clear[project_housekeeping:4]
 ```
+
+## Make enabled pages sites public (DANGER)
+
+**DANGER**:
+Don't run if you've already enabled
+[Pages Access Control](../pages/index.md#access-control) a while ago.
+
+If you enabling [Pages Access Control](../pages/index.md#access-control) much later
+than it was introduced, you may have a lot of projects with pages access level set to
+`Everyone with access`(gitlab.com situation).
+Enabling access control and redeploying these projects will make them private
+in that case.
+
+To fix default settings, run:
+
+**Omnibus Installation**
+
+```
+sudo gitlab-rake gitlab:pages:make_enabled_public
+```
+
+**Source Installation**
+
+```
+cd /home/git/gitlab
+sudo -u git -H bundle exec rake gitlab:pages:make_enabled_public RAILS_ENV=production
+```
