@@ -16,7 +16,7 @@ describe 'rake gitlab:pages:make_all_public' do
   end
 
   subject do
-    run_rake_task('gitlab:pages:make_all_public')
+    run_rake_task('gitlab:pages:make_enabled_public')
   end
 
   it 'schedules background migrations' do

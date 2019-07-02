@@ -6,9 +6,9 @@ namespace :gitlab do
       puts "OK: gitlab-pages admin API is reachable"
     end
 
-    desc "Makes all pages sites public(needed to enable access-control on gitlab.com)"
-    task make_all_public: :environment do
-      ::Gitlab::BackgroundMigration::MakeAllPagesSitesPublic.new.perform
+    desc "Makes enabled pages sites public(needed to enable access-control on gitlab.com)"
+    task make_enabled_public: :environment do
+      ::Gitlab::BackgroundMigration::MakeEnabledPagesSitesPublic.new.perform
     end
   end
 end

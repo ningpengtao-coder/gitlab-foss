@@ -3,7 +3,7 @@
 module Gitlab
   module BackgroundMigration
     # changes access level for pages sites to public and updates config
-    class MakeAllPagesSitesPublic
+    class MakeEnabledPagesSitesPublic
       include Gitlab::Database::MigrationHelpers
 
       MIGRATION = 'MakePagesSitesPublic'
