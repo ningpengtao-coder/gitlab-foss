@@ -10,17 +10,30 @@ class Projects::WikisController < Projects::ApplicationController
   before_action :authorize_admin_wiki!, only: :destroy
   before_action :load_project_wiki
   before_action :load_page, only: [:show, :edit, :update, :history, :destroy]
+  before_action :load_dir, only: [:show_dir]
   before_action :valid_encoding?, only: [:show, :edit, :update], if: :load_page
   before_action only: [:edit, :update], unless: :valid_encoding? do
     redirect_to(project_wiki_path(@project, @page))
   end
 
   def pages
+    @nesting = show_children_param
+    @show_children = @nesting != 'hidden'
     @wiki_pages = Kaminari.paginate_array(
       @project_wiki.list_pages(sort: params[:sort], direction: params[:direction])
     ).page(params[:page])
 
-    @wiki_entries = WikiDirectory.group_by_directory(@wiki_pages)
+    @wiki_entries = case @nesting
+                    when 'flat'
+                      @wiki_pages
+                    else
+                      WikiDirectory.group_by_directory(@wiki_pages)
+                    end
+  end
+
+  # One of ['tree', 'hidden', 'flat']
+  def show_children_param
+    params.permit(:show_children).fetch(:show_children, params[:sort] == 'created_at' ? 'flat' : 'tree')
   end
 
   def show
@@ -29,6 +42,9 @@ class Projects::WikisController < Projects::ApplicationController
     if @page
       set_encoding_error unless valid_encoding?
 
+      @page_dir = @project_wiki.find_dir(@page.directory) if @page.directory.present?
+      @show_children = true
+
       render 'show'
     elsif file_blob
       send_blob(@project_wiki.repository, file_blob)
@@ -36,6 +52,19 @@ class Projects::WikisController < Projects::ApplicationController
       @page = build_page(title: params[:id])
 
       render 'edit'
+    else
+      render 'empty'
+    end
+  end
+
+  def show_dir
+    @show_children = true # or false, it doesn't matter, since we only support one-level
+    if @wiki_dir
+      @wiki_pages = Kaminari
+        .paginate_array(@wiki_dir.pages)
+        .page(params[:page])
+      @wiki_entries = @wiki_pages
+      render 'show_dir'
     else
       render 'empty'
     end
@@ -131,7 +160,7 @@ class Projects::WikisController < Projects::ApplicationController
   end
 
   def wiki_params
-    params.require(:wiki).permit(:title, :content, :format, :message, :last_commit_sha)
+    params.require(:wikis_page).permit(:title, :content, :format, :message, :last_commit_sha)
   end
 
   def build_page(args)
@@ -142,6 +171,16 @@ class Projects::WikisController < Projects::ApplicationController
 
   def load_page
     @page ||= @project_wiki.find_page(*page_params)
+  end
+
+  def load_dir
+    @wiki_dir ||= @project_wiki.find_dir(*dir_params)
+  end
+
+  def dir_params
+    keys = [:id, :sort, :direction]
+
+    params.values_at(*keys)
   end
 
   def page_params

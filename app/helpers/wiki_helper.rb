@@ -48,13 +48,13 @@ module WikiHelper
     expose_url(api_v4_projects_wikis_attachments_path(id: @project.id))
   end
 
-  def wiki_sort_controls(project, sort, direction)
+  def wiki_sort_controls(sort, direction, &block)
     sort ||= ProjectWiki::TITLE_ORDER
     link_class = 'btn btn-default has-tooltip reverse-sort-btn qa-reverse-sort'
     reversed_direction = direction == 'desc' ? 'asc' : 'desc'
     icon_class = direction == 'desc' ? 'highest' : 'lowest'
 
-    link_to(project_wikis_pages_path(project, sort: sort, direction: reversed_direction),
+    link_to(yield(sort: sort, direction: reversed_direction),
       type: 'button', class: link_class, title: _('Sort direction')) do
       sprite_icon("sort-#{icon_class}", size: 16)
     end
@@ -65,6 +65,32 @@ module WikiHelper
       s_("Wiki|Created date")
     else
       s_("Wiki|Title")
+    end
+  end
+
+  def wiki_show_children_title(show_children)
+    if show_children == 'tree'
+      icon('folder-open', text: s_("Wiki|Grouped"))
+    elsif show_children == 'hidden'
+      icon('folder', text: s_("Wiki|Hide folder contents"))
+    else
+      icon('clone', text: s_("Wiki|Show files separately"))
+    end
+  end
+
+  def wiki_page_title(wiki_page, nesting)
+    case nesting
+    when 'flat'
+      tags = []
+      if wiki_page.directory.present?
+        tags << content_tag(:span, wiki_page.directory, class: 'wiki-page-dir-name')
+        tags << content_tag(:span, '/', class: 'wiki-page-name-separator')
+      end
+
+      tags << content_tag(:span, wiki_page.title, class: 'wiki-page-title')
+      tags.join('').html_safe
+    else
+      wiki_page.title
     end
   end
 end

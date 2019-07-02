@@ -31,6 +31,12 @@ describe Projects::WikisController do
     end
   end
 
+  describe 'GET #show_dir' do
+    subject { get :show_dir, params: { namespace_id: project.namespace, project_id: project, id: dir_slug } }
+
+    # TODO
+  end
+
   describe 'GET #show' do
     render_views
 
