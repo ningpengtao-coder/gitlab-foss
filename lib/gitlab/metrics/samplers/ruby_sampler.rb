@@ -9,7 +9,7 @@ module Gitlab
         def initialize(interval)
           metrics[:process_start_time_seconds].set(labels.merge(worker_label), Time.now.to_i)
 
-          super(interval)
+          super
         end
 
         def metrics
