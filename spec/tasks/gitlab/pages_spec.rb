@@ -5,6 +5,8 @@ require 'rake_helper'
 describe 'rake gitlab:pages:make_all_public' do
   let!(:old_project_with_public_pages) { create(:project, :pages_public) }
   let!(:project_for_update) { create(:project, :pages_enabled) }
+  let!(:project_with_disabled_pages) { create(:project, :pages_disabled) }
+  let!(:project_with_private_pages) { create(:project, :pages_private) }
   let!(:public_project) { create(:project, :public)}
 
   let(:migration_name) { 'MakePagesSitesPublic' }
@@ -43,6 +45,22 @@ describe 'rake gitlab:pages:make_all_public' do
       expect do
         subject
       end.not_to change { public_project.reload.project_feature.pages_access_level }.from(ProjectFeature::ENABLED)
+    end
+  end
+
+  it 'skips project with private pages' do
+    perform_enqueued_jobs do
+      expect do
+        subject
+      end.not_to change { project_with_private_pages.reload.project_feature.pages_access_level }.from(ProjectFeature::PRIVATE)
+    end
+  end
+
+  it 'skips project with disabled pages' do
+    perform_enqueued_jobs do
+      expect do
+        subject
+      end.not_to change { project_with_disabled_pages.reload.project_feature.pages_access_level }.from(ProjectFeature::DISABLED)
     end
   end
 end
