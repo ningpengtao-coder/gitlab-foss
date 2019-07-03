@@ -258,7 +258,7 @@ sudo gitlab-rake gitlab:exclusive_lease:clear[project_housekeeping:4]
 Don't run if you've already enabled
 [Pages Access Control](../pages/index.md#access-control) a while ago.
 
-If you enabling [Pages Access Control](../pages/index.md#access-control) much later
+If you're enabling [Pages Access Control](../pages/index.md#access-control) much later
 than it was introduced, you may have a lot of projects with pages access level set to
 `Everyone with access`(gitlab.com situation).
 Enabling access control and redeploying these projects will make them private
