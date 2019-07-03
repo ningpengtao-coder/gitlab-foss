@@ -114,7 +114,7 @@ module Gitlab
           end
 
           def json_error_message
-            { key: key, context: @context, errors: @errors }.to_json
+            JSON.pretty_generate({ key: key, context: @context, errors: @errors })
           end
         end
       end
