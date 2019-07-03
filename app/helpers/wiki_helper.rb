@@ -78,19 +78,21 @@ module WikiHelper
     end
   end
 
-  def wiki_page_title(wiki_page, nesting)
+  def wiki_pages_wiki_page_link(wiki_page, nesting, project)
+    wiki_page_link = link_to wiki_page.title, project_wiki_path(project, wiki_page), class: 'wiki-page-title'
     case nesting
     when 'flat'
       tags = []
       if wiki_page.directory.present?
-        tags << content_tag(:span, wiki_page.directory, class: 'wiki-page-dir-name')
+        wiki_dir = WikiDirectory.new(wiki_page.directory)
+        tags << link_to(wiki_dir.slug, project_wiki_dir_path(project, wiki_dir), class: 'wiki-page-dir-name')
         tags << content_tag(:span, '/', class: 'wiki-page-name-separator')
       end
 
-      tags << content_tag(:span, wiki_page.title, class: 'wiki-page-title')
+      tags << wiki_page_link
       tags.join('').html_safe
     else
-      wiki_page.title
+      wiki_page_link
     end
   end
 end
