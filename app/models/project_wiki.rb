@@ -113,7 +113,7 @@ class ProjectWiki
   #         the page.
   #
   # Returns an initialized WikiPage instance or nil
-  def find_page(title, version = nil, sort = nil)
+  def find_page(title, version = nil)
     page_title, page_dir = page_title_and_dir(title)
 
     if page = wiki.page(title: page_title, version: version, dir: page_dir)
