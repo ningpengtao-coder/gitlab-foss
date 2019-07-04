@@ -35,6 +35,10 @@ module Gitlab
         User.arel_table
       end
 
+      def projects_table
+        Project.arel_table
+      end
+
       def build_table
         ::CommitStatus.arel_table
       end
