@@ -1158,7 +1158,7 @@ Examples:
 + Or pluses
 ```
 
-<!-- The "2." and "4." in the example above is changed to "1." below only to match the standards on docs.gitlab.com -->
+<!-- The "2." and "4." in the example above are changed to "1." below, only to match the standards on docs.gitlab.com -->
 
 1. First ordered list item
 1. Another item
