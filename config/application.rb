@@ -237,7 +237,15 @@ module Gitlab
       caching_config_hash[:pool_timeout] = 1
     end
 
-    config.cache_store = :redis_store, caching_config_hash
+    l1_cache_size_mb = ENV['GITLAB_L1_RAILS_CACHE_SIZE_MB'].to_i
+    if l1_cache_size_mb > 0 # rubocop:disable Style/ConditionalAssignment
+      config.cache_store = :level2, {
+        L1: [:memory_store, size: l1_cache_size_mb.megabytes, expires_in: 1.minute, race_condition_ttl: 1.second],
+        L2: [:redis_store, caching_config_hash]
+      }
+    else
+      config.cache_store = :redis_store, caching_config_hash
+    end
 
     config.active_job.queue_adapter = :sidekiq
 
