@@ -3,8 +3,7 @@
 require 'fast_spec_helper'
 
 describe Gitlab::TimeTooltipFormatter do
-  let(:time) { Time.now.utc }
-  let(:formatter) { described_class.new(time: time) }
+  let(:formatter) { described_class.new(time: Time.now) }
 
   describe '#tooltip_format' do
     it 'returns the correct symbol based on timezoned attribute' do
@@ -30,9 +29,14 @@ describe Gitlab::TimeTooltipFormatter do
   end
 
   describe '#time_for_tooltip' do
+    before { Time.zone = 'UTC' }
+
     it 'returns the time at the correct time zone' do
+      formatter = described_class.new(time: Time.now)
       formatter.timezoned = true
-      expect(formatter.time_for_tooltip.to_s).to include '-0400'
+      expect(formatter.time_for_tooltip.to_s).not_to include 'UTC'
+      formatter.timezoned = false
+      expect(formatter.time_for_tooltip.to_s).to include 'UTC'
     end
   end
 end
