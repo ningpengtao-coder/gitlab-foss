@@ -33,6 +33,9 @@ class Projects::WikiPagesController < Projects::ApplicationController
     end
   end
 
+  def edit
+  end
+
   def update
     @page = WikiPages::UpdateService
       .new(@project, current_user, wiki_params)
@@ -97,6 +100,11 @@ class Projects::WikiPagesController < Projects::ApplicationController
     render 'edit'
   end
 
+  # Callback for PreviewMarkdown
+  def preview_markdown_params
+    { pipeline: :wiki, project_wiki: project_wiki, page_slug: params[:id] }
+  end
+
   private
 
   def show_page
@@ -121,9 +129,6 @@ class Projects::WikiPagesController < Projects::ApplicationController
     @page = build_page(title: params[:id])
 
     render 'edit'
-  end
-
-  def edit
   end
 
   def wiki_params

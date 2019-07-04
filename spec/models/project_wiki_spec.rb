@@ -63,6 +63,14 @@ describe ProjectWiki do
     end
   end
 
+  describe "#wiki_page_path" do
+    it "returns the wiki page path" do
+      expected = "#{Gitlab.config.gitlab.relative_url_root}/#{project.full_path}/wikis/page"
+
+      expect(subject.wiki_page_path).to eq expected
+    end
+  end
+
   describe "#wiki" do
     it "contains a Gitlab::Git::Wiki instance" do
       expect(subject.wiki).to be_a Gitlab::Git::Wiki

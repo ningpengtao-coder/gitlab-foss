@@ -40,4 +40,12 @@ module CapybaraHelpers
   def clear_browser_session
     page.driver.browser.manage.delete_cookie('_gitlab_session')
   end
+
+  def scroll_to(element)
+    script = <<-JS
+      arguments[0].scrollIntoView(true);
+    JS
+
+    page.driver.browser.execute_script(script, element.native)
+  end
 end

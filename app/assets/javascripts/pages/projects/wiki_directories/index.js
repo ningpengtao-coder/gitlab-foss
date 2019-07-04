@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import ShortcutsWiki from '~/behaviors/shortcuts/shortcuts_wiki';
-import Wikis from './wikis';
+import Wikis from '../wikis/wikis';
 import GLForm from '../../../gl_form';
 
 document.addEventListener('DOMContentLoaded', () => {

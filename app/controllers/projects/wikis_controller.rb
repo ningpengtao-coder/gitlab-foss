@@ -7,13 +7,13 @@ class Projects::WikisController < Projects::ApplicationController
 
   def pages
     @nesting = show_children_param
-    @show_children = @nesting != 'hidden'
+    @show_children = @nesting != ProjectWiki::NESTING_CLOSED
     @wiki_pages = Kaminari.paginate_array(
       @project_wiki.list_pages(sort: params[:sort], direction: params[:direction])
     ).page(params[:page])
 
     @wiki_entries = case @nesting
-                    when 'flat'
+                    when ProjectWiki::NESTING_FLAT
                       @wiki_pages
                     else
                       WikiDirectory.group_by_directory(@wiki_pages)
@@ -25,8 +25,9 @@ class Projects::WikisController < Projects::ApplicationController
 
   private
 
-  # One of ['tree', 'hidden', 'flat']
+  # One of ProjectWiki::NESTINGS
   def show_children_param
-    params.permit(:show_children).fetch(:show_children, params[:sort] == 'created_at' ? 'flat' : 'tree')
+    default_val = params[:sort] == 'created_at' ? ProjectWiki::NESTING_FLAT : ProjectWiki::NESTING_TREE
+    params.permit(:show_children).fetch(:show_children, default_val)
   end
 end

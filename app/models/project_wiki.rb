@@ -17,6 +17,10 @@ class ProjectWiki
   CREATED_AT_ORDER = 'created_at'
   DIRECTION_DESC = 'desc'
   DIRECTION_ASC = 'asc'
+  NESTING_FLAT = 'flat'
+  NESTING_TREE = 'tree'
+  NESTING_CLOSED = 'hidden'
+  NESTINGS = [NESTING_TREE, NESTING_CLOSED, NESTING_FLAT].freeze
 
   # Returns a string describing what went wrong after
   # an operation fails.
@@ -58,7 +62,11 @@ class ProjectWiki
   end
 
   def wiki_base_path
-    [Gitlab.config.gitlab.relative_url_root, '/', @project.full_path, '/wikis'].join('')
+    [Gitlab.config.gitlab.relative_url_root, @project.full_path, 'wikis'].join('/')
+  end
+
+  def wiki_page_path
+    wiki_base_path + '/page'
   end
 
   # Returns the Gitlab::Git::Wiki object.

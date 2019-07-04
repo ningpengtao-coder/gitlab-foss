@@ -48,13 +48,14 @@ module WikiHelper
     expose_url(api_v4_projects_wikis_attachments_path(id: @project.id))
   end
 
-  def wiki_sort_controls(sort, direction, &block)
-    sort ||= ProjectWiki::TITLE_ORDER
+  def wiki_sort_controls(sort_params = {}, &block)
+    sort = sort_params[:sort] || ProjectWiki::TITLE_ORDER
+    currently_desc = sort_params[:direction] == 'desc'
     link_class = 'btn btn-default has-tooltip reverse-sort-btn qa-reverse-sort'
-    reversed_direction = direction == 'desc' ? 'asc' : 'desc'
-    icon_class = direction == 'desc' ? 'highest' : 'lowest'
+    reversed_direction = currently_desc ? 'asc' : 'desc'
+    icon_class = currently_desc ? 'highest' : 'lowest'
 
-    link_to(yield(sort: sort, direction: reversed_direction),
+    link_to(yield(sort_params.merge(sort: sort, direction: reversed_direction)),
       type: 'button', class: link_class, title: _('Sort direction')) do
       sprite_icon("sort-#{icon_class}", size: 16)
     end
@@ -69,19 +70,22 @@ module WikiHelper
   end
 
   def wiki_show_children_title(show_children)
-    if show_children == 'tree'
-      sprite_icon_with_text('folder-open', s_("Wiki|Show folder contents"), size: 16)
-    elsif show_children == 'hidden'
-      sprite_icon_with_text('folder-o', s_("Wiki|Hide folder contents"), size: 16)
-    else
-      sprite_icon_with_text('list-bulleted', s_("Wiki|Show files separately"), size: 16)
-    end
+    icon_name, icon_text =
+      if show_children == ProjectWiki::NESTING_TREE
+        ['folder-open', s_("Wiki|Show folder contents")]
+      elsif show_children == ProjectWiki::NESTING_CLOSED
+        ['folder-o', s_("Wiki|Hide folder contents")]
+      else
+        ['list-bulleted', s_("Wiki|Show files separately")]
+      end
+
+    sprite_icon_with_text(icon_name, icon_text, size: 16)
   end
 
   def wiki_pages_wiki_page_link(wiki_page, nesting, project)
     wiki_page_link = link_to wiki_page.title, project_wiki_path(project, wiki_page), class: 'wiki-page-title'
     case nesting
-    when 'flat'
+    when ProjectWiki::NESTING_FLAT
       tags = []
       if wiki_page.directory.present?
         wiki_dir = WikiDirectory.new(wiki_page.directory)
