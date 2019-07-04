@@ -135,8 +135,7 @@ module ApplicationHelper
 
     content_tag :time, l(time, format: formatter.time_format),
       class: formatter.css_classes,
-      # title: l(formatter.time_for_tooltip, format: formatter.tooltip_format),
-      title: time.class.name,
+      title: l(formatter.time_for_tooltip, format: formatter.tooltip_format),
       datetime: formatter.time_to_datetime,
       data: formatter.element_data
   end
