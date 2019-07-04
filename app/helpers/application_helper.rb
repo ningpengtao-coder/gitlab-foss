@@ -125,7 +125,7 @@ module ApplicationHelper
   #
   # Returns an HTML-safe String
   def time_ago_with_tooltip(time, placement: 'top', html_class: '', short_format: false, timezoned: false)
-    formatter = TimeTooltipFormatter.new(
+    formatter = Gitlab::TimeTooltipFormatter.new(
       time: time,
       placement: placement,
       html_class: html_class,
@@ -135,7 +135,8 @@ module ApplicationHelper
 
     content_tag :time, l(time, format: formatter.time_format),
       class: formatter.css_classes,
-      title: l(formatter.time_for_tooltip, format: formatter.tooltip_format),
+      # title: l(formatter.time_for_tooltip, format: formatter.tooltip_format),
+      title: time.class.name,
       datetime: formatter.time_to_datetime,
       data: formatter.element_data
   end

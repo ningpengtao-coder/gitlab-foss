@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class TimeTooltipFormatter
+class Gitlab::TimeTooltipFormatter
   attr_accessor :time, :placement, :html_class, :short_format, :timezoned
 
   TIME_FORMAT = '%b %d, %Y'
 
-  def initialize(time:, placement:, html_class:, short_format:, timezoned:)
+  def initialize(time:, placement: 'top', html_class: '', short_format: false, timezoned: false)
     @time = time
     @placement = placement
     @html_class = html_class
