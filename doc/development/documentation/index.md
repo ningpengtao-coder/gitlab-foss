@@ -595,6 +595,7 @@ The following sample `markdownlint` configuration modifies the available default
   "no-trailing-punctuation": false,
   "ol-prefix": { "style": "one" },
   "blanks-around-fences": false,
+  "first-line-heading": { "level": 2 },
   "no-inline-html": {
     "allowed_elements": [
       "table",
