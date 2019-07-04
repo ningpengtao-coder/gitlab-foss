@@ -92,7 +92,7 @@ describe 'projects/ci/lints/show' do
       render
 
       expect(rendered).to have_content('Status: syntax is incorrect')
-      expect(rendered).to have_content('Error: Undefined error')
+      expect(rendered).to have_content('Undefined error')
       expect(rendered).not_to have_content('Tag list:')
     end
   end
