@@ -124,21 +124,20 @@ module ApplicationHelper
   # `html_class` argument is provided.
   #
   # Returns an HTML-safe String
-  def time_ago_with_tooltip(time, placement: 'top', html_class: '', short_format: false)
-    css_classes = [short_format ? 'js-short-timeago' : 'js-timeago']
-    css_classes << html_class unless html_class.blank?
+  def time_ago_with_tooltip(time, placement: 'top', html_class: '', short_format: false, timezoned: false)
+    formatter = TimeTooltipFormatter.new(
+      time: time,
+      placement: placement,
+      html_class: html_class,
+      short_format: short_format,
+      timezoned: timezoned
+    )
 
-    element = content_tag :time, l(time, format: "%b %d, %Y"),
-      class: css_classes.join(' '),
-      title: l(time.to_time.in_time_zone, format: :timeago_tooltip),
-      datetime: time.to_time.getutc.iso8601,
-      data: {
-        toggle: 'tooltip',
-        placement: placement,
-        container: 'body'
-      }
-
-    element
+    content_tag :time, l(time, format: formatter.time_format),
+      class: formatter.css_classes,
+      title: l(formatter.time_for_tooltip, format: formatter.tooltip_format),
+      datetime: formatter.time_to_datetime,
+      data: formatter.element_data
   end
 
   def edited_time_ago_with_tooltip(object, placement: 'top', html_class: 'time_ago', exclude_author: false)

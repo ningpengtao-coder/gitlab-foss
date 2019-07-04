@@ -270,4 +270,5 @@ en:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       timeago_tooltip: "%b %-d, %Y %-l:%M%P"
+      timeago_tooltip_tz: "%b %-d, %Y %-l:%M%P %Z"
     pm: pm
