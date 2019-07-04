@@ -68,11 +68,20 @@ module Gitlab
       end
 
       def allowed_ids_source
-        { project_id: project.id }
+        group ? { group_id: group.id } : { project_id: project.id }
+      end
+
+      def serialization_context
+        namespace = group ? group.name : project.namespace
+        { namespace: namespace }
       end
 
       def projects
-        [project]
+        group ? group.projects : [project]
+      end
+
+      def group
+        @group ||= options.fetch(:group, nil)
       end
     end
   end

@@ -42,6 +42,10 @@ module Gitlab
         end
       end
 
+      def group_median
+        median_query(projects.map(&:id))
+      end
+
       def median_query(project_ids)
         # Build a `SELECT` query. We find the first of the `end_time_attrs` that isn't `NULL` (call this end_time).
         # Next, we find the first of the start_time_attrs that isn't `NULL` (call this start_time).
@@ -77,7 +81,11 @@ module Gitlab
       end
 
       def projects
-        [project]
+        group ? group.projects : [project]
+      end
+
+      def group
+        @group ||= options.fetch(:group, nil)
       end
     end
   end
