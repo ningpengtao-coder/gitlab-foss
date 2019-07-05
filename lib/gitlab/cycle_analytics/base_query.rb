@@ -24,12 +24,17 @@ module Gitlab
           .where(issue_table[:created_at].gteq(options[:from]))
 
         # Load merge_requests
-        query = query.join(mr_table, Arel::Nodes::OuterJoin)
+
+        query = load_merge_requests(query)
+
+        query
+      end
+
+      def load_merge_requests(query)
+        query.join(mr_table, Arel::Nodes::OuterJoin)
           .on(mr_table[:id].eq(mr_closing_issues_table[:merge_request_id]))
           .join(mr_metrics_table)
           .on(mr_table[:id].eq(mr_metrics_table[:merge_request_id]))
-
-        query
       end
     end
   end
