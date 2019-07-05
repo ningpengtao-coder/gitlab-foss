@@ -29,7 +29,9 @@ describe Gitlab::TimeTooltipFormatter do
   end
 
   describe '#time_for_tooltip' do
-    before { Time.zone = 'UTC' }
+    before do
+      Time.zone = 'UTC'
+    end
 
     it 'returns the time at the correct time zone' do
       formatter = described_class.new(time: Time.now)
