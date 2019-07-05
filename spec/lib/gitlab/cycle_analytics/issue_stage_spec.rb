@@ -70,5 +70,28 @@ describe Gitlab::CycleAnalytics::IssueStage do
         expect(result.map { |event| event[:title] }).to contain_exactly(issue_2_1.title, issue_2_2.title)
       end
     end
+
+    context 'when subgroup is given' do
+      let(:subgroup) { create(:group, parent: group) }
+      let(:project_4) { create(:project, group: subgroup) }
+      let(:project_5) { create(:project, group: subgroup) }
+      let(:issue_3_1) { create(:issue, project: project_4, created_at: 90.minutes.ago) }
+      let(:issue_3_2) { create(:issue, project: project_5, created_at: 60.minutes.ago) }
+      let(:issue_3_3) { create(:issue, project: project_5, created_at: 60.minutes.ago) }
+
+      before do
+        issue_3_1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago)
+        issue_3_2.metrics.update!(first_added_to_board_at: 30.minutes.ago)
+      end
+
+      describe '#events' do
+        it 'exposes merge requests that close issues' do
+          result = stage.events
+
+          expect(result.count).to eq(4)
+          expect(result.map { |event| event[:title] }).to contain_exactly(issue_2_1.title, issue_2_2.title, issue_3_1.title, issue_3_2.title)
+        end
+      end
+    end
   end
 end

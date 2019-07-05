@@ -68,12 +68,11 @@ module Gitlab
       end
 
       def allowed_ids_source
-        group ? { group_id: group.id } : { project_id: project.id }
+        group ? { group_id: group.id, include_subgroups: true } : { project_id: @project.id }
       end
 
       def serialization_context
-        namespace = group ? group.name : project.namespace
-        { namespace: namespace }
+        {}
       end
 
       def projects
