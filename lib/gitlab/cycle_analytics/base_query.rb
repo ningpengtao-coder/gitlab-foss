@@ -20,6 +20,7 @@ module Gitlab
           .join(routes_table).on(projects_table[:namespace_id].eq(routes_table[:source_id]))
           .project(issue_table[:project_id].as("project_id"))
           .where(issue_table[:project_id].in(project_ids))
+          .where(routes_table[:source_type].eq('Namespace'))
           .where(issue_table[:created_at].gteq(options[:from]))
 
         # Load merge_requests
