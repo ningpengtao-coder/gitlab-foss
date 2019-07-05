@@ -40,7 +40,7 @@ describe CycleAnalytics::GroupLevel do
     end
 
     it 'returns medians for each stage for a specific group' do
-      expect(subject.summary.map { |summary| summary[:value] }).to contain_exactly(1, 0, 1)
+      expect(subject.summary.map { |summary| summary[:value] }).to contain_exactly(1, 1)
     end
   end
 end
