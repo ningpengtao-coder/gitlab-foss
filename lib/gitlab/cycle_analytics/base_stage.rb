@@ -81,7 +81,7 @@ module Gitlab
       end
 
       def projects
-        group ? group.projects : [project]
+        group ? Project.inside_path(group.full_path) : [project]
       end
 
       def group
