@@ -6,11 +6,11 @@ const FORM = 'gitlab-form';
 const FORM_CONTAINER = 'gitlab-form-wrapper';
 const LOGIN = 'gitlab-login-button';
 const LOGOUT = 'gitlab-logout-button';
-const MR_ID_BOX = 'gitlab-submit-mr-button';
+const MR_ID = 'gitlab-submit-mr';
 const MR_ID_SUBMIT = 'gitlab-submit-mr-button';
 const NOTE = 'gitlab-validation-note';
 const NOTE_CONTAINER = 'gitlab-note-wrapper';
-const REMEMBER_TOKEN = 'gitlab-remember-token';
+const REMEMBER_ITEM = 'gitlab-remember-item';
 const REVIEW_CONTAINER = 'gitlab-review-container';
 const TOKEN_BOX = 'gitlab-token';
 
@@ -30,9 +30,11 @@ export {
   FORM_CONTAINER,
   LOGIN,
   LOGOUT,
+  MR_ID,
+  MR_ID_SUBMIT,
   NOTE,
   NOTE_CONTAINER,
-  REMEMBER_TOKEN,
+  REMEMBER_ITEM,
   REVIEW_CONTAINER,
   TOKEN_BOX,
   BLACK,

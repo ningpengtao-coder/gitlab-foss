@@ -8,7 +8,7 @@ import {
   FORM_CONTAINER,
   NOTE,
   NOTE_CONTAINER,
-  REMEMBER_TOKEN,
+  REMEMBER_ITEM,
   REVIEW_CONTAINER,
   TOKEN_BOX,
 } from './constants';
@@ -29,7 +29,7 @@ const selectForm = () => document.getElementById(FORM);
 const selectFormContainer = () => document.getElementById(FORM_CONTAINER);
 const selectNote = () => document.getElementById(NOTE);
 const selectNoteContainer = () => document.getElementById(NOTE_CONTAINER);
-const selectRemember = () => document.getElementById(REMEMBER_TOKEN);
+const selectRemember = () => document.getElementById(REMEMBER_ITEM);
 const selectToken = () => document.getElementById(TOKEN_BOX);
 
 export {

@@ -1,14 +1,15 @@
+import { nextView } from '../store'
 import { LOGIN, TOKEN_BOX } from './constants';
 import { clearNote, postError } from './note';
 import singleForm from './single_line_form';
 import { selectRemember, selectToken } from './utils';
-import { addCommentForm } from './wrapper';
+import { addForm } from './wrapper';
 
-const loginLabel = `
+const labelText = `
   Enter your <a class="gitlab-link" href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html">personal access token</a>
 `;
 
-const login = singleForm(TOKEN_BOX, LOGIN, loginLabel);
+const login = singleForm(TOKEN_BOX, LOGIN, { labelText });
 
 const storeToken = (token, state) => {
   const { localStorage } = window;
@@ -38,7 +39,7 @@ const authorizeUser = state => {
   }
 
   storeToken(token, state);
-  addCommentForm();
+  addForm(nextView(state, LOGIN));
 };
 
 export { authorizeUser, login };

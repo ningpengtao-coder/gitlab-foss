@@ -8,7 +8,7 @@ import {
   selectFormContainer,
   selectNoteContainer,
 } from './utils';
-import { commentIcon, compressIcon } from './wrapper_icons';
+import { collapseButton, commentIcon, compressIcon } from './wrapper_icons';
 
 const form = content => `
   <form id="${FORM}">
@@ -16,17 +16,17 @@ const form = content => `
   </form>
 `;
 
-const buttonAndForm = ({ content, toggleButton }) => `
+const buttonAndForm = (content) => `
   <div id="${FORM_CONTAINER}" class="gitlab-form-open">
-    ${toggleButton}
+    ${collapseButton}
     ${form(content)}
   </div>
 `;
 
-const addCommentForm = () => {
+const addForm = (form) => {
   const formWrapper = selectForm();
-  formWrapper.innerHTML = comment;
-};
+  formWrapper.innerHTML = form;
+}
 
 const addLoginForm = () => {
   const formWrapper = selectForm();
@@ -99,4 +99,4 @@ function toggleForm() {
   }
 }
 
-export { addCommentForm, addLoginForm, buttonAndForm, logoutUser, toggleForm };
+export { addForm, addLoginForm, buttonAndForm, logoutUser, toggleForm };

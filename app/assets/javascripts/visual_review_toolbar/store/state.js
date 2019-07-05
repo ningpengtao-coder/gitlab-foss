@@ -1,4 +1,10 @@
-import { comment, login, collapseButton } from '../components';
+import {
+  comment,
+  login,
+  mrForm,
+  LOGIN,
+  MR_ID,
+ } from '../components';
 
 const state = {
   browser: '',
@@ -22,6 +28,25 @@ const getBrowserId = sUsrAg => {
   for (nIdx; nIdx > -1 && sUsrAg.indexOf(aKeys[nIdx]) === -1; nIdx -= 1);
   return aKeys[nIdx];
 };
+
+const nextView = (state, form = 'none') => {
+
+  const formsList = {
+    [LOGIN]: (state) => state.mergeRequestId ? comment : mrForm,
+    [MR_ID]: (state) => state.token ? comment : login,
+    none: (state) => {
+      if (!state.token) {
+        return login;
+      } else if (!state.mergeRequestId) {
+        return mrForm
+      } else {
+        return comment
+      }
+    }
+  };
+
+  return formsList[form](state)
+}
 
 const initializeState = (wind, doc) => {
   const {
@@ -49,30 +74,20 @@ const initializeState = (wind, doc) => {
     projectPath,
     userAgent,
   });
+
+  return state;
 };
 
-function getInitialView({ localStorage }) {
-  const loginView = {
-    content: login,
-    toggleButton: collapseButton,
-  };
-
-  const commentView = {
-    content: comment,
-    toggleButton: collapseButton,
-  };
-
+const getInitialView = ({ localStorage }) => {
   try {
     const token = localStorage.getItem('token');
 
     if (token) {
       state.token = token;
-      return commentView;
     }
-    return loginView;
-  } catch (err) {
-    return loginView;
+  } finally {
+    return nextView(state);
   }
 }
 
-export { initializeState, getInitialView, state };
+export { initializeState, getInitialView, nextView, state };
