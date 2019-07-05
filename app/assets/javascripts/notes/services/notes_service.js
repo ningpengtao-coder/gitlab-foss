@@ -25,8 +25,10 @@ export default {
   toggleResolveNote(endpoint, isResolved) {
     const { RESOLVE_NOTE_METHOD_NAME, UNRESOLVE_NOTE_METHOD_NAME } = constants;
     const method = isResolved ? UNRESOLVE_NOTE_METHOD_NAME : RESOLVE_NOTE_METHOD_NAME;
+    // need to set this to null or ie < edge will send 'undefined' as a string
+    const data = null;
 
-    return Vue.http[method](endpoint);
+    return Vue.http[method](endpoint, data);
   },
   poll(data = {}) {
     const endpoint = data.notesData.notesPath;
