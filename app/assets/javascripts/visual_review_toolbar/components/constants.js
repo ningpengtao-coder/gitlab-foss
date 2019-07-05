@@ -4,11 +4,13 @@ const COMMENT_BOX = 'gitlab-comment';
 const COMMENT_BUTTON = 'gitlab-comment-button';
 const FORM = 'gitlab-form';
 const FORM_CONTAINER = 'gitlab-form-wrapper';
-const LOGIN = 'gitlab-login';
+const LOGIN = 'gitlab-login-button';
 const LOGOUT = 'gitlab-logout-button';
+const MR_ID_BOX = 'gitlab-submit-mr-button';
+const MR_ID_SUBMIT = 'gitlab-submit-mr-button';
 const NOTE = 'gitlab-validation-note';
 const NOTE_CONTAINER = 'gitlab-note-wrapper';
-const REMEMBER_TOKEN = 'gitlab-remember_token';
+const REMEMBER_TOKEN = 'gitlab-remember-token';
 const REVIEW_CONTAINER = 'gitlab-review-container';
 const TOKEN_BOX = 'gitlab-token';
 

@@ -1,21 +1,14 @@
-import { LOGIN, REMEMBER_TOKEN, TOKEN_BOX } from './constants';
+import { LOGIN, TOKEN_BOX } from './constants';
 import { clearNote, postError } from './note';
-import { buttonClearStyles, selectRemember, selectToken } from './utils';
+import singleForm from './single_line_form';
+import { selectRemember, selectToken } from './utils';
 import { addCommentForm } from './wrapper';
 
-const login = `
-  <div>
-    <label for="${TOKEN_BOX}" class="gitlab-label">Enter your <a class="gitlab-link" href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html">personal access token</a></label>
-    <input class="gitlab-input" type="password" id="${TOKEN_BOX}" name="${TOKEN_BOX}" aria-required="true" autocomplete="current-password">
-  </div>
-  <div class="gitlab-checkbox-wrapper">
-    <input type="checkbox" id="${REMEMBER_TOKEN}" name="${REMEMBER_TOKEN}" value="remember">
-    <label for="${REMEMBER_TOKEN}" class="gitlab-checkbox-label">Remember me</label>
-  </div>
-  <div class="gitlab-button-wrapper">
-    <button class="gitlab-button-wide gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="${LOGIN}"> Submit </button>
-  </div>
+const loginLabel = `
+  Enter your <a class="gitlab-link" href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html">personal access token</a>
 `;
+
+const login = singleForm(TOKEN_BOX, LOGIN, loginLabel);
 
 const storeToken = (token, state) => {
   const { localStorage } = window;
