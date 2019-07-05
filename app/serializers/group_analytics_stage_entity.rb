@@ -14,4 +14,3 @@ class GroupAnalyticsStageEntity < Grape::Entity
     stage.group_median.to_f.nonzero? ? distance_of_time_in_words(stage.group_median) : nil
   end
 end
-
