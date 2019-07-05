@@ -46,6 +46,16 @@ module Gitlab
         ee? ? 'gitlab-ee' : 'gitlab-ce'
       end
 
+      def markdown_list(items)
+        list = items.map { |item| "* `#{item}`" }.join("\n")
+
+        if items.size > 10
+          "\n<details>\n\n#{list}\n\n</details>\n"
+        else
+          list
+        end
+      end
+
       # @return [Hash<String,Array<String>>]
       def changes_by_category
         all_changed_files.each_with_object(Hash.new { |h, k| h[k] = [] }) do |file, hash|

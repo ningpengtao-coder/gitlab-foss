@@ -85,6 +85,20 @@ describe Gitlab::Danger::Helper do
     end
   end
 
+  describe '#markdown_list' do
+    it 'creates a markdown list of items' do
+      items = %w[a b]
+
+      expect(helper.markdown_list(items)).to eq("* `a`\n* `b`")
+    end
+
+    it 'wraps items in <details> when there are more than 10 items' do
+      items = ('a'..'k').to_a
+
+      expect(helper.markdown_list(items)).to match(%r{<details>[^<]+</details>})
+    end
+  end
+
   describe '#changes_by_category' do
     it 'categorizes changed files' do
       expect(fake_git).to receive(:added_files) { %w[foo foo.md foo.rb foo.js db/foo lib/gitlab/database/foo.rb qa/foo ee/changelogs/foo.yml] }

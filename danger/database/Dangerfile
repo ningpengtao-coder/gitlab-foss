@@ -8,6 +8,20 @@ updated too (unless the migration isn't changing the DB schema
 and isn't the most recent one).
 MSG
 
+DB_MESSAGE = <<~MSG
+This merge request requires a database review. To make sure these
+changes are reviewed, take the following steps:
+
+1. Add labels ~database and ~"database::review pending" to your merge request.
+1. Use the [Database%20changes checklist](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab/merge_request_templates/Database%20changes.md)
+   template or add the appropriate items to the MR description.
+1. Assign and mention the database reviewer suggested by Reviewer Roulette.
+MSG
+
+DB_FILES_MESSAGE = <<~MSG
+The following files require a review from the Database team:
+MSG
+
 non_geo_db_schema_updated = !git.modified_files.grep(%r{\Adb/schema\.rb}).empty?
 geo_db_schema_updated = !git.modified_files.grep(%r{\Aee/db/geo/schema\.rb}).empty?
 
@@ -24,27 +38,18 @@ end
 
 db_paths_to_review = helper.changes_by_category[:database]
 
-unless db_paths_to_review.empty?
+if gitlab.mr_labels.include?('database') || db_paths_to_review.any?
   message 'This merge request adds or changes files that require a ' \
-    'review from the Database team.'
+    'review from the [Database team](https://gitlab.com/groups/gl-database/-/group_members).'
 
-  markdown(<<~MARKDOWN.strip)
-## Database Review
-
-The following files require a review from the Database team:
-
-* #{db_paths_to_review.map { |path| "`#{path}`" }.join("\n* ")}
-
-To make sure these changes are reviewed, take the following steps:
-
-1. Edit your merge request, and add `gl-database` to the list of Group
-   approvers.
-1. Mention `@gl-database` in a separate comment, and explain what needs to be
-   reviewed by the team. Please don't mention the team until your changes are
-   ready for review.
-  MARKDOWN
+  markdown(DB_MESSAGE)
+  markdown(DB_FILES_MESSAGE + helper.markdown_list(db_paths_to_review)) if db_paths_to_review.any?
 
   unless gitlab.mr_labels.include?('database')
     warn 'This merge request is missing the ~database label.'
+  end
+
+  unless gitlab.mr_labels.any? { |label| label.start_with?('database::') }
+    warn 'This merge request is missing the ~"database::review pending" label.'
   end
 end

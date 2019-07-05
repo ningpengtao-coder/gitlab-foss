@@ -34,56 +34,47 @@ for review.
 
 A Merge Request author's role is to:
 
-* Decide whether a database review is needed and apply ~database and ~"database::review pending" if so.
+* Decide whether a database review is needed.
+* If database review is needed, apply ~database and ~"database::review pending" labels.
+* Use the [database changes](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab/merge_request_templates/Database%20changes.md)
+  merge request template, or include the appropriate items in the MR description.
 
 A database **reviewer**'s role is to:
 
 * Perform a first-pass review on the MR and suggest improvements to the author.
-* Once satisfied, relabel the MR with ~"database::reviewed" and reassign MR to a database **maintainer**.
+* Once satisfied, relabel the MR with ~"database::reviewed" and
+  reassign MR to the database **maintainer** suggested by Reviewer
+  Roulette.
 
-A database **maintainer**'s role is to
+A database **maintainer**'s role is to:
 
-* Perform another database review of the MR.
+* Perform the final database review on the MR.
 * Discuss further improvements or other relevant changes with the database reviewer and the MR author.
-* Finally relabel the MR with ~"database::approved"
-* And if requested, approve or merge the MR, or pass it on to other maintainers as required (frontend, backend, docs).
+* Finally Approve the MR relabel the MR with ~"database::approved"
+* And if requested, approve and merge the MR, or pass it on to other maintainers as required (frontend, backend, docs).
 
 ### Distributing review workload
 
-Ideally, review workload is distributed using our review roulette
+Review workload is distributed using [reviewer roulette](code_review.md#reviewer-roulette)
 ([example](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/25181#note_147551725)).
 The MR author should then co-assign the suggested database
 **reviewer**. When they give their sign-off, they will hand over to
 the suggested database **maintainer**.
 
-However, some changes are not yet automatically detected to need a
-database review. For those changes, MR authors typically mention
-`@gl-database` in order to get a review.
-
-Until there are [Merge boards](https://gitlab.com/gitlab-org/gitlab-ce/issues/35336),
-a list of pending database reviews is maintained in an issue titled
-"Database Reviews" in the [infrastructure tracker](https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Database&search=Database+Reviews)
-([example](https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues/6998)).
-Note the issue rolls over after two weeks and a new issue is created.
-
-The Database Reviews issue contains a list of pending database
-reviews. Database **reviewers** and **maintainers** should work from
-the list of pending database reviews and
-
-1. Pick an MR from the list that doesn't have a person attached to it.
-1. Edit the description of the issue and put your handle next the MR.
-1. Proceed with reviewing the MR in question.
-1. Once review has been completed - check the box.
+If reviewer roulette didn't suggest a database reviewer & maintainer,
+make sure you have applied the ~database label and rerun the
+`danger-review` CI job, or pick someone from the
+[`@gl-database` team](https://gitlab.com/groups/gl-database/-/group_members).
 
 ### How to review for database
 
 * Check migrations
   * Review relational modeling and design choices
-  * Review migrations follow [database migration style guide](https://docs.gitlab.com/ee/development/migration_style_guide.html), for example
-    * [Check ordering of columns](https://docs.gitlab.com/ee/development/ordering_table_columns.html)
-    * [Check indexes are present for foreign keys](https://docs.gitlab.com/ee/development/migration_style_guide.html#adding-foreign-key-constraints)
+  * Review migrations follow [database migration style guide](migration_style_guide.md), for example
+    * [Check ordering of columns](ordering_table_columns.md)
+    * [Check indexes are present for foreign keys](migration_style_guide.md#adding-foreign-key-constraints)
   * Ensure that migrations execute in a transaction or only contain concurrent index/foreign key helpers (with transactions disabled)
-  * Check consistency with `db/schema.rb` and that migrations are [reversible](https://docs.gitlab.com/ee/development/migration_style_guide.html#reversibility)
+  * Check consistency with `db/schema.rb` and that migrations are [reversible](migration_style_guide.md#reversibility)
   * For data migrations, establish a time estimate for execution
 * Check post deploy migration
   * Make sure we can expect post deploy migrations to finish within 1 hour max.
@@ -92,8 +83,8 @@ the list of pending database reviews and
   * Establish a time estimate for execution
 * Query performance
   * Check for any obviously complex queries and queries the author specifically points out for review (if any)
-  * If not present yet, ask the author to provide SQL queries and query plans (e.g. by using [chatops](https://docs.gitlab.com/ee/development/understanding_explain_plans.html) or direct database access)
+  * If not present yet, ask the author to provide SQL queries and query plans (e.g. by using [chatops](understanding_explain_plans.md#chatops) or direct database access)
   * For given queries, review parameters regarding data distribution
-  * [Check query plans](https://docs.gitlab.com/ee/development/understanding_explain_plans.html) and suggest improvements to queries (changing the query, schema or adding indexes and similar)
+  * [Check query plans](understanding_explain_plans.md) and suggest improvements to queries (changing the query, schema or adding indexes and similar)
   * General guideline is for queries to come in below 100ms execution time
   * If queries rely on prior migrations that are not present yet on production (eg indexes, columns), you can use a [one-off instance from the restore pipeline](https://ops.gitlab.net/gitlab-com/gl-infra/gitlab-restore/postgres-gprd) in order to establish a proper testing environment.
