@@ -7,7 +7,7 @@ const FORM_CONTAINER = 'gitlab-form-wrapper';
 const LOGIN = 'gitlab-login-button';
 const LOGOUT = 'gitlab-logout-button';
 const MR_ID = 'gitlab-submit-mr';
-const MR_ID_SUBMIT = 'gitlab-submit-mr-button';
+const MR_ID_BUTTON = 'gitlab-submit-mr-button';
 const NOTE = 'gitlab-validation-note';
 const NOTE_CONTAINER = 'gitlab-note-wrapper';
 const REMEMBER_ITEM = 'gitlab-remember-item';
@@ -31,7 +31,7 @@ export {
   LOGIN,
   LOGOUT,
   MR_ID,
-  MR_ID_SUBMIT,
+  MR_ID_BUTTON,
   NOTE,
   NOTE_CONTAINER,
   REMEMBER_ITEM,

@@ -1,7 +1,4 @@
-import { comment } from './comment';
 import { CLEAR, FORM, FORM_CONTAINER, WHITE } from './constants';
-import { login } from './login';
-import { clearNote } from './note';
 import {
   selectCollapseButton,
   selectForm,
@@ -26,26 +23,6 @@ const buttonAndForm = (content) => `
 const addForm = (form) => {
   const formWrapper = selectForm();
   formWrapper.innerHTML = form;
-}
-
-const addLoginForm = () => {
-  const formWrapper = selectForm();
-  formWrapper.innerHTML = login;
-};
-
-function logoutUser() {
-  const { localStorage } = window;
-
-  // All the browsers we support have localStorage, so let's silently fail
-  // and go on with the rest of the functionality.
-  try {
-    localStorage.removeItem('token');
-  } catch (err) {
-    return;
-  }
-
-  clearNote();
-  addLoginForm();
 }
 
 function toggleForm() {
@@ -99,4 +76,4 @@ function toggleForm() {
   }
 }
 
-export { addForm, addLoginForm, buttonAndForm, logoutUser, toggleForm };
+export { addForm, buttonAndForm, toggleForm };

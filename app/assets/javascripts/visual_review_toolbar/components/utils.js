@@ -6,6 +6,7 @@ import {
   COMMENT_BUTTON,
   FORM,
   FORM_CONTAINER,
+  MR_ID,
   NOTE,
   NOTE_CONTAINER,
   REMEMBER_ITEM,
@@ -27,6 +28,7 @@ const selectCommentButton = () => document.getElementById(COMMENT_BUTTON);
 const selectContainer = () => document.getElementById(REVIEW_CONTAINER);
 const selectForm = () => document.getElementById(FORM);
 const selectFormContainer = () => document.getElementById(FORM_CONTAINER);
+const selectMrBox = () => document.getElementById(MR_ID);
 const selectNote = () => document.getElementById(NOTE);
 const selectNoteContainer = () => document.getElementById(NOTE_CONTAINER);
 const selectRemember = () => document.getElementById(REMEMBER_ITEM);
@@ -41,6 +43,7 @@ export {
   selectCommentButton,
   selectForm,
   selectFormContainer,
+  selectMrBox,
   selectNote,
   selectNoteContainer,
   selectRemember,

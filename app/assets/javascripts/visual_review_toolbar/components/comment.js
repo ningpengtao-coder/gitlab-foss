@@ -1,3 +1,4 @@
+import { nextView } from '../store'
 import { BLACK, COMMENT_BOX, MUTED, LOGOUT } from './constants';
 import { clearNote, postError } from './note';
 import {
@@ -7,6 +8,7 @@ import {
   selectNote,
   selectNoteContainer,
 } from './utils';
+import { addForm } from './wrapper';
 
 const comment = `
   <div>
@@ -145,4 +147,22 @@ const postComment = ({
     });
 };
 
-export { comment, postComment };
+const logoutUser = (state) => {
+  const { localStorage } = window;
+
+  // All the browsers we support have localStorage, so let's silently fail
+  // and go on with the rest of the functionality.
+  try {
+    localStorage.removeItem('token');
+    localStorage.removeItem('mergeRequestId');
+  } finally {
+    state.token = '';
+    state.mergeRequestId = '';
+  }
+
+  clearNote();
+  addForm(nextView(state, COMMENT_BOX));
+}
+
+
+export { comment, logoutUser, postComment };

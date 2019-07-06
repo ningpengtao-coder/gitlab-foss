@@ -2,6 +2,7 @@ import {
   comment,
   login,
   mrForm,
+  COMMENT_BOX,
   LOGIN,
   MR_ID,
  } from '../components';
@@ -32,6 +33,7 @@ const getBrowserId = sUsrAg => {
 const nextView = (state, form = 'none') => {
 
   const formsList = {
+    [COMMENT_BOX]: () => state.token ? mrForm : login,
     [LOGIN]: (state) => state.mergeRequestId ? comment : mrForm,
     [MR_ID]: (state) => state.token ? comment : login,
     none: (state) => {
@@ -67,7 +69,7 @@ const initializeState = (wind, doc) => {
     href,
     innerWidth,
     innerHeight,
-    mergeRequestId,
+    // mergeRequestId,
     mrUrl,
     platform,
     projectId,
@@ -81,9 +83,14 @@ const initializeState = (wind, doc) => {
 const getInitialView = ({ localStorage }) => {
   try {
     const token = localStorage.getItem('token');
+    const mrId = localStorage.getItem('mergeRequestId');
 
     if (token) {
       state.token = token;
+    }
+
+    if (mrId) {
+      state.mergeRequestId = mrId;
     }
   } finally {
     return nextView(state);

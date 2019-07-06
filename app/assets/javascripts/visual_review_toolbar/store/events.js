@@ -1,4 +1,5 @@
 import {
+  addMr,
   authorizeUser,
   logoutUser,
   postComment,
@@ -7,6 +8,7 @@ import {
   COMMENT_BUTTON,
   LOGIN,
   LOGOUT,
+  MR_ID_BUTTON,
 } from '../components';
 
 import { state } from './state';
@@ -22,7 +24,9 @@ const eventLookup = ({ target: { id } }) => {
     case LOGIN:
       return authorizeUser.bind(null, state);
     case LOGOUT:
-      return logoutUser;
+      return logoutUser.bind(null, state);
+    case MR_ID_BUTTON:
+      return addMr.bind(null, state);
     default:
       return noop;
   }
