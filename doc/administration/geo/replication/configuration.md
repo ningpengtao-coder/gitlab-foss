@@ -242,7 +242,7 @@ node's Geo Nodes dashboard in your browser.
 ![Geo dashboard](img/geo_node_dashboard.png)
 
 If your installation isn't working properly, check the
-[troubleshooting document].
+[troubleshooting document](troubleshooting.md).
 
 The two most obvious issues that can become apparent in the dashboard are:
 
