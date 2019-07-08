@@ -575,7 +575,7 @@ After you set it up, login with username `root` and the newly created password.
 Apart from Amazon's Cloudwatch which you can enable on various services,
 GitLab provides its own integrated monitoring solution based on Prometheus.
 For more information on how to set it up, visit the
-[GitLab Prometheus documentation](../../administration/monitoring/prometheus/index.md)
+[GitLab Prometheus documentation](../../administration/high_availability/prometheus/index.md)
 
 GitLab also has various [health check endpoints](../..//user/admin_area/monitoring/health_check.md)
 that you can ping and get reports.

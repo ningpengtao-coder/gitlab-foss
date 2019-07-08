@@ -172,7 +172,7 @@ GitLab. Approximately 200MB of memory will be consumed by these processes, with
 default settings.
 
 If you would like to disable Prometheus and it's exporters or read more information
-about it, check the [Prometheus documentation](../administration/monitoring/prometheus/index.md).
+about it, check the [Prometheus documentation](../administration/high_availability/prometheus/index.md).
 
 ## GitLab Runner
 

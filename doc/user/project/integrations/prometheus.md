@@ -207,11 +207,11 @@ If the "No data found" screen continues to appear, it could be due to:
 [kube]: ./kubernetes.md
 [prometheus-k8s-sd]: https://prometheus.io/docs/operating/configuration/#<kubernetes_sd_config>
 [prometheus]: https://prometheus.io
-[gitlab-prometheus-k8s-monitor]: ../../../administration/monitoring/prometheus/index.md#configuring-prometheus-to-monitor-kubernetes
+[gitlab-prometheus-k8s-monitor]: ../../../administration/high_availability/prometheus/index.md#configuring-prometheus-to-monitor-kubernetes
 [prometheus-docker-image]: https://hub.docker.com/r/prom/prometheus/
 [prometheus-yml]:samples/prometheus.yml
 [gitlab.com-ip-range]: https://gitlab.com/gitlab-com/infrastructure/issues/434
 [ci-environment-slug]: ../../../ci/variables/#predefined-environment-variables
 [ce-8935]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8935
 [ce-10408]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/10408
-[promgldocs]: ../../../administration/monitoring/prometheus/index.md
+[promgldocs]: ../../../administration/high_availability/prometheus/index.md

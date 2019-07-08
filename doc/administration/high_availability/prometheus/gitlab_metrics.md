@@ -146,5 +146,5 @@ directory will be automatically configured.
 [29118]: https://gitlab.com/gitlab-org/gitlab-ce/issues/29118
 [Prometheus]: https://prometheus.io
 [restart]: ../../restart_gitlab.md#omnibus-gitlab-restart
-[whitelist]: ../ip_whitelist.md
+[whitelist]: ../../monitoring/ip_whitelist.md
 [reconfigure]: ../../restart_gitlab.md#omnibus-gitlab-reconfigure
