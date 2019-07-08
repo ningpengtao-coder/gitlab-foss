@@ -19,10 +19,8 @@ module CycleAnalytics
       end
     end
 
-    private
-
-    def stats_per_stage
-      STAGES.map do |stage_name|
+    def stats
+      @stats ||= STAGES.map do |stage_name|
         self[stage_name].as_json(serializer: GroupAnalyticsStageSerializer)
       end
     end
