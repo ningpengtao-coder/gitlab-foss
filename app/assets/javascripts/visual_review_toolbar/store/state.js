@@ -34,15 +34,15 @@ const nextView = (state, form = 'none') => {
 
   const formsList = {
     [COMMENT_BOX]: () => state.token ? mrForm : login,
-    [LOGIN]: (state) => state.mergeRequestId ? comment : mrForm,
-    [MR_ID]: (state) => state.token ? comment : login,
+    [LOGIN]: (state) => state.mergeRequestId ? comment(state) : mrForm,
+    [MR_ID]: (state) => state.token ? comment(state) : login,
     none: (state) => {
       if (!state.token) {
         return login;
       } else if (!state.mergeRequestId) {
         return mrForm
       } else {
-        return comment
+        return comment(state)
       }
     }
   };

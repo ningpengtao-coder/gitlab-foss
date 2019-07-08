@@ -1,4 +1,5 @@
 // component selectors
+const CHANGE_MR_ID_BUTTON ='gitlab-change-me';
 const COLLAPSE_BUTTON = 'gitlab-collapse';
 const COMMENT_BOX = 'gitlab-comment';
 const COMMENT_BUTTON = 'gitlab-comment-button';
@@ -23,6 +24,7 @@ const RED = 'rgba(219, 59, 33, 1)';
 const WHITE = 'rgba(250, 250, 250, 1)';
 
 export {
+  CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
   COMMENT_BOX,
   COMMENT_BUTTON,

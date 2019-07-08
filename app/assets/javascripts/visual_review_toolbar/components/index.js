@@ -1,5 +1,6 @@
-import { comment, logoutUser, postComment } from './comment';
+import { changeSelectedMr, comment, logoutUser, postComment } from './comment';
 import {
+  CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
   COMMENT_BOX,
   COMMENT_BUTTON,
@@ -20,6 +21,7 @@ export {
   addMr,
   authorizeUser,
   buttonAndForm,
+  changeSelectedMr,
   comment,
   login,
   logoutUser,
@@ -28,6 +30,7 @@ export {
   postComment,
   selectContainer,
   toggleForm,
+  CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
   COMMENT_BOX,
   COMMENT_BUTTON,

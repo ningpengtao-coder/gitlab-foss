@@ -1,9 +1,11 @@
 import {
   addMr,
   authorizeUser,
+  changeSelectedMr,
   logoutUser,
   postComment,
   toggleForm,
+  CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
   COMMENT_BUTTON,
   LOGIN,
@@ -15,8 +17,13 @@ import { state } from './state';
 
 const noop = () => {};
 
+// State needs to be bound here to be acted on
+// because these are called by click events and
+// as such are called with only the `event` object
 const eventLookup = ({ target: { id } }) => {
   switch (id) {
+    case CHANGE_MR_ID_BUTTON:
+      return changeSelectedMr.bind(null, state);
     case COLLAPSE_BUTTON:
       return toggleForm;
     case COMMENT_BUTTON:

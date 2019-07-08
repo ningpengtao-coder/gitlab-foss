@@ -9,10 +9,12 @@ import {
   selectNoteContainer,
 } from './utils';
 import { addForm } from './wrapper';
+import { changeSelectedMr, selectedMrNote } from './comment.mr_note'
 
-const comment = `
+const comment = (state) => `
   <div>
     <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true"></textarea>
+    ${selectedMrNote(state)}
     <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
   </div>
   <div class="gitlab-button-wrapper">
@@ -134,7 +136,7 @@ const postComment = ({
     .then(data => {
       const commentId = data.notes[0].id;
       const feedbackLink = `${mrUrl}/${projectPath}/merge_requests/${mergeRequestId}#note_${commentId}`;
-      const feedbackInfo = `Feedback sent. View at <a class="gitlab-link" href="${feedbackLink}">${projectPath} #${mergeRequestId} (comment ${commentId})</a>`;
+      const feedbackInfo = `Feedback sent. View at <a class="gitlab-link" href="${feedbackLink}">${projectPath} !${mergeRequestId} (comment ${commentId})</a>`;
       confirmAndClear(feedbackInfo);
     })
     .catch(err => {
@@ -164,5 +166,4 @@ const logoutUser = (state) => {
   addForm(nextView(state, COMMENT_BOX));
 }
 
-
-export { comment, logoutUser, postComment };
+export { changeSelectedMr, comment, logoutUser, postComment };

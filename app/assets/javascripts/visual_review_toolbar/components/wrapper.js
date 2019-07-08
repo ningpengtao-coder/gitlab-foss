@@ -5,7 +5,7 @@ import {
   selectFormContainer,
   selectNoteContainer,
 } from './utils';
-import { collapseButton, commentIcon, compressIcon } from './wrapper_icons';
+import { collapseButton, commentIcon, compressIcon } from './wrapper.icons';
 
 const form = content => `
   <form id="${FORM}">
