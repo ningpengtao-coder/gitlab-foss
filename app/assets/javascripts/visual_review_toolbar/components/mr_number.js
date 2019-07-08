@@ -1,28 +1,29 @@
-import { nextView } from '../store'
+import { nextView } from '../store';
 import { MR_ID, MR_ID_BUTTON } from './constants';
 import { clearNote, postError } from './note';
 import singleForm from './single_line_form';
 import { escape, selectMrBox, selectRemember } from './utils';
 import { addForm } from './wrapper';
 
+/* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
 const mrLabel = `Enter your merge request ID`;
+/* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
 const mrRememberText = `Remember this number`;
 
 const texts = {
   labelText: mrLabel,
-  rememberText: mrRememberText
-}
+  rememberText: mrRememberText,
+};
 
 const mrForm = singleForm({
   inputId: MR_ID,
   buttonId: MR_ID_BUTTON,
   autocomplete: '',
   type: 'text',
-  ...texts
+  ...texts,
 });
 
 const storeMR = (id, state) => {
-
   const { localStorage } = window;
   const rememberMe = selectRemember().checked;
 
@@ -33,11 +34,11 @@ const storeMR = (id, state) => {
       localStorage.setItem('mergeRequestId', id);
     }
   } finally {
-      state.mergeRequestId = id;
+    state.mergeRequestId = id;
   }
-}
+};
 
-const addMr = (state) => {
+const addMr = state => {
   // Clear any old errors
   clearNote(MR_ID);
 

@@ -1,11 +1,4 @@
-import {
-  comment,
-  login,
-  mrForm,
-  COMMENT_BOX,
-  LOGIN,
-  MR_ID,
- } from '../components';
+import { comment, login, mrForm, COMMENT_BOX, LOGIN, MR_ID } from '../components';
 
 const state = {
   browser: '',
@@ -30,25 +23,26 @@ const getBrowserId = sUsrAg => {
   return aKeys[nIdx];
 };
 
-const nextView = (state, form = 'none') => {
-
+const nextView = (appState, form = 'none') => {
   const formsList = {
-    [COMMENT_BOX]: () => state.token ? mrForm : login,
-    [LOGIN]: (state) => state.mergeRequestId ? comment(state) : mrForm,
-    [MR_ID]: (state) => state.token ? comment(state) : login,
-    none: (state) => {
-      if (!state.token) {
+    [COMMENT_BOX]: currentState => (currentState.token ? mrForm : login),
+    [LOGIN]: currentState => (currentState.mergeRequestId ? comment(currentState) : mrForm),
+    [MR_ID]: currentState => (currentState.token ? comment(currentState) : login),
+    none: currentState => {
+      if (!currentState.token) {
         return login;
-      } else if (!state.mergeRequestId) {
-        return mrForm
-      } else {
-        return comment(state)
       }
-    }
+
+      if (currentState.token && !currentState.mergeRequestId) {
+        return mrForm;
+      }
+
+      return comment(currentState);
+    },
   };
 
-  return formsList[form](state)
-}
+  return formsList[form](appState);
+};
 
 const initializeState = (wind, doc) => {
   const {
@@ -93,8 +87,9 @@ const getInitialView = ({ localStorage }) => {
       state.mergeRequestId = mrId;
     }
   } finally {
+    /* eslint-disable-next-line no-unsafe-finally */
     return nextView(state);
   }
-}
+};
 
 export { initializeState, getInitialView, nextView, state };

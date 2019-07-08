@@ -1,16 +1,11 @@
-import { nextView } from '../store'
+import { nextView } from '../store';
 import { CHANGE_MR_ID_BUTTON, COMMENT_BOX } from './constants';
-import { clearNote, postError } from './note';
+import { clearNote } from './note';
 import { buttonClearStyles, selectCommentBox } from './utils';
 import { addForm } from './wrapper';
 
-const selectedMrNote = (state) => {
-
-  const {
-    mrUrl,
-    projectPath,
-    mergeRequestId
-  } = state;
+const selectedMrNote = state => {
+  const { mrUrl, projectPath, mergeRequestId } = state;
 
   const mrLink = `${mrUrl}/${projectPath}/merge_requests/${mergeRequestId}`;
 
@@ -20,9 +15,9 @@ const selectedMrNote = (state) => {
       <button style="${buttonClearStyles}" type="button" id="${CHANGE_MR_ID_BUTTON}" class="gitlab-link gitlab-link-button">Change</button>
     </p>
   `;
-}
+};
 
-const changeSelectedMr = (state) => {
+const changeSelectedMr = state => {
   const { localStorage, sessionStorage } = window;
   const currentComment = selectCommentBox().value;
 
@@ -32,7 +27,7 @@ const changeSelectedMr = (state) => {
     localStorage.removeItem('mergeRequestId');
 
     if (currentComment) {
-      sessionStorage.setItem('comment', currentComment)
+      sessionStorage.setItem('comment', currentComment);
     }
   } finally {
     state.mergeRequestId = '';
@@ -40,6 +35,6 @@ const changeSelectedMr = (state) => {
 
   clearNote();
   addForm(nextView(state, COMMENT_BOX));
-}
+};
 
-export { changeSelectedMr, selectedMrNote }
+export { changeSelectedMr, selectedMrNote };

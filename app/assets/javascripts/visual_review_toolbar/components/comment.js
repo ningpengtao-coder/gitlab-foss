@@ -1,4 +1,4 @@
-import { nextView } from '../store'
+import { nextView } from '../store';
 import { BLACK, COMMENT_BOX, MUTED, LOGOUT } from './constants';
 import { clearNote, postError } from './note';
 import {
@@ -9,28 +9,29 @@ import {
   selectNoteContainer,
 } from './utils';
 import { addForm } from './wrapper';
-import { changeSelectedMr, selectedMrNote } from './comment.mr_note'
+import { changeSelectedMr, selectedMrNote } from './comment_mr_note';
 
-const comment = (state) => {
+const comment = state => {
   const { sessionStorage } = window;
   let savedComment = '';
 
   try {
     savedComment = sessionStorage.getItem('comment');
   } finally {
-    return `
-      <div>
-        <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true">${savedComment || ''}</textarea>
-        ${selectedMrNote(state)}
-        <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
-      </div>
-      <div class="gitlab-button-wrapper">
-        <button class="gitlab-button gitlab-button-secondary" style="${buttonClearStyles}" type="button" id="${LOGOUT}"> Log out </button>
-        <button class="gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="gitlab-comment-button"> Send feedback </button>
-      </div>
-    `
+    savedComment = savedComment || '';
   }
 
+  return `
+    <div>
+      <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true">${savedComment}</textarea>
+      ${selectedMrNote(state)}
+      <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
+    </div>
+    <div class="gitlab-button-wrapper">
+      <button class="gitlab-button gitlab-button-secondary" style="${buttonClearStyles}" type="button" id="${LOGOUT}"> Log out </button>
+      <button class="gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="gitlab-comment-button"> Send feedback </button>
+    </div>
+  `;
 };
 
 const resetCommentButton = () => {
@@ -50,12 +51,11 @@ const resetCommentBox = () => {
 
 const resetCommentText = () => {
   try {
-    sessionStorage.removeItem('comment')
+    sessionStorage.removeItem('comment');
   } finally {
     const commentBox = selectCommentBox();
     commentBox.value = '';
   }
-
 };
 
 const resetComment = () => {
@@ -90,7 +90,7 @@ const setInProgressState = () => {
   commentBox.style.pointerEvents = 'none';
 };
 
-const commentErrors = (error) => {
+const commentErrors = error => {
   switch (error.status) {
     case 401:
       /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
@@ -100,7 +100,7 @@ const commentErrors = (error) => {
       return 'Not found. You may have entered an incorrect merge request ID.';
     default:
       /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
-      return `Your comment could not be sent. Please try again. Error: ${error.message}`
+      return `Your comment could not be sent. Please try again. Error: ${error.message}`;
   }
 };
 
@@ -169,17 +169,13 @@ const postComment = ({
       confirmAndClear(feedbackInfo);
     })
     .catch(err => {
-
-      postError(
-        commentErrors(err),
-        COMMENT_BOX,
-      );
+      postError(commentErrors(err), COMMENT_BOX);
       resetCommentBox();
       resetCommentButton();
     });
 };
 
-const logoutUser = (state) => {
+const logoutUser = state => {
   const { localStorage, sessionStorage } = window;
   const currentComment = selectCommentBox().value;
 
@@ -190,7 +186,7 @@ const logoutUser = (state) => {
     localStorage.removeItem('mergeRequestId');
 
     if (currentComment) {
-      sessionStorage.setItem('comment', currentComment)
+      sessionStorage.setItem('comment', currentComment);
     }
   } finally {
     state.token = '';
@@ -199,6 +195,6 @@ const logoutUser = (state) => {
 
   clearNote();
   addForm(nextView(state, COMMENT_BOX));
-}
+};
 
 export { changeSelectedMr, comment, logoutUser, postComment };

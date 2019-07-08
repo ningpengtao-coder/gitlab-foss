@@ -1,4 +1,4 @@
-import { nextView } from '../store'
+import { nextView } from '../store';
 import { LOGIN, TOKEN_BOX } from './constants';
 import { clearNote, postError } from './note';
 import singleForm from './single_line_form';
@@ -14,7 +14,7 @@ const login = singleForm({
   buttonId: LOGIN,
   labelText,
   autocomplete: 'current-password',
-  type: 'password'
+  type: 'password',
 });
 
 const storeToken = (token, state) => {

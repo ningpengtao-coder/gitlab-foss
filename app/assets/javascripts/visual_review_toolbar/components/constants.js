@@ -1,5 +1,5 @@
 // component selectors
-const CHANGE_MR_ID_BUTTON ='gitlab-change-me';
+const CHANGE_MR_ID_BUTTON = 'gitlab-change-me';
 const COLLAPSE_BUTTON = 'gitlab-collapse';
 const COMMENT_BOX = 'gitlab-comment';
 const COMMENT_BUTTON = 'gitlab-comment-button';

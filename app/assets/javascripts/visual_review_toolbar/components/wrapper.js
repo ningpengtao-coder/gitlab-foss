@@ -5,7 +5,7 @@ import {
   selectFormContainer,
   selectNoteContainer,
 } from './utils';
-import { collapseButton, commentIcon, compressIcon } from './wrapper.icons';
+import { collapseButton, commentIcon, compressIcon } from './wrapper_icons';
 
 const form = content => `
   <form id="${FORM}">
@@ -13,20 +13,20 @@ const form = content => `
   </form>
 `;
 
-const buttonAndForm = (content) => `
+const buttonAndForm = content => `
   <div id="${FORM_CONTAINER}" class="gitlab-form-open">
     ${collapseButton}
     ${form(content)}
   </div>
 `;
 
-const addForm = (form) => {
+const addForm = nextForm => {
   const formWrapper = selectForm();
-  formWrapper.innerHTML = form;
-}
+  formWrapper.innerHTML = nextForm;
+};
 
 function toggleForm() {
-  const collapseButton = selectCollapseButton();
+  const toggleButton = selectCollapseButton();
   const currentForm = selectForm();
   const formContainer = selectFormContainer();
   const noteContainer = selectNoteContainer();
@@ -61,15 +61,15 @@ function toggleForm() {
     },
   };
 
-  const nextState = collapseButton.classList.contains('gitlab-collapse-open') ? CLOSED : OPEN;
+  const nextState = toggleButton.classList.contains('gitlab-collapse-open') ? CLOSED : OPEN;
   const currentVals = stateVals[nextState];
 
   formContainer.classList.replace(...currentVals.containerClasses);
   formContainer.style.backgroundColor = currentVals.backgroundColor;
   formContainer.classList.toggle('gitlab-form-open');
   currentForm.style.display = currentVals.display;
-  collapseButton.classList.replace(...currentVals.buttonClasses);
-  collapseButton.innerHTML = currentVals.icon;
+  toggleButton.classList.replace(...currentVals.buttonClasses);
+  toggleButton.innerHTML = currentVals.icon;
 
   if (noteContainer && noteContainer.innerText.length > 0) {
     noteContainer.style.display = currentVals.display;

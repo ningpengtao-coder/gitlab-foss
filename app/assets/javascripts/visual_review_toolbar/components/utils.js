@@ -34,11 +34,7 @@ const selectNoteContainer = () => document.getElementById(NOTE_CONTAINER);
 const selectRemember = () => document.getElementById(REMEMBER_ITEM);
 const selectToken = () => document.getElementById(TOKEN_BOX);
 
-const escape = (str) => {
-    return str.replace(/[^0-9A-Za-z ]/g, function(c) {
-        return "";
-    } );
-}
+const escape = str => str.replace(/[^0-9A-Za-z ]/g, () => '');
 
 export {
   buttonClearStyles,
