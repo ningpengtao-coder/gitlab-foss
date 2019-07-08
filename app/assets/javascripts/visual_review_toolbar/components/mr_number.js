@@ -38,7 +38,6 @@ const storeMR = (id, state) => {
 }
 
 const addMr = (state) => {
-  console.log('MR YEAH')
   // Clear any old errors
   clearNote(MR_ID);
 
