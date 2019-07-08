@@ -343,11 +343,9 @@ Example of response
 
 ## Get job artifacts
 
-> **Notes**:
->
-> - [Introduced][ce-2893] in GitLab 8.5.
-> - The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
->   in [GitLab Premium][ee] 9.5.
+- [Introduced][ce-2893] in GitLab 8.5.
+- The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
+  in [GitLab Premium][ee] 9.5.
 
 Get the job's artifacts zipped archive of a project.
 
@@ -403,11 +401,9 @@ Possible response status codes:
 
 ## Download the artifacts archive
 
-> **Notes**:
->
-> - [Introduced][ce-5347] in GitLab 8.10.
-> - The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
->   in [GitLab Premium][ee] 9.5.
+- [Introduced][ce-5347] in GitLab 8.10.
+- The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
+  in [GitLab Premium][ee] 9.5.
 
 Download the artifacts zipped archive from the given reference name and job,
 provided the job finished successfully. This is the same as
@@ -485,7 +481,7 @@ Parameters
 | Attribute       | Type           | Required | Description                                                                                                      |
 |-----------------|----------------|----------|------------------------------------------------------------------------------------------------------------------|
 | `id`            | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
-| `job_id  `      | integer        | yes      | The unique job identifier.                                                                                       |
+| `job_id`      | integer        | yes      | The unique job identifier.                                                                                       |
 | `artifact_path` | string         | yes      | Path to a file inside the artifacts archive.                                                                     |
 
 Example request:
@@ -781,7 +777,6 @@ DELETE /projects/:id/jobs/:job_id/artifacts
 |-----------|----------------|----------|------------------------------------------------------------------------------------------------------------------|
 | `id`      | integer/string | yes      | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `job_id`  | integer        | yes      | ID of a job.                                                                |
-
 
 Example request:
 

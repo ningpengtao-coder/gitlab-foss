@@ -1,9 +1,9 @@
 # Award emoji
 
-> - First [introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/1825) in GitLab 8.2.
-> - GitLab 9.0 [introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/9570) the usage of native emoji if the platform
->  supports them and falls back to images or CSS sprites. This change greatly
->  improved award emoji performance overall.
+- First [introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/1825) in GitLab 8.2.
+- GitLab 9.0 [introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/9570)
+  the usage of native emoji if the platform supports them and falls back to images or
+  CSS sprites. This change greatly improved award emoji performance overall.
 
 When you're collaborating online, you get fewer opportunities for high-fives
 and thumbs-ups. Emoji can be awarded to [issues](project/issues/index.md), [merge requests](project/merge_requests/index.md),

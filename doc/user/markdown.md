@@ -1166,9 +1166,9 @@ Examples:
    1. Next ordered sub-list item
 4. And another item.
 
-* Unordered lists can use asterisks
+- Unordered lists can use asterisks
 - Or minuses
-+ Or pluses
+- Or pluses
 
 ---
 
@@ -1189,7 +1189,7 @@ Example:
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 
 ---
 
@@ -1210,7 +1210,7 @@ Example:
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 
 ### Superscripts / Subscripts
 

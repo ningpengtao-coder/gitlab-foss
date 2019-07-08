@@ -435,15 +435,15 @@ This example shows:
 The information shown in the **Environments** page is limited to the latest
 deployments, but an environment can have multiple deployments.
 
-> **Notes:**
->
-> - While you can create environments manually in the web interface, we recommend
->   that you define your environments in `.gitlab-ci.yml` first. They will
->   be automatically created for you after the first deploy.
-> - The environments page can only be viewed by users with [Reporter permission](../user/permissions.md#project-members-permissions)
->   and above. For more information on permissions, see the [permissions documentation](../user/permissions.md).
-> - Only deploys that happen after your `.gitlab-ci.yml` is properly configured
->   will show up in the **Environment** and **Last deployment** lists.
+**Note:**
+
+- While you can create environments manually in the web interface, we recommend
+  that you define your environments in `.gitlab-ci.yml` first. They will
+  be automatically created for you after the first deploy.
+- The environments page can only be viewed by users with [Reporter permission](../user/permissions.md#project-members-permissions)
+  and above. For more information on permissions, see the [permissions documentation](../user/permissions.md).
+- Only deploys that happen after your `.gitlab-ci.yml` is properly configured
+  will show up in the **Environment** and **Last deployment** lists.
 
 ### Viewing deployment history
 
@@ -591,12 +591,12 @@ exist, you should see something like:
 
 ### Monitoring environments
 
-> **Notes:**
->
-> - For the monitoring dashboard to appear, you need to:
->   - Enable the [Prometheus integration](../user/project/integrations/prometheus.md).
->   - Configure Prometheus to collect at least one [supported metric](../user/project/integrations/prometheus_library/index.md).
-> - With GitLab 9.2, all deployments to an environment are shown directly on the monitoring dashboard.
+**Note:**
+
+- For the monitoring dashboard to appear, you need to:
+  - Enable the [Prometheus integration](../user/project/integrations/prometheus.md).
+  - Configure Prometheus to collect at least one [supported metric](../user/project/integrations/prometheus_library/index.md).
+- With GitLab 9.2, all deployments to an environment are shown directly on the monitoring dashboard.
 
 If you have enabled [Prometheus for monitoring system and response metrics](../user/project/integrations/prometheus.md),
 you can monitor the behavior of your app running in each environment.
