@@ -13,7 +13,13 @@ const texts = {
   rememberText: mrRememberText
 }
 
-const mrForm = singleForm(MR_ID, MR_ID_BUTTON, texts);
+const mrForm = singleForm({
+  inputId: MR_ID,
+  buttonId: MR_ID_BUTTON,
+  autocomplete: '',
+  type: 'text',
+  ...texts
+});
 
 const storeMR = (id, state) => {
 

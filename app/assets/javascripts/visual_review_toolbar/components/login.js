@@ -9,7 +9,13 @@ const labelText = `
   Enter your <a class="gitlab-link" href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html">personal access token</a>
 `;
 
-const login = singleForm(TOKEN_BOX, LOGIN, { labelText });
+const login = singleForm({
+  inputId: TOKEN_BOX,
+  buttonId: LOGIN,
+  labelText,
+  autocomplete: 'current-password',
+  type: 'password'
+});
 
 const storeToken = (token, state) => {
   const { localStorage } = window;

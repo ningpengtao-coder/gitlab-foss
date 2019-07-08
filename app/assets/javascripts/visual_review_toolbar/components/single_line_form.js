@@ -1,15 +1,18 @@
 import { REMEMBER_ITEM } from './constants';
 import { buttonClearStyles } from './utils';
 
-const singleForm = (
+const singleForm = ({
   inputId,
   buttonId,
-  { labelText, rememberText = 'Remember me'} = {}
-) => {
+  type,
+  autocomplete,
+  labelText,
+  rememberText = 'Remember me'
+}) => {
   return `
     <div>
       <label for="${inputId}" class="gitlab-label">${labelText}</label>
-      <input class="gitlab-input" type="password" id="${inputId}" name="${inputId}" aria-required="true" autocomplete="current-password">
+      <input class="gitlab-input" type="${type}" id="${inputId}" name="${inputId}" aria-required="true" autocomplete="${autocomplete}">
     </div>
     <div class="gitlab-checkbox-wrapper">
       <input type="checkbox" id="${REMEMBER_ITEM}" name="${REMEMBER_ITEM}" value="remember">
