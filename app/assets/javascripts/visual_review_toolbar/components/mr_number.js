@@ -2,7 +2,7 @@ import { nextView } from '../store'
 import { MR_ID, MR_ID_BUTTON } from './constants';
 import { clearNote, postError } from './note';
 import singleForm from './single_line_form';
-import { selectMrBox, selectRemember } from './utils';
+import { escape, selectMrBox, selectRemember } from './utils';
 import { addForm } from './wrapper';
 
 const mrLabel = `Enter your merge request ID`;
@@ -49,7 +49,7 @@ const addMr = (state) => {
     return;
   }
 
-  storeMR(mrNumber, state);
+  storeMR(escape(mrNumber), state);
   addForm(nextView(state, MR_ID));
 };
 
