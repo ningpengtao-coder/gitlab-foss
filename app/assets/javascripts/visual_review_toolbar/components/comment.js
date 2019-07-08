@@ -75,6 +75,20 @@ const setInProgressState = () => {
   commentBox.style.pointerEvents = 'none';
 };
 
+const commentErrors = (error) => {
+  switch (error.status) {
+    case 401:
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      return 'Unauthorized. You may have entered an incorrect authentication token.';
+    case 404:
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      return 'Not found. You may have entered an incorrect merge request ID.';
+    default:
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      return `Your comment could not be sent. Please try again. Error: ${error.message}`
+  }
+};
+
 const postComment = ({
   href,
   platform,
@@ -131,7 +145,7 @@ const postComment = ({
         return response.json();
       }
 
-      throw new Error(`${response.status}: ${response.statusText}`);
+      throw response;
     })
     .then(data => {
       const commentId = data.notes[0].id;
@@ -140,8 +154,10 @@ const postComment = ({
       confirmAndClear(feedbackInfo);
     })
     .catch(err => {
+      console.log(err);
+
       postError(
-        `Your comment could not be sent. Please try again. Error: ${err.message}`,
+        commentErrors(err),
         COMMENT_BOX,
       );
       resetCommentBox();
