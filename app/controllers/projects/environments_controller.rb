@@ -17,7 +17,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 
   def index
-    @environments = project.environments
+    @environments = project.environments.with_successfull_deployment
       .with_state(params[:scope] || :available)
 
     respond_to do |format|
@@ -27,8 +27,8 @@ class Projects::EnvironmentsController < Projects::ApplicationController
 
         render json: {
           environments: serialize_environments(request, response, params[:nested]),
-          available_count: project.environments.available.count,
-          stopped_count: project.environments.stopped.count
+          available_count: project.environments.with_successfull_deployment.available.count,
+          stopped_count: project.environments.with_successfull_deployment.stopped.count
         }
       end
     end
@@ -37,7 +37,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   # Returns all environments for a given folder
   # rubocop: disable CodeReuse/ActiveRecord
   def folder
-    folder_environments = project.environments.where(environment_type: params[:id])
+    folder_environments = project.environments.with_successfull_deployment.where(environment_type: params[:id])
     @environments = folder_environments.with_state(params[:scope] || :available)
       .order(:name)
     @folder = params[:id]
