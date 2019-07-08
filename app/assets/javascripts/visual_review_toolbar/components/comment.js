@@ -11,17 +11,27 @@ import {
 import { addForm } from './wrapper';
 import { changeSelectedMr, selectedMrNote } from './comment.mr_note'
 
-const comment = (state) => `
-  <div>
-    <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true"></textarea>
-    ${selectedMrNote(state)}
-    <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
-  </div>
-  <div class="gitlab-button-wrapper">
-    <button class="gitlab-button gitlab-button-secondary" style="${buttonClearStyles}" type="button" id="${LOGOUT}"> Log out </button>
-    <button class="gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="gitlab-comment-button"> Send feedback </button>
-  </div>
-`;
+const comment = (state) => {
+  const { sessionStorage } = window;
+  let savedComment = '';
+
+  try {
+    savedComment = sessionStorage.getItem('comment');
+  } finally {
+    return `
+      <div>
+        <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true">${savedComment || ''}</textarea>
+        ${selectedMrNote(state)}
+        <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
+      </div>
+      <div class="gitlab-button-wrapper">
+        <button class="gitlab-button gitlab-button-secondary" style="${buttonClearStyles}" type="button" id="${LOGOUT}"> Log out </button>
+        <button class="gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="gitlab-comment-button"> Send feedback </button>
+      </div>
+    `
+  }
+
+};
 
 const resetCommentButton = () => {
   const commentButton = selectCommentButton();
@@ -39,8 +49,13 @@ const resetCommentBox = () => {
 };
 
 const resetCommentText = () => {
-  const commentBox = selectCommentBox();
-  commentBox.value = '';
+  try {
+    sessionStorage.removeItem('comment')
+  } finally {
+    const commentBox = selectCommentBox();
+    commentBox.value = '';
+  }
+
 };
 
 const resetComment = () => {
@@ -154,7 +169,6 @@ const postComment = ({
       confirmAndClear(feedbackInfo);
     })
     .catch(err => {
-      console.log(err);
 
       postError(
         commentErrors(err),
@@ -166,13 +180,18 @@ const postComment = ({
 };
 
 const logoutUser = (state) => {
-  const { localStorage } = window;
+  const { localStorage, sessionStorage } = window;
+  const currentComment = selectCommentBox().value;
 
   // All the browsers we support have localStorage, so let's silently fail
   // and go on with the rest of the functionality.
   try {
     localStorage.removeItem('token');
     localStorage.removeItem('mergeRequestId');
+
+    if (currentComment) {
+      sessionStorage.setItem('comment', currentComment)
+    }
   } finally {
     state.token = '';
     state.mergeRequestId = '';
