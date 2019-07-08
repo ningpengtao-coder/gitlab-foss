@@ -26,6 +26,14 @@ describe Gitlab::CycleAnalytics::GroupStageSummary do
 
       expect(subject.first[:value]).to eq(2)
     end
+
+    it "finds issues from subgroups" do
+      Timecop.freeze(5.days.from_now) { create(:issue, project: create(:project, namespace: create(:group, parent: group))) }
+      Timecop.freeze(5.days.from_now) { create(:issue, project: project) }
+      Timecop.freeze(5.days.from_now) { create(:issue, project: project_2) }
+
+      expect(subject.first[:value]).to eq(3)
+    end
   end
 
   describe "#deploys" do
