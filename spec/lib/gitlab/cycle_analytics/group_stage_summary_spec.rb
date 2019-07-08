@@ -38,12 +38,20 @@ describe Gitlab::CycleAnalytics::GroupStageSummary do
       expect(subject.second[:value]).to eq(2)
     end
 
-    it "doesn't find commits from other projects" do
+    it "doesn't find deploys from other projects" do
       Timecop.freeze(5.days.from_now) do
         create(:deployment, :success, project: create(:project, :repository, namespace: create(:group)))
       end
 
       expect(subject.second[:value]).to eq(0)
+    end
+
+    it "finds deploys from subgroups" do
+      Timecop.freeze(5.days.from_now) do
+        create(:deployment, :success, project: create(:project, :repository, namespace: create(:group, parent: group)))
+      end
+
+      expect(subject.second[:value]).to eq(1)
     end
   end
 end
