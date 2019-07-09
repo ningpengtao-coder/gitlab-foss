@@ -1,0 +1,6 @@
+---
+title: Show local times on the project deployment page instead of having UTC-based
+  times.
+merge_request: 30369
+author:
+type: fixed
