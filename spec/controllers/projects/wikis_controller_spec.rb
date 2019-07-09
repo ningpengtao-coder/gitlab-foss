@@ -46,11 +46,11 @@ describe Projects::WikisController do
           expect(assigns :nesting).to eq default_nesting
         end
 
-        it 'shows children by default' do
-          expect(assigns :show_children).to be true
+        it 'hides children if the default requires it' do
+          expect(assigns :show_children).to be(default_nesting != ProjectWiki::NESTING_CLOSED)
         end
 
-        %w[hidden tree flat].each do |nesting|
+        ProjectWiki::NESTINGS.each do |nesting|
           context "the user explicitly passes show_children = #{nesting}" do
             let(:nesting_params) { { show_children: nesting } }
 
@@ -70,8 +70,8 @@ describe Projects::WikisController do
       end
     end
 
-    include_examples 'sorting-and-nesting', 'created_at', 'flat'
-    include_examples 'sorting-and-nesting', 'title', 'tree'
+    include_examples 'sorting-and-nesting', ProjectWiki::CREATED_AT_ORDER, ProjectWiki::NESTING_FLAT
+    include_examples 'sorting-and-nesting', ProjectWiki::TITLE_ORDER, ProjectWiki::NESTING_CLOSED
   end
 
   def create_page(name, content)

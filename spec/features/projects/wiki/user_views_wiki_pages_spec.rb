@@ -30,8 +30,10 @@ describe 'User views wiki pages' do
   let(:pages) do
     page.all(".wiki-pages-list li #{page_link_selector}")
   end
+  let(:wikis_allow_change_nesting) { false }
 
   before do
+    stub_feature_flags(wikis_allow_change_nesting: wikis_allow_change_nesting)
     project.add_maintainer(user)
     sign_in(user)
     visit(project_wikis_pages_path(project))
@@ -60,22 +62,12 @@ describe 'User views wiki pages' do
   context 'ordered by title' do
     let(:sub_folder) { project_wiki.find_dir('sub-folder') }
 
-    context 'asc' do
-      let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, sub_folder, wiki_page4, wiki_page5] }
+    context 'default display settings' do
+      context 'asc' do
+        let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, sub_folder] }
 
-      it_behaves_like 'correctly_sorted_pages'
-    end
-
-    context 'nested' do
-      before do
-        page.within('.wiki-nesting-dropdown') do
-          click_link 'Hide folder contents'
-        end
+        it_behaves_like 'correctly_sorted_pages'
       end
-
-      let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, sub_folder] }
-
-      it_behaves_like 'correctly_sorted_pages'
 
       context 'desc' do
         before do
@@ -88,38 +80,94 @@ describe 'User views wiki pages' do
       end
     end
 
-    context 'flat' do
-      before do
-        page.within('.wiki-nesting-dropdown') do
-          click_link 'Show files separately'
-        end
-      end
+    context 'changing nesting is disabled' do
+      let(:wikis_allow_change_nesting) { false }
 
-      let(:page_link_selector) { 'a.wiki-page-title' }
-
-      let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, wiki_page4, wiki_page5] }
-
-      it_behaves_like 'correctly_sorted_pages'
-
-      context 'desc' do
-        before do
-          sort_desc!
-        end
-
-        let(:expected_sequence) { [wiki_page5, wiki_page4, wiki_page1, wiki_page3, wiki_page2] }
-
-        it_behaves_like 'correctly_sorted_pages'
+      it 'does not display a nesting controller' do
+        expect(page).not_to have_css('.wiki-nesting-dropdown')
       end
     end
 
-    context 'desc' do
-      before do
-        sort_desc!
+    context 'changing nesting is enabled' do
+      let(:wikis_allow_change_nesting) { true }
+
+      it 'displays a nesting controller' do
+        expect(page).to have_css('.wiki-nesting-dropdown')
       end
 
-      let(:expected_sequence) { [sub_folder, wiki_page5, wiki_page4, wiki_page1, wiki_page3, wiki_page2] }
+      context 'tree' do
+        before do
+          page.within('.wiki-nesting-dropdown') do
+            click_link 'Show folder contents'
+          end
+        end
 
-      it_behaves_like 'correctly_sorted_pages'
+        context 'asc' do
+          let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, sub_folder, wiki_page4, wiki_page5] }
+
+          it_behaves_like 'correctly_sorted_pages'
+        end
+
+        context 'desc' do
+          before do
+            sort_desc!
+          end
+
+          let(:expected_sequence) { [sub_folder, wiki_page5, wiki_page4, wiki_page1, wiki_page3, wiki_page2] }
+
+          it_behaves_like 'correctly_sorted_pages'
+        end
+      end
+
+      context 'nested' do
+        before do
+          page.within('.wiki-nesting-dropdown') do
+            click_link 'Hide folder contents'
+          end
+        end
+
+        context 'asc' do
+          let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, sub_folder] }
+
+          it_behaves_like 'correctly_sorted_pages'
+        end
+
+        context 'desc' do
+          before do
+            sort_desc!
+          end
+
+          let(:expected_sequence) { [sub_folder, wiki_page1, wiki_page3, wiki_page2] }
+
+          it_behaves_like 'correctly_sorted_pages'
+        end
+      end
+
+      context 'flat' do
+        before do
+          page.within('.wiki-nesting-dropdown') do
+            click_link 'Show files separately'
+          end
+        end
+
+        let(:page_link_selector) { 'a.wiki-page-title' }
+
+        context 'asc' do
+          let(:expected_sequence) { [wiki_page2, wiki_page3, wiki_page1, wiki_page4, wiki_page5] }
+
+          it_behaves_like 'correctly_sorted_pages'
+        end
+
+        context 'desc' do
+          before do
+            sort_desc!
+          end
+
+          let(:expected_sequence) { [wiki_page5, wiki_page4, wiki_page1, wiki_page3, wiki_page2] }
+
+          it_behaves_like 'correctly_sorted_pages'
+        end
+      end
     end
   end
 

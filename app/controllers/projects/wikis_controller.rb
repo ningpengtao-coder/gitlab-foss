@@ -27,7 +27,13 @@ class Projects::WikisController < Projects::ApplicationController
 
   # One of ProjectWiki::NESTINGS
   def show_children_param
-    default_val = params[:sort] == 'created_at' ? ProjectWiki::NESTING_FLAT : ProjectWiki::NESTING_TREE
+    default_val = case params[:sort]
+                  when ProjectWiki::CREATED_AT_ORDER
+                    ProjectWiki::NESTING_FLAT
+                  else
+                    ProjectWiki::NESTING_CLOSED
+                  end
+
     params.permit(:show_children).fetch(:show_children, default_val)
   end
 end
