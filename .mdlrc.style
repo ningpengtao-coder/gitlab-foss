@@ -22,12 +22,12 @@ rule "MD025" # only 1 level 1 header
 rule "MD026", :punctuation => '.,;:!' # no trailing punctuation in headers
 rule "MD027" # no multiple spaces after blockquote symbol
 rule "MD028" # no blank lines within blockquote
-rule "MD029", :style => :one # ordered list item prefix, shoulded be ordered
+rule "MD029", :style => :one # ordered list item prefix, should be ordered
 rule "MD030" # spaces after list markers
-# rule "MD031" # fenced code blocks need line surrounding
-# rule "MD032" # lists should be surrounded by line
-# rule 'MD034' # Bare URL used
-# rule "MD035", :style => "---" # Horizontal rule style
+rule "MD031" # fenced code blocks need line surrounding
+rule "MD032" # lists should be surrounded by line
+rule 'MD034' # Bare URL used
+rule "MD035", :style => "---" # Horizontal rule style
 # rule "MD037" # Spaces inside emphasis markers
 # rule "MD038" # Spaces inside code span elements
 # rule "MD039" # Spaces inside link text
