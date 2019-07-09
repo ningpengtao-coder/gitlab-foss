@@ -2260,6 +2260,9 @@ msgstr ""
 msgid "CiVariables|Masked"
 msgstr ""
 
+msgid "CiVariables|Protected"
+msgstr ""
+
 msgid "CiVariables|Remove variable row"
 msgstr ""
 
@@ -2267,9 +2270,6 @@ msgid "CiVariables|Scope"
 msgstr ""
 
 msgid "CiVariables|Specify variable values to be used in this run. The values specified in %{linkStart}CI/CD settings%{linkEnd} will be used as default"
-msgstr ""
-
-msgid "CiVariables|State"
 msgstr ""
 
 msgid "CiVariables|Type"
@@ -2288,6 +2288,9 @@ msgid "CiVariable|All environments"
 msgstr ""
 
 msgid "CiVariable|Create wildcard"
+msgstr ""
+
+msgid "CiVariable|Delete"
 msgstr ""
 
 msgid "CiVariable|Error occurred while saving variables"
