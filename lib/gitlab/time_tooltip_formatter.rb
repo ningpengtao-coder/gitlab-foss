@@ -18,8 +18,7 @@ class Gitlab::TimeTooltipFormatter
   end
 
   def tooltip_format
-    format = timezoned ? 'timeago_tooltip_tz' : 'timeago_tooltip'
-    format.to_sym
+    timezoned ? :timeago_tooltip_tz : :timeago_tooltip
   end
 
   def css_classes
