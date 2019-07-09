@@ -31,7 +31,7 @@ rule "MD035", :style => "---" # Horizontal rule style
 rule "MD037" # Spaces inside emphasis markers
 rule "MD038" # Spaces inside code span elements
 # rule "MD039" # Spaces inside link text
-# rule "MD046" # Code block style
+rule "MD046" # Code block style
 
 # False positives, see https://github.com/markdownlint/markdownlint/issues/261
 # rule "MD004", :style => :dash # unordered list style - dash
