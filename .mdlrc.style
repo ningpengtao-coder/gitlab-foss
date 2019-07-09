@@ -28,7 +28,9 @@ rule "MD009" # trailing spaces not allowed
 rule "MD010" # hard tabs not allowed
 rule "MD011" # alert on reversed link syntax
 rule "MD012" # alert on multiple consecutive blank lines
+
 # rule "MD013" # line length should be no more than 80 characters
+
 rule "MD014" # dollars signs not before commands w/o showing output
 rule "MD018" # must have space after header style
 rule "MD019" # no multiple spaces after header style
@@ -43,13 +45,17 @@ rule "MD029", :style => :ordered # ordered list item prefix, shoulded be ordered
 rule "MD030" # spaces after list markers
 rule "MD031" # fenced code blocks need line surrounding
 rule "MD032" # lists should be surrounded by line
+
 rule "MD033" # Inline HTML
+
 rule 'MD034' # Bare URL used
 rule "MD035" # Horizontal rule style
-rule "MD036" # Emphasis used instead of a header
+
+# rule "MD036" # Emphasis used instead of a header
+
 rule "MD037" # Spaces inside emphasis markers
 rule "MD038" # Spaces inside code span elements
 rule "MD039" # Spaces inside link text
 rule "MD040" # Fenced code blocks should have a language specified
-rule "MD041" # First line in file should be a top level header
+# rule "MD041" # First line in file should be a top level header
 rule "MD046" # Code block style
