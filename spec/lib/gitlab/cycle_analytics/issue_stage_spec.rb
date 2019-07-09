@@ -91,6 +91,13 @@ describe Gitlab::CycleAnalytics::IssueStage do
           expect(result.count).to eq(4)
           expect(result.map { |event| event[:title] }).to contain_exactly(issue_2_1.title, issue_2_2.title, issue_3_1.title, issue_3_2.title)
         end
+
+        it 'exposes merge requests that close issues with full path for subgroup' do
+          result = stage.events
+
+          expect(result.count).to eq(4)
+          expect(result.find { |event| event[:title] == issue_3_1.title }[:url]).to include("#{subgroup.full_path}")
+        end
       end
     end
   end
