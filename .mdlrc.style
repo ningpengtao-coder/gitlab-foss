@@ -2,13 +2,14 @@
 # and related to the options file ./mdlrc
 
 # See https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md
+
 rule "MD001" # header levels increment by 1
 rule "MD002" # first header should be level 1
-rule "MD003", :style => :atx # header style - atx
+# rule "MD003", :style => :atx # header style - atx
 rule "MD005" # don't allow inconsistent indentation for list items
 rule "MD006" # start bullets at beginning of line
-rule "MD007", :indent => 2 # unordered list indentation should be 2 spaces
-rule "MD009", :br_spaces => 2 # trailing spaces not allowed
+# rule "MD007", :indent => 2 # unordered list indentation should be 2 spaces
+# rule "MD009", :br_spaces => 2 # trailing spaces not allowed
 rule "MD010" # hard tabs not allowed
 rule "MD011" # alert on reversed link syntax
 rule "MD012" # alert on multiple consecutive blank lines
@@ -16,26 +17,28 @@ rule "MD018" # must have space after header style
 rule "MD019" # no multiple spaces after header style
 rule "MD022" # headers should be surrounded by blank lines
 rule "MD023" # headers must start at the beginning of the line
-rule "MD024", :allow_different_nesting => true # no multiple headers with same content
+# rule "MD024", :allow_different_nesting => true # no multiple headers with same content
 rule "MD025" # only 1 level 1 header
-rule "MD026", :punctuation => '.,;:!' # no trailing punctuation in headers
+# rule "MD026", :punctuation => '.,;:!' # no trailing punctuation in headers
 rule "MD027" # no multiple spaces after blockquote symbol
 rule "MD028" # no blank lines within blockquote
-rule "MD029", :style => :one # ordered list item prefix, shoulded be ordered
+# rule "MD029", :style => :one # ordered list item prefix, shoulded be ordered
 rule "MD030" # spaces after list markers
 rule "MD031" # fenced code blocks need line surrounding
 rule "MD032" # lists should be surrounded by line
 rule 'MD034' # Bare URL used
-rule "MD035", :style => "---" # Horizontal rule style
+# rule "MD035", :style => "---" # Horizontal rule style
 rule "MD037" # Spaces inside emphasis markers
 rule "MD038" # Spaces inside code span elements
 rule "MD039" # Spaces inside link text
 rule "MD046" # Code block style
+
 # False positives, see https://github.com/markdownlint/markdownlint/issues/261
-# rule "MD004", :style => :dash unordered list style - dash
-# rule "MD013"  line length should be no more than 80 characters
-# rule "MD014"  dollars signs not before commands w/o showing output
-# rule "MD033"  Inline HTML
-# rule "MD036"  Emphasis used instead of a header
-# rule "MD040"  Fenced code blocks should have a language specified
-# rule "MD041"  First line in file should be a top level header
+# rule "MD004", :style => :dash # unordered list style - dash
+
+# rule "MD013" # line length should be no more than 80 characters
+# rule "MD014" # dollars signs not before commands w/o showing output
+# rule "MD033" # Inline HTML
+# rule "MD036" # Emphasis used instead of a header
+# rule "MD040" # Fenced code blocks should have a language specified
+# rule "MD041" # First line in file should be a top level header
