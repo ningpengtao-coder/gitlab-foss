@@ -32,10 +32,10 @@ rule "MD038" # Spaces inside code span elements
 rule "MD039" # Spaces inside link text
 rule "MD046" # Code block style
 # False positives, see https://github.com/markdownlint/markdownlint/issues/261
-# rule "MD004", :style => :dash # unordered list style - dash
-# rule "MD013" # line length should be no more than 80 characters
-# rule "MD014" # dollars signs not before commands w/o showing output
-# rule "MD033" # Inline HTML
-# rule "MD036" # Emphasis used instead of a header
-# rule "MD040" # Fenced code blocks should have a language specified
-# rule "MD041" # First line in file should be a top level header
+# rule "MD004", :style => :dash unordered list style - dash
+# rule "MD013"  line length should be no more than 80 characters
+# rule "MD014"  dollars signs not before commands w/o showing output
+# rule "MD033"  Inline HTML
+# rule "MD036"  Emphasis used instead of a header
+# rule "MD040"  Fenced code blocks should have a language specified
+# rule "MD041"  First line in file should be a top level header
