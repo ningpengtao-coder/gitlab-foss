@@ -3,28 +3,46 @@
 require 'fast_spec_helper'
 
 describe Gitlab::TimeTooltipFormatter do
-  let(:formatter) { described_class.new(time: Time.now) }
+  let(:timezoned) { false }
+  let(:short_format) { false }
+  let(:html_class) { '' }
+  let(:formatter) do
+    described_class.new(time: Time.now,
+                        short_format: short_format,
+                        timezoned: timezoned,
+                        html_class: html_class)
+  end
 
   describe '#tooltip_format' do
-    it 'returns the correct symbol based on timezoned attribute' do
-      formatter.timezoned = false
+    it 'returns the timeago_tooltip symbol' do
       expect(formatter.tooltip_format).to eq :timeago_tooltip
+    end
 
-      formatter.timezoned = true
-      expect(formatter.tooltip_format).to eq :timeago_tooltip_tz
+    context 'when timezoned attribute is set to true' do
+      let(:timezoned) { true }
+      it 'returns the timeago_tooltip_tz symbol' do
+        expect(formatter.tooltip_format).to eq :timeago_tooltip_tz
+      end
     end
   end
 
   describe '#css_classes' do
-    let(:random_class) { 'random-class' }
-
     it 'returns the correct array of classes' do
-      formatter.short_format = true
-      expect(formatter.css_classes).to eq 'js-short-timeago'
-      formatter.html_class = random_class
-      expect(formatter.css_classes).to eq "js-short-timeago #{random_class}"
-      formatter.short_format = false
-      expect(formatter.css_classes).to eq "js-timeago #{random_class}"
+      expect(formatter.css_classes).to eq "js-timeago"
+    end
+
+    context 'when short_format is set to true' do
+      let(:short_format) { true }
+      it 'returns the correct array of classes' do
+        expect(formatter.css_classes).to eq 'js-short-timeago'
+      end
+    end
+
+    context 'when a random class is added' do
+      let(:html_class) { 'random_class' }
+      it 'returns the correct array of classes with this class in it' do
+        expect(formatter.css_classes).to eq "js-timeago #{html_class}"
+      end
     end
   end
 
@@ -34,11 +52,14 @@ describe Gitlab::TimeTooltipFormatter do
     end
 
     it 'returns the time at the correct time zone' do
-      formatter = described_class.new(time: Time.now)
-      formatter.timezoned = true
-      expect(formatter.time_for_tooltip.to_s).not_to include 'UTC'
-      formatter.timezoned = false
       expect(formatter.time_for_tooltip.to_s).to include 'UTC'
+    end
+
+    context 'when timezoned attribute is true' do
+      let(:timezoned) { true }
+      it 'returns the time at the correct time zone' do
+        expect(formatter.time_for_tooltip.to_s).not_to include 'UTC'
+      end
     end
   end
 end
