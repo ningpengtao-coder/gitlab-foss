@@ -93,3 +93,18 @@
   padding: $gl-padding-8 - $border-size;
   color: $gray-700;
 }
+
+.svg-icon {
+  display: inline-flex;
+  align-self: center;
+
+  svg {
+    height: 1em;
+    width: 1em;
+  }
+
+  &.svg-baseline svg {
+    top: .125em;
+    position: relative;
+  }
+}
