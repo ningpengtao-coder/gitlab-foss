@@ -2,18 +2,6 @@
 # and related to the options file ./mdlrc
 
 # See https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md
-# for more detailed information on the rules and styles.
-
-rule "MD001"
-rule "MD003", :style => :atx
-rule "MD011"
-rule "MD023"
-rule "MD032"
-rule "MD034"
-rule "MD037"
-
-# Should not be used currently:
-
 rule "MD001" # header levels increment by 1
 rule "MD002" # first header should be level 1
 rule "MD003", :style => :atx # header style - atx
@@ -43,10 +31,8 @@ rule "MD037" # Spaces inside emphasis markers
 rule "MD038" # Spaces inside code span elements
 rule "MD039" # Spaces inside link text
 rule "MD046" # Code block style
-
 # False positives, see https://github.com/markdownlint/markdownlint/issues/261
 # rule "MD004", :style => :dash # unordered list style - dash
-
 # rule "MD013" # line length should be no more than 80 characters
 # rule "MD014" # dollars signs not before commands w/o showing output
 # rule "MD033" # Inline HTML
