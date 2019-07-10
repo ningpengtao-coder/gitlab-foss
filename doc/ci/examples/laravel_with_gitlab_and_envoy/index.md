@@ -216,7 +216,7 @@ Our deployment plan is to clone the latest release from GitLab repository, insta
 
 #### @setup directive
 
-The first step of our deployment process is to define a set of variables within [@setup](https://laravel.com/docs/envoy/#setup) directive.
+The first step of our deployment process is to define a set of variables within @ [setup](https://laravel.com/docs/envoy/#setup) directive.
 You may change the `app` to your application's name:
 
 ```php
@@ -241,7 +241,7 @@ You may change the `app` to your application's name:
 
 #### @story directive
 
-The [@story](https://laravel.com/docs/envoy/#stories) directive allows us define a list of tasks that can be run as a single task.
+The @ [story](https://laravel.com/docs/envoy/#stories) directive allows us define a list of tasks that can be run as a single task.
 Here we have three tasks called `clone_repository`, `run_composer`, `update_symlinks`. These variables are usable to making our task's codes more cleaner:
 
 ```php
