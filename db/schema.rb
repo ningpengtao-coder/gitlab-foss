@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190703130053) do
+ActiveRecord::Schema.define(version: 20190710103736) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1720,6 +1720,18 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.string "encrypted_password_iv"
     t.string "jira_issue_transition_id"
     t.index ["service_id"], name: "index_jira_tracker_data_on_service_id", using: :btree
+  end
+
+  create_table "job_logs", force: :cascade do |t|
+    t.bigint "job_id", null: false
+    t.datetime "started_at", null: false
+    t.datetime "finished_at", null: false
+    t.index ["job_id"], name: "index_job_logs_on_job_id", using: :btree
+  end
+
+  create_table "jobs", force: :cascade do |t|
+    t.datetime "scheduled_for", null: false
+    t.index ["scheduled_for"], name: "index_jobs_on_scheduled_for", using: :btree
   end
 
   create_table "keys", id: :serial, force: :cascade do |t|
@@ -3748,6 +3760,7 @@ ActiveRecord::Schema.define(version: 20190703130053) do
   add_foreign_key "jira_connect_subscriptions", "jira_connect_installations", name: "fk_f1d617343f", on_delete: :cascade
   add_foreign_key "jira_connect_subscriptions", "namespaces", name: "fk_a3c10bcf7d", on_delete: :cascade
   add_foreign_key "jira_tracker_data", "services", on_delete: :cascade
+  add_foreign_key "job_logs", "jobs", on_delete: :cascade
   add_foreign_key "label_links", "labels", name: "fk_d97dd08678", on_delete: :cascade
   add_foreign_key "label_priorities", "labels", on_delete: :cascade
   add_foreign_key "label_priorities", "projects", on_delete: :cascade
