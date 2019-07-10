@@ -5,7 +5,7 @@
   %span.svg-icon.svg-baseline{ class: icon_active_class }
     = sprite_icon('book', size: 16)
   - if is_active
-    = wiki_page.human_title
+    %span{ title: s_('Wiki|The current page') }= wiki_page.human_title
   - else
     = link_to project_wiki_path(@project, wiki_page) do
       = wiki_page.human_title

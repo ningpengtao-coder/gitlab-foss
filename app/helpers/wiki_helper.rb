@@ -82,15 +82,17 @@ module WikiHelper
     sprite_icon_with_text(icon_name, icon_text, size: 16)
   end
 
-  def wiki_pages_wiki_page_link(wiki_page, nesting, project)
+  def wiki_pages_wiki_page_link(wiki_page, nesting, project, current_dir = '')
     wiki_page_link = link_to wiki_page.title, project_wiki_path(project, wiki_page), class: 'wiki-page-title'
     case nesting
     when ProjectWiki::NESTING_FLAT
       tags = []
-      if wiki_page.directory.present?
-        wiki_dir = WikiDirectory.new(wiki_page.directory)
-        tags << link_to(wiki_dir.slug, project_wiki_dir_path(project, wiki_dir), class: 'wiki-page-dir-name')
-        tags << content_tag(:span, '/', class: 'wiki-page-name-separator')
+      wiki_dir = WikiDirectory.new(wiki_page.directory)
+      while wiki_dir.slug != current_dir
+        path = project_wiki_dir_path(project, wiki_dir)
+        tags.unshift content_tag(:span, '/', class: 'wiki-page-name-separator')
+        tags.unshift link_to(wiki_dir.title, path, class: 'wiki-page-dir-name')
+        wiki_dir = WikiDirectory.new(wiki_dir.directory)
       end
 
       tags << wiki_page_link
