@@ -165,6 +165,12 @@ class ProjectWiki
     false
   end
 
+  def build_page(attrs)
+    WikiPage.new(self).tap do |page|
+      page.update_attributes(attrs) # rubocop:disable Rails/ActiveRecordAliases
+    end
+  end
+
   def update_page(page, content:, title: nil, format: :markdown, message: nil)
     commit = commit_details(:updated, message, page.title)
 

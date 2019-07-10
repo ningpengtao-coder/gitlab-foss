@@ -5,8 +5,11 @@ class Projects::WikiPagesController < Projects::ApplicationController
   include SendsBlob
   include PreviewMarkdown
   include Gitlab::Utils::StrongMemoize
+  include EmptyActions
+  include RedirectWhen
 
   attr_accessor :project_wiki, :sidebar_page, :sidebar_wiki_entries
+  empty_action :edit
 
   # Share the templates from the wikis controller.
   def self.local_prefixes
@@ -21,6 +24,10 @@ class Projects::WikiPagesController < Projects::ApplicationController
     redirect_to(project_wiki_path(@project, @page))
   end
 
+  redirect_when(:created, :updated) do
+    [project_wiki_path(@project, @page), { notice: _('Wiki was successfully updated.') }]
+  end
+
   def show
     if @page
       show_page
@@ -31,9 +38,6 @@ class Projects::WikiPagesController < Projects::ApplicationController
     else
       render 'empty'
     end
-  end
-
-  def edit
   end
 
   def update
@@ -49,11 +53,6 @@ class Projects::WikiPagesController < Projects::ApplicationController
     render 'edit'
   end
 
-  def updated!
-    redirect_to(project_wiki_path(@project, @page),
-                notice: _('Wiki was successfully updated.'))
-  end
-
   def create
     @page = WikiPages::CreateService
       .new(@project, current_user, wiki_params)
@@ -63,17 +62,10 @@ class Projects::WikiPagesController < Projects::ApplicationController
 
     render action: "edit"
   rescue Gitlab::Git::Wiki::OperationError => e
-    @page = build_page(wiki_params)
+    @page = project_wiki.build_page(wiki_params)
     @error = e
 
     render 'edit'
-  end
-
-  def created!
-    redirect_to(
-      project_wiki_path(@project, @page),
-      notice: _('Wiki was successfully updated.')
-    )
   end
 
   def history
@@ -126,19 +118,13 @@ class Projects::WikiPagesController < Projects::ApplicationController
   end
 
   def create_missing_page
-    @page = build_page(title: params[:id])
+    @page = project_wiki.build_page(title: params[:id])
 
     render 'edit'
   end
 
   def wiki_params
     params.require(:wiki_page).permit(:title, :content, :format, :message, :last_commit_sha)
-  end
-
-  def build_page(args)
-    WikiPage.new(@project_wiki).tap do |page|
-      page.update_attributes(args) # rubocop:disable Rails/ActiveRecordAliases
-    end
   end
 
   def load_page
