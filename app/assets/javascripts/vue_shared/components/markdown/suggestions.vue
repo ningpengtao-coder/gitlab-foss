@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { __ } from '~/locale';
 import SuggestionDiff from './suggestion_diff.vue';
 import Flash from '~/flash';
-import { __ } from '~/locale';
 
 export default {
   components: { SuggestionDiff },

@@ -19,7 +19,6 @@ import { GlTooltip } from '@gitlab/ui';
 import defaultAvatarUrl from 'images/no_avatar.png';
 import { __ } from '~/locale';
 import { placeholderImage } from '../../../lazy_loader';
-import { __ } from '~/locale';
 
 export default {
   name: 'UserAvatarImage',
