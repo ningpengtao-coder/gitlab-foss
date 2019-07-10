@@ -12117,6 +12117,9 @@ msgstr ""
 msgid "WikiPage|Write your content or drag files here…"
 msgstr ""
 
+msgid "Wiki|Contents"
+msgstr ""
+
 msgid "Wiki|Create Page"
 msgstr ""
 
