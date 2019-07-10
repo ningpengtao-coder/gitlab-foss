@@ -4,8 +4,7 @@
 tools developed by IBM which also include a centralized version control system
 similar to Git.
 
-A good read of ClearCase's basic concepts is can be found in this [StackOverflow
-post](https://stackoverflow.com/a/645771/974710).
+A good read of ClearCase's basic concepts is can be found in this [StackOverflow post](https://stackoverflow.com/a/645771/974710).
 
 The following table illustrates the main differences between ClearCase and Git:
 
@@ -20,7 +19,7 @@ The following table illustrates the main differences between ClearCase and Git:
 | Server | UNIX, Windows legacy systems | UNIX, macOS |
 | License | Proprietary | GPL |
 
-_Taken from the slides [ClearCase and the journey to Git](https://www.open.collab.net/media/pdfs/ClearCase-and-the-journey-to-Git.pdf) provided by collab.net_
+Taken from the slides [ClearCase and the journey to Git](https://www.open.collab.net/media/pdfs/ClearCase-and-the-journey-to-Git.pdf) provided by collab.net
 
 ## Why migrate
 
