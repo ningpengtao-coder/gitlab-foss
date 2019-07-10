@@ -127,7 +127,7 @@ integration, make sure the following requirements are met:
 - A [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
   is set up and you have permissions to access it.
 - The Kubernetes Engine API and related service are enabled. It should work immediately but may take up to 10 minutes after you create a project. For more information see the
-  ["Before you begin" section of the Kubernetes Engine docs](https://cloud.google.com/kubernetes-engine/docs/quickstart#before-you-begin).
+  [Before you begin section of the Kubernetes Engine docs](https://cloud.google.com/kubernetes-engine/docs/quickstart#before-you-begin).
 
 #### Creating the cluster
 
