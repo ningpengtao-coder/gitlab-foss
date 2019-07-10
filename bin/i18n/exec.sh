@@ -1,8 +1,7 @@
 GLOB="$1" # pattern to diff on
 PATCH_NAME="$2" # name for the patch
 PROJECT_ID="$3"
-TARGET_REF="$4"
-ACCESS_TOKEN="$5"
+ACCESS_TOKEN="$4"
 
 echo "Creating patch $PATCH_NAME from dir $GLOB"
 
@@ -12,7 +11,7 @@ eval $PATCH
 # Just chill
 sleep 5
 
-BRANCH="sh ./bin/i18n/create-branch.sh $PATCH_NAME $PROJECT_ID $TARGET_REF $ACCESS_TOKEN"
+BRANCH="sh ./bin/i18n/create-branch.sh $PATCH_NAME $PROJECT_ID $ACCESS_TOKEN"
 eval $BRANCH
 
 # Just chill

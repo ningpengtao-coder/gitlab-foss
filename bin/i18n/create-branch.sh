@@ -1,7 +1,6 @@
 BRANCH_NAME=$1
 PROJECT_ID=$2
-TARGET_REF=$3
-ACCESS_TOKEN=$4
+ACCESS_TOKEN=$3
 
 CMD_MASTER="git checkout master"
 CMD_BRANCH="git checkout -b $BRANCH_NAME"
