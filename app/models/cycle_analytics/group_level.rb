@@ -2,15 +2,17 @@
 
 module CycleAnalytics
   class GroupLevel < Base
+    attr_reader :options
+
     def initialize(project: nil, options:)
       @project = project
       @options = options
     end
 
     def summary
-      @summary ||= ::Gitlab::CycleAnalytics::GroupStageSummary.new(@options[:group],
-                                                              from: @options[:from],
-                                                              current_user: @options[:current_user]).data
+      @summary ||= ::Gitlab::CycleAnalytics::GroupStageSummary.new(options[:group],
+                                                              from: options[:from],
+                                                              current_user: options[:current_user]).data
     end
 
     def permissions(user: nil)
