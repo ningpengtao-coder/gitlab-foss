@@ -86,4 +86,57 @@ describe WikiHelper do
       expect(helper.wiki_sort_title('unknown')).to eq('Title')
     end
   end
+
+  describe '#wiki_pages_wiki_page_link' do
+    let(:project) { create(:project, :wiki_repo) }
+    let(:project_wiki) { ProjectWiki.new(project, project.owner) }
+    let(:page) { project_wiki.build_page(title: 'foo/bar/baz', content: 'blah') }
+
+    let(:link) { helper.wiki_pages_wiki_page_link(page, nesting, project, current_dir) }
+    let(:prefix) { "#{project.namespace.name}/#{project.name}/wikis" }
+    let(:separator) { '<span class="wiki-page-name-separator">/</span>' }
+    let(:foo_part) { %Q(<a class="wiki-page-dir-name" href="/#{prefix}/dir/foo">foo</a>) }
+    let(:bar_part) { %Q(<a class="wiki-page-dir-name" href="/#{prefix}/dir/foo/bar">bar</a>) }
+    let(:baz_part) { %Q(<a class="wiki-page-title" href="/#{prefix}/page/foo/bar/baz">foo/bar/baz</a>) }
+
+    shared_examples 'when not flat mode' do
+      [ProjectWiki::NESTING_CLOSED, ProjectWiki::NESTING_TREE].each do |nesting_mode|
+        context "the nesting is #{nesting_mode}" do
+          let(:nesting) { nesting_mode }
+
+          it 'produces a good link' do
+            expect(link).to eq baz_part
+          end
+        end
+      end
+    end
+
+    context 'there is no current dir' do
+      let(:current_dir) { nil }
+      context 'the nesting is flat' do
+        let(:nesting) { ProjectWiki::NESTING_FLAT }
+
+        it 'produces a good link' do
+          expected = [foo_part, bar_part, baz_part].join(separator)
+          expect(link).to eq expected
+        end
+      end
+
+      include_examples 'when not flat mode'
+    end
+
+    context 'there is a current dir' do
+      let(:current_dir) { 'foo' }
+      context 'the nesting is flat' do
+        let(:nesting) { ProjectWiki::NESTING_FLAT }
+
+        it 'produces a good link' do
+          expected = [bar_part, baz_part].join(separator)
+          expect(link).to eq expected
+        end
+      end
+
+      include_examples 'when not flat mode'
+    end
+  end
 end
