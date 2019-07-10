@@ -110,7 +110,7 @@ There are two options when adding a new cluster to your project:
 ### Add new GKE cluster
 
 TIP: **Tip:**
-Every new Google Cloud Platform (GCP) account receives [$300 in credit upon sign up](https://console.cloud.google.com/freetrial),
+Every new Google Cloud Platform (GCP) account receives [300 in credit upon sign up](https://console.cloud.google.com/freetrial),
 and in partnership with Google, GitLab is able to offer an additional $200 for new GCP accounts to get started with GitLab's
 Google Kubernetes Engine Integration. All you have to do is [follow this link](https://goo.gl/AaJzRW) and apply for credit.
 
@@ -182,114 +182,112 @@ To add an existing Kubernetes cluster to your project:
 
 1. Click **Add Kubernetes cluster**.
 1. Click **Add an existing Kubernetes cluster** and fill in the details:
-   - **Kubernetes cluster name** (required) - The name you wish to give the cluster.
-   - **Environment scope** (required) - The
-     [associated environment](#setting-the-environment-scope-premium) to this cluster.
-   - **API URL** (required) -
-     It's the URL that GitLab uses to access the Kubernetes API. Kubernetes
-     exposes several APIs, we want the "base" URL that is common to all of them,
-     e.g., `https://kubernetes.example.com` rather than `https://kubernetes.example.com/api/v1`.
+    - **Kubernetes cluster name** (required) - The name you wish to give the cluster.
+    - **Environment scope** (required) - The
+      [associated environment](#setting-the-environment-scope-premium) to this cluster.
+    - **API URL** (required) -
+      It's the URL that GitLab uses to access the Kubernetes API. Kubernetes
+      exposes several APIs, we want the "base" URL that is common to all of them,
+      e.g., `https://kubernetes.example.com` rather than `https://kubernetes.example.com/api/v1`.
 
-     Get the API URL by running this command:
+      Get the API URL by running this command:
 
-     ```sh
-     kubectl cluster-info | grep 'Kubernetes master' | awk '/http/ {print $NF}'
-     ```
+      ```sh
+      kubectl cluster-info | grep 'Kubernetes master' | awk '/http/ {print $NF}'
+      ```
+    - **CA certificate** (required) - A valid Kubernetes certificate is needed to authenticate to the EKS cluster. We will use the certificate created by default.
+      - List the secrets with `kubectl get secrets`, and one should named similar to
+       `default-token-xxxxx`. Copy that token name for use below.
+      - Get the certificate by running this command:
 
-   - **CA certificate** (required) - A valid Kubernetes certificate is needed to authenticate to the EKS cluster. We will use the certificate created by default.
-     - List the secrets with `kubectl get secrets`, and one should named similar to
-      `default-token-xxxxx`. Copy that token name for use below.
-     - Get the certificate by running this command:
+      ```sh
+      kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
+      ```
+    - **Token** -
+      GitLab authenticates against Kubernetes using service tokens, which are
+      scoped to a particular `namespace`.
+      **The token used should belong to a service account with
+      [cluster-admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+      privileges.** To create this service account:
 
-     ```sh
-     kubectl get secret <secret name> -o jsonpath="{['data']['ca\.crt']}" | base64 --decode
-     ```
+      1. Create a file called `gitlab-admin-service-account.yaml` with contents:
 
-   - **Token** -
-     GitLab authenticates against Kubernetes using service tokens, which are
-     scoped to a particular `namespace`.
-     **The token used should belong to a service account with
-     [`cluster-admin`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
-     privileges.** To create this service account:
+         ```yaml
+         apiVersion: v1
+         kind: ServiceAccount
+         metadata:
+           name: gitlab-admin
+           namespace: kube-system
+         ---
+         apiVersion: rbac.authorization.k8s.io/v1beta1
+         kind: ClusterRoleBinding
+         metadata:
+           name: gitlab-admin
+         roleRef:
+           apiGroup: rbac.authorization.k8s.io
+           kind: ClusterRole
+           name: cluster-admin
+         subjects:
+         - kind: ServiceAccount
+           name: gitlab-admin
+           namespace: kube-system
+         ```
 
-     1. Create a file called `gitlab-admin-service-account.yaml` with contents:
+      1. Apply the service account and cluster role binding to your cluster:
 
-        ```yaml
-        apiVersion: v1
-        kind: ServiceAccount
-        metadata:
-          name: gitlab-admin
-          namespace: kube-system
-        ---
-        apiVersion: rbac.authorization.k8s.io/v1beta1
-        kind: ClusterRoleBinding
-        metadata:
-          name: gitlab-admin
-        roleRef:
-          apiGroup: rbac.authorization.k8s.io
-          kind: ClusterRole
-          name: cluster-admin
-        subjects:
-        - kind: ServiceAccount
-          name: gitlab-admin
-          namespace: kube-system
-        ```
+          ```bash
+          kubectl apply -f gitlab-admin-service-account.yaml
+          ```
 
-     1. Apply the service account and cluster role binding to your cluster:
+          Output:
 
-        ```bash
-        kubectl apply -f gitlab-admin-service-account.yaml
-        ```
+          ```bash
+          serviceaccount "gitlab-admin" created
+          clusterrolebinding "gitlab-admin" created
+          ```
 
-        Output:
+      1. Retrieve the token for the `gitlab-admin` service account:
 
-        ```bash
-        serviceaccount "gitlab-admin" created
-        clusterrolebinding "gitlab-admin" created
-        ```
+          ```bash
+          kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep gitlab-admin | awk '{print $1}')
+          ```
 
-     1. Retrieve the token for the `gitlab-admin` service account:
+         Copy the `<authentication_token>` value from the output:
 
-        ```bash
-        kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep gitlab-admin | awk '{print $1}')
-        ```
+         ```yaml
+         Name:         gitlab-admin-token-b5zv4
+         Namespace:    kube-system
+         Labels:       <none>
+         Annotations:  kubernetes.io/service-account.name=gitlab-admin
+                       kubernetes.io/service-account.uid=bcfe66ac-39be-11e8-97e8-026dce96b6e8
 
-        Copy the `<authentication_token>` value from the output:
+         Type:  kubernetes.io/service-account-token
 
-        ```yaml
-        Name:         gitlab-admin-token-b5zv4
-        Namespace:    kube-system
-        Labels:       <none>
-        Annotations:  kubernetes.io/service-account.name=gitlab-admin
-                      kubernetes.io/service-account.uid=bcfe66ac-39be-11e8-97e8-026dce96b6e8
+         Data
+         ====
+         ca.crt:     1025 bytes
+         namespace:  11 bytes
+         token:      <authentication_token>
+         ```
 
-        Type:  kubernetes.io/service-account-token
+      NOTE: **Note:**
+      For GKE clusters, you will need the
+      `container.clusterRoleBindings.create` permission to create a cluster
+      role binding. You can follow the [Google Cloud
+      documentation](https://cloud.google.com/iam/docs/granting-changing-revoking-access)
+      to grant access.
 
-        Data
-        ====
-        ca.crt:     1025 bytes
-        namespace:  11 bytes
-        token:      <authentication_token>
-        ```
+    - **GitLab-managed cluster** - Leave this checked if you want GitLab to manage namespaces and service accounts for this cluster. See the [Managed clusters section](#gitlab-managed-clusters) for more information.
 
-     NOTE: **Note:**
-     For GKE clusters, you will need the
-     `container.clusterRoleBindings.create` permission to create a cluster
-     role binding. You can follow the [Google Cloud
-     documentation](https://cloud.google.com/iam/docs/granting-changing-revoking-access)
-     to grant access.
-
-   - **GitLab-managed cluster** - Leave this checked if you want GitLab to manage namespaces and service accounts for this cluster. See the [Managed clusters section](#gitlab-managed-clusters) for more information.
-
-   - **Project namespace** (optional) - You don't have to fill it in; by leaving
-     it blank, GitLab will create one for you. Also:
-     - Each project should have a unique namespace.
-     - The project namespace is not necessarily the namespace of the secret, if
-       you're using a secret with broader permissions, like the secret from `default`.
-     - You should **not** use `default` as the project namespace.
-     - If you or someone created a secret specifically for the project, usually
-       with limited permissions, the secret's namespace and project namespace may
-       be the same.
+    - **Project namespace** (optional) - You don't have to fill it in; by leaving
+      it blank, GitLab will create one for you. Also:
+       - Each project should have a unique namespace.
+       - The project namespace is not necessarily the namespace of the secret, if
+         you're using a secret with broader permissions, like the secret from `default`.
+       - You should **not** use `default` as the project namespace.
+       - If you or someone created a secret specifically for the project, usually
+         with limited permissions, the secret's namespace and project namespace may
+         be the same.
 
 1. Finally, click the **Create Kubernetes cluster** button.
 
@@ -388,7 +386,7 @@ GitLab creates the necessary service accounts and privileges to install and run
 
 - A `gitlab` service account with `cluster-admin` privileges is created in the `default` namespace
   to manage the newly created cluster.
-- A project service account with [`edit`
+- A project service account with [edit
   privileges](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
   is created in the GitLab-created project namespace for [deployment jobs](#deployment-variables).
 
@@ -428,13 +426,13 @@ GitLab creates the following resources for RBAC clusters.
 | Name              | Type                 | Details                                                                                                    | Created when               |
 |:------------------|:---------------------|:-----------------------------------------------------------------------------------------------------------|:---------------------------|
 | `gitlab`          | `ServiceAccount`     | `default` namespace                                                                                        | Creating a new GKE Cluster |
-| `gitlab-admin`    | `ClusterRoleBinding` | [`cluster-admin`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) roleRef | Creating a new GKE Cluster |
+| `gitlab-admin`    | `ClusterRoleBinding` | [cluster-admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) roleRef | Creating a new GKE Cluster |
 | `gitlab-token`    | `Secret`             | Token for `gitlab` ServiceAccount                                                                          | Creating a new GKE Cluster |
 | `tiller`          | `ServiceAccount`     | `gitlab-managed-apps` namespace                                                                            | Installing Helm Tiller     |
 | `tiller-admin`    | `ClusterRoleBinding` | `cluster-admin` roleRef                                                                                    | Installing Helm Tiller     |
 | Project namespace | `ServiceAccount`     | Uses namespace of Project                                                                                  | Deploying to a cluster     |
 | Project namespace | `Secret`             | Token for project ServiceAccount                                                                           | Deploying to a cluster     |
-| Project namespace | `RoleBinding`        | [`edit`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) roleRef          | Deploying to a cluster     |
+| Project namespace | `RoleBinding`        | [edit](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) roleRef          | Deploying to a cluster     |
 
 NOTE: **Note:**
 Project-specific resources are only created if your cluster is [managed by GitLab](#gitlab-managed-clusters).
@@ -576,7 +574,7 @@ The output of the following examples will show the external endpoint of your
 cluster. This information can then be used to set up DNS entries and forwarding
 rules that allow external access to your deployed applications.
 
-If you installed the Ingress [via the **Applications**](#installing-applications),
+If you installed the Ingress [via the Applications](#installing-applications),
 run the following command:
 
 ```bash
@@ -669,10 +667,10 @@ To find the cause of this error when creating a namespace and service account, c
 
 Reasons for failure include:
 
-- The token you gave GitLab does not have [`cluster-admin`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+- The token you gave GitLab does not have [cluster-admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
   privileges required by GitLab.
 - Missing `KUBECONFIG` or `KUBE_TOKEN` variables. To be passed to your job, they must have a matching
-  [`environment:name`](../../../ci/environments.md#defining-environments). If your job has no
+  [environment:name](../../../ci/environments.md#defining-environments). If your job has no
   `environment:name` set, it will not be passed the Kubernetes credentials.
 
 NOTE: **NOTE:**
