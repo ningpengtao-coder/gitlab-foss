@@ -4,4 +4,5 @@
 # See https://github.com/markdownlint/markdownlint/blob/master/docs/configuration.md
 
 ignore_front_matter true
+verbose true
 style File.expand_path('.mdlrc.style', __dir__)
