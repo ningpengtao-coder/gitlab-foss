@@ -9,6 +9,7 @@ class WikiPage
   include ActiveModel::Conversion
   include StaticModel
   include HasWikiDirectory
+  include Presentable
 
   extend ActiveModel::Naming
 

@@ -3,6 +3,7 @@
 class WikiDirectory
   include StaticModel
   include HasWikiDirectory
+  include Presentable
   include ActiveModel::Validations
 
   attr_accessor :slug, :pages
