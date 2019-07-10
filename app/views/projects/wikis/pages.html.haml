@@ -2,7 +2,7 @@
 - breadcrumb_title s_("Wiki|Pages")
 - page_title s_("Wiki|Contents"), _("Wiki")
 
-= render 'page_listing', { allow_change_nesting: ::Feature.enabled?(:wikis_allow_change_nesting), wiki_page_title: page_title, page_path: ->(opts) { project_wikis_pages_path(@project, opts) } }
+= render 'page_listing', { parent_path: nil, allow_change_nesting: ::Feature.enabled?(:wikis_allow_change_nesting), wiki_page_title: page_title, page_path: ->(opts) { project_wikis_pages_path(@project, opts) } }
 
 
 

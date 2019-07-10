@@ -44,7 +44,7 @@ RSpec.describe WikiDirectory do
       let(:page_dir_2) { wiki.find_page('dir_2') }
 
       let(:dir_1) do
-        described_class.new('dir_1', [wiki.find_page('dir_1/page_2')])
+        described_class.new('dir_1', [dir_1_1, wiki.find_page('dir_1/page_2')])
       end
       let(:dir_1_1) do
         described_class.new('dir_1/dir_1_1', [wiki.find_page('dir_1/dir_1_1/page_3')])
@@ -68,14 +68,14 @@ RSpec.describe WikiDirectory do
         context 'sort by title' do
           let(:grouped_entries) { described_class.group_by_directory(wiki.list_pages) }
 
-          let(:expected_grouped_entries) { [dir_1_1, dir_1, page_dir_2, dir_2, page_1, page_6] }
+          let(:expected_grouped_entries) { [dir_1, page_dir_2, dir_2, page_1, page_6] }
 
           it_behaves_like "a correct grouping"
         end
 
         context 'sort by created_at' do
           let(:grouped_entries) { described_class.group_by_directory(wiki.list_pages(sort: 'created_at')) }
-          let(:expected_grouped_entries) { [dir_1_1, page_1, dir_1, page_dir_2, dir_2, page_6] }
+          let(:expected_grouped_entries) { [page_1, dir_1, page_dir_2, dir_2, page_6] }
 
           it_behaves_like "a correct grouping"
         end
@@ -215,6 +215,6 @@ RSpec.describe WikiDirectory do
   end
 
   def slugs(thing)
-    Array.wrap(thing.respond_to?(:pages) ? thing.pages.map(&:slug) : thing.slug)
+    Array.wrap(thing.respond_to?(:pages) ? thing.pages.flat_map(&method(:slugs)) : thing.slug)
   end
 end

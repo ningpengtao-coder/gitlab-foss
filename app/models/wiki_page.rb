@@ -8,6 +8,8 @@ class WikiPage
   include ActiveModel::Validations
   include ActiveModel::Conversion
   include StaticModel
+  include HasWikiDirectory
+
   extend ActiveModel::Naming
 
   def self.primary_key
@@ -96,11 +98,6 @@ class WikiPage
   # The raw content of this page.
   def content
     @attributes[:content] ||= @page&.text_data
-  end
-
-  # The hierarchy of the directory this page is contained in.
-  def directory
-    wiki.page_title_and_dir(slug)&.last.to_s
   end
 
   # The processed/formatted content of this page.

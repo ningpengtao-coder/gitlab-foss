@@ -142,8 +142,10 @@ class ProjectWiki
     pages = wiki
       .list_pages(sort: sort, direction_desc: descending)
       .map { |page| WikiPage.new(self, page, true) }
-      .select { |wp| wp.directory == dir_name }
-    WikiDirectory.new(dir_name, pages) if pages.present?
+      .select { |wp| wp.directory.start_with?(dir_name) }
+    dir = WikiDirectory.group_by_directory(pages).first
+    dir = dir.pages.first while dir && dir.slug != dir_name
+    dir
   end
 
   def find_sidebar(version = nil)
@@ -194,11 +196,8 @@ class ProjectWiki
   end
 
   def page_title_and_dir(title)
-    return unless title
-
-    title_array = title.split("/")
-    title = title_array.pop
-    [title, title_array.join("/")]
+    path = Gitlab::WikiPath.parse(title)
+    [path.basename, path.dirname]
   end
 
   def repository

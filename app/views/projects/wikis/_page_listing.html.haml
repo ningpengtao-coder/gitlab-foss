@@ -40,6 +40,8 @@
           = wiki_sort_controls(current_sorting.merge(show_children: @nesting), &page_path)
 
   %ul.wiki-pages-list.content-list
+    - if parent_path.present?
+      %li.wiki-parent-link= link_to _('..'), parent_path, title: _('Go up one level')
     = render @wiki_entries, context: 'pages'
 
   = paginate @wiki_pages, theme: 'gitlab'

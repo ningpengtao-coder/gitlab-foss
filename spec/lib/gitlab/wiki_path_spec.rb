@@ -8,25 +8,25 @@ describe Gitlab::WikiPath do
   context 'the path is nil' do
     let(:path_string) { nil }
 
-    it { is_expected.to have_attributes(dirname: '', basename: '') }
+    it { is_expected.to have_attributes(depth: 0, dirname: '', basename: '') }
   end
 
   context 'the path is empty' do
     let(:path_string) { '' }
 
-    it { is_expected.to have_attributes(dirname: '', basename: '') }
+    it { is_expected.to have_attributes(depth: 0, dirname: '', basename: '') }
   end
 
   context 'the path is a single element' do
     let(:path_string) { 'foo' }
 
-    it { is_expected.to have_attributes(dirname: '', basename: 'foo') }
+    it { is_expected.to have_attributes(depth: 0, dirname: '', basename: 'foo') }
   end
 
   context 'the path is a single element with spaces' do
     let(:path_string) { 'foo bar' }
 
-    it { is_expected.to have_attributes(dirname: '', basename: 'foo bar') }
+    it { is_expected.to have_attributes(depth: 0, dirname: '', basename: 'foo bar') }
 
     it { is_expected.to be_root_level }
   end
@@ -34,7 +34,7 @@ describe Gitlab::WikiPath do
   context 'the path is two elements' do
     let(:path_string) { 'foo/bar' }
 
-    it { is_expected.to have_attributes(dirname: 'foo', basename: 'bar') }
+    it { is_expected.to have_attributes(depth: 1, dirname: 'foo', basename: 'bar') }
 
     it { is_expected.not_to be_root_level }
 
@@ -46,7 +46,7 @@ describe Gitlab::WikiPath do
   context 'the path is several elements' do
     let(:path_string) { 'foo/bar/baz' }
 
-    it { is_expected.to have_attributes(dirname: 'foo/bar', basename: 'baz') }
+    it { is_expected.to have_attributes(depth: 2, dirname: 'foo/bar', basename: 'baz') }
 
     it { is_expected.not_to be_root_level }
 

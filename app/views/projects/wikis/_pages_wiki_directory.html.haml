@@ -5,11 +5,12 @@
     - else
       = sprite_icon('folder-o', size: 16)
 
-  = link_to wiki_dir.slug, project_wiki_dir_path(@project, wiki_dir)
-  - unless @show_children
-    %span.badge.badge-pill.wiki-dir-page-count= wiki_dir.page_count
-    .float-right
-      %small= (s_("Last edited %{date}") % { date: time_ago_with_tooltip(wiki_dir.last_version.authored_date) }).html_safe
+  = link_to wiki_dir.title, project_wiki_dir_path(@project, wiki_dir)
+
   - if @show_children
     %ul
       = render wiki_dir.pages, context: context
+  - else
+    %span.badge.badge-pill.wiki-dir-page-count= wiki_dir.page_count
+    .float-right
+      %small= (s_("Last edited %{date}") % { date: time_ago_with_tooltip(wiki_dir.last_version.authored_date) }).html_safe

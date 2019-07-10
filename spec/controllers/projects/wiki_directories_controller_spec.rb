@@ -49,7 +49,66 @@ describe Projects::WikiDirectoriesController do
 
       it 'sets show_children to true' do
         visit_page
-        expect(assigns(:show_children)).to be true
+        expect(assigns(:show_children)).to be false
+      end
+
+      it 'sets the breadcrumb_dirs' do
+        visit_page
+        expect(assigns(:breadcrumb_dirs)).to be_empty
+      end
+    end
+
+    context 'visiting a deeply nested directory' do
+      let(:wiki_title) { 'root-dir/sub-dir/some-page' }
+      let(:dir_slug) { 'root-dir/sub-dir' }
+      let(:visit_page) { subject }
+
+      it { is_expected.to render_template('show_dir') }
+
+      it 'sets the wiki_dir attribute' do
+        visit_page
+        expect(assigns(:wiki_dir)).to eq WikiDirectory.new(dir_slug, [project_wiki.find_page(wiki_title)])
+      end
+
+      it 'sets show_children to true' do
+        visit_page
+        expect(assigns(:show_children)).to be false
+      end
+
+      it 'sets the breadcrumb_dirs' do
+        visit_page
+        expect(assigns(:breadcrumb_dirs)).to have_attributes(size: 1)
+      end
+    end
+
+    context 'visiting a very deeply nested directory' do
+      let(:wiki_title) { 'root-dir/sub-dir/sub-dir-2/some-page' }
+      let(:dir_slug) { 'root-dir/sub-dir/sub-dir-2' }
+      let(:visit_page) { subject }
+
+      it { is_expected.to render_template('show_dir') }
+
+      it 'sets the wiki_dir attribute' do
+        visit_page
+        expect(assigns(:wiki_dir)).to eq WikiDirectory.new(dir_slug, [project_wiki.find_page(wiki_title)])
+      end
+
+      it 'sets show_children to true' do
+        visit_page
+        expect(assigns(:show_children)).to be false
+      end
+
+      it 'sets the breadcrumb_dirs' do
+        visit_page
+        expect(assigns(:breadcrumb_dirs)).to have_attributes(size: 2)
+      end
+
+      it 'sets the breadcrumb_dirs' do
+        visit_page
+        expect(assigns(:breadcrumb_dirs)).to include(
+          have_attributes(title: 'root-dir'),
+          have_attributes(title: 'sub-dir')
+        )
       end
     end
   end

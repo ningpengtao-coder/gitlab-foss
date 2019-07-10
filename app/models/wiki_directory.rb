@@ -2,6 +2,7 @@
 
 class WikiDirectory
   include StaticModel
+  include HasWikiDirectory
   include ActiveModel::Validations
 
   attr_accessor :slug, :pages
@@ -23,7 +24,6 @@ class WikiDirectory
   end
 
   alias_method :to_param, :slug
-  alias_method :title, :slug
 
   # Sorts and groups pages by directory.
   #
@@ -35,7 +35,14 @@ class WikiDirectory
   def self.group_by_directory(pages)
     grouped = []
     dirs = Hash.new do |h, k|
-      new(k).tap { |dir| grouped << (h[k] = dir) }
+      new(k).tap do |dir|
+        h[k] = dir
+        if dir.root_dir?
+          grouped << dir
+        else
+          h[dir.directory] << dir
+        end
+      end
     end
 
     (pages.presence || []).each_with_object(grouped) do |page, top_level|
@@ -50,8 +57,8 @@ class WikiDirectory
     @pages = pages
   end
 
-  def <<(page)
-    @pages << page
+  def <<(child)
+    @pages << child
     @last_version = nil
   end
 
@@ -61,6 +68,19 @@ class WikiDirectory
 
   def page_count
     @pages.size
+  end
+
+  def root_dir?
+    path = Gitlab::WikiPath.parse(slug)
+    path.root_level?
+  end
+
+  def depth
+    Gitlab::WikiPath.parse(slug).depth
+  end
+
+  def title
+    Gitlab::WikiPath.parse(slug).basename
   end
 
   # Relative path to the partial to be used when rendering collections

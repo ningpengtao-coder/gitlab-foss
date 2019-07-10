@@ -2,12 +2,13 @@
 
 class Projects::WikisController < Projects::ApplicationController
   include HasProjectWiki
+  include WikiNesting
 
   attr_accessor :project_wiki, :sidebar_page, :sidebar_wiki_entries
 
+  before_action :set_nesting, only: [:pages]
+
   def pages
-    @nesting = show_children_param
-    @show_children = @nesting != ProjectWiki::NESTING_CLOSED
     @wiki_pages = Kaminari.paginate_array(
       @project_wiki.list_pages(sort: params[:sort], direction: params[:direction])
     ).page(params[:page])
@@ -21,19 +22,5 @@ class Projects::WikisController < Projects::ApplicationController
   end
 
   def git_access
-  end
-
-  private
-
-  # One of ProjectWiki::NESTINGS
-  def show_children_param
-    default_val = case params[:sort]
-                  when ProjectWiki::CREATED_AT_ORDER
-                    ProjectWiki::NESTING_FLAT
-                  else
-                    ProjectWiki::NESTING_CLOSED
-                  end
-
-    params.permit(:show_children).fetch(:show_children, default_val)
   end
 end
