@@ -29,6 +29,16 @@
 .dropdown-menu-labels {
   .dropdown-content {
     max-height: 135px;
+
+    .label-item {
+      display: flex;
+      flex-direction: row;
+      word-break: break-word;
+    }
+    
+    .dropdown-label-box {
+      flex: 0 0 auto;
+    }
   }
 }
 
