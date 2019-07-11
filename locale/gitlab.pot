@@ -305,6 +305,12 @@ msgstr ""
 msgid "- show less"
 msgstr ""
 
+msgid ".."
+msgstr ""
+
+msgid "/"
+msgstr ""
+
 msgid "0 for unlimited"
 msgstr ""
 
@@ -4990,6 +4996,9 @@ msgid "Go to project"
 msgstr ""
 
 msgid "Go to your fork"
+msgstr ""
+
+msgid "Go up one level"
 msgstr ""
 
 msgid "Google Code import"
@@ -12154,6 +12163,9 @@ msgid "Wiki|Show files separately"
 msgstr ""
 
 msgid "Wiki|Show folder contents"
+msgstr ""
+
+msgid "Wiki|The current page"
 msgstr ""
 
 msgid "Wiki|Title"
