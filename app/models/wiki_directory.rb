@@ -26,30 +26,35 @@ class WikiDirectory
 
   alias_method :to_param, :slug
 
-  # Sorts and groups pages by directory.
-  #
-  # pages - an array of WikiPage objects.
-  #
-  # Returns an array of WikiPage and WikiDirectory objects.
-  # The entries are sorted in the order of the input array, where
-  # directories appear in the position of their first member.
-  def self.group_by_directory(pages)
-    grouped = []
-    dirs = Hash.new do |h, k|
-      new(k).tap do |dir|
-        h[k] = dir
-        if dir.root_dir?
-          grouped << dir
-        else
-          h[dir.directory] << dir
-        end
+  class << self
+    # Sorts and groups pages by directory.
+    #
+    # pages - an array of WikiPage objects.
+    #
+    # Returns an array of WikiPage and WikiDirectory objects.
+    # The entries are sorted in the order of the input array, where
+    # directories appear in the position of their first member.
+    def group_by_directory(pages)
+      grouped = []
+      dirs = grouping_map(grouped)
+
+      (pages.presence || []).each_with_object(grouped) do |page, top_level|
+        group = page.directory.present? ? dirs[page.directory] : top_level
+
+        group << page
       end
     end
 
-    (pages.presence || []).each_with_object(grouped) do |page, top_level|
-      group = page.directory.present? ? dirs[page.directory] : top_level
+    private
 
-      group << page
+    def grouping_map(top_level)
+      Hash.new do |h, k|
+        new(k).tap do |dir|
+          h[k] = dir
+          parent = dir.root_dir? ? top_level : h[dir.directory]
+          parent << dir
+        end
+      end
     end
   end
 

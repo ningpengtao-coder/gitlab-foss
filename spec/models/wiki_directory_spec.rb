@@ -50,18 +50,18 @@ RSpec.describe WikiDirectory do
         described_class.new('dir_1/dir_1_1', [wiki.find_page('dir_1/dir_1_1/page_3')])
       end
       let(:dir_2) do
-        pages = [wiki.find_page('dir_2/page_5'),
-                 wiki.find_page('dir_2/page_4')]
+        pages = [wiki.find_page('dir_2/page_4'),
+                 wiki.find_page('dir_2/page_5')]
         described_class.new('dir_2', pages)
       end
 
       context "#list_pages" do
         shared_examples "a correct grouping" do
           let(:grouped_slugs) { grouped_entries.map(&method(:slugs)) }
-          let(:expected_slugs) { expected_grouped_entries.map(&method(:slugs)).map(&method(:match_array)) }
+          let(:expected_slugs) { expected_grouped_entries.map(&method(:slugs)) }
 
           it 'returns an array with pages and directories' do
-            expect(grouped_slugs).to match_array(expected_slugs)
+            expect(grouped_slugs).to eq expected_slugs
           end
         end
 
@@ -73,19 +73,16 @@ RSpec.describe WikiDirectory do
           it_behaves_like "a correct grouping"
         end
 
-        context 'sort by created_at' do
-          let(:grouped_entries) { described_class.group_by_directory(wiki.list_pages(sort: 'created_at')) }
-          let(:expected_grouped_entries) { [page_1, dir_1, page_dir_2, dir_2, page_6] }
-
-          it_behaves_like "a correct grouping"
-        end
-
         it 'returns an array with retained order with directories at the top' do
-          expected_order = ['dir_1/dir_1_1/page_3', 'dir_1/page_2', 'dir_2', 'dir_2/page_4', 'dir_2/page_5', 'page_1', 'page_6']
+          expected_order = [[['dir_1/dir_1_1/page_3'], 'dir_1/page_2'],
+                            'dir_2',
+                            ['dir_2/page_4', 'dir_2/page_5'],
+                            'page_1',
+                            'page_6']
 
           grouped_entries = described_class.group_by_directory(wiki.list_pages)
 
-          actual_order = grouped_entries.flat_map(&method(:slugs))
+          actual_order = grouped_entries.map(&method(:slugs))
 
           expect(actual_order).to eq(expected_order)
         end
@@ -215,6 +212,6 @@ RSpec.describe WikiDirectory do
   end
 
   def slugs(thing)
-    Array.wrap(thing.respond_to?(:pages) ? thing.pages.flat_map(&method(:slugs)) : thing.slug)
+    thing.respond_to?(:pages) ? thing.pages.map(&method(:slugs)) : thing.slug
   end
 end
