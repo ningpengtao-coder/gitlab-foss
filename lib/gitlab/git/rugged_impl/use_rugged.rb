@@ -5,7 +5,6 @@ module Gitlab
     module RuggedImpl
       module UseRugged
         def use_rugged?(repo, feature_key)
-          return false
           feature = Feature.get(feature_key)
           return feature.enabled? if Feature.persisted?(feature)
 

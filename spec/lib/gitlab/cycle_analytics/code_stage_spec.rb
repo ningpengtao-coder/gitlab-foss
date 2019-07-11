@@ -10,13 +10,13 @@ describe Gitlab::CycleAnalytics::CodeStage do
   let(:issue_3) { create(:issue, project: project, created_at: 60.minutes.ago) }
   let(:mr_1) { create(:merge_request, source_project: project, created_at: 15.minutes.ago) }
   let(:mr_2) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'A') }
-  let!(:mr_3) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'B') }
   let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: project.creator, project: project }) }
 
   before do
     issue_1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago, first_mentioned_in_commit_at: 45.minutes.ago)
     issue_2.metrics.update!(first_added_to_board_at: 60.minutes.ago, first_mentioned_in_commit_at: 40.minutes.ago)
     issue_3.metrics.update!(first_added_to_board_at: 60.minutes.ago, first_mentioned_in_commit_at: 40.minutes.ago)
+    create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'B')
     create(:merge_requests_closing_issues, merge_request: mr_1, issue: issue_1)
     create(:merge_requests_closing_issues, merge_request: mr_2, issue: issue_2)
   end
