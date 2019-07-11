@@ -6,7 +6,7 @@ module CycleAnalytics
 
     def initialize(project, options:)
       @project = project
-      @options = options
+      @options = options.merge(project: project)
     end
 
     def summary

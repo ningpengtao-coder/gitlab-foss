@@ -5,10 +5,9 @@ module Gitlab
     class BaseStage
       include BaseQuery
 
-      attr_reader :project, :options
+      attr_reader :options
 
-      def initialize(project: nil, options:)
-        @project = project
+      def initialize(options:)
         @options = options
       end
 
@@ -24,7 +23,7 @@ module Gitlab
         raise NotImplementedError.new("Expected #{self.name} to implement title")
       end
 
-      def median
+      def project_median
         return if project.nil?
 
         BatchLoader.for(project.id).batch(key: name) do |project_ids, loader|
@@ -71,8 +70,7 @@ module Gitlab
       private
 
       def event_fetcher
-        @event_fetcher ||= Gitlab::CycleAnalytics::EventFetcher[name].new(project: project,
-                                                                          stage: name,
+        @event_fetcher ||= Gitlab::CycleAnalytics::EventFetcher[name].new(stage: name,
                                                                           options: event_options)
       end
 
@@ -86,6 +84,10 @@ module Gitlab
 
       def group
         @group ||= options.fetch(:group, nil)
+      end
+
+      def project
+        @project ||= options.fetch(:project, nil)
       end
     end
   end

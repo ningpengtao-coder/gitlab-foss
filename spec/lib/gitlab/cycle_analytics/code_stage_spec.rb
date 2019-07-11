@@ -11,7 +11,7 @@ describe Gitlab::CycleAnalytics::CodeStage do
   let(:mr_1) { create(:merge_request, source_project: project, created_at: 15.minutes.ago) }
   let(:mr_2) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'A') }
   let!(:mr_3) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'B') }
-  let(:stage) { described_class.new(project: project, options: { from: 2.days.ago, current_user: project.creator }) }
+  let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: project.creator, project: project }) }
 
   before do
     issue_1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago, first_mentioned_in_commit_at: 45.minutes.ago)
@@ -23,13 +23,13 @@ describe Gitlab::CycleAnalytics::CodeStage do
 
   it_behaves_like 'base stage'
 
-  describe '#median' do
+  describe '#project_median' do
     around do |example|
       Timecop.freeze { example.run }
     end
 
     it 'counts median from issues with metrics' do
-      expect(stage.median).to eq(ISSUES_MEDIAN)
+      expect(stage.project_median).to eq(ISSUES_MEDIAN)
     end
   end
 
