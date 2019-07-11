@@ -144,7 +144,6 @@ To learn more about configuration options for GitLab Pages, read the following:
 |---+---|
 | [Custom domains and SSL/TLS Certificates](getting_started_part_three.md) | How to add custom domains and subdomains to your website, configure DNS records and SSL/TLS certificates. |
 | [CloudFlare certificates](https://about.gitlab.com/2017/02/07/setting-up-gitlab-pages-with-cloudflare-certificates/) | Secure your Pages site with CloudFlare certificates. |
-| [Let's Encrypt certificates](lets_encrypt_for_gitlab_pages.md) | Secure your Pages site with Let's Encrypt certificates. |
 |---+---|
 | [Static vs dynamic websites](https://about.gitlab.com/2016/06/03/ssg-overview-gitlab-pages-part-1-dynamic-x-static/) | A conceptual overview on static versus dynamic sites. |
 | [Modern static site generators](https://about.gitlab.com/2016/06/10/ssg-overview-gitlab-pages-part-2/) | A conceptual overview on SSGs. |

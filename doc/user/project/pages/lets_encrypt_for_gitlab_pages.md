@@ -6,6 +6,8 @@ last_updated: 2019-06-04
 
 # Let's Encrypt for GitLab Pages
 
+**This tutorial is DEPRECATED** in favor of [seemless integration](using-certificates-provided-by-lets-encrypt).
+
 If you have a GitLab Pages website served under your own domain,
 you might want to secure it with a SSL/TSL certificate.
 

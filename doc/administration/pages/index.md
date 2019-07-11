@@ -265,6 +265,22 @@ verification requirement. Navigate to `Admin area ➔ Settings` and uncheck
 **Require users to prove ownership of custom domains** in the Pages section.
 This setting is enabled by default.
 
+### Let's Encrypt integration
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/28996) in GitLab 12.1.
+
+To allow users to
+[use SSL certificates provided by Let's Encrypt](../../user/project/pages/getting_started_part_three.md#using-certificates-provided-by-lets-encrypt)
+you need to enable integration.
+
+You need to:
+1. Choose an email on which you will recieve notifications about expiring domains.
+2. Visit [admin page](/admin/application_settings/preferences),
+3. Expand "Pages" settings group, enter email and accept Let's Encrypt's Terms of Service as shonw below.
+4. Click "Save changes".
+
+![Let's Encrypt settings](img/lets_encrypt.png)
+
 ### Access control
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/33422) in GitLab 11.5.

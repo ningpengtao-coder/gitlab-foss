@@ -244,11 +244,38 @@ with a certain security level. A static personal website will
 not require the same security level as an online banking web app,
 for instance.
 
+### Using certificates provided by Let's Encrypt
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/28996) in GitLab 12.1.
+
 There are some certificate authorities that
 offer free certificates, aiming to make the internet more secure
 to everyone. The most popular is [Let's Encrypt](https://letsencrypt.org/),
 which issues certificates trusted by most of browsers, it's open
-source, and free to use. See our tutorial on [how to secure your GitLab Pages website with Let's Encrypt](lets_encrypt_for_gitlab_pages.md).
+source, and free to use.
+
+#### Requirements
+
+Befor you can enable automatic provisioning of SSL certificate for you domain, we you should already have:
+
+- Created a [project](getting_started_part_two.md) in GitLab which
+  contains your website's source code.
+- Acquired a domain (`example.com`) and added a [DNS entry](getting_started_part_three.md#dns-records)
+  pointing it to your Pages website.
+- [Added your domain to your Pages project](getting_started_part_three.md#add-your-custom-domain-to-gitlab-pages-settings)
+  and verified your ownership.
+- If you use **self-hosted** GitLab instance, you also need to ask you administrator to [enable integration with Let's Encrypt](../../../administration/pages/index.md#lets-encrypt-integration).
+
+If you've already done all that you can enable Let's Encrypt integration on domain settings page:
+
+![Enable Let's Encrypt](img/lets_encrypt.png)
+
+Note that issuance of cerficate and updating pages configuration **can take up to an hour**.
+
+If you already have SSL certificate in domain settings it will continue to work until it will replaced
+by Let's Encrypt's certificate.
+
+### Using certificates provided by CloudFlare
 
 Similarly popular are [certificates issued by CloudFlare](https://www.cloudflare.com/ssl/),
 which also offers a [free CDN service](https://blog.cloudflare.com/cloudflares-free-cdn-and-you/).
