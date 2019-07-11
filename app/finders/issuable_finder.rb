@@ -487,9 +487,9 @@ class IssuableFinder
   def by_milestone(items)
     if milestones?
       if filter_by_no_milestone?
-        items = items.left_joins_milestones.where(milestone_id: [-1, nil])
+        items = items.left_joins_milestones.where(milestone_id: nil)
       elsif filter_by_any_milestone?
-        items = items.any_milestone
+        items
       elsif filter_by_upcoming_milestone?
         upcoming_ids = Milestone.upcoming_ids(projects, related_groups)
         items = items.left_joins_milestones.where(milestone_id: upcoming_ids)
