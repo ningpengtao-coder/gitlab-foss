@@ -39,4 +39,4 @@ rule "MD038" # Spaces inside code span elements
 
 rule "MD040" # Fenced code blocks should have a language specified
 rule "MD046" # Code block style
-rule "MD047" # Files should end with a single newline character
+# rule "MD047" # Files should end with a single newline character
