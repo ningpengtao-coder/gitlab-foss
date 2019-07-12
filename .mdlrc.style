@@ -6,7 +6,6 @@
 
 rule "MD001"
 rule "MD003", :style => :atx
-rule "MD010"
 rule "MD011"
 rule "MD023"
 rule "MD032"
@@ -18,6 +17,7 @@ rule "MD005" # don't allow inconsistent indentation for list items
 rule "MD006" # start bullets at beginning of line
 rule "MD007" # unordered list indentation should be 2 spaces
 rule "MD009" # trailing spaces not allowed
+rule "MD010" # Hard Tabs
 rule "MD012" # alert on multiple consecutive blank lines
 rule "MD018" # must have space after header style
 rule "MD019" # no multiple spaces after header style
@@ -37,5 +37,5 @@ rule "MD035", :style => "---" # Horizontal rule style
 # rule "MD036" # Emphasis used instead of a header  ***
 rule "MD038" # Spaces inside code span elements
 
-rule "MD040" # Fenced code blocks should have a language specified
+# rule "MD040" # Fenced code blocks should have a language specified
 rule "MD046" # Code block style
