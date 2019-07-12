@@ -6,7 +6,7 @@
 
 ## List Releases
 
-Paginated list of Releases, sorted by `created_at`.
+Paginated list of Releases, sorted by `released_at`.
 
 ```
 GET /projects/:id/releases
@@ -488,3 +488,9 @@ Example response:
    }
 }
 ```
+
+## Upcoming Releases
+
+A release with a `released_at` in the future will be labeled an "Upcoming Release" in the UI:
+
+![Upcoming release](img/upcoming_release.png)
