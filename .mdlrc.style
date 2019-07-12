@@ -34,9 +34,8 @@ rule "MD031" # fenced code blocks need line surrounding
 
 rule "MD035", :style => "---" # Horizontal rule style
 
-rule "MD036" # Emphasis used instead of a header
+rule "MD036" # Emphasis used instead of a header  ***
 rule "MD038" # Spaces inside code span elements
 
 rule "MD040" # Fenced code blocks should have a language specified
 rule "MD046" # Code block style
-rule "MD047" # Files should end with a single newline character
