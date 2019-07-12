@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190703130053) do
+ActiveRecord::Schema.define(version: 20190711111748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -190,10 +190,8 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.integer "elasticsearch_replicas", default: 1, null: false
     t.text "encrypted_lets_encrypt_private_key"
     t.text "encrypted_lets_encrypt_private_key_iv"
-    t.string "required_instance_ci_template"
     t.boolean "dns_rebinding_protection_enabled", default: true, null: false
     t.boolean "default_project_deletion_protection", default: false, null: false
-    t.boolean "grafana_enabled", default: false, null: false
     t.boolean "lock_memberships_to_ldap", default: false, null: false
     t.text "help_text"
     t.boolean "elasticsearch_indexing", default: false, null: false
@@ -226,7 +224,9 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.integer "custom_project_templates_group_id"
     t.boolean "elasticsearch_limit_indexing", default: false, null: false
     t.string "geo_node_allowed_ips", default: "0.0.0.0/0, ::/0"
+    t.string "required_instance_ci_template"
     t.boolean "time_tracking_limit_to_hours", default: false, null: false
+    t.boolean "grafana_enabled", default: false, null: false
     t.string "grafana_url", default: "/-/grafana", null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
@@ -1086,6 +1086,8 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.integer "project_id", null: false
     t.integer "issue_id", null: false
     t.string "filename", null: false
+    t.bigint "deleted_in_version_id"
+    t.index ["deleted_in_version_id"], name: "index_design_management_designs_on_deleted_in_version_id", using: :btree
     t.index ["issue_id", "filename"], name: "index_design_management_designs_on_issue_id_and_filename", unique: true, using: :btree
     t.index ["project_id"], name: "index_design_management_designs_on_project_id", using: :btree
   end
@@ -2531,7 +2533,7 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.index ["project_id"], name: "index_project_import_data_on_project_id", using: :btree
   end
 
-  create_table "project_incident_management_settings", primary_key: "project_id", id: :serial, force: :cascade do |t|
+  create_table "project_incident_management_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
     t.boolean "create_issue", default: true, null: false
     t.boolean "send_email", default: false, null: false
     t.text "issue_template_key"
@@ -2882,6 +2884,7 @@ ActiveRecord::Schema.define(version: 20190703130053) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path"], name: "index_redirect_routes_on_path", unique: true, using: :btree
+    t.index ["path"], name: "index_redirect_routes_on_path_text_pattern_ops", using: :btree, opclasses: {"path"=>"varchar_pattern_ops"}
     t.index ["source_type", "source_id"], name: "index_redirect_routes_on_source_type_and_source_id", using: :btree
   end
 
@@ -3671,6 +3674,7 @@ ActiveRecord::Schema.define(version: 20190703130053) do
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "clusters", name: "fk_289bba3222", on_delete: :nullify
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
+  add_foreign_key "design_management_designs", "design_management_versions", column: "deleted_in_version_id", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
   add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", name: "fk_03c671965c", on_delete: :cascade
