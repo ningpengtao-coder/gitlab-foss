@@ -50,7 +50,7 @@ export default {
 
 <template>
   <div v-if="resolvableDiscussionsCount > 0" class="line-resolve-all-container full-width-mobile">
-    <div class="full-width-mobile d-flex d-sm-block">
+    <div class="full-width-mobile d-flex">
       <div :class="{ 'has-next-btn': hasNextButton }" class="line-resolve-all">
         <span
           :class="{ 'is-active': allResolved }"
@@ -64,29 +64,27 @@ export default {
           {{ n__('thread resolved', 'threads resolved', resolvableDiscussionsCount) }}
         </span>
       </div>
-      <div
-        v-if="resolveAllDiscussionsIssuePath && !allResolved"
-        class="btn-group btn-group-sm"
-        role="group"
-      >
-        <a
-          v-gl-tooltip
-          :href="resolveAllDiscussionsIssuePath"
-          :title="s__('Resolve all threads in new issue')"
-          class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
-        >
-          <icon name="issue-new" />
-        </a>
-      </div>
-      <div v-if="isLoggedIn && !allResolved" class="btn-group btn-group-sm" role="group">
-        <button
-          v-gl-tooltip
-          title="Jump to first unresolved thread"
-          class="btn btn-default discussion-next-btn"
-          @click="jumpToFirstUnresolvedDiscussion"
-        >
-          <icon name="comment-next" />
-        </button>
+      <div class="btn-group btn-group-sm" role="group">
+        <template v-if="resolveAllDiscussionsIssuePath && !allResolved">
+          <a
+            v-gl-tooltip
+            :href="resolveAllDiscussionsIssuePath"
+            :title="s__('Resolve all threads in new issue')"
+            class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
+          >
+            <icon name="issue-new" />
+          </a>
+        </template>
+        <template v-if="isLoggedIn && !allResolved">
+          <button
+            v-gl-tooltip
+            title="Jump to first unresolved thread"
+            class="btn btn-default discussion-next-btn"
+            @click="jumpToFirstUnresolvedDiscussion"
+          >
+            <icon name="comment-next" />
+          </button>
+        </template>
       </div>
     </div>
   </div>
