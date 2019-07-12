@@ -7,6 +7,7 @@
 rule "MD001"
 rule "MD003", :style => :atx
 rule "MD011"
+rule "MD018" # must have space after header style
 rule "MD023"
 rule "MD032"
 rule "MD034"
@@ -19,7 +20,6 @@ rule "MD007" # unordered list indentation should be 2 spaces
 rule "MD009" # trailing spaces not allowed
 rule "MD010" # Hard Tabs
 rule "MD012" # alert on multiple consecutive blank lines
-rule "MD018" # must have space after header style
 rule "MD019" # no multiple spaces after header style
 rule "MD022" # headers should be surrounded by blank lines
 rule "MD024", :allow_different_nesting => true # no multiple headers with same content
