@@ -4,6 +4,7 @@ import {
   changeSelectedMr,
   logoutUser,
   postComment,
+  saveComment,
   toggleForm,
   CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
@@ -14,6 +15,7 @@ import {
 } from '../components';
 
 import { state } from './state';
+import debounce from './utils';
 
 const noop = () => {};
 
@@ -23,7 +25,10 @@ const noop = () => {};
 const eventLookup = ({ target: { id } }) => {
   switch (id) {
     case CHANGE_MR_ID_BUTTON:
-      return changeSelectedMr.bind(null, state);
+      return () => {
+        saveComment();
+        changeSelectedMr(state);
+      };
     case COLLAPSE_BUTTON:
       return toggleForm;
     case COMMENT_BUTTON:
@@ -31,7 +36,10 @@ const eventLookup = ({ target: { id } }) => {
     case LOGIN:
       return authorizeUser.bind(null, state);
     case LOGOUT:
-      return logoutUser.bind(null, state);
+      return () => {
+        saveComment();
+        logoutUser(state);
+      };
     case MR_ID_BUTTON:
       return addMr.bind(null, state);
     default:
@@ -44,4 +52,11 @@ const updateWindowSize = wind => {
   state.innerHeight = wind.innerHeight;
 };
 
-export { eventLookup, updateWindowSize };
+const initializeGlobalListeners = () => {
+  window.addEventListener('resize', debounce(updateWindowSize.bind(null, window), 200));
+  window.addEventListener('beforeunload', () => {
+    saveComment();
+  });
+};
+
+export { eventLookup, initializeGlobalListeners };

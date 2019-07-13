@@ -1,4 +1,4 @@
-import { changeSelectedMr, comment, logoutUser, postComment } from './comment';
+import { changeSelectedMr, comment, logoutUser, postComment, saveComment } from './comment';
 import {
   CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
@@ -28,6 +28,7 @@ export {
   mrForm,
   note,
   postComment,
+  saveComment,
   selectContainer,
   toggleForm,
   CHANGE_MR_ID_BUTTON,

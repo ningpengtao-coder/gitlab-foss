@@ -1,7 +1,7 @@
 import './styles/toolbar.css';
 
 import { buttonAndForm, note, selectContainer, REVIEW_CONTAINER } from './components';
-import { debounce, eventLookup, getInitialView, initializeState, updateWindowSize } from './store';
+import { eventLookup, getInitialView, initializeGlobalListeners, initializeState } from './store';
 
 /*
 
@@ -32,5 +32,5 @@ window.addEventListener('load', () => {
     eventLookup(event)();
   });
 
-  window.addEventListener('resize', debounce(updateWindowSize.bind(null, window), 200));
+  initializeGlobalListeners();
 });
