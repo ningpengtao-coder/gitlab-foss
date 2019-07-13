@@ -17,8 +17,8 @@ module Gitlab
               .fabricate(attributes.delete(:only))
             @except = Gitlab::Ci::Build::Policy
               .fabricate(attributes.delete(:except))
-            @rules = Gitlab::Ci::Build::rules
-              .fabricate(attributes.delete(:rules)
+            @rules = Gitlab::Ci::Build::Rules
+              .fabricate(attributes.delete(:rules))
           end
 
           def included?

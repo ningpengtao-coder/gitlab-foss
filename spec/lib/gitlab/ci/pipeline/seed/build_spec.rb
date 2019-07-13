@@ -359,7 +359,7 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
       end
     end
 
-    context 'when repository path does not matches' do
+    context 'when repository path does not match' do
       context 'when using only' do
         let(:attributes) do
           { name: 'rspec', only: { refs: %w[branches@fork] } }
@@ -394,7 +394,7 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
       let(:attributes) { { name: 'rspec', rules: rule_set } }
 
-      context 'with a matching policy' do
+      context 'with a matching if: policy' do
         context 'with an explicit `drop` policy outcome' do
           where(:rule_set) do
             [
@@ -459,7 +459,8 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
       end
 
       context 'with no policies' do
-        let(:rule_set) { [ ] }
+        let(:rule_set) { [] }
+        it { is_expected.to be_included }
       end
     end
   end

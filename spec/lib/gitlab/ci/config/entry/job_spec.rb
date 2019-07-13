@@ -9,7 +9,7 @@ describe Gitlab::Ci::Config::Entry::Job do
 
       let(:result) do
         %i[before_script script stage type after_script cache
-           image services only except variables artifacts
+           image services only except rules variables artifacts
            environment coverage retry]
       end
 
