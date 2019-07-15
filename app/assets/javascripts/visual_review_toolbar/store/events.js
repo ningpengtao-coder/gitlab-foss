@@ -54,8 +54,15 @@ const updateWindowSize = wind => {
 
 const initializeGlobalListeners = () => {
   window.addEventListener('resize', debounce(updateWindowSize.bind(null, window), 200));
-  window.addEventListener('beforeunload', () => {
-    saveComment();
+  window.addEventListener('beforeunload', event => {
+    try {
+      saveComment();
+    } catch (err) {
+      // in this case, if saving the comment fails,
+      // the user will be warned
+      event.preventDefault();
+      event.returnValue = '';
+    }
   });
 };
 
