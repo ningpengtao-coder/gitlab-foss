@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module CycleAnalytics
-  class Base
+  module BaseMethods
     STAGES = %i[issue plan code test review staging production].freeze
 
     def all_medians_by_stage

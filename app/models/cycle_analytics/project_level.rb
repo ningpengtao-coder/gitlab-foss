@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module CycleAnalytics
-  class ProjectLevel < Base
+  class ProjectLevel
+    include BaseMethods
     attr_reader :project, :options
 
     def initialize(project, options:)

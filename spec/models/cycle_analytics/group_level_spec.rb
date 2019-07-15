@@ -12,7 +12,7 @@ describe CycleAnalytics::GroupLevel do
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
-  subject { described_class.new(project: nil, options: { from: from_date, group: group, current_user: user }) }
+  subject { described_class.new(options: { from: from_date, group: group, current_user: user }) }
 
   describe '#permissions' do
     it 'returns permissions' do

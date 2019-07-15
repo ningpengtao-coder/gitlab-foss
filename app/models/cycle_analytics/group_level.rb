@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module CycleAnalytics
-  class GroupLevel < Base
+  class GroupLevel
+    include BaseMethods
     attr_reader :options
 
-    def initialize(project: nil, options:)
-      @project = project
+    def initialize(options:)
       @options = options
     end
 
