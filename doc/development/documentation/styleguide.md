@@ -648,6 +648,21 @@ How it renders in docs.gitlab.com:
 DANGER: **Danger:**
 This is a breaking change, a bug, or something very important to note.
 
+### Announcement
+
+Use it for marketing announcements and other calls to action.
+Requires review and approval from a technical writer.
+
+```md
+CTA: **Announcement:**
+This is an announcement.
+```
+
+How it renders in docs.gitlab.com:
+
+CTA: **Announcement:**
+This is an announcement.
+
 ## Blockquotes
 
 For highlighting a text within a blue blockquote, use this format:
