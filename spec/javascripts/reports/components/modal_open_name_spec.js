@@ -34,12 +34,4 @@ describe('Modal open name', () => {
   it('renders the issue name', () => {
     expect(vm.$el.textContent.trim()).toEqual('Issue');
   });
-
-  it('calls openModal actions when button is clicked', () => {
-    spyOn(vm, 'openModal');
-
-    vm.$el.click();
-
-    expect(vm.openModal).toHaveBeenCalled();
-  });
 });
