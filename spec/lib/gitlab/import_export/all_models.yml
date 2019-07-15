@@ -397,6 +397,7 @@ project:
 - merge_trains
 - designs
 - project_aliases
+- project_pages_metadatum
 award_emoji:
 - awardable
 - user

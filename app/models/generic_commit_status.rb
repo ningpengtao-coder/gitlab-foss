@@ -3,6 +3,8 @@
 class GenericCommitStatus < CommitStatus
   before_validation :set_default_values
 
+  scope :successful_pages_deploy, -> { success.where(stage: 'deploy', name: 'pages:deploy') }
+
   validates :target_url, addressable_url: true,
                          length: { maximum: 255 },
                          allow_nil: true

@@ -599,6 +599,7 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
     t.index ["name"], name: "index_ci_builds_on_name_for_security_products_values", where: "((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text]))"
     t.index ["project_id", "id"], name: "index_ci_builds_on_project_id_and_id"
     t.index ["project_id", "status"], name: "index_ci_builds_project_id_and_status_for_live_jobs_partial2", where: "(((type)::text = 'Ci::Build'::text) AND ((status)::text = ANY (ARRAY[('running'::character varying)::text, ('pending'::character varying)::text, ('created'::character varying)::text])))"
+    t.index ["project_id"], name: "index_ci_builds_on_project_id_for_successfull_pages_deploy", where: "(((type)::text = 'GenericCommitStatus'::text) AND ((stage)::text = 'deploy'::text) AND ((name)::text = 'pages:deploy'::text) AND ((status)::text = 'success'::text))"
     t.index ["protected"], name: "index_ci_builds_on_protected"
     t.index ["queued_at"], name: "index_ci_builds_on_queued_at"
     t.index ["runner_id"], name: "index_ci_builds_on_runner_id"
@@ -2686,6 +2687,15 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
     t.index ["status"], name: "index_project_mirror_data_on_status"
   end
 
+  create_table "project_pages_metadata", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.boolean "deployed", default: false, null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["deployed"], name: "index_project_pages_metadata_on_deployed"
+    t.index ["project_id"], name: "index_project_pages_metadata_on_project_id", unique: true
+  end
+
   create_table "project_repositories", force: :cascade do |t|
     t.integer "shard_id", null: false
     t.string "disk_path", null: false
@@ -3976,6 +3986,7 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
   add_foreign_key "project_incident_management_settings", "projects", on_delete: :cascade
   add_foreign_key "project_metrics_settings", "projects", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", on_delete: :cascade
+  add_foreign_key "project_pages_metadata", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade

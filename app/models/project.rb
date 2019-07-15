@@ -61,11 +61,11 @@ class Project < ApplicationRecord
 
   cache_markdown_field :description, pipeline: :description
 
-  delegate :feature_available?, :builds_enabled?, :wiki_enabled?,
-           :merge_requests_enabled?, :issues_enabled?, :pages_enabled?, :public_pages?,
-           :merge_requests_access_level, :issues_access_level, :wiki_access_level,
-           :snippets_access_level, :builds_access_level, :repository_access_level,
-           to: :project_feature, allow_nil: true
+  delegate :feature_available?, :builds_enabled?, :wiki_enabled?, :merge_requests_enabled?,
+    :issues_enabled?, :pages_enabled?, :public_pages?, :private_pages?,
+    :merge_requests_access_level, :issues_access_level, :wiki_access_level,
+    :snippets_access_level, :builds_access_level, :repository_access_level,
+    to: :project_feature, allow_nil: true
 
   delegate :base_dir, :disk_path, :ensure_storage_path_exists, to: :storage
 
@@ -291,6 +291,8 @@ class Project < ApplicationRecord
   has_many :remote_mirrors, inverse_of: :project
   has_many :cycle_analytics_stages, class_name: 'Analytics::CycleAnalytics::ProjectStage'
 
+  has_one :project_pages_metadatum, inverse_of: :project
+
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
   accepts_nested_attributes_for :import_data
@@ -419,6 +421,14 @@ class Project < ApplicationRecord
   scope :with_group_runners_enabled, -> do
     joins(:ci_cd_settings)
     .where(project_ci_cd_settings: { group_runners_enabled: true })
+  end
+
+  scope :project_pages_metadata_not_migrated, -> do
+    where('NOT EXISTS (SELECT 1 FROM project_pages_metadata WHERE projects.id=project_pages_metadata.project_id)')
+  end
+
+  scope :with_pages_deployed, -> do
+    where('EXISTS (SELECT 1 FROM project_pages_metadata WHERE projects.id=project_pages_metadata.project_id AND deployed = TRUE)')
   end
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
@@ -592,6 +602,25 @@ class Project < ApplicationRecord
       with_merge_requests_enabled = with_merge_requests_available_for_user(user).select(:id)
 
       from_union([with_issues_enabled, with_merge_requests_enabled]).select(:id)
+    end
+
+    def migrate_project_pages_metadata
+      successful_pages_deploy = GenericCommitStatus
+        .successful_pages_deploy
+        .select('TRUE')
+        .where("ci_builds.project_id = projects.id").limit(1)
+        .to_sql
+
+      select_from = project_pages_metadata_not_migrated
+        .select("projects.id, COALESCE((#{successful_pages_deploy}), FALSE), NOW(), NOW()")
+        .to_sql
+
+      connection_pool.with_connection do |connection|
+        connection.execute <<~INSERT_SQL
+          INSERT INTO project_pages_metadata (project_id, deployed, created_at, updated_at)
+          #{select_from}
+        INSERT_SQL
+      end
     end
   end
 
@@ -1630,6 +1659,10 @@ class Project < ApplicationRecord
     "#{url}/#{url_path}"
   end
 
+  def pages_group_root?
+    pages_group_url == pages_url
+  end
+
   def pages_subdomain
     full_path.partition('/').first
   end
@@ -1668,6 +1701,7 @@ class Project < ApplicationRecord
     # Projects with a missing namespace cannot have their pages removed
     return unless namespace
 
+    mark_pages_as_not_deployed unless destroyed?
     ::Projects::UpdatePagesConfigurationService.new(self).execute
 
     # 1. We rename pages to temporary directory
@@ -1680,6 +1714,14 @@ class Project < ApplicationRecord
     end
   end
   # rubocop: enable CodeReuse/ServiceClass
+
+  def mark_pages_as_deployed
+    update_pages_deployed(true)
+  end
+
+  def mark_pages_as_not_deployed
+    update_pages_deployed(false)
+  end
 
   # rubocop:disable Gitlab/RailsLogger
   def write_repository_config(gl_full_path: full_path)
@@ -2199,6 +2241,10 @@ class Project < ApplicationRecord
     members.maintainers.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
   end
 
+  def pages_lookup_path(trim_prefix: nil, domain: nil)
+    Pages::LookupPath.new(self, trim_prefix: trim_prefix, domain: domain)
+  end
+
   private
 
   def merge_requests_allowing_collaboration(source_branch = nil)
@@ -2323,5 +2369,20 @@ class Project < ApplicationRecord
 
   def services_templates
     @services_templates ||= Service.where(template: true)
+  end
+
+  def update_pages_deployed(flag)
+    flag = flag ? 'TRUE' : 'FALSE'
+
+    upsert = <<~SQL
+      INSERT INTO project_pages_metadata (project_id, deployed, created_at, updated_at)
+      VALUES (#{id}, #{flag}, NOW(), NOW())
+      ON CONFLICT (project_id) DO UPDATE
+      SET deployed = EXCLUDED.deployed, updated_at = NOW()
+    SQL
+
+    self.class.connection_pool.with_connection do |connection|
+      connection.execute(upsert)
+    end
   end
 end

@@ -3489,6 +3489,7 @@ describe Project do
 
   describe '#remove_pages' do
     let(:project) { create(:project) }
+    let(:project_pages_metadatum) { create(:project_pages_metadatum, project: project, deployed: true) }
     let(:namespace) { project.namespace }
     let(:pages_path) { project.pages_path }
 
@@ -3501,12 +3502,12 @@ describe Project do
       end
     end
 
-    it 'removes the pages directory' do
+    it 'removes the pages directory and marks the project as not having pages deployed' do
       expect_any_instance_of(Projects::UpdatePagesConfigurationService).to receive(:execute)
       expect_any_instance_of(Gitlab::PagesTransfer).to receive(:rename_project).and_return(true)
       expect(PagesWorker).to receive(:perform_in).with(5.minutes, :remove, namespace.full_path, anything)
 
-      project.remove_pages
+      expect { project.remove_pages }.to change { project_pages_metadatum.reload.deployed }.from(true).to(false)
     end
 
     it 'is a no-op when there is no namespace' do
@@ -3516,13 +3517,13 @@ describe Project do
       expect_any_instance_of(Projects::UpdatePagesConfigurationService).not_to receive(:execute)
       expect_any_instance_of(Gitlab::PagesTransfer).not_to receive(:rename_project)
 
-      project.remove_pages
+      expect { project.remove_pages }.not_to change { project_pages_metadatum.reload.deployed }
     end
 
     it 'is run when the project is destroyed' do
       expect(project).to receive(:remove_pages).and_call_original
 
-      project.destroy
+      expect { project.destroy }.not_to raise_error
     end
   end
 
@@ -4972,6 +4973,50 @@ describe Project do
         project.check_personal_projects_limit
 
         expect(project.errors).to be_empty
+      end
+    end
+  end
+
+  describe '.migrate_project_pages_metadata' do
+    it 'marks projects with successful pages deployment' do
+      not_migrated_with_pages = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy').project
+      not_migrated_no_pages = create(:project)
+      migrated = create(:project_pages_metadatum, deployed: true).project
+      other_project = create(:project)
+
+      projects = described_class.where(id: [not_migrated_with_pages, not_migrated_no_pages, migrated])
+
+      expect { projects.migrate_project_pages_metadata }.not_to raise_error
+
+      expect(not_migrated_with_pages.project_pages_metadatum.deployed).to eq(true)
+      expect(not_migrated_no_pages.project_pages_metadatum.deployed).to eq(false)
+      expect(migrated.project_pages_metadatum.deployed).to eq(true)
+      expect(other_project.project_pages_metadatum).to be_nil
+    end
+  end
+
+  context 'pages deployed' do
+    {
+      'mark_pages_as_deployed' => true,
+      'mark_pages_as_not_deployed' => false
+    }.each do |method, flag|
+      describe "##{method}" do
+        it "creates new record and sets deployed to #{flag} if none exists yet" do
+          project = create(:project)
+
+          project.send(method)
+
+          expect(project.project_pages_metadatum.deployed).to eq(flag)
+        end
+
+        it "updates the existing record and sets deployed to #{flag}" do
+          project_pages_metadatum = create(:project_pages_metadatum, deployed: !flag)
+          project = project_pages_metadatum.project
+
+          expect { project.send(method) }.to change {
+            project_pages_metadatum.reload.deployed
+          }.from(!flag).to(flag)
+        end
       end
     end
   end
