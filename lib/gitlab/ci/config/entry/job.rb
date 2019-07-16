@@ -17,6 +17,7 @@ module Gitlab
                             environment coverage retry parallel extends].freeze
 
           validations do
+            validates :config, type: Hash
             validates :config, allowed_keys: ALLOWED_KEYS
             validates :config, presence: true
             validates :script, presence: true
@@ -25,7 +26,7 @@ module Gitlab
             validate  :rules_only_except_exclusivity
 
             def rules_only_except_exclusivity
-              return unless config.key?(:rules)
+              return unless config.try(:key?, :rules)
 
               errors.add(:config, '`only:` may not be used with `rules:`') if config.key?(:only)
               errors.add(:config, '`except:` may not be used with `rules:`') if config.key?(:except)
