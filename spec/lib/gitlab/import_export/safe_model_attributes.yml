@@ -715,3 +715,16 @@ List:
 - updated_at
 - milestone_id
 - user_id
+DesignManagement::Design:
+- id
+- project_id
+- issue_id
+- filename
+DesignManagement::DesignVersion:
+- design_id
+- event
+- version_id
+DesignManagement::Version:
+- id
+- sha
+- issue_id

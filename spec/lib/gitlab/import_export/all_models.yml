@@ -23,6 +23,7 @@ issues:
 - epic_issue
 - epic
 - designs
+- versions
 events:
 - author
 - project
@@ -492,3 +493,16 @@ lists:
 milestone_releases:
 - milestone
 - release
+design: &design
+- issue
+- design_versions
+- versions
+- notes
+designs: *design
+design_versions:
+- design
+- version
+versions:
+- issue
+- designs
+- design_versions

@@ -228,6 +228,15 @@ methods:
 # into the previous structures if EE is used.
 ee:
   project_tree:
+    - issues:
+      - designs:
+        - notes:
+          - :author
+          - events:
+            - :push_event_payload
+      - versions:
+        - design_versions:
+          - :design # Duplicate export of issues.designs in order to link the record to both Issue and DesignVersion
     - protected_branches:
       - :unprotect_access_levels
     - protected_environments:
