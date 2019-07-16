@@ -1,49 +1,24 @@
 # frozen_string_literal: true
 
-# See http://doc.gitlab.com/ce/development/migration_style_guide.html
-# for more information on how to write migrations for GitLab.
-
 class DefaultWeightToNil < ActiveRecord::Migration[5.1]
-  include Gitlab::Database::MigrationHelpers
-
-  # Set this constant to true if this migration requires downtime.
   DOWNTIME = false
 
-  # When a migration requires downtime you **must** uncomment the following
-  # constant and define a short and easy to understand explanation as to why the
-  # migration requires downtime.
-  # DOWNTIME_REASON = ''
-
-  # When using the methods "add_concurrent_index", "remove_concurrent_index" or
-  # "add_column_with_default" you must disable the use of transactions
-  # as these methods can not run in an existing transaction.
-  # When using "add_concurrent_index" or "remove_concurrent_index" methods make sure
-  # that either of them is the _only_ method called in the migration,
-  # any other changes should go in a separate migration.
-  # This ensures that upon failure _only_ the index creation or removing fails
-  # and can be retried or reverted easily.
-  #
-  # To disable transactions uncomment the following line and remove these
-  # comments:
-  # disable_ddl_transaction!
-
   def up
-    update_board_weights_from_none_to_any
+    execute(update_board_weights_query)
   end
 
   def down
-    update_board_weights_from_any_to_none
+    # no-op
   end
 
-  # up method
+  private
 
-  def update_board_weights_from_none_to_any
-    execute("UPDATE boards SET weight = null WHERE weight = -1")
-  end
-
-  # down method
-
-  def update_board_weights_from_any_to_none
-    execute("UPDATE boards SET weight = -1 WHERE weight = null")
+  # Only 288 records to update, as of 2019/07/18
+  def update_board_weights_query
+    <<~HEREDOC
+   UPDATE boards
+     SET weight = NULL
+   WHERE boards.weight = -1
+    HEREDOC
   end
 end
