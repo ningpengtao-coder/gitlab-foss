@@ -9,8 +9,9 @@ import {
   metricsGroupsAPIResponse,
   mockApiEndpoint,
   environmentData,
-  singleGroupResponse,
   dashboardGitResponse,
+  metricsNewGroupsAPIResponse,
+  mockedQueryResultPayload,
 } from './mock_data';
 
 const propsData = {
@@ -161,12 +162,16 @@ describe('Dashboard', () => {
       });
 
       component.$store.commit(
+        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+        metricsNewGroupsAPIResponse,
+      );
+      component.$store.commit(`monitoringDashboard/${types.SET_QUERY_RESULT}`, {
+        metricId: mockedQueryResultPayload.metricId,
+        result: mockedQueryResultPayload.result,
+      });
+      component.$store.commit(
         `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
         environmentData,
-      );
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        singleGroupResponse,
       );
 
       Vue.nextTick()
@@ -200,11 +205,14 @@ describe('Dashboard', () => {
         store,
       });
 
-      component.$store.commit(`monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`, []);
       component.$store.commit(
         `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        singleGroupResponse,
+        metricsNewGroupsAPIResponse,
       );
+      component.$store.commit(`monitoringDashboard/${types.SET_QUERY_RESULT}`, {
+        metricId: mockedQueryResultPayload.metricId,
+        result: mockedQueryResultPayload.result,
+      });
 
       Vue.nextTick()
         .then(() => {
@@ -230,12 +238,16 @@ describe('Dashboard', () => {
       });
 
       component.$store.commit(
+        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+        metricsNewGroupsAPIResponse,
+      );
+      component.$store.commit(`monitoringDashboard/${types.SET_QUERY_RESULT}`, {
+        metricId: mockedQueryResultPayload.metricId,
+        result: mockedQueryResultPayload.result,
+      });
+      component.$store.commit(
         `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
         environmentData,
-      );
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        singleGroupResponse,
       );
 
       Vue.nextTick()
@@ -448,13 +460,18 @@ describe('Dashboard', () => {
       });
 
       component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
-        environmentData,
+        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+        metricsNewGroupsAPIResponse,
       );
 
+      component.$store.commit(`monitoringDashboard/${types.SET_QUERY_RESULT}`, {
+        metricId: mockedQueryResultPayload.metricId,
+        result: mockedQueryResultPayload.result,
+      });
+
       component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        singleGroupResponse,
+        `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
+        environmentData,
       );
 
       component.$store.commit(

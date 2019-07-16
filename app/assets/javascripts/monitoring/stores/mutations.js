@@ -27,8 +27,6 @@ export default {
 
     if (!state.groups.length) {
       state.emptyState = 'noData';
-    } else {
-      state.showEmptyState = false;
     }
   },
   [types.RECEIVE_METRICS_DATA_FAILURE](state, error) {

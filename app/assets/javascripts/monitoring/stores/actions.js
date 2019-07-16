@@ -84,9 +84,7 @@ export const fetchData = ({ dispatch }, params) => {
   dispatch('fetchEnvironmentsData');
 };
 
-export const fetchMetricsData = ({ state, dispatch }, params) => {
-  return dispatch('fetchDashboard', params);
-};
+export const fetchMetricsData = ({ dispatch }, params) => dispatch('fetchDashboard', params);
 
 export const fetchDashboard = ({ state, dispatch }, params) => {
   dispatch('requestMetricsDashboard');
