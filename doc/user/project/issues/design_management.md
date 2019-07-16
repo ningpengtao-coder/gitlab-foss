@@ -39,8 +39,6 @@ to be enabled:
   The [`svg` extension is not yet supported](https://gitlab.com/gitlab-org/gitlab-ee/issues/12771).
 - Design uploads are limited to 10 files at a time.
 - [Designs cannot yet be deleted](https://gitlab.com/gitlab-org/gitlab-ee/issues/11089).
-- Design Management is
-  [not yet supported in the project export](https://gitlab.com/gitlab-org/gitlab-ee/issues/11090).
 - Design Management data
   [isn't deleted when a project is destroyed](https://gitlab.com/gitlab-org/gitlab-ee/issues/13429) yet.
 - Design Management data [won't be moved](https://gitlab.com/gitlab-org/gitlab-ee/issues/13426)
