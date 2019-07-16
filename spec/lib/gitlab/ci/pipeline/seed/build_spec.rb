@@ -398,9 +398,9 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
         context 'with an explicit `drop` policy outcome' do
           where(:rule_set) do
             [
-              [[{ if: '$VARIABLE == null',              policy: 'drop' }]],
-              [[{ if: '$VARIABLE == null',              policy: 'drop' }, { if: '$VARIABLE == null', policy: 'run' }]],
-              [[{ if: '$VARIABLE != "the wrong value"', policy: 'drop' }, { if: '$VARIABLE == null', policy: 'run' }]]
+              [[{ if: '$VARIABLE == null',              outcome: 'drop' }]],
+              [[{ if: '$VARIABLE == null',              outcome: 'drop' }, { if: '$VARIABLE == null', outcome: 'run' }]],
+              [[{ if: '$VARIABLE != "the wrong value"', outcome: 'drop' }, { if: '$VARIABLE == null', outcome: 'run' }]]
             ]
           end
 
@@ -412,9 +412,9 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
         context 'with an explicit `run` policy outcome' do
           where(:rule_set) do
             [
-              [[{ if: '$VARIABLE == null',              policy: 'run' }]],
-              [[{ if: '$VARIABLE == null',              policy: 'run' }, { if: '$VARIABLE == null', policy: 'drop' }]],
-              [[{ if: '$VARIABLE != "the wrong value"', policy: 'run' }, { if: '$VARIABLE == null', policy: 'drop' }]]
+              [[{ if: '$VARIABLE == null',              outcome: 'run' }]],
+              [[{ if: '$VARIABLE == null',              outcome: 'run' }, { if: '$VARIABLE == null', outcome: 'drop' }]],
+              [[{ if: '$VARIABLE != "the wrong value"', outcome: 'run' }, { if: '$VARIABLE == null', outcome: 'drop' }]]
             ]
           end
 
@@ -438,18 +438,77 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
         end
       end
 
+      context 'with a matching changes: policy' do
+        let(:pipeline) do
+          create(:ci_pipeline, project: project).tap do |pipeline|
+            stub_pipeline_modified_paths(pipeline, %w[app/models/ci/pipeline.rb spec/models/ci/pipeline_spec.rb .gitlab-ci.yml])
+          end
+        end
+
+        context 'with an explicit `drop` policy outcome' do
+          where(:rule_set) do
+            [
+              [[{ changes: '*/**/*.rb',                 outcome: 'drop' }]],
+              [[{ changes: 'app/models/ci/pipeline.rb', outcome: 'drop' }]],
+              [[{ changes: 'spec/**/*.rb',              outcome: 'drop' }]],
+              [[{ changes: '*.yml',                     outcome: 'drop' }]],
+              [[{ changes: '.*.yml',                    outcome: 'drop' }]],
+              [[{ changes: '**/*',                      outcome: 'drop' }]],
+            ]
+          end
+
+          with_them do
+            it { is_expected.not_to be_included }
+          end
+        end
+
+        context 'with an explicit `run` policy outcome' do
+          where(:rule_set) do
+            [
+              [[{ changes: '*/**/*.rb',                 outcome: 'run' }]],
+              [[{ changes: 'app/models/ci/pipeline.rb', outcome: 'run' }]],
+              [[{ changes: 'spec/**/*.rb',              outcome: 'run' }]],
+              [[{ changes: '*.yml',                     outcome: 'run' }]],
+              [[{ changes: '.*.yml',                    outcome: 'run' }]],
+              [[{ changes: '**/*',                      outcome: 'run' }]],
+            ]
+          end
+
+          with_them do
+            it { is_expected.to be_included }
+          end
+        end
+
+        context 'without an explicit policy outcome' do
+          where(:rule_set) do
+            [
+              [[{ changes: '*/**/*.rb' }]],
+              [[{ changes: 'app/models/ci/pipeline.rb' }]],
+              [[{ changes: 'spec/**/*.rb' }]],
+              [[{ changes: '*.yml' }]],
+              [[{ changes: '.*.yml' }]],
+              [[{ changes: '**/*' }]],
+            ]
+          end
+
+          with_them do
+            it { is_expected.to be_included }
+          end
+        end
+      end
+
       context 'with no matching policy' do
         where(:rule_set) do
           [
-            [[{ if: '$VARIABLE != null',              policy: 'drop' }]],
-            [[{ if: '$VARIABLE != null',              policy: 'drop' }, { if: '$VARIABLE != null', policy: 'run' }]],
-            [[{ if: '$VARIABLE == "the wrong value"', policy: 'drop' }, { if: '$VARIABLE != null', policy: 'run' }]],
-            [[{ if: '$VARIABLE != null',              policy: 'run'  }]],
-            [[{ if: '$VARIABLE != null',              policy: 'run'  }, { if: '$VARIABLE != null', policy: 'drop' }]],
-            [[{ if: '$VARIABLE == "the wrong value"', policy: 'run'  }, { if: '$VARIABLE != null', policy: 'drop' }]],
-            [[{ if: '$VARIABLE != null'                              }]],
-            [[{ if: '$VARIABLE != null'                              }, { if: '$VARIABLE != null' }]],
-            [[{ if: '$VARIABLE == "the wrong value"'                 }, { if: '$VARIABLE != null' }]]
+            [[{ if: '$VARIABLE != null',              outcome: 'drop' }]],
+            [[{ if: '$VARIABLE != null',              outcome: 'drop' }, { if: '$VARIABLE != null', outcome: 'run' }]],
+            [[{ if: '$VARIABLE == "the wrong value"', outcome: 'drop' }, { if: '$VARIABLE != null', outcome: 'run' }]],
+            [[{ if: '$VARIABLE != null',              outcome: 'run'  }]],
+            [[{ if: '$VARIABLE != null',              outcome: 'run'  }, { if: '$VARIABLE != null', outcome: 'drop' }]],
+            [[{ if: '$VARIABLE == "the wrong value"', outcome: 'run'  }, { if: '$VARIABLE != null', outcome: 'drop' }]],
+            [[{ if: '$VARIABLE != null'                               }]],
+            [[{ if: '$VARIABLE != null'                               }, { if: '$VARIABLE != null' }]],
+            [[{ if: '$VARIABLE == "the wrong value"'                  }, { if: '$VARIABLE != null' }]]
           ]
         end
 
