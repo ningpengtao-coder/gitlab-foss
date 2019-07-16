@@ -155,7 +155,6 @@ export default {
       'metricsWithData',
       'useDashboardEndpoint',
       'allDashboards',
-      'multipleDashboardsEnabled',
       'additionalPanelTypesEnabled',
     ]),
     groupsWithData() {
@@ -272,7 +271,7 @@ export default {
         v-if="environmentsEndpoint"
         class="dropdowns d-flex align-items-center justify-content-between"
       >
-        <div v-if="multipleDashboardsEnabled" class="d-flex align-items-center">
+        <div class="d-flex align-items-center">
           <label class="mb-0">{{ __('Dashboard') }}</label>
           <gl-dropdown
             class="ml-2 mr-3 js-dashboards-dropdown"

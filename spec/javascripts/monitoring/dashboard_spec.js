@@ -444,7 +444,6 @@ describe('Dashboard', () => {
 
       component.$store.dispatch('monitoringDashboard/setFeatureFlags', {
         prometheusEndpoint: false,
-        multipleDashboardsEnabled: true,
       });
 
       component.$store.commit(

@@ -499,30 +499,6 @@ describe Projects::EnvironmentsController do
       end
     end
 
-    context 'when multiple dashboards is disabled' do
-      before do
-        stub_feature_flags(environment_metrics_show_multiple_dashboards: false)
-      end
-
-      let(:dashboard_params) { { format: :json } }
-
-      it_behaves_like '200 response'
-
-      context 'when the dashboard could not be provided' do
-        before do
-          allow(YAML).to receive(:safe_load).and_return({})
-        end
-
-        it_behaves_like 'error response', :unprocessable_entity
-      end
-
-      context 'when a dashboard param is specified' do
-        let(:dashboard_params) { { format: :json, dashboard: '.gitlab/dashboards/not_there_dashboard.yml' } }
-
-        it_behaves_like '200 response'
-      end
-    end
-
     context 'when multiple dashboards is enabled' do
       let(:dashboard_params) { { format: :json } }
 
