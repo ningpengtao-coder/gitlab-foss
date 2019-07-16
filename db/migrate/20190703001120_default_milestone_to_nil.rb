@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:disable Style/Documentation
 
 class DefaultMilestoneToNil < ActiveRecord::Migration[5.1]
   include Gitlab::Database::MigrationHelpers
@@ -19,6 +18,8 @@ class DefaultMilestoneToNil < ActiveRecord::Migration[5.1]
 
     Board.where(milestone_id: -1).each_batch(of: 50) do |batch|
       range = batch.pluck('MIN(id)', 'MAX(id)').first
+
+      say "Setting board weights from None to Any: #{range[0]} - #{range[1]}"
 
       Gitlab::BackgroundMigration::UpdateBoardMilestonesFromNoneToAny.new.perform(*range)
     end

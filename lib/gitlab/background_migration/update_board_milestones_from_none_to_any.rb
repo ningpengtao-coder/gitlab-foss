@@ -9,11 +9,7 @@ module Gitlab
       end
 
       def perform(start_id, stop_id)
-        Rails.logger.info("Setting board milestones from None to Any: #{start_id} - #{stop_id}") # rubocop:disable Gitlab/RailsLogger
-
-        update = 'UPDATE boards SET milestone_id = null'
-
-        Board.where(id: start_id..stop_id).update_all(update)
+        Board.where(id: start_id..stop_id).update_all(milestone_id: nil)
       end
     end
   end
