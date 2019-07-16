@@ -1108,6 +1108,8 @@ class Repository
 
     raw.create_repository
     after_create
+
+    true
   end
 
   def blobs_metadata(paths, ref = 'HEAD')
