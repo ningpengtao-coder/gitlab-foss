@@ -101,6 +101,27 @@ pre.code,
   color: $white-code-color;
 }
 
+// Expansion line
+.line_expansion {
+  background-color: $gray-light;
+
+  & > * + * {
+    margin-right: 30px;
+    border: 1px solid red;
+  }
+
+  td {
+    padding: 8px 0;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    text-align: center;
+  }
+
+  a {
+    color: $blue-600;
+  }
+}
+
 // Diff line
 .line_holder {
   &.match .line_content,

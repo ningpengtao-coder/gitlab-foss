@@ -3,6 +3,7 @@ import { mapGetters } from 'vuex';
 import draftCommentsMixin from 'ee_else_ce/diffs/mixins/draft_comments';
 import inlineDiffTableRow from './inline_diff_table_row.vue';
 import inlineDiffCommentRow from './inline_diff_comment_row.vue';
+import inlineDiffExpansionRow from './inline_diff_expansion_row.vue';
 
 export default {
   components: {
@@ -10,6 +11,7 @@ export default {
     inlineDiffTableRow,
     InlineDraftCommentRow: () =>
       import('ee_component/batch_comments/components/inline_draft_comment_row.vue'),
+    inlineDiffExpansionRow,
   },
   mixins: [draftCommentsMixin],
   props: {
@@ -45,6 +47,7 @@ export default {
   >
     <tbody>
       <template v-for="(line, index) in diffLines">
+        <inline-diff-expansion-row :key="`expand-${line.line_code}`" :line="line" />
         <inline-diff-table-row
           :key="line.line_code"
           :file-hash="diffFile.file_hash"

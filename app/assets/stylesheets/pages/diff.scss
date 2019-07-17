@@ -405,8 +405,13 @@ table.code {
   border-collapse: separate;
   margin: 0;
   padding: 0;
-  table-layout: fixed;
+  table-layout: auto;
   border-radius: 0 0 $border-radius-default $border-radius-default;
+
+  tr:first-of-type.line_expansion > td,
+  tr:last-of-type.line_expansion > td {
+    border-top: 0;
+  }
 
   tr.line_holder td {
     line-height: $code-line-height;
