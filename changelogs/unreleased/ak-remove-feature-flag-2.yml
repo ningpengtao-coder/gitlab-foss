@@ -1,0 +1,5 @@
+---
+title: Remove `environment_metrics_show_multiple_dashboards` feature flag
+merge_request: 30799
+author:
+type: changed
