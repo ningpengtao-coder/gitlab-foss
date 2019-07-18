@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { pluralize } from './lib/utils/text_utility';
+import { n__ } from '~/locale';
 import { localTimeAgo } from './lib/utils/datetime_utility';
 import Pager from './pager';
 import axios from './lib/utils/axios_utils';
@@ -92,7 +92,7 @@ export default class CommitsList {
       );
       $commitsHeadersLast
         .find('span.commits-count')
-        .text(`${commitsCount} ${pluralize('commit', commitsCount)}`);
+        .text(`${commitsCount} ${n__('commit', 'commits', commitsCount)}`);
     }
 
     localTimeAgo($processedData.find('.js-timeago'));

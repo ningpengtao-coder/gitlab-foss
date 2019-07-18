@@ -2,8 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import timeago from 'timeago.js';
 import dateFormat from 'dateformat';
-import { pluralize } from './text_utility';
-import { languageCode, s__, __ } from '../../locale';
+import { languageCode, s__, __, n__ } from '../../locale';
 
 window.timeago = timeago;
 
@@ -234,9 +233,13 @@ export const timeIntervalInWords = intervalInSeconds => {
   let text = '';
 
   if (minutes >= 1) {
-    text = `${minutes} ${pluralize('minute', minutes)} ${seconds} ${pluralize('second', seconds)}`;
+    text = `${minutes} ${n__('minute', 'minutes', minutes)} ${seconds} ${n__(
+      'second',
+      'seconds',
+      seconds,
+    )}`;
   } else {
-    text = `${seconds} ${pluralize('second', seconds)}`;
+    text = `${seconds} ${n__('second', 'seconds', seconds)}`;
   }
   return text;
 };
