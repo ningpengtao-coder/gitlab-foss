@@ -35,6 +35,21 @@ const propsData = {
 
 export default propsData;
 
+function setupComponentStore(component) {
+  component.$store.commit(
+    `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
+    metricsNewGroupsAPIResponse,
+  );
+  component.$store.commit(
+    `monitoringDashboard/${types.SET_QUERY_RESULT}`,
+    mockedQueryResultPayload,
+  );
+  component.$store.commit(
+    `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
+    environmentData,
+  );
+}
+
 describe('Dashboard', () => {
   let DashboardComponent;
   let mock;
@@ -109,18 +124,7 @@ describe('Dashboard', () => {
           store,
         });
 
-        component.$store.commit(
-          `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-          metricsNewGroupsAPIResponse,
-        );
-        component.$store.commit(
-          `monitoringDashboard/${types.SET_QUERY_RESULT}`,
-          mockedQueryResultPayload,
-        );
-        component.$store.commit(
-          `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
-          environmentData,
-        );
+        setupComponentStore(component);
       });
 
       it('renders the environments dropdown with a number of environments', done => {
@@ -220,20 +224,7 @@ describe('Dashboard', () => {
         store,
       });
 
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
-        environmentData,
-      );
-
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        metricsNewGroupsAPIResponse,
-      );
-
-      component.$store.commit(
-        `monitoringDashboard/${types.SET_QUERY_RESULT}`,
-        mockedQueryResultPayload,
-      );
+      setupComponentStore(component);
 
       Vue.nextTick()
         .then(() => {
@@ -305,20 +296,7 @@ describe('Dashboard', () => {
         store,
       });
 
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
-        environmentData,
-      );
-
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        metricsNewGroupsAPIResponse,
-      );
-
-      component.$store.commit(
-        `monitoringDashboard/${types.SET_QUERY_RESULT}`,
-        mockedQueryResultPayload,
-      );
+      setupComponentStore(component);
 
       Vue.nextTick()
         .then(() => {
@@ -433,20 +411,7 @@ describe('Dashboard', () => {
         multipleDashboardsEnabled: true,
       });
 
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_METRICS_DATA_SUCCESS}`,
-        metricsNewGroupsAPIResponse,
-      );
-
-      component.$store.commit(
-        `monitoringDashboard/${types.SET_QUERY_RESULT}`,
-        mockedQueryResultPayload,
-      );
-
-      component.$store.commit(
-        `monitoringDashboard/${types.RECEIVE_ENVIRONMENTS_DATA_SUCCESS}`,
-        environmentData,
-      );
+      setupComponentStore(component);
 
       component.$store.commit(
         `monitoringDashboard/${types.SET_ALL_DASHBOARDS}`,
