@@ -665,8 +665,12 @@ class Project < ApplicationRecord
     if auto_devops&.enabled.nil?
       has_auto_devops_implicitly_enabled?
     else
-      auto_devops.enabled?
+      has_auto_devops_explicitly_enabled?
     end
+  end
+
+  def has_auto_devops_explicitly_enabled?
+    auto_devops&.enabled?
   end
 
   def has_auto_devops_implicitly_enabled?

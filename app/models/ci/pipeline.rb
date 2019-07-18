@@ -809,9 +809,14 @@ module Ci
     def implied_ci_yaml_file
       return unless project
 
-      if project.auto_devops_enabled?
+      if project.auto_devops_enabled? && auto_devops_buildable?
         Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content
       end
+    end
+
+    def auto_devops_buildable?
+      project.has_auto_devops_explicitly_enabled? ||
+        Gitlab::AutoDevops::BuildableDetector.new(project, sha).buildable?
     end
 
     def pipeline_data
