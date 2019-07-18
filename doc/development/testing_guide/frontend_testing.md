@@ -505,6 +505,16 @@ glob otherwise your shell may split it into multiple arguments:
 yarn karma -f 'spec/javascripts/ide/**/file_spec.js'
 ```
 
+## Test helpers
+
+### Wait until axios requests finish
+The axios utils module located in `~/lib/utils/axios_utils` contains two helper methods for tests that spawn HTTP requests. These are very useful if you don't have a handle to the request's Promise, for example when a Vue component does a request as part of its lifecycle.
+
+- `waitFor(url, callback)`: Runs `callback` after a request to `url` finishes (either successfully or unsuccessfully).
+- `waitForAll(callback)`: Runs `callback` once all pending requests have finished. If no requests are pending, runs `callback` on the next tick.
+
+Both functions run `callback` on the next tick after the requests finish (using `setImmediate()`), to allow any `.then()` or `.catch()` handlers to run.
+
 ## RSpec feature integration tests
 
 Information on setting up and running RSpec integration tests with
