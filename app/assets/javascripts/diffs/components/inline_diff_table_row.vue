@@ -56,7 +56,11 @@ export default {
       ];
     },
     inlineRowId() {
-      return this.line.line_code || `${this.fileHash}_${this.line.old_line}_${this.line.new_line}`;
+      return (
+        this.line.line_code ||
+        `match_${this.fileHash}_${this.line.meta_data.old_pos}_${this.line.meta_data.new_pos}`
+      );
+      // return this.line.line_code || `${this.fileHash}_${this.line.old_line}_${this.line.new_line}`;
     },
   },
   created() {

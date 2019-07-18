@@ -190,6 +190,10 @@ export const loadMoreLines = ({ commit }, options) => {
   return axios.get(endpoint, { params }).then(res => {
     const contextLines = res.data || [];
 
+    console.log('%c>>>>endpoint', 'color:deeppink', endpoint);
+    console.log('%c>>>>params', 'color:deeppink', params);
+    console.log('%c>>>>contextLines', 'color:deeppink', contextLines);
+
     commit(types.ADD_CONTEXT_LINES, {
       lineNumbers,
       contextLines,

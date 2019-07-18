@@ -46,6 +46,7 @@ export default {
       default: false,
     },
     isMatchLine: {
+      // isMatchLine: true ->> ...
       type: Boolean,
       required: false,
       default: false,
@@ -154,6 +155,14 @@ export default {
 
       const params = { since, to, bottom, offset, unfold, view };
       const lineNumbers = { oldLineNumber, newLineNumber };
+
+      console.log('info', {
+        endpoint, // static
+        params, // static
+        lineNumbers,
+        fileHash, // static
+      });
+
       this.loadMoreLines({ endpoint, params, lineNumbers, fileHash })
         .then(() => {
           this.isRequesting = false;
@@ -169,35 +178,35 @@ export default {
 
 <template>
   <div>
-    <span v-if="isMatchLine" class="context-cell" role="button" @click="handleLoadMoreLines"
+    <!-- <span v-if="isMatchLine" class="context-cell" role="button" @click="handleLoadMoreLines"
       >...</span
     >
-    <template v-else>
-      <button
-        v-if="shouldRenderCommentButton"
-        v-show="shouldShowCommentButton"
-        type="button"
-        class="add-diff-note js-add-diff-note-button qa-diff-comment"
-        title="Add a comment to this line"
-        @click="handleCommentButton"
-      >
-        <icon :size="12" name="comment" />
-      </button>
-      <a
-        v-if="lineNumber"
-        :data-linenumber="lineNumber"
-        :href="lineHref"
-        @click="setHighlightedRow(lineCode)"
-      >
-      </a>
-      <diff-gutter-avatars
-        v-if="shouldShowAvatarsOnGutter"
-        :discussions="line.discussions"
-        :discussions-expanded="line.discussionsExpanded"
-        @toggleLineDiscussions="
-          toggleLineDiscussions({ lineCode, fileHash, expanded: !line.discussionsExpanded })
-        "
-      />
-    </template>
+    <template v-else> -->
+    <button
+      v-if="shouldRenderCommentButton"
+      v-show="shouldShowCommentButton"
+      type="button"
+      class="add-diff-note js-add-diff-note-button qa-diff-comment"
+      title="Add a comment to this line"
+      @click="handleCommentButton"
+    >
+      <icon :size="12" name="comment" />
+    </button>
+    <a
+      v-if="lineNumber"
+      :data-linenumber="lineNumber"
+      :href="lineHref"
+      @click="setHighlightedRow(lineCode)"
+    >
+    </a>
+    <diff-gutter-avatars
+      v-if="shouldShowAvatarsOnGutter"
+      :discussions="line.discussions"
+      :discussions-expanded="line.discussionsExpanded"
+      @toggleLineDiscussions="
+        toggleLineDiscussions({ lineCode, fileHash, expanded: !line.discussionsExpanded })
+      "
+    />
+    <!-- </template> -->
   </div>
 </template>

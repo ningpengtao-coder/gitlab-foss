@@ -74,6 +74,7 @@ export default {
   computed: {
     ...mapGetters(['isLoggedIn']),
     isMatchLine() {
+      // SAM: remove
       return this.line.type === MATCH_LINE_TYPE;
     },
     isContextLine() {

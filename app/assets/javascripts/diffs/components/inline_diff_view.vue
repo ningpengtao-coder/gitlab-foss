@@ -47,9 +47,16 @@ export default {
   >
     <tbody>
       <template v-for="(line, index) in diffLines">
-        <inline-diff-expansion-row :key="`expand-${line.line_code}`" :line="line" />
+        <inline-diff-expansion-row
+          :key="`expand-${index}`"
+          :file-hash="diffFile.file_hash"
+          :context-lines-path="diffFile.context_lines_path"
+          :line="line"
+          :is-top="index === 0"
+          :is-bottom="index + 1 === diffLinesLength"
+        />
         <inline-diff-table-row
-          :key="line.line_code"
+          :key="line.line_code || index"
           :file-hash="diffFile.file_hash"
           :context-lines-path="diffFile.context_lines_path"
           :line="line"
