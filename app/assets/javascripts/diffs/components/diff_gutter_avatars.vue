@@ -43,11 +43,7 @@ export default {
         return '';
       }
 
-      return n__(
-        `${this.moreCount} more comment`,
-        `${this.moreCount} more comments`,
-        this.moreCount,
-      );
+      return n__('%d more comment', '%d more comments', this.moreCount);
     },
   },
   methods: {

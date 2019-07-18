@@ -90,9 +90,10 @@ export default class CommitsList {
           .first()
           .find('li.commit').length,
       );
+
       $commitsHeadersLast
         .find('span.commits-count')
-        .text(`${commitsCount} ${n__('commit', 'commits', commitsCount)}`);
+        .text(n__('%d commit', '%d commits', commitsCount));
     }
 
     localTimeAgo($processedData.find('.js-timeago'));
