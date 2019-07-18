@@ -30,7 +30,7 @@ describe API::Jobs do
   end
 
   set(:project) do
-    create(:project, :repository, public_builds: false)
+    create(:project, :auto_devops_disabled, :repository, public_builds: false)
   end
 
   set(:pipeline) do

@@ -57,6 +57,18 @@ describe Ci::PrepareBuildService do
           subject
         end
       end
+
+      context 'prerequisites unsupported' do
+        before do
+          allow(prerequisite).to receive(:complete!).and_throw(:unsupported)
+        end
+
+        it 'skips the build' do
+          subject
+
+          expect(build.reload).to be_skipped
+        end
+      end
     end
 
     context 'build has no prerequisites' do

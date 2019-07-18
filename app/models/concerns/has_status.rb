@@ -107,6 +107,7 @@ module HasStatus
     scope :finished, -> { with_status(:success, :failed, :canceled) }
     scope :failed_or_canceled, -> { with_status(:failed, :canceled) }
     scope :incomplete, -> { without_statuses(completed_statuses) }
+    scope :skippable, -> { with_status(:created, :preparing, :pending) }
 
     scope :cancelable, -> do
       where(status: [:running, :preparing, :pending, :created, :scheduled])

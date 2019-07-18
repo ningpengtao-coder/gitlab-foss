@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Ci::ProcessPipelineService, '#execute' do
   let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :auto_devops_disabled) }
 
   let(:pipeline) do
     create(:ci_empty_pipeline, ref: 'master', project: project)

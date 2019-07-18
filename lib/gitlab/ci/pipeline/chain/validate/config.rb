@@ -11,7 +11,11 @@ module Gitlab
             def perform!
               unless @pipeline.config_processor
                 unless @pipeline.ci_yaml_file
-                  return error("Missing #{@pipeline.ci_yaml_file_path} file")
+                  if @pipeline.project.auto_devops_enabled?
+                    return error("Auto-DevOps enabled but no buildable files found")
+                  else
+                    return error("Missing #{@pipeline.ci_yaml_file_path} file")
+                  end
                 end
 
                 if @command.save_incompleted && @pipeline.has_yaml_errors?

@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Ci::PlayBuildService, '#execute' do
   let(:user) { create(:user, developer_projects: [project]) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :auto_devops_disabled) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:build) { create(:ci_build, :manual, pipeline: pipeline) }
 
@@ -13,7 +13,7 @@ describe Ci::PlayBuildService, '#execute' do
   end
 
   context 'when project does not have repository yet' do
-    let(:project) { create(:project) }
+    let(:project) { create(:project, :auto_devops_disabled) }
 
     it 'allows user to play build if protected branch rules are met' do
       create(:protected_branch, :developers_can_merge,
@@ -31,7 +31,7 @@ describe Ci::PlayBuildService, '#execute' do
   end
 
   context 'when project has repository' do
-    let(:project) { create(:project, :repository) }
+    let(:project) { create(:project, :auto_devops_disabled, :repository) }
 
     it 'allows user with developer role to play a build' do
       service.execute(build)

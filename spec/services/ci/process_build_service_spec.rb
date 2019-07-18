@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe Ci::ProcessBuildService, '#execute' do
   let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :auto_devops_disabled) }
 
   subject { described_class.new(project, user).execute(build, current_status) }
 

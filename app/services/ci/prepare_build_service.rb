@@ -9,9 +9,14 @@ module Ci
     end
 
     def execute
-      prerequisites.each(&:complete!)
+      catch :unsupported do
+        prerequisites.each(&:complete!)
 
-      build.enqueue!
+        build.enqueue!
+        return # rubocop:disable Cop/AvoidReturnFromBlocks
+      end
+
+      build.pipeline.skip_all
     rescue => e
       Gitlab::Sentry.track_acceptable_exception(e, extra: { build_id: build.id })
 

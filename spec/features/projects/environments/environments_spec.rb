@@ -148,7 +148,7 @@ describe 'Environments page', :js do
     end
 
     context 'when there are successful deployments' do
-      let(:project) { create(:project, :repository) }
+      let(:project) { create(:project, :auto_devops_disabled, :repository) }
 
       let!(:deployment) do
         create(:deployment, :success,

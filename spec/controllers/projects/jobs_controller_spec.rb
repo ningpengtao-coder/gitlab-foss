@@ -6,7 +6,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   include ApiHelpers
   include HttpIOHelpers
 
-  let(:project) { create(:project, :public) }
+  let(:project) { create(:project, :public, :auto_devops_disabled) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:user) { create(:user) }
 

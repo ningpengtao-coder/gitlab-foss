@@ -269,6 +269,7 @@ Ci::Pipeline:
 - protected
 - iid
 - merge_request_id
+- auto_devops_buildable
 Ci::Stage:
 - id
 - name

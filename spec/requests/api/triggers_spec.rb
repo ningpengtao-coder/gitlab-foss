@@ -6,7 +6,7 @@ describe API::Triggers do
 
   let!(:trigger_token) { 'secure_token' }
   let!(:trigger_token_2) { 'secure_token_2' }
-  let!(:project) { create(:project, :repository, creator: user) }
+  let!(:project) { create(:project, :auto_devops_disabled, :repository, creator: user) }
   let!(:maintainer) { create(:project_member, :maintainer, user: user, project: project) }
   let!(:developer) { create(:project_member, :developer, user: user2, project: project) }
   let!(:trigger) { create(:ci_trigger, project: project, token: trigger_token, owner: user) }

@@ -59,7 +59,7 @@ describe 'Pipeline', :js do
   describe 'GET /:project/pipelines/:id' do
     include_context 'pipeline builds'
 
-    let(:project) { create(:project, :repository) }
+    let(:project) { create(:project, :auto_devops_disabled, :repository) }
     let(:pipeline) { create(:ci_pipeline, project: project, ref: 'master', sha: project.commit.id, user: user) }
 
     subject(:visit_pipeline) { visit project_pipeline_path(project, pipeline) }
@@ -595,7 +595,7 @@ describe 'Pipeline', :js do
   describe 'GET /:project/pipelines/:id/builds' do
     include_context 'pipeline builds'
 
-    let(:project) { create(:project, :repository) }
+    let(:project) { create(:project, :auto_devops_disabled, :repository) }
     let(:pipeline) { create(:ci_pipeline, project: project, ref: 'master', sha: project.commit.id) }
 
     before do

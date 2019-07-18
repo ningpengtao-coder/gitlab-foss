@@ -6,7 +6,7 @@ describe Ci::Pipeline, :mailer do
   include ProjectForksHelper
 
   let(:user) { create(:user) }
-  set(:project) { create(:project) }
+  set(:project) { create(:project, :auto_devops_disabled) }
 
   let(:pipeline) do
     create(:ci_empty_pipeline, status: :created, project: project)
@@ -2062,10 +2062,6 @@ describe Ci::Pipeline, :mailer do
 
   describe '#set_config_source' do
     context 'when pipelines does not contain needed data and auto devops is disabled' do
-      before do
-        stub_application_setting(auto_devops_enabled: false)
-      end
-
       it 'defines source to be unknown' do
         pipeline.set_config_source
 
@@ -2111,6 +2107,7 @@ describe Ci::Pipeline, :mailer do
         context 'auto devops enabled' do
           before do
             allow(project).to receive(:ci_config_path) { 'custom' }
+            project.update!(auto_devops_attributes: { enabled: true })
           end
 
           it 'defines source to be auto devops' do
@@ -2164,7 +2161,7 @@ describe Ci::Pipeline, :mailer do
 
     context 'when the source is auto_devops_source' do
       before do
-        stub_application_setting(auto_devops_enabled: true)
+        project.update!(auto_devops_attributes: { enabled: true })
         pipeline.auto_devops_source!
       end
 
@@ -2435,6 +2432,49 @@ describe Ci::Pipeline, :mailer do
 
       it 'cancels created builds' do
         expect(latest_status).to eq %w(canceled canceled)
+      end
+    end
+  end
+
+  describe '#skip_all' do
+    let(:latest_status) { pipeline.statuses.pluck(:status) }
+
+    context 'when there is a preparing external job and a regular job' do
+      before do
+        create(:ci_build, :preparing, pipeline: pipeline)
+        create(:generic_commit_status, :preparing, pipeline: pipeline)
+
+        pipeline.skip_all
+      end
+
+      it 'cancels both jobs' do
+        expect(latest_status).to contain_exactly('skipped', 'skipped')
+      end
+    end
+
+    context 'when jobs are in different stages' do
+      before do
+        create(:ci_build, :preparing, stage_idx: 0, pipeline: pipeline)
+        create(:ci_build, :preparing, stage_idx: 1, pipeline: pipeline)
+
+        pipeline.skip_all
+      end
+
+      it 'cancels both jobs' do
+        expect(latest_status).to contain_exactly('skipped', 'skipped')
+      end
+    end
+
+    context 'when there are created builds present in the pipeline' do
+      before do
+        create(:ci_build, :preparing, stage_idx: 0, pipeline: pipeline)
+        create(:ci_build, :created, stage_idx: 1, pipeline: pipeline)
+
+        pipeline.skip_all
+      end
+
+      it 'cancels created builds' do
+        expect(latest_status).to eq %w(skipped skipped)
       end
     end
   end

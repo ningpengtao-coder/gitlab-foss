@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Gitlab::SlashCommands::Command do
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :auto_devops_disabled) }
   let(:user) { create(:user) }
   let(:chat_name) { double(:chat_name, user: user) }
 

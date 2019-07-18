@@ -108,8 +108,8 @@ describe Ci::StopEnvironmentsService do
   describe '#execute_for_merge_request' do
     subject { service.execute_for_merge_request(merge_request) }
 
-    let(:merge_request) { create(:merge_request, source_branch: 'feature', target_branch: 'master') }
-    let(:project) { merge_request.project }
+    let(:project) { create(:project, :auto_devops_disabled, :repository) }
+    let(:merge_request) { create(:merge_request, source_project: project, source_branch: 'feature', target_branch: 'master') }
     let(:user) { create(:user) }
 
     let(:pipeline) do

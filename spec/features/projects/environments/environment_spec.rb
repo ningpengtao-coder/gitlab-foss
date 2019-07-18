@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'Environment' do
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :auto_devops_disabled) }
   let(:user) { create(:user) }
   let(:role) { :developer }
 

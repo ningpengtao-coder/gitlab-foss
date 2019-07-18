@@ -6,7 +6,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
   include ReactiveCachingHelpers
   using RSpec::Parameterized::TableSyntax
 
-  let(:project) { create(:project, :stubbed_repository) }
+  let(:project) { create(:project, :auto_devops_disabled, :stubbed_repository) }
   subject(:environment) { create(:environment, project: project) }
 
   it { is_expected.to be_kind_of(ReactiveCaching) }

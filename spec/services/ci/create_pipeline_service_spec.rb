@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Ci::CreatePipelineService do
   include ProjectForksHelper
 
-  set(:project) { create(:project, :repository) }
+  set(:project) { create(:project, :repository, :auto_devops_disabled) }
   let(:user) { create(:admin) }
   let(:ref_name) { 'refs/heads/master' }
 

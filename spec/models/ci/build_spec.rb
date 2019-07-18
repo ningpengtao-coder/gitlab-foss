@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Ci::Build do
   set(:user) { create(:user) }
   set(:group) { create(:group, :access_requestable) }
-  set(:project) { create(:project, :repository, group: group) }
+  set(:project) { create(:project, :auto_devops_disabled, :repository, group: group) }
 
   set(:pipeline) do
     create(:ci_pipeline, project: project,
@@ -3006,7 +3006,7 @@ describe Ci::Build do
   end
 
   describe 'state transition: any => [:pending]' do
-    let(:build) { create(:ci_build, :created) }
+    let(:build) { create(:ci_build, :created, project: project) }
 
     it 'queues BuildQueueWorker' do
       expect(BuildQueueWorker).to receive(:perform_async).with(build.id)

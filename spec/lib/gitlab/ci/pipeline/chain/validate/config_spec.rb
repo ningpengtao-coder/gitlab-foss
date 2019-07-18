@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Pipeline::Chain::Validate::Config do
-  set(:project) { create(:project, :repository) }
+  set(:project) { create(:project, :repository, :auto_devops_disabled) }
   set(:user) { create(:user) }
 
   let(:command) do
@@ -27,6 +27,22 @@ describe Gitlab::Ci::Pipeline::Chain::Validate::Config do
     it 'appends errors about missing configuration' do
       expect(pipeline.errors.to_a)
         .to include 'Missing .gitlab-ci.yml file'
+    end
+
+    it 'breaks the chain' do
+      expect(step.break?).to be true
+    end
+  end
+
+  context 'when pipeline has no Auto-DevOps buildable files' do
+    let(:project) { create(:project, :repository, :auto_devops) }
+    let(:pipeline) do
+      build_stubbed(:ci_pipeline, project: project)
+    end
+
+    it 'appends errors about missing configuration' do
+      expect(pipeline.errors.to_a)
+        .to include 'Auto-DevOps enabled but no buildable files found'
     end
 
     it 'breaks the chain' do

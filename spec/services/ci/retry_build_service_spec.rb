@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Ci::RetryBuildService do
   set(:user) { create(:user) }
-  set(:project) { create(:project) }
+  set(:project) { create(:project, :auto_devops_disabled) }
   set(:pipeline) { create(:ci_pipeline, project: project) }
 
   let(:stage) do

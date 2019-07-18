@@ -6,7 +6,7 @@ describe Ci::RetryPipelineService, '#execute' do
   include ProjectForksHelper
 
   let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, :auto_devops_disabled) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
   let(:service) { described_class.new(project, user) }
 
@@ -272,7 +272,7 @@ describe Ci::RetryPipelineService, '#execute' do
 
   context 'when maintainer is allowed to push to forked project' do
     let(:user) { create(:user) }
-    let(:project) { create(:project, :public) }
+    let(:project) { create(:project, :auto_devops_disabled, :public) }
     let(:forked_project) { fork_project(project) }
     let(:pipeline) { create(:ci_pipeline, project: forked_project, ref: 'fixes') }
 

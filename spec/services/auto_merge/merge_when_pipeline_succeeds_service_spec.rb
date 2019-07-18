@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe AutoMerge::MergeWhenPipelineSucceedsService do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :auto_devops_disabled, :repository) }
 
   let(:mr_merge_if_green_enabled) do
     create(:merge_request, merge_when_pipeline_succeeds: true, merge_user: user,

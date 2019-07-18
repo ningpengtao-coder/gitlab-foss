@@ -15,6 +15,8 @@ describe Gitlab::Ci::Build::Prerequisite::Factory do
     subject { described_class.new(build).unmet }
 
     before do
+      expect(described_class).to receive(:prerequisites)
+        .and_return([Gitlab::Ci::Build::Prerequisite::KubernetesNamespace])
       expect(Gitlab::Ci::Build::Prerequisite::KubernetesNamespace)
         .to receive(:new).with(build).and_return(kubernetes_namespace)
     end

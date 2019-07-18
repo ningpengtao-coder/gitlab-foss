@@ -744,6 +744,7 @@ ActiveRecord::Schema.define(version: 2019_08_15_093949) do
     t.integer "merge_request_id"
     t.binary "source_sha"
     t.binary "target_sha"
+    t.boolean "auto_devops_buildable"
     t.index ["auto_canceled_by_id"], name: "index_ci_pipelines_on_auto_canceled_by_id"
     t.index ["merge_request_id"], name: "index_ci_pipelines_on_merge_request_id", where: "(merge_request_id IS NOT NULL)"
     t.index ["pipeline_schedule_id"], name: "index_ci_pipelines_on_pipeline_schedule_id"

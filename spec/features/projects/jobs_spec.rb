@@ -7,7 +7,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
   let(:user) { create(:user) }
   let(:user_access_level) { :developer }
-  let(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :auto_devops_disabled, :repository) }
   let(:pipeline) { create(:ci_pipeline, project: project, sha: project.commit('HEAD').sha) }
 
   let(:job) { create(:ci_build, :trace_live, pipeline: pipeline) }

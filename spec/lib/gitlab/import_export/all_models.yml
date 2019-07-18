@@ -144,6 +144,7 @@ ci_pipelines:
 - pending_builds
 - retryable_builds
 - cancelable_statuses
+- skippable_statuses
 - manual_actions
 - scheduled_actions
 - artifacts
