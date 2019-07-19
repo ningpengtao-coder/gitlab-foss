@@ -111,7 +111,9 @@ so you can use it for scripting purposes.
 >**Note:**
 The latest artifacts are considered as the artifacts created by jobs in the
 latest pipeline that succeeded for the specific ref.
-Artifacts for other pipelines can be accessed with direct access to them.
+Artifacts for other pipelines can be accessed with direct access to them. This 
+means, for example, that if multiple pipelines run against the same ref, only
+one will have artifacts available via a link that refers to that ref.
 
 The structure of the URL to download the whole artifacts archive is the following:
 
