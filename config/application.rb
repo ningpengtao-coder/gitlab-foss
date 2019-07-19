@@ -15,6 +15,7 @@ module Gitlab
     require_dependency Rails.root.join('lib/gitlab')
     require_dependency Rails.root.join('lib/gitlab/redis/wrapper')
     require_dependency Rails.root.join('lib/gitlab/redis/cache')
+    require_dependency Rails.root.join('lib/gitlab/cache/store')
     require_dependency Rails.root.join('lib/gitlab/redis/queues')
     require_dependency Rails.root.join('lib/gitlab/redis/shared_state')
     require_dependency Rails.root.join('lib/gitlab/request_context')
@@ -228,25 +229,7 @@ module Gitlab
       end
     end
 
-    # Use caching across all environments
-    caching_config_hash = Gitlab::Redis::Cache.params
-    caching_config_hash[:namespace] = Gitlab::Redis::Cache::CACHE_NAMESPACE
-    caching_config_hash[:expires_in] = 2.weeks # Cache should not grow forever
-    if Sidekiq.server? # threaded context
-      caching_config_hash[:pool_size] = Sidekiq.options[:concurrency] + 5
-      caching_config_hash[:pool_timeout] = 1
-    end
-
-    l1_cache_size_mb = ENV['GITLAB_L1_RAILS_CACHE_SIZE_MB'].to_i
-    if l1_cache_size_mb > 0 # rubocop:disable Style/ConditionalAssignment
-      config.cache_store = :level2, {
-        L1: [:memory_store, size: l1_cache_size_mb.megabytes, expires_in: 1.minute, race_condition_ttl: 1.second],
-        L2: [:redis_store, caching_config_hash]
-      }
-    else
-      config.cache_store = :redis_store, caching_config_hash
-    end
-
+    config.cache_store = Gitlab::Cache::Store.cache
     config.active_job.queue_adapter = :sidekiq
 
     # This is needed for gitlab-shell

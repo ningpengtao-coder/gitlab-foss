@@ -20,24 +20,24 @@ module ReactiveCachingHelpers
   end
 
   def read_reactive_cache(subject, *qualifiers)
-    Rails.cache.read(reactive_cache_key(subject, *qualifiers))
+    Gitlab::Cache::Store.main.read(reactive_cache_key(subject, *qualifiers))
   end
 
   def write_reactive_cache(subject, data, *qualifiers)
     start_reactive_cache_lifetime(subject, *qualifiers)
-    Rails.cache.write(reactive_cache_key(subject, *qualifiers), data)
+    Gitlab::Cache::Store.main.write(reactive_cache_key(subject, *qualifiers), data)
   end
 
   def reactive_cache_alive?(subject, *qualifiers)
-    Rails.cache.read(alive_reactive_cache_key(subject, *qualifiers))
+    Gitlab::Cache::Store.main.read(alive_reactive_cache_key(subject, *qualifiers))
   end
 
   def invalidate_reactive_cache(subject, *qualifiers)
-    Rails.cache.delete(alive_reactive_cache_key(subject, *qualifiers))
+    Gitlab::Cache::Store.main.delete(alive_reactive_cache_key(subject, *qualifiers))
   end
 
   def start_reactive_cache_lifetime(subject, *qualifiers)
-    Rails.cache.write(alive_reactive_cache_key(subject, *qualifiers), true)
+    Gitlab::Cache::Store.main.write(alive_reactive_cache_key(subject, *qualifiers), true)
   end
 
   def expect_reactive_cache_update_queued(subject)

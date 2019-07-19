@@ -114,7 +114,7 @@ module ReactiveCaching
       keep_alive_reactive_cache!(*args)
 
       begin
-        data = Rails.cache.read(full_reactive_cache_key(*args))
+        data = Gitlab::Cache::Store.main.read(full_reactive_cache_key(*args))
         yield data unless data.nil?
       rescue InvalidateReactiveCache
         refresh_reactive_cache!(*args)
@@ -123,8 +123,8 @@ module ReactiveCaching
     end
 
     def clear_reactive_cache!(*args)
-      Rails.cache.delete(full_reactive_cache_key(*args))
-      Rails.cache.delete(alive_reactive_cache_key(*args))
+      Gitlab::Cache::Store.main.delete(full_reactive_cache_key(*args))
+      Gitlab::Cache::Store.main.delete(alive_reactive_cache_key(*args))
     end
 
     def exclusively_update_reactive_cache!(*args)
@@ -133,8 +133,8 @@ module ReactiveCaching
           enqueuing_update(*args) do
             key = full_reactive_cache_key(*args)
             new_value = calculate_reactive_cache(*args)
-            old_value = Rails.cache.read(key)
-            Rails.cache.write(key, new_value)
+            old_value = Gitlab::Cache::Store.main.read(key)
+            Gitlab::Cache::Store.main.write(key, new_value)
             reactive_cache_updated(*args) if new_value != old_value
           end
         end
@@ -150,7 +150,7 @@ module ReactiveCaching
     end
 
     def keep_alive_reactive_cache!(*args)
-      Rails.cache.write(alive_reactive_cache_key(*args), true, expires_in: self.class.reactive_cache_lifetime)
+      Gitlab::Cache::Store.main.write(alive_reactive_cache_key(*args), true, expires_in: self.class.reactive_cache_lifetime)
     end
 
     def full_reactive_cache_key(*qualifiers)
@@ -174,9 +174,9 @@ module ReactiveCaching
 
     def within_reactive_cache_lifetime?(*args)
       if Feature.enabled?(:reactive_caching_check_key_exists, default_enabled: true)
-        Rails.cache.exist?(alive_reactive_cache_key(*args))
+        Gitlab::Cache::Store.main.exist?(alive_reactive_cache_key(*args))
       else
-        !!Rails.cache.read(alive_reactive_cache_key(*args))
+        !!Gitlab::Cache::Store.main.read(alive_reactive_cache_key(*args))
       end
     end
 

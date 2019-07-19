@@ -2785,7 +2785,7 @@ describe User do
 
       expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
 
-      allow(Rails).to receive(:cache).and_return(cache_mock)
+      allow(Gitlab::Cache::Store).to receive(:main).and_return(cache_mock)
 
       user.invalidate_issue_cache_counts
     end
@@ -2799,7 +2799,7 @@ describe User do
 
       expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_merge_requests_count'])
 
-      allow(Rails).to receive(:cache).and_return(cache_mock)
+      allow(Gitlab::Cache::Store).to receive(:main).and_return(cache_mock)
 
       user.invalidate_merge_request_cache_counts
     end
@@ -2813,7 +2813,7 @@ describe User do
 
       expect(cache_mock).to receive(:delete).with(['users', user.id, 'personal_projects_count'])
 
-      allow(Rails).to receive(:cache).and_return(cache_mock)
+      allow(Gitlab::Cache::Store).to receive(:main).and_return(cache_mock)
 
       user.invalidate_personal_projects_count
     end

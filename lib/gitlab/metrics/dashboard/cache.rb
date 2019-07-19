@@ -14,16 +14,16 @@ module Gitlab
           def fetch(key)
             register_key(key)
 
-            Rails.cache.fetch(key) { yield }
+            Gitlab::Cache::Store.main.fetch(key) { yield }
           end
 
           # Resets all dashboard caches, such that all
           # dashboard content will be loaded from source on
           # subsequent dashboard calls.
           def delete_all!
-            all_keys.each { |key| Rails.cache.delete(key) }
+            all_keys.each { |key| Gitlab::Cache::Store.main.delete(key) }
 
-            Rails.cache.delete(CACHE_KEYS)
+            Gitlab::Cache::Store.main.delete(CACHE_KEYS)
           end
 
           private
@@ -31,11 +31,11 @@ module Gitlab
           def register_key(key)
             new_keys = all_keys.add(key).to_a.join('|')
 
-            Rails.cache.write(CACHE_KEYS, new_keys)
+            Gitlab::Cache::Store.main.write(CACHE_KEYS, new_keys)
           end
 
           def all_keys
-            Set.new(Rails.cache.read(CACHE_KEYS)&.split('|'))
+            Set.new(Gitlab::Cache::Store.main.read(CACHE_KEYS)&.split('|'))
           end
         end
       end

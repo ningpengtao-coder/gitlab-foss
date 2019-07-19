@@ -11,11 +11,11 @@ class BaseCountService
   end
 
   def count
-    Rails.cache.fetch(cache_key, cache_options) { uncached_count }.to_i
+    Gitlab::Cache::Store.main.fetch(cache_key, cache_options) { uncached_count }.to_i
   end
 
   def count_stored?
-    Rails.cache.read(cache_key).present?
+    Gitlab::Cache::Store.main.read(cache_key).present?
   end
 
   def refresh_cache(&block)
@@ -27,7 +27,7 @@ class BaseCountService
   end
 
   def delete_cache
-    Rails.cache.delete(cache_key)
+    Gitlab::Cache::Store.main.delete(cache_key)
   end
 
   def raw?
@@ -45,6 +45,6 @@ class BaseCountService
   end
 
   def update_cache_for_key(key, &block)
-    Rails.cache.write(key, block_given? ? yield : uncached_count, raw: raw?)
+    Gitlab::Cache::Store.main.write(key, block_given? ? yield : uncached_count, raw: raw?)
   end
 end

@@ -182,11 +182,17 @@ RSpec.configure do |config|
 
   config.around(:each, :use_clean_rails_memory_store_caching) do |example|
     caching_store = Rails.cache
+    level1_store = Gitlab::Cache::Store.cache
+    level2_store = Gitlab::Cache::Store.main
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    Gitlab::Cache::Store.cache = Rails.cache
+    Gitlab::Cache::Store.main = Rails.cache
 
     example.run
 
     Rails.cache = caching_store
+    Gitlab::Cache::Store.cache = level1_store
+    Gitlab::Cache::Store.main = level2_store
   end
 
   config.around(:each, :clean_gitlab_redis_cache) do |example|

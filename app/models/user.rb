@@ -1282,31 +1282,31 @@ class User < ApplicationRecord
   end
 
   def assigned_open_merge_requests_count(force: false)
-    Rails.cache.fetch(['users', id, 'assigned_open_merge_requests_count'], force: force, expires_in: 20.minutes) do
+    Gitlab::Cache::Store.main.fetch(['users', id, 'assigned_open_merge_requests_count'], force: force, expires_in: 20.minutes) do
       MergeRequestsFinder.new(self, assignee_id: self.id, state: 'opened', non_archived: true).execute.count
     end
   end
 
   def assigned_open_issues_count(force: false)
-    Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: 20.minutes) do
+    Gitlab::Cache::Store.main.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: 20.minutes) do
       IssuesFinder.new(self, assignee_id: self.id, state: 'opened', non_archived: true).execute.count
     end
   end
 
   def todos_done_count(force: false)
-    Rails.cache.fetch(['users', id, 'todos_done_count'], force: force, expires_in: 20.minutes) do
+    Gitlab::Cache::Store.main.fetch(['users', id, 'todos_done_count'], force: force, expires_in: 20.minutes) do
       TodosFinder.new(self, state: :done).execute.count
     end
   end
 
   def todos_pending_count(force: false)
-    Rails.cache.fetch(['users', id, 'todos_pending_count'], force: force, expires_in: 20.minutes) do
+    Gitlab::Cache::Store.main.fetch(['users', id, 'todos_pending_count'], force: force, expires_in: 20.minutes) do
       TodosFinder.new(self, state: :pending).execute.count
     end
   end
 
   def personal_projects_count(force: false)
-    Rails.cache.fetch(['users', id, 'personal_projects_count'], force: force, expires_in: 24.hours, raw: true) do
+    Gitlab::Cache::Store.main.fetch(['users', id, 'personal_projects_count'], force: force, expires_in: 24.hours, raw: true) do
       personal_projects.count
     end.to_i
   end
@@ -1325,23 +1325,23 @@ class User < ApplicationRecord
   end
 
   def invalidate_issue_cache_counts
-    Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
+    Gitlab::Cache::Store.main.delete(['users', id, 'assigned_open_issues_count'])
   end
 
   def invalidate_merge_request_cache_counts
-    Rails.cache.delete(['users', id, 'assigned_open_merge_requests_count'])
+    Gitlab::Cache::Store.main.delete(['users', id, 'assigned_open_merge_requests_count'])
   end
 
   def invalidate_todos_done_count
-    Rails.cache.delete(['users', id, 'todos_done_count'])
+    Gitlab::Cache::Store.main.delete(['users', id, 'todos_done_count'])
   end
 
   def invalidate_todos_pending_count
-    Rails.cache.delete(['users', id, 'todos_pending_count'])
+    Gitlab::Cache::Store.main.delete(['users', id, 'todos_pending_count'])
   end
 
   def invalidate_personal_projects_count
-    Rails.cache.delete(['users', id, 'personal_projects_count'])
+    Gitlab::Cache::Store.main.delete(['users', id, 'personal_projects_count'])
   end
 
   # This is copied from Devise::Models::Lockable#valid_for_authentication?, as our auth

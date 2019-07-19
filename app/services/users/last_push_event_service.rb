@@ -9,7 +9,7 @@ module Users
       @user = user
     end
 
-    # Caches the given push event for the current user in the Rails cache.
+    # Caches the given push event for the current user in the Gitlab::Cache::Store.main.
     #
     # event - An instance of PushEvent to cache.
     def cache_last_push_event(event)
@@ -50,7 +50,7 @@ module Users
         # We don't want to keep querying the same data over and over when a
         # merge request has been created, thus we remove the key if no event
         # (meaning an MR was created) is returned.
-        Rails.cache.delete(cache_key)
+        Gitlab::Cache::Store.main.delete(cache_key)
       end
 
       event
@@ -75,13 +75,13 @@ module Users
     end
 
     def get_key(key)
-      Rails.cache.read(key, raw: true)
+      Gitlab::Cache::Store.main.read(key, raw: true)
     end
 
     def set_key(key, value)
       # We're using raw values here since this takes up less space and we don't
       # store complex objects.
-      Rails.cache.write(key, value, raw: true, expires_in: EXPIRATION)
+      Gitlab::Cache::Store.main.write(key, value, raw: true, expires_in: EXPIRATION)
     end
   end
 end
