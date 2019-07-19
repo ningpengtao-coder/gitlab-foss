@@ -59,7 +59,7 @@ export default {
     state.groups.forEach(group => {
       group.metrics.forEach(metric => {
         metric.queries.forEach(query => {
-          if (query.metric_id === metricId) {
+          if ((query.metric_id || query.id) === metricId) {
             state.metricsWithData.push(metricId);
             // ensure dates/numbers are correctly formatted for charts
             const normalizedResults = result.map(normalizeQueryResult);

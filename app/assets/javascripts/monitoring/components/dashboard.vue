@@ -222,7 +222,7 @@ export default {
         return charts;
       }
       return charts.filter(chart =>
-        chart.metrics.some(metric => this.metricsWithData.includes(metric.metric_id)),
+        chart.metrics.some(metric => this.metricsWithData.includes(metric.metric_id || metric.id)),
       );
     },
     // TODO: BEGIN, Duplicated code with panel_type until feature flag is removed

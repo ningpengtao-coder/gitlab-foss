@@ -164,7 +164,7 @@ export const fetchPrometheusMetric = ({ commit }, { metric, params }) => {
   };
 
   return fetchPrometheusResult(metric.prometheus_endpoint_path, queryParams).then(result => {
-    commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
+    commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id || metric.id, result });
   });
 };
 
