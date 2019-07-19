@@ -35,7 +35,6 @@ export default {
     <ul class="list-unstyled">
       <li>
         <button
-          v-tooltip
           :class="{
             active: currentActivityView === $options.activityBarViews.edit,
           }"
@@ -53,7 +52,6 @@ export default {
       </li>
       <li>
         <button
-          v-tooltip
           :class="{
             active: currentActivityView === $options.activityBarViews.review,
           }"
@@ -71,7 +69,6 @@ export default {
       </li>
       <li v-show="hasChanges">
         <button
-          v-tooltip
           :class="{
             active: currentActivityView === $options.activityBarViews.commit,
           }"
