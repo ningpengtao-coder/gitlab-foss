@@ -48,6 +48,7 @@ export default {
           @click.prevent="changedActivityView($event, $options.activityBarViews.edit)"
         >
           <icon name="code" />
+          <span>{{s__('IDE|Edit')}}</span>
         </button>
       </li>
       <li>
@@ -65,6 +66,7 @@ export default {
           @click.prevent="changedActivityView($event, $options.activityBarViews.review)"
         >
           <icon name="file-modified" />
+          <span>{{s__('IDE|Review')}}</span>
         </button>
       </li>
       <li v-show="hasChanges">
@@ -82,6 +84,7 @@ export default {
           @click.prevent="changedActivityView($event, $options.activityBarViews.commit)"
         >
           <icon name="commit" />
+          <span>{{s__('IDE|Commit')}}</span>
         </button>
       </li>
     </ul>
