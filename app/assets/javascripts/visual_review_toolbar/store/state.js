@@ -63,7 +63,7 @@ const initializeState = (wind, doc) => {
     href,
     innerWidth,
     innerHeight,
-    // mergeRequestId,
+    mergeRequestId,
     mrUrl,
     platform,
     projectId,
