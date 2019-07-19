@@ -41,7 +41,7 @@ export default {
     closeButtonLabel: {
       type: String,
       required: false,
-      default: __('Cancel'),
+      default: 'Cancel',
     },
     primaryButtonLabel: {
       type: String,

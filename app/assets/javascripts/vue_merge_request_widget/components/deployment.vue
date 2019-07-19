@@ -14,7 +14,7 @@ import ReviewAppLink from './review_app_link.vue';
 import MRWidgetService from '../services/mr_widget_service';
 
 export default {
-  name: 'Deployment',
+  name: __('Deployment'),
   components: {
     LoadingButton,
     MemoryUsage,

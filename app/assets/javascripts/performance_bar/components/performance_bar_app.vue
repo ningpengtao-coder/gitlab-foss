@@ -43,7 +43,7 @@ export default {
     },
     {
       metric: 'redis',
-      header: 'Redis calls',
+      header: s__('PerformanceBar|Redis calls'),
       details: 'details',
       keys: ['cmd'],
     },
