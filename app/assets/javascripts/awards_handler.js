@@ -21,14 +21,14 @@ const requestAnimationFrame =
 const FROM_SENTENCE_REGEX = /(?:, and | and |, )/; // For separating lists produced by ruby's Array#toSentence
 
 const categoryLabelMap = {
-  activity: 'Activity',
-  people: 'People',
-  nature: 'Nature',
-  food: 'Food',
-  travel: 'Travel',
-  objects: 'Objects',
-  symbols: 'Symbols',
-  flags: 'Flags',
+  activity: __('Activity'),
+  people: __('People'),
+  nature: __('Nature'),
+  food: __('Food'),
+  travel: __('Travel'),
+  objects: __('Objects'),
+  symbols: __('Symbols'),
+  flags: __('Flags'),
 };
 
 const IS_VISIBLE = 'is-visible';
@@ -154,7 +154,7 @@ export class AwardsHandler {
     const frequentlyUsedEmojis = this.getFrequentlyUsedEmojis();
     let frequentlyUsedCatgegory = '';
     if (frequentlyUsedEmojis.length > 0) {
-      frequentlyUsedCatgegory = this.renderCategory('Frequently used', frequentlyUsedEmojis, {
+      frequentlyUsedCatgegory = this.renderCategory(__('Frequently used'), frequentlyUsedEmojis, {
         menuListClass: 'frequent-emojis',
       });
     }

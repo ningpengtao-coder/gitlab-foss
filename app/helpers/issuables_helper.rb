@@ -226,10 +226,13 @@ module IssuablesHelper
 
   def issuables_state_counter_text(issuable_type, state, display_count)
     titles = {
-      opened: "Open"
+      opened: _("Open"),
+      closed: _("Closed"),
+      merged: _("Merged"),
+      all: _("All")
     }
 
-    state_title = titles[state] || state.to_s.humanize
+    state_title = titles[state]
     html = content_tag(:span, state_title)
 
     if display_count
