@@ -13,7 +13,7 @@ const singleForm = ({
 }) => `
   <div>
     <label for="${inputId}" class="gitlab-label">${labelText}</label>
-    <input class="gitlab-input" type="${type}" id="${inputId}" name="${inputId}" placeholder="e.g., ${placeholder}" aria-required="true" autocomplete="${autocomplete}">
+    <input class="gitlab-input" type="${type}" id="${inputId}" name="${inputId}" placeholder="${placeholder}" aria-required="true" autocomplete="${autocomplete}">
   </div>
   <div class="gitlab-checkbox-wrapper">
     <input type="checkbox" id="${REMEMBER_ITEM}" name="${REMEMBER_ITEM}" value="remember">
