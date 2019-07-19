@@ -486,6 +486,31 @@ describe('Job App ', () => {
         });
       });
     });
+
+    describe('sidebar', () => {
+      it('has no blank blocks', done => {
+        mock.onGet(props.endpoint).replyOnce(
+          200,
+          Object.assign({}, job, {
+            duration: null,
+            finished_at: null,
+            erased_at: null,
+            queued: null,
+            runner: null,
+            coverage: null,
+            tags: [],
+            cancel_path: null,
+          }),
+        );
+
+        setTimeout(() => {
+          vm.$el.querySelectorAll('.blocks-container > *').forEach(block => {
+            expect(block.textContent.trim()).not.toBe('');
+          });
+          done();
+        }, 0);
+      });
+    });
   });
 
   describe('archived job', () => {
