@@ -57,8 +57,6 @@ module Gitlab
           sample_gc
 
           metrics[:sampler_duration].increment(labels, System.monotonic_time - start_time)
-        ensure
-          GC::Profiler.clear
         end
 
         private
@@ -71,6 +69,8 @@ module Gitlab
 
           # Collect the GC time since last sample in float seconds.
           metrics[:total_time].increment(labels, GC::Profiler.total_time)
+
+          GC::Profiler.clear
         end
 
         def set_memory_usage_metrics
