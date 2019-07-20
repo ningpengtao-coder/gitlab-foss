@@ -55,4 +55,4 @@ const addMr = state => {
   addForm(nextView(state, MR_ID));
 };
 
-export { addMr, mrForm };
+export { addMr, mrForm, storeMR };

@@ -48,4 +48,4 @@ const authorizeUser = state => {
   addForm(nextView(state, LOGIN));
 };
 
-export { authorizeUser, login };
+export { authorizeUser, login, storeToken };
