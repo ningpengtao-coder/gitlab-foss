@@ -59,8 +59,9 @@ const initializeGlobalListeners = () => {
       saveComment();
     } catch (err) {
       // in this case, if saving the comment fails,
-      // the user will be warned
+      // the user will be warned, as recommended by MDN: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload#Example
       event.preventDefault();
+      /* eslint-disable-next-line no-param-reassign */
       event.returnValue = '';
     }
   });
