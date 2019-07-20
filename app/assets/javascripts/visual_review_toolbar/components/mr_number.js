@@ -19,7 +19,7 @@ const mrForm = singleForm({
   inputId: MR_ID,
   buttonId: MR_ID_BUTTON,
   autocomplete: '',
-  type: 'text',
+  type: 'number',
   placeholder: 'e.g., 321',
   ...texts,
 });
