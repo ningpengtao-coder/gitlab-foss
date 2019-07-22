@@ -153,6 +153,7 @@ Continued reading:
 - [Quick Start Guide](quick_start_guide.md)
 - [Style Guide](style_guide.md)
 - [Best Practices](best_practices.md)
+- [How to add and test new scenarios](new_scenarios.md)
 
 ## Where can I ask for help?
 
