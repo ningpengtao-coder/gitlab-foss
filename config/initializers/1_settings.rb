@@ -644,7 +644,8 @@ Settings['monitoring'] ||= Settingslogic.new({})
 Settings.monitoring['ip_whitelist'] ||= ['127.0.0.1/8']
 Settings.monitoring['unicorn_sampler_interval'] ||= 10
 Settings.monitoring['puma_sampler_interval'] ||= 5
-Settings.monitoring['ruby_sampler_interval'] ||= 60
+# TODO: for test, remove later
+Settings.monitoring['ruby_sampler_interval'] ||= 20
 Settings.monitoring['sidekiq_exporter'] ||= Settingslogic.new({})
 Settings.monitoring.sidekiq_exporter['enabled'] ||= false
 Settings.monitoring.sidekiq_exporter['address'] ||= 'localhost'

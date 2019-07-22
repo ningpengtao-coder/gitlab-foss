@@ -9,6 +9,8 @@ module Gitlab
         def initialize(interval)
           metrics[:process_start_time_seconds].set(labels, Time.now.to_i)
 
+          @last_gc_count = GC.stat[:count]
+
           super
         end
 
@@ -37,7 +39,9 @@ module Gitlab
             process_resident_memory_bytes:  ::Gitlab::Metrics.gauge(with_prefix(:process, :resident_memory_bytes), 'Memory used', labels),
             process_start_time_seconds:     ::Gitlab::Metrics.gauge(with_prefix(:process, :start_time_seconds), 'Process start time seconds'),
             sampler_duration:               ::Gitlab::Metrics.counter(with_prefix(:sampler, :duration_seconds_total), 'Sampler time', labels),
-            total_time:                     ::Gitlab::Metrics.counter(with_prefix(:gc, :duration_seconds_total), 'Total GC time', labels)
+            total_time:                     ::Gitlab::Metrics.counter(with_prefix(:gc, :duration_seconds_total), 'Total GC time', labels),
+
+            ruby_gc_lost_profile_events:    ::Gitlab::Metrics.counter(with_prefix(:gc, :lost_profile_events), 'Lost GC::Profiler events', labels)
           }
 
           GC.stat.keys.each do |key|
@@ -61,16 +65,30 @@ module Gitlab
 
         private
 
+        # TODO: move most of the logic to a separate class
         def sample_gc
-          # Collect generic GC stats.
-          GC.stat.each do |key, value|
-            metrics[key].set(labels, value)
+          current_gc_count = GC.stat[:count]
+          new_events_since_last_sample = current_gc_count - @last_gc_count
+
+          profiled_events = GC::Profiler.raw_data.count
+
+          lost_profiled_events = new_events_since_last_sample - profiled_events
+          unless lost_profiled_events.zero?
+            ruby_gc_lost_profile_events.increment(lost_profiled_events)
           end
 
           # Collect the GC time since last sample in float seconds.
           metrics[:total_time].increment(labels, GC::Profiler.total_time)
 
+          @last_gc_count = current_gc_count
+          # TODO: ensure it's not called somewhere else (wrap into separate class + cop)
           GC::Profiler.clear
+
+          # Collect generic GC stats.
+          GC.stat.each do |key, value|
+            metrics[key].set(labels, value)
+          end
+
         end
 
         def set_memory_usage_metrics
