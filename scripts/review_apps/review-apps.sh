@@ -156,8 +156,9 @@ function install_external_dns() {
 function create_application_secret() {
   echoinfo "Creating the ${CI_ENVIRONMENT_SLUG}-gitlab-initial-root-password secret in the ${KUBE_NAMESPACE} namespace..." true
 
-  kubectl create secret generic -n "$KUBE_NAMESPACE" \
+  kubectl create secret generic \
     "${CI_ENVIRONMENT_SLUG}-gitlab-initial-root-password" \
+    -n "$KUBE_NAMESPACE" \
     --from-literal="password=${REVIEW_APPS_ROOT_PASSWORD}" \
     --dry-run -o json | kubectl apply -f -
 }
