@@ -34,11 +34,8 @@ const selectNoteContainer = () => document.getElementById(NOTE_CONTAINER);
 const selectRemember = () => document.getElementById(REMEMBER_ITEM);
 const selectToken = () => document.getElementById(TOKEN_BOX);
 
-const escape = str => str.replace(/[^0-9A-Za-z ]/g, () => '');
-
 export {
   buttonClearStyles,
-  escape,
   selectById,
   selectCollapseButton,
   selectContainer,

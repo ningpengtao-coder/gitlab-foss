@@ -2,7 +2,7 @@ import { nextView } from '../store';
 import { MR_ID, MR_ID_BUTTON } from './constants';
 import { clearNote, postError } from './note';
 import singleForm from './single_line_form';
-import { escape, selectMrBox, selectRemember } from './utils';
+import { selectMrBox, selectRemember } from './utils';
 import { addForm } from './wrapper';
 
 /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
@@ -51,8 +51,8 @@ const addMr = state => {
     return;
   }
 
-  storeMR(escape(mrNumber), state);
+  storeMR(mrNumber, state);
   addForm(nextView(state, MR_ID));
 };
 
-export { addMr, mrForm, storeMR };
+export { addMr, mrForm };
