@@ -135,6 +135,6 @@ You can use that value in [a new GitLab QA pipeline](https://gitlab.com/gitlab-o
 
 ![The Run Pipeline screen in the GitLab QA project showing a non-master branch selected and a value for the RELEASE environment variable](img/run_pipeline_v12_1.png)
 
-GitLab QA uses that GitLab Docker image name to derive the QA Docker image name. E.g., a GitLab Docker image with the name `registry.gitlab.com/gitlab-org/omnibus-gitlab/gitlab-ee:4fac57ed1408c29121bc8446c8cdbcae515ac064` corresponds to a QA Docker image named `registry.gitlab.com/gitlab-org/omnibus-gitlab/gitlab-ee:4fac57ed1408c29121bc8446c8cdbcae515ac064` (note `gitlab-ee` vs. `gitlab-ee-qa`).
+GitLab QA uses that GitLab Docker image name to derive the QA Docker image name. E.g., a GitLab Docker image with the name `registry.gitlab.com/gitlab-org/omnibus-gitlab/gitlab-ee:4fac57ed1408c29121bc8446c8cdbcae515ac064` corresponds to a QA Docker image named `registry.gitlab.com/gitlab-org/omnibus-gitlab/gitlab-ee-qa:4fac57ed1408c29121bc8446c8cdbcae515ac064` (note `gitlab-ee` vs. `gitlab-ee-qa`).
 
 When you run that pipeline, it will use the changes in the GitLab QA branch, e.g., your new orchestrated scenario, and the changes in your GitLab CE/EE merge request, e,g., your new instance-level scenario and tests.
