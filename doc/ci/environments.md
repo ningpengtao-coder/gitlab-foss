@@ -561,6 +561,28 @@ to automatically stop.
 
 You can read more in the [`.gitlab-ci.yml` reference](yaml/README.md#environmenton_stop).
 
+### Deleting an environment
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/31032) in GitLab 12.3.
+
+You can delete stopped environments in one of two ways.
+
+The first way is to access the **Delete** button by viewing the list of
+**Stopped** environments.
+
+  1. Navigate to **Operations > Environments**.
+  1. Click the **Stopped** tab to access the list of stopped environments.
+  1. Click the **Delete** button that appears next to the environment you want to delete.
+  1. Finally, confirm your chosen environment in the modal that appears to delete it.
+
+The second way is to access the **Delete** button by viewing the details for a
+stopped environment.
+
+  1. Navigate to **Operations > Environments**.
+  1. Click on the name of an environment within the **Stopped** enfironments list.
+  1. Click on the **Delete** button that appears at the top for all stopped environments.
+  1. Finally, confirm your chosen environment in the modal that appears to delete it.
+
 ### Grouping similar environments
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7015) in GitLab 8.14.

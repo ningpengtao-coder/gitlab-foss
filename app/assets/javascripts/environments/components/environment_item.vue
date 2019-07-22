@@ -10,6 +10,7 @@ import environmentItemMixin from 'ee_else_ce/environments/mixins/environment_ite
 import ActionsComponent from './environment_actions.vue';
 import ExternalUrlComponent from './environment_external_url.vue';
 import StopComponent from './environment_stop.vue';
+import DeleteComponent from './environment_delete.vue';
 import RollbackComponent from './environment_rollback.vue';
 import TerminalButtonComponent from './environment_terminal_button.vue';
 import MonitoringButtonComponent from './environment_monitoring.vue';
@@ -32,6 +33,7 @@ export default {
     ActionsComponent,
     ExternalUrlComponent,
     StopComponent,
+    DeleteComponent,
     RollbackComponent,
     TerminalButtonComponent,
     MonitoringButtonComponent,
@@ -87,6 +89,15 @@ export default {
      */
     canStopEnvironment() {
       return this.model && this.model.can_stop;
+    },
+
+    /**
+     * Returns whether the environment can be deleted.
+     *
+     * @returns {Boolean}
+     */
+    canDeleteEnvironment() {
+      return this.model && !this.model.can_stop && this.model.can_update && this.model.delete_path;
     },
 
     /**
@@ -431,6 +442,7 @@ export default {
         this.externalURL ||
         this.monitoringUrl ||
         this.canStopEnvironment ||
+        this.canDeleteEnvironment ||
         this.canRetry
       );
     },
@@ -582,6 +594,8 @@ export default {
         />
 
         <stop-component v-if="canStopEnvironment" :environment="model" />
+
+        <delete-component v-if="canDeleteEnvironment" :environment="model" />
       </div>
     </div>
   </div>

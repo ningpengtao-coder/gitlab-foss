@@ -29,6 +29,10 @@ module GitlabRoutingHelper
     metrics_project_environment_path(environment.project, environment, *args)
   end
 
+  def environment_delete_path(project, environment, *args)
+    "#{Settings.gitlab.url}/api/v4/projects/#{project.id}/environments/#{environment.id}"
+  end
+
   def issue_path(entity, *args)
     project_issue_path(entity.project, entity, *args)
   end

@@ -14,7 +14,8 @@ export default () =>
     },
     mixins: [canaryCalloutMixin],
     data() {
-      const environmentsData = document.querySelector(this.$options.el).dataset;
+      const domEl = document.querySelector(this.$options.el);
+      const environmentsData = domEl.dataset;
 
       return {
         endpoint: environmentsData.environmentsDataEndpoint,

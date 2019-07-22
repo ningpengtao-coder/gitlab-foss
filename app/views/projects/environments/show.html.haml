@@ -34,6 +34,24 @@
             = button_to stop_project_environment_path(@project, @environment), class: 'btn btn-danger has-tooltip', method: :post do
               = s_('Environments|Stop environment')
 
+%div{ class: container_class }
+  - if can?(current_user, :update_environment, @environment) && @environment.stopped?
+    #delete-environment-modal.modal.fade{ tabindex: -1 }
+      .modal-dialog
+        .modal-content
+          .modal-header
+            %h4.modal-title.d-flex.mw-100
+              = s_("Environments|Delete environment")
+              %span.has-tooltip.text-truncate.ml-1.mr-1.flex-fill{ title: @environment.name, data: { container: '#delete-environment-modal' } }
+                = @environment.name
+              ?
+          .modal-body
+            %p= s_("Environments|Deleting the '%{environment_name}' environment cannot be undone. Are you sure?") % { environment_name: @environment.name }
+          .modal-footer
+            = button_tag _('Cancel'), type: 'button', class: 'btn btn-cancel', data: { dismiss: 'modal' }
+            = button_to environment_delete_path(@project, @environment), class: 'btn btn-danger has-tooltip', data: { redirect_url: project_environments_path(@project) }, method: :delete do
+              = s_('Environments|Delete environment')
+
   .top-area
     %h3.page-title= @environment.name
     .nav-controls.ml-auto.my-2
@@ -47,6 +65,10 @@
           target: '#stop-environment-modal' } do
           = sprite_icon('stop')
           = s_('Environments|Stop')
+      - if can?(current_user, :update_environment, @environment) && @environment.stopped?
+        = button_tag class: 'btn btn-danger', type: 'button', data: { toggle: 'modal',
+          target: '#delete-environment-modal' } do
+          = s_('Environments|Delete')
 
   .environments-container
     - if @deployments.blank?
