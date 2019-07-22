@@ -69,7 +69,9 @@ module Projects
       new_project.forked_from_project = @project
 
       builds_access_level = @project.project_feature.builds_access_level
-      new_project.project_feature.update(builds_access_level: builds_access_level)
+      new_project
+        .project_feature
+        .update(project_id: new_project.id, builds_access_level: builds_access_level)
 
       new_project
     end
