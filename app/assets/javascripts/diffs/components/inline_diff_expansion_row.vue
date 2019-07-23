@@ -106,8 +106,8 @@ export default {
 
       this.isRequesting = true;
       const endpoint = this.contextLinesPath;
-      let oldLineNumber = this.line.meta_data.old_pos || 0;
-      let newLineNumber = this.line.meta_data.new_pos || 0;
+      const oldLineNumber = this.line.meta_data.old_pos || 0;
+      const newLineNumber = this.line.meta_data.new_pos || 0;
       const offset = newLineNumber - oldLineNumber;
       const bottom = this.isBottom;
       const { fileHash } = this;
@@ -132,8 +132,8 @@ export default {
         to = newLineNumber - 1;
 
         // This will adjust it to be the top:
-        newLineNumber = prevLineNumber;
-        oldLineNumber = prevLineNumber - offset;
+        // newLineNumber = prevLineNumber;
+        // oldLineNumber = prevLineNumber - offset;
       }
 
       const params = { since, to, bottom, offset, unfold, view };
@@ -153,9 +153,11 @@ export default {
     },
     handleExpandDownLines() {
       console.log('%c===============', 'color:DodgerBlue');
-      // if (this.isRequesting) {
-      //   return;
-      // }
+      if (this.isRequesting) {
+        return;
+      }
+
+      console.log('>>>> this.diffFiles', this.diffFiles);
 
       this.isRequesting = true;
       const endpoint = this.contextLinesPath;
@@ -165,6 +167,7 @@ export default {
       const bottom = this.isBottom;
       const { fileHash } = this;
       const view = this.diffViewType;
+      let handleDown = false;
       // LET
       let unfold = true;
 
@@ -173,20 +176,27 @@ export default {
       let since = lineNumber;
       let to = lineNumber + UNFOLD_COUNT;
 
+      console.log('this line OLD', this.line.meta_data.old_pos);
+      console.log('this line NEW', this.line.meta_data.new_pos);
+
       // NOT bottom
       if (!bottom) {
         console.log('if(!bottom) >> bottom:', bottom);
         // Do some logic to find "prevLineNumber"
         const diffFile = utils.findDiffFile(this.diffFiles, this.fileHash);
+        console.log('diffFile', diffFile);
         const indexForInline = utils.findIndexInInlineLines(diffFile.highlighted_diff_lines, {
           oldLineNumber,
           newLineNumber,
         });
+        console.log('indexForInline', indexForInline);
+
         const prevLine = diffFile.highlighted_diff_lines[indexForInline - 2];
         const prevLineNumber = (prevLine && prevLine.new_line) || 0;
 
         console.log('prevLine', prevLine);
         console.log('prevLineNumber', prevLineNumber);
+        // debugger;
 
         // This will adjust it to be the top:
         newLineNumber = prevLineNumber;
@@ -200,22 +210,31 @@ export default {
           to = this.line.meta_data.new_pos - 1;
           unfold = false;
         }
+        handleDown = true;
+        // debugger;
       }
-
       const params = { since, to, bottom, offset, unfold, view };
       const lineNumbers = { oldLineNumber, newLineNumber };
+      const nextLineNumbers = {
+        old_line: this.line.meta_data.old_pos || 0,
+        new_line: this.line.meta_data.new_pos || 0,
+      };
+      // const lineNumbers = {
+      //   oldLineNumber: this.line.meta_data.old_pos || 0,
+      //   newLineNumber: this.line.meta_data.new_pos || 0,
+      // };
 
       console.log('params', params);
       console.log('lineNumbers', lineNumbers);
 
-      // this.loadMoreLines({ endpoint, params, lineNumbers, fileHash })
-      //   .then(() => {
-      //     this.isRequesting = false;
-      //   })
-      //   .catch(() => {
-      //     createFlash(s__('Diffs|Something went wrong while fetching diff lines.'));
-      //     this.isRequesting = false;
-      //   });
+      this.loadMoreLines({ endpoint, params, lineNumbers, fileHash, handleDown, nextLineNumbers })
+        .then(() => {
+          this.isRequesting = false;
+        })
+        .catch(() => {
+          createFlash(s__('Diffs|Something went wrong while fetching diff lines.'));
+          this.isRequesting = false;
+        });
     },
   },
 };

@@ -183,9 +183,13 @@ export const cancelCommentForm = ({ commit }, { lineCode, fileHash }) => {
 };
 
 export const loadMoreLines = ({ commit }, options) => {
-  const { endpoint, params, lineNumbers, fileHash } = options;
+  const { endpoint, params, lineNumbers, fileHash, handleDown = false, nextLineNumbers = {} } = options;
 
   params.from_merge_request = true;
+
+  if (handleDown) {
+    params.bottom = true;
+  }
 
   return axios.get(endpoint, { params }).then(res => {
     const contextLines = res.data || [];
@@ -199,6 +203,8 @@ export const loadMoreLines = ({ commit }, options) => {
       contextLines,
       params,
       fileHash,
+      handleDown,
+      nextLineNumbers,
     });
   });
 };

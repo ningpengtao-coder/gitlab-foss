@@ -55,8 +55,10 @@ export default {
           :is-top="index === 0"
           :is-bottom="index + 1 === diffLinesLength"
         />
+        <!-- SAM: 👇 figure out a better ID-->
         <inline-diff-table-row
-          :key="line.line_code || index"
+          :class="`inline-diff-table-row${line.line_code || index}`"
+          :key="`table-${line.line_code || index}`"
           :file-hash="diffFile.file_hash"
           :context-lines-path="diffFile.context_lines_path"
           :line="line"

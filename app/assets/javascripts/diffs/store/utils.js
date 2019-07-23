@@ -112,20 +112,33 @@ export const findIndexInParallelLines = (lines, lineNumbers) => {
   );
 };
 
-export function removeMatchLine(diffFile, lineNumbers, bottom) {
+export function removeMatchLine(diffFile, lineNumbers, bottom, handleDown) {
   const indexForInline = findIndexInInlineLines(diffFile.highlighted_diff_lines, lineNumbers);
   const indexForParallel = findIndexInParallelLines(diffFile.parallel_diff_lines, lineNumbers);
-  const factor = bottom ? 1 : -1;
+  let factor = bottom ? 1 : -1;
+
+  if (handleDown) {
+    factor = 1;
+  }
+
+  // console.log(
+  //   'removeMatchLine',
+  //   diffFile.highlighted_diff_lines.splice(indexForInline + factor, 1),
+  //   diffFile.parallel_diff_lines.splice(indexForParallel + factor, 1),
+  // );
 
   diffFile.highlighted_diff_lines.splice(indexForInline + factor, 1);
   diffFile.parallel_diff_lines.splice(indexForParallel + factor, 1);
 }
 
-export function addLineReferences(lines, lineNumbers, bottom) {
+export function addLineReferences(lines, lineNumbers, bottom, handleDown, nextLineNumbers) {
   const { oldLineNumber, newLineNumber } = lineNumbers;
   const lineCount = lines.length;
   let matchLineIndex = -1;
 
+  console.log('addLineReferences BOTTOM', bottom);
+
+  // Fill in the lines
   const linesWithNumbers = lines.map((l, index) => {
     if (l.type === MATCH_LINE_TYPE) {
       matchLineIndex = index;
@@ -139,12 +152,28 @@ export function addLineReferences(lines, lineNumbers, bottom) {
     return l;
   });
 
+  // console.log('linesWithNumbers', linesWithNumbers);
+  // debugger;
+
+  // We need to set the meta_data to use the next line numbers
   if (matchLineIndex > -1) {
     const line = linesWithNumbers[matchLineIndex];
-    const targetLine = bottom
-      ? linesWithNumbers[matchLineIndex - 1]
-      : linesWithNumbers[matchLineIndex + 1];
+    let targetLine;
 
+    if (handleDown) {
+      // targetLine = linesWithNumbers[matchLineIndex - 1];
+      targetLine = nextLineNumbers;
+    } else if (bottom) {
+      targetLine = linesWithNumbers[matchLineIndex - 1];
+    } else {
+      targetLine = linesWithNumbers[matchLineIndex + 1];
+    }
+
+    // const targetLine = bottom
+    //   ? linesWithNumbers[matchLineIndex - 1]
+    //   : linesWithNumbers[matchLineIndex + 1];
+
+    // This has to be numbers AFTER the gutter
     Object.assign(line, {
       meta_data: {
         old_pos: targetLine.old_line,
@@ -152,19 +181,24 @@ export function addLineReferences(lines, lineNumbers, bottom) {
       },
     });
   }
-
+  console.log('linesWithNumbers', linesWithNumbers);
   return linesWithNumbers;
 }
 
 export function addContextLines(options) {
-  const { inlineLines, parallelLines, contextLines, lineNumbers } = options;
+  const { inlineLines, parallelLines, contextLines, lineNumbers, handleDown } = options;
   const normalizedParallelLines = contextLines.map(line => ({
     left: line,
     right: line,
     line_code: line.line_code,
   }));
 
-  if (options.bottom) {
+  if (handleDown) {
+    const inlineIndex = findIndexInInlineLines(inlineLines, lineNumbers);
+    const parallelIndex = findIndexInParallelLines(parallelLines, lineNumbers);
+    inlineLines.splice(inlineIndex + 1, 0, ...contextLines);
+    parallelLines.splice(parallelIndex + 1, 0, ...normalizedParallelLines);
+  } else if (options.bottom) {
     inlineLines.push(...contextLines);
     parallelLines.push(...normalizedParallelLines);
   } else {
@@ -173,6 +207,8 @@ export function addContextLines(options) {
     inlineLines.splice(inlineIndex, 0, ...contextLines);
     parallelLines.splice(parallelIndex, 0, ...normalizedParallelLines);
   }
+
+  console.log('inlineLines', inlineLines);
 }
 
 /**

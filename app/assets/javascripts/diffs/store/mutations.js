@@ -71,25 +71,37 @@ export default {
   },
 
   [types.ADD_CONTEXT_LINES](state, options) {
-    const { lineNumbers, contextLines, fileHash } = options;
+    const { lineNumbers, contextLines, fileHash, handleDown, nextLineNumbers } = options;
     const { bottom } = options.params;
     const diffFile = findDiffFile(state.diffFiles, fileHash);
 
-    removeMatchLine(diffFile, lineNumbers, bottom);
+    console.log('ADD_CONTEXT_LINES handleDown', handleDown);
 
-    const lines = addLineReferences(contextLines, lineNumbers, bottom).map(line => ({
+    // Remove the Gutter
+    removeMatchLine(diffFile, lineNumbers, bottom, handleDown);
+
+    // Fill in the new_line and old_line info
+    const lines = addLineReferences(
+      contextLines,
+      lineNumbers,
+      bottom,
+      handleDown, // SAM: delete
+      nextLineNumbers,
+    ).map(line => ({
       ...line,
       line_code: line.line_code || `${fileHash}_${line.old_line}_${line.new_line}`,
       discussions: line.discussions || [],
       hasForm: false,
     }));
 
+    // Add the news lines into the array
     addContextLines({
       inlineLines: diffFile.highlighted_diff_lines,
       parallelLines: diffFile.parallel_diff_lines,
       contextLines: lines,
       bottom,
       lineNumbers,
+      handleDown,
     });
   },
 
