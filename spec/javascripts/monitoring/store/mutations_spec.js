@@ -162,6 +162,36 @@ describe('Monitoring mutations', () => {
 
       expect(stateCopy.metricsWithData).toEqual([]);
     });
+
+    it('sets metricsWithData value when using the id field', () => {
+      stateCopy.groups.map(group => {
+        const modGroup = group;
+        const metrics = group.metrics.map(metric => {
+          const modMetric = metric;
+          const queries = metric.queries.map(query => {
+            const modQuery = query;
+
+            delete modQuery.metric_id;
+            return modQuery;
+          });
+
+          modMetric.queries = queries;
+          return modMetric;
+        });
+
+        modGroup.metrics = metrics;
+        return modGroup;
+      });
+
+      mutations[types.SET_QUERY_RESULT](stateCopy, {
+        metricId: 'system_metrics_kubernetes_container_memory_total',
+        result,
+      });
+
+      expect(stateCopy.metricsWithData).toEqual([
+        'system_metrics_kubernetes_container_memory_total',
+      ]);
+    });
   });
 
   describe('SET_ALL_DASHBOARDS', () => {
