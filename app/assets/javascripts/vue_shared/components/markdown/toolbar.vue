@@ -52,7 +52,7 @@ export default {
       <span class="uploading-progress-container hide">
         <i class="fa fa-file-image-o toolbar-button-icon" aria-hidden="true"></i>
         <span class="attaching-file-message"></span>
-        <span class="uploading-progress">{{ __("0%") }}</span>
+        <span class="uploading-progress">{{ __('0%') }}</span>
         <span class="uploading-spinner">
           <i class="fa fa-spinner fa-spin toolbar-button-icon" aria-hidden="true"></i>
         </span>
