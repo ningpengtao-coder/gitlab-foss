@@ -27,20 +27,28 @@ describe Prometheus::PidProvider do
         hide_const('Puma')
       end
 
-      context 'when `Prometheus::Client::Support::Unicorn` provides worker_id' do
+      context 'when unicorn master is specified in process name' do
         before do
-          expect(::Prometheus::Client::Support::Unicorn).to receive(:worker_id).and_return(1)
+          expect(described_class).to receive(:process_name).at_least(:once).and_return('unicorn_rails master')
+        end
+
+        it { is_expected.to eq 'unicorn_master' }
+      end
+
+      context 'when unicorn worker id is specified in process name' do
+        before do
+          expect(described_class).to receive(:process_name).at_least(:once).and_return('unicorn_rails worker[1]')
         end
 
         it { is_expected.to eq 'unicorn_1' }
       end
 
-      context 'when no worker_id is provided from `Prometheus::Client::Support::Unicorn`' do
+      context 'when no specified unicorn master or worker id in process name' do
         before do
-          expect(::Prometheus::Client::Support::Unicorn).to receive(:worker_id).and_return(nil)
+          expect(described_class).to receive(:process_name).at_least(:once).and_return('bin/unicorn_rails')
         end
 
-        it { is_expected.to eq 'unicorn_master' }
+        it { is_expected.to eq "process_#{Process.pid}" }
       end
     end
 
