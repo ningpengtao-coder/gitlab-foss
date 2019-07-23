@@ -6,7 +6,14 @@ import Icon from '~/vue_shared/components/icon.vue';
 import { MATCH_LINE_TYPE, UNFOLD_COUNT } from '../constants';
 import * as utils from '../store/utils';
 
+const EXPAND_UP = 0;
+const EXPAND_DOWN = 1;
+
 export default {
+  created() {
+    this.EXPAND_UP = EXPAND_UP;
+    this.EXPAND_DOWN = EXPAND_DOWN;
+  },
   components: {
     Icon,
   },
@@ -51,45 +58,24 @@ export default {
   },
   methods: {
     ...mapActions('diffs', ['loadMoreLines']),
-    handleExpandUpLines() {
-      if (this.isRequesting) {
-        return;
-      }
-
-      this.isRequesting = true;
-      const endpoint = this.contextLinesPath;
-      const oldLineNumber = this.line.meta_data.old_pos || 0;
-      const newLineNumber = this.line.meta_data.new_pos || 0;
-      const offset = newLineNumber - oldLineNumber;
-      const bottom = this.isBottom;
-      const { fileHash } = this;
-      const view = this.diffViewType;
-      // LET
-      let unfold = true;
-      const lineNumber = newLineNumber - 1;
-      let since = lineNumber - UNFOLD_COUNT;
-      const to = lineNumber;
-
+    getPrevLineNumber(oldLineNumber, newLineNumber) {
       const diffFile = utils.findDiffFile(this.diffFiles, this.fileHash);
       const indexForInline = utils.findIndexInInlineLines(diffFile.highlighted_diff_lines, {
         oldLineNumber,
         newLineNumber,
       });
       const prevLine = diffFile.highlighted_diff_lines[indexForInline - 2];
-      const prevLineNumber = (prevLine && prevLine.new_line) || 0;
-
-      if (since <= prevLineNumber + 1) {
-        since = prevLineNumber + 1;
-        unfold = false;
-      }
-
-      const params = { since, to, bottom, offset, unfold, view };
-      const lineNumbers = { oldLineNumber, newLineNumber };
-
-      console.log('params', params);
-      console.log('lineNumbers', lineNumbers);
-
-      this.loadMoreLines({ endpoint, params, lineNumbers, fileHash })
+      return (prevLine && prevLine.new_line) || 0;
+    },
+    callLoadMoreLines(
+      endpoint,
+      params,
+      lineNumbers,
+      fileHash,
+      isExpandDown = false,
+      nextLineNumbers = {},
+    ) {
+      this.loadMoreLines({ endpoint, params, lineNumbers, fileHash, isExpandDown, nextLineNumbers })
         .then(() => {
           this.isRequesting = false;
         })
@@ -98,12 +84,100 @@ export default {
           this.isRequesting = false;
         });
     },
-    handleShowAllLines() {
-      console.log('%c===============', 'color:DodgerBlue');
-      // if (this.isRequesting) {
-      //   return;
-      // }
+    handleExpandLines(type) {
+      if (this.isRequesting) {
+        return;
+      }
 
+      this.isRequesting = true;
+      const endpoint = this.contextLinesPath;
+      const { fileHash } = this;
+      const view = this.diffViewType;
+      const oldLineNumber = this.line.meta_data.old_pos || 0;
+      const newLineNumber = this.line.meta_data.new_pos || 0;
+      const offset = newLineNumber - oldLineNumber;
+
+      const expandOptions = { endpoint, fileHash, view, oldLineNumber, newLineNumber, offset };
+
+      if (type === EXPAND_UP) {
+        this.handleExpandUpLines(expandOptions);
+      } else if (type === EXPAND_DOWN) {
+        this.handleExpandDownLines(expandOptions);
+      } else {
+        this.handleShowAllLines();
+      }
+    },
+    handleExpandUpLines(expandOptions) {
+      const { endpoint, fileHash, view, oldLineNumber, newLineNumber, offset } = expandOptions;
+
+      const bottom = this.isBottom;
+      const lineNumber = newLineNumber - 1;
+      const to = lineNumber;
+      let since = lineNumber - UNFOLD_COUNT;
+      let unfold = true;
+
+      const prevLineNumber = this.getPrevLineNumber(oldLineNumber, newLineNumber);
+      if (since <= prevLineNumber + 1) {
+        since = prevLineNumber + 1;
+        unfold = false;
+      }
+
+      const params = { since, to, bottom, offset, unfold, view };
+      const lineNumbers = { oldLineNumber, newLineNumber };
+      this.callLoadMoreLines(endpoint, params, lineNumbers, fileHash);
+    },
+    handleExpandDownLines(expandOptions) {
+      const {
+        endpoint,
+        fileHash,
+        view,
+        oldLineNumber: metaOldPos,
+        newLineNumber: metaNewPos,
+        offset,
+      } = expandOptions;
+
+      const bottom = true;
+      const nextLineNumbers = {
+        old_line: metaOldPos,
+        new_line: metaNewPos,
+      };
+
+      let unfold = true;
+      let isExpandDown = false;
+      let oldLineNumber = metaOldPos;
+      let newLineNumber = metaNewPos;
+      let lineNumber = metaNewPos + 1;
+      let since = lineNumber;
+      let to = lineNumber + UNFOLD_COUNT;
+
+      if (!this.isBottom) {
+        const prevLineNumber = this.getPrevLineNumber(oldLineNumber, newLineNumber);
+
+        isExpandDown = true;
+        oldLineNumber = prevLineNumber - offset;
+        newLineNumber = prevLineNumber;
+        lineNumber = prevLineNumber + 1;
+        since = lineNumber;
+        to = lineNumber + UNFOLD_COUNT;
+
+        if (to >= metaNewPos) {
+          to = metaNewPos - 1;
+          unfold = false;
+        }
+      }
+
+      const params = { since, to, bottom, offset, unfold, view };
+      const lineNumbers = { oldLineNumber, newLineNumber };
+      this.callLoadMoreLines(
+        endpoint,
+        params,
+        lineNumbers,
+        fileHash,
+        isExpandDown,
+        nextLineNumbers,
+      );
+    },
+    handleShowAllLines() {
       this.isRequesting = true;
       const endpoint = this.contextLinesPath;
       const oldLineNumber = this.line.meta_data.old_pos || 0;
@@ -151,91 +225,6 @@ export default {
       //     this.isRequesting = false;
       //   });
     },
-    handleExpandDownLines() {
-      console.log('%c===============', 'color:DodgerBlue');
-      if (this.isRequesting) {
-        return;
-      }
-
-      console.log('>>>> this.diffFiles', this.diffFiles);
-
-      this.isRequesting = true;
-      const endpoint = this.contextLinesPath;
-      let oldLineNumber = this.line.meta_data.old_pos || 0;
-      let newLineNumber = this.line.meta_data.new_pos || 0;
-      const offset = newLineNumber - oldLineNumber;
-      const bottom = this.isBottom;
-      const { fileHash } = this;
-      const view = this.diffViewType;
-      let handleDown = false;
-      // LET
-      let unfold = true;
-
-      // YES bottom
-      let lineNumber = newLineNumber + 1;
-      let since = lineNumber;
-      let to = lineNumber + UNFOLD_COUNT;
-
-      console.log('this line OLD', this.line.meta_data.old_pos);
-      console.log('this line NEW', this.line.meta_data.new_pos);
-
-      // NOT bottom
-      if (!bottom) {
-        console.log('if(!bottom) >> bottom:', bottom);
-        // Do some logic to find "prevLineNumber"
-        const diffFile = utils.findDiffFile(this.diffFiles, this.fileHash);
-        console.log('diffFile', diffFile);
-        const indexForInline = utils.findIndexInInlineLines(diffFile.highlighted_diff_lines, {
-          oldLineNumber,
-          newLineNumber,
-        });
-        console.log('indexForInline', indexForInline);
-
-        const prevLine = diffFile.highlighted_diff_lines[indexForInline - 2];
-        const prevLineNumber = (prevLine && prevLine.new_line) || 0;
-
-        console.log('prevLine', prevLine);
-        console.log('prevLineNumber', prevLineNumber);
-        // debugger;
-
-        // This will adjust it to be the top:
-        newLineNumber = prevLineNumber;
-        oldLineNumber = prevLineNumber - offset;
-
-        lineNumber = prevLineNumber + 1;
-        since = lineNumber;
-        to = lineNumber + UNFOLD_COUNT;
-
-        if (to >= this.line.meta_data.new_pos) {
-          to = this.line.meta_data.new_pos - 1;
-          unfold = false;
-        }
-        handleDown = true;
-        // debugger;
-      }
-      const params = { since, to, bottom, offset, unfold, view };
-      const lineNumbers = { oldLineNumber, newLineNumber };
-      const nextLineNumbers = {
-        old_line: this.line.meta_data.old_pos || 0,
-        new_line: this.line.meta_data.new_pos || 0,
-      };
-      // const lineNumbers = {
-      //   oldLineNumber: this.line.meta_data.old_pos || 0,
-      //   newLineNumber: this.line.meta_data.new_pos || 0,
-      // };
-
-      console.log('params', params);
-      console.log('lineNumbers', lineNumbers);
-
-      this.loadMoreLines({ endpoint, params, lineNumbers, fileHash, handleDown, nextLineNumbers })
-        .then(() => {
-          this.isRequesting = false;
-        })
-        .catch(() => {
-          createFlash(s__('Diffs|Something went wrong while fetching diff lines.'));
-          this.isRequesting = false;
-        });
-    },
   },
 };
 </script>
@@ -244,7 +233,7 @@ export default {
   <tr v-if="isMatchLine" class="line_expansion">
     <td colspan="3">
       <div class="content">
-        <a v-if="canExpandUp" @click="handleExpandUpLines" class="cursor-pointer">
+        <a v-if="canExpandUp" @click="handleExpandLines(EXPAND_UP)" class="cursor-pointer">
           <icon
             :size="12"
             name="expand-left"
@@ -256,7 +245,7 @@ export default {
         <a class="mx-2 cursor-pointer" @click="handleShowAllLines">
           <span>Show all</span>
         </a>
-        <a v-if="canExpandDown" class="cursor-pointer" @click="handleExpandDownLines">
+        <a v-if="canExpandDown" class="cursor-pointer" @click="handleExpandLines(EXPAND_DOWN)">
           <icon
             :size="12"
             name="expand-left"
