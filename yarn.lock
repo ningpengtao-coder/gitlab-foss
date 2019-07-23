@@ -991,8 +991,10 @@
   dependencies:
     requireindex "~1.1.0"
 
-"@gitlab/eslint-plugin-vue-i18n@../../eslint-plugin-vue-i18n":
-  version "1.1.0"
+"@gitlab/eslint-plugin-vue-i18n@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/eslint-plugin-vue-i18n/-/eslint-plugin-vue-i18n-1.2.0.tgz#6dcd8bf6bdd7a31c1c4c2c4114762508af435836"
+  integrity sha512-lROk643/C3tBORIJeXNQlPutjAdSkjA43rpNHVxugU5OcpIOfc7oVXDZ23GwiHMZp8bE3QpP/91PEvEY9ywAVQ==
   dependencies:
     vue-eslint-parser "^6.0.4"
 
