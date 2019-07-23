@@ -163,25 +163,23 @@ describe('Monitoring mutations', () => {
       expect(stateCopy.metricsWithData).toEqual([]);
     });
 
-    it('sets metricsWithData value when using the id field', () => {
-      stateCopy.groups.map(group => {
-        const modGroup = group;
-        const metrics = group.metrics.map(metric => {
-          const modMetric = metric;
-          const queries = metric.queries.map(query => {
-            const modQuery = query;
+    it('sets metricsWithData values when no metric_id is present but the id field is', () => {
+      stateCopy.groups.map(group => ({
+        group: {
+          ...group,
+          metrics: group.metrics.map(metric => ({
+            metric: {
+              ...metric,
+              queries: metric.queries.map(query => {
+                const queryNoMetricId = query;
+                delete queryNoMetricId.metric_id;
 
-            delete modQuery.metric_id;
-            return modQuery;
-          });
-
-          modMetric.queries = queries;
-          return modMetric;
-        });
-
-        modGroup.metrics = metrics;
-        return modGroup;
-      });
+                return queryNoMetricId;
+              }),
+            },
+          })),
+        },
+      }));
 
       mutations[types.SET_QUERY_RESULT](stateCopy, {
         metricId: 'system_metrics_kubernetes_container_memory_total',

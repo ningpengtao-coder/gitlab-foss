@@ -1,0 +1,5 @@
+---
+title: Fix project defined dashboards not rendering
+merge_request: 30970
+author:
+type: fixed
