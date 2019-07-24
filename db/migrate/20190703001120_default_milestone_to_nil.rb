@@ -14,18 +14,21 @@ class DefaultMilestoneToNil < ActiveRecord::Migration[5.1]
   end
 
   def up
-    Gitlab::BackgroundMigration.steal('UpdateBoardMilestonesFromNoneToAny')
-
-    Board.where(milestone_id: -1).each_batch(of: 50) do |batch|
-      range = batch.pluck('MIN(id)', 'MAX(id)').first
-
-      say "Setting board weights from None to Any: #{range[0]} - #{range[1]}"
-
-      Gitlab::BackgroundMigration::UpdateBoardMilestonesFromNoneToAny.new.perform(*range)
-    end
+    execute(update_board_milestones_query)
   end
 
   def down
-    # noop
+    # no-op
+  end
+
+  private
+
+  # Only 105 records to update, as of 2019/07/18
+  def update_board_milestones_query
+    <<~HEREDOC
+   UPDATE boards
+     SET milestone_id = NULL
+   WHERE boards.milestone_id = -1
+    HEREDOC
   end
 end
