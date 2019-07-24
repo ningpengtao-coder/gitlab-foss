@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import Flash from '~/flash';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { s__, __ } from '~/locale';

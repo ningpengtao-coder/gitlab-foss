@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { __, sprintf } from '~/locale';
 import Timeago from 'timeago.js';
 import _ from 'underscore';

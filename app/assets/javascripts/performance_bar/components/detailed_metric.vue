@@ -63,6 +63,8 @@ export default {
         <template v-if="detailsList.length">
           <tr v-for="(item, index) in detailsList" :key="index">
             <td>
+              <!-- NOTE: we probably dont want to translate units -->
+              <!-- eslint-disable-next-line @gitlab/vue-i18n/no-bare-strings -->
               <span>{{ item.duration }}ms</span>
             </td>
             <td>

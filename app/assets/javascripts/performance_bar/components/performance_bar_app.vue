@@ -128,10 +128,13 @@ export default {
         <a v-else :href="profileUrl">{{ s__('PerformanceBar|profile') }}</a>
       </div>
       <div id="peek-view-gc" class="view">
+        <!-- NOTE: we probably don't want to translate units of measure? -->
+        <!-- eslint-disable @gitlab/vue-i18n/no-bare-strings -->
         <span v-if="currentRequest.details" class="bold">
           <span title="Invoke Time">{{ currentRequest.details.gc.gc_time }}</span
           >ms / <span title="Invoke Count">{{ currentRequest.details.gc.invokes }}</span> gc
         </span>
+        <!-- eslint-enable @gitlab/vue-i18n/no-bare-strings -->
       </div>
       <div
         v-if="currentRequest.details && currentRequest.details.tracing"

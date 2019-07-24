@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { GlPopover, GlSkeletonLoading } from '@gitlab/ui';
 import Icon from '../../vue_shared/components/icon.vue';
 import CiIcon from '../../vue_shared/components/ci_icon.vue';

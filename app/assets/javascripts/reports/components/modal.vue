@@ -48,6 +48,8 @@ export default {
           </template>
 
           <template v-else-if="field.type === $options.fieldTypes.miliseconds">
+            <!-- NOTE: We probably dont want to translate units of measure? -->
+            <!-- eslint-disable-next-line @gitlab/vue-i18n/no-bare-strings  -->
             {{ field.value }} ms
           </template>
 
