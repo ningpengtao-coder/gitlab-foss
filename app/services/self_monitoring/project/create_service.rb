@@ -13,6 +13,7 @@ module SelfMonitoring
 
       steps :validate_admins,
         :create_project,
+        :save_project_id,
         :add_project_members,
         :add_to_whitelist,
         :add_prometheus_manual_configuration
@@ -43,8 +44,23 @@ module SelfMonitoring
         if project.persisted?
           success(project: project)
         else
-          log_error("Could not create self-monitoring project. Errors: #{project.errors.full_messages}")
-          error('Could not create project')
+          log_error(_("Could not create instance administration project. Errors: %{errors}") % { errors: project.errors.full_messages })
+          error(_('Could not create project'))
+        end
+      end
+
+      def save_project_id
+        result = ApplicationSettings::UpdateService.new(
+          Gitlab::CurrentSettings.current_application_settings,
+          project_owner,
+          { instance_administration_project_id: @project.id }
+        ).execute
+
+        if result
+          success
+        else
+          log_error(_("Could not save instance administration project ID, errors: %{errors}") % { errors: Gitlab::CurrentSettings.errors.full_messages })
+          error(_('Could not save project ID'))
         end
       end
 

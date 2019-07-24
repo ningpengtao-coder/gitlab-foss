@@ -3306,6 +3306,12 @@ msgstr ""
 msgid "Could not create Wiki Repository at this time. Please try again later."
 msgstr ""
 
+msgid "Could not create instance administration project. Errors: %{errors}"
+msgstr ""
+
+msgid "Could not create project"
+msgstr ""
+
 msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
@@ -3319,6 +3325,12 @@ msgid "Could not revoke impersonation token %{token_name}."
 msgstr ""
 
 msgid "Could not revoke personal access token %{personal_access_token_name}."
+msgstr ""
+
+msgid "Could not save instance administration project ID, errors: %{errors}"
+msgstr ""
+
+msgid "Could not save project ID"
 msgstr ""
 
 msgid "Coverage"

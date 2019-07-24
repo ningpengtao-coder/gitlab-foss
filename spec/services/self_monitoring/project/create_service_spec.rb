@@ -30,15 +30,13 @@ describe SelfMonitoring::Project::CreateService do
 
     context 'with admin users' do
       let(:project) { result[:project] }
+      let(:application_setting) { create(:application_setting) }
 
       let!(:user) { create(:user, :admin) }
 
       before do
-        allow(ApplicationSetting)
-          .to receive(:current)
-          .and_return(
-            ApplicationSetting.build_from_defaults(allow_local_requests_from_web_hooks_and_services: true)
-          )
+        application_setting.allow_local_requests_from_web_hooks_and_services = true
+        allow(Gitlab::CurrentSettings).to receive(:current_application_settings) { application_setting }
       end
 
       shared_examples 'has prometheus service' do |listen_address|
@@ -90,13 +88,26 @@ describe SelfMonitoring::Project::CreateService do
         )
       end
 
+      it 'saves the project id' do
+        expect(result[:status]).to eq(:success)
+        expect(application_setting.instance_administration_project_id).to eq(project.id)
+      end
+
+      context 'when saving project id fails' do
+        before do
+          allow(application_setting).to receive(:update) { false }
+        end
+
+        it 'returns error' do
+          expect(result[:status]).to eq(:error)
+          expect(result[:failed_step]).to eq(:save_project_id)
+          expect(result[:message]).to eq('Could not save project ID')
+        end
+      end
+
       context 'when local requests from hooks and services are not allowed' do
         before do
-          allow(ApplicationSetting)
-            .to receive(:current)
-            .and_return(
-              ApplicationSetting.build_from_defaults(allow_local_requests_from_web_hooks_and_services: false)
-            )
+          application_setting.allow_local_requests_from_web_hooks_and_services = false
         end
 
         it_behaves_like 'has prometheus service', 'http://localhost:9090'
