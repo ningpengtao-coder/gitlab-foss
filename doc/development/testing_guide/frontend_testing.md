@@ -309,8 +309,8 @@ it('waits for an Ajax call', done => {
 });
 ```
 
-If you are not able to register handlers to the `Promise`—for example because it is executed in a synchronous Vue life
-cycle hook—you can flush all pending `Promise`s:
+If you are not able to register handlers to the `Promise`—for example because it is executed in a synchronous Vue life cycle hook, please take a look at the [waitFor](#wait-until-axios-requests-finish) helpers or you can flush all pending `Promise`s:
+
 
 **in Jest:**
 
