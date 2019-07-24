@@ -53,7 +53,7 @@ exports[`MR Popover loaded state matches the snapshot 1`] = `
     >
       
       foo/bar!1
-    
+      
     </div>
   </div>
 </glpopover-stub>
@@ -88,7 +88,7 @@ exports[`MR Popover shows skeleton-loader while apollo is loading 1`] = `
     >
       
       foo/bar!1
-    
+      
     </div>
   </div>
 </glpopover-stub>

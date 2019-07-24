@@ -311,9 +311,6 @@ msgstr ""
 msgid "0 for unlimited"
 msgstr ""
 
-msgid "0%"
-msgstr ""
-
 msgid "1 %{type} addition"
 msgid_plural "%{count} %{type} additions"
 msgstr[0] ""
