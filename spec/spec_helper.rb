@@ -263,7 +263,7 @@ RSpec.configure do |config|
   end
 
   config.around(:each, :postgresql) do |example|
-    example.run if Gitlab::Database.postgresql?
+    example.run
   end
 
   # This makes sure the `ApplicationController#can?` method is stubbed with the

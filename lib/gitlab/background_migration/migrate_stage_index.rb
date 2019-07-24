@@ -13,8 +13,7 @@ module Gitlab
       private
 
       def migrate_stage_index_sql(start_id, stop_id)
-        if Gitlab::Database.postgresql?
-          <<~SQL
+        <<~SQL
             WITH freqs AS (
               SELECT stage_id, stage_idx, COUNT(*) AS freq FROM ci_builds
                 WHERE stage_id BETWEEN #{start_id} AND #{stop_id}
@@ -29,18 +28,7 @@ module Gitlab
             UPDATE ci_stages SET position = indexes.index
               FROM indexes WHERE indexes.stage_id = ci_stages.id
                 AND ci_stages.position IS NULL;
-          SQL
-        else
-          <<~SQL
-            UPDATE ci_stages
-              SET position =
-                (SELECT stage_idx FROM ci_builds
-                  WHERE ci_builds.stage_id = ci_stages.id
-                  GROUP BY ci_builds.stage_idx ORDER BY COUNT(*) DESC LIMIT 1)
-            WHERE ci_stages.id BETWEEN #{start_id} AND #{stop_id}
-              AND ci_stages.position IS NULL
-          SQL
-        end
+        SQL
       end
     end
   end
