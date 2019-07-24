@@ -11,10 +11,6 @@ const EXPAND_UP = 1;
 const EXPAND_DOWN = 2;
 
 export default {
-  created() {
-    this.EXPAND_DOWN = EXPAND_DOWN;
-    this.EXPAND_UP = EXPAND_UP;
-  },
   components: {
     Icon,
   },
@@ -56,6 +52,10 @@ export default {
     canExpandDown() {
       return this.isBottom || !this.isTop;
     },
+  },
+  created() {
+    this.EXPAND_DOWN = EXPAND_DOWN;
+    this.EXPAND_UP = EXPAND_UP;
   },
   methods: {
     ...mapActions('diffs', ['loadMoreLines']),
@@ -209,7 +209,7 @@ export default {
   <tr v-if="isMatchLine" class="line_expansion">
     <td colspan="3">
       <div class="content">
-        <a v-if="canExpandUp" @click="handleExpandLines(EXPAND_UP)" class="cursor-pointer">
+        <a v-if="canExpandUp" class="cursor-pointer" @click="handleExpandLines(EXPAND_UP)">
           <icon
             :size="12"
             name="expand-left"

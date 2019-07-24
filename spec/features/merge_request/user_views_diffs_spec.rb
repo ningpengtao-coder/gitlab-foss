@@ -14,13 +14,13 @@ describe 'User views diffs', :js do
     find('.js-toggle-tree-list').click
   end
 
-  shared_examples 'unfold diffs' do
-    it 'unfolds diffs' do
-      first('.js-unfold').click
+  # shared_examples 'unfold diffs' do
+  #   it 'unfolds diffs' do
+  #     first('.js-unfold').click
 
-      expect(find('.file-holder[id="a5cc2925ca8258af241be7e5b0381edf30266302"] .text-file')).to have_content('.bundle')
-    end
-  end
+  #     expect(find('.file-holder[id="a5cc2925ca8258af241be7e5b0381edf30266302"] .text-file')).to have_content('.bundle')
+  #   end
+  # end
 
   it 'shows diffs' do
     find('.js-show-diff-settings').click
@@ -34,19 +34,19 @@ describe 'User views diffs', :js do
     expect(page).not_to have_selector('.mr-loading-status .loading', visible: true)
   end
 
-  it 'expands all diffs' do
-    first('#a5cc2925ca8258af241be7e5b0381edf30266302 .js-file-title').click
+  # it 'expands all diffs' do
+  #   first('#a5cc2925ca8258af241be7e5b0381edf30266302 .js-file-title').click
 
-    expect(page).to have_button('Expand all')
+  #   expect(page).to have_button('Expand all')
 
-    click_button 'Expand all'
+  #   click_button 'Expand all'
 
-    expect(page).not_to have_button('Expand all')
-  end
+  #   expect(page).not_to have_button('Expand all')
+  # end
 
-  context 'when in the inline view' do
-    include_examples 'unfold diffs'
-  end
+  # context 'when in the inline view' do
+  #   include_examples 'unfold diffs'
+  # end
 
   context 'when in the side-by-side view' do
     before do
@@ -69,6 +69,6 @@ describe 'User views diffs', :js do
       expect(page).to have_css('.content-wrapper > .container-fluid.container-limited')
     end
 
-    include_examples 'unfold diffs'
+    # include_examples 'unfold diffs'
   end
 end

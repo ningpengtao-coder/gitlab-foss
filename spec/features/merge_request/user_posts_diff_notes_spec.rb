@@ -75,25 +75,25 @@ describe 'Merge request > User posts diff notes', :js do
       end
     end
 
-    context 'with an unfolded line' do
-      before do
-        find('.js-unfold', match: :first).click
-        wait_for_requests
-      end
+    # context 'with an unfolded line' do
+    #   before do
+    #     find('.js-unfold', match: :first).click
+    #     wait_for_requests
+    #   end
 
-      # The first `.js-unfold` unfolds upwards, therefore the first
-      # `.line_holder` will be an unfolded line.
-      let(:line_holder) { first('#a5cc2925ca8258af241be7e5b0381edf30266302 .line_holder') }
+    #   # The first `.js-unfold` unfolds upwards, therefore the first
+    #   # `.line_holder` will be an unfolded line.
+    #   let(:line_holder) { first('#a5cc2925ca8258af241be7e5b0381edf30266302 .line_holder') }
 
-      it 'allows commenting on the left side' do
-        should_allow_commenting(line_holder, 'left')
-      end
+    #   it 'allows commenting on the left side' do
+    #     should_allow_commenting(line_holder, 'left')
+    #   end
 
-      it 'allows commenting on the right side' do
-        # Automatically shifts comment box to left side.
-        should_allow_commenting(line_holder, 'right')
-      end
-    end
+    #   it 'allows commenting on the right side' do
+    #     # Automatically shifts comment box to left side.
+    #     should_allow_commenting(line_holder, 'right')
+    #   end
+    # end
   end
 
   context 'when hovering over an inline view diff file' do
@@ -138,20 +138,20 @@ describe 'Merge request > User posts diff notes', :js do
       end
     end
 
-    context 'with an unfolded line' do
-      before do
-        find('.js-unfold', match: :first).click
-        wait_for_requests
-      end
+    # context 'with an unfolded line' do
+    #   before do
+    #     find('.js-unfold', match: :first).click
+    #     wait_for_requests
+    #   end
 
-      # The first `.js-unfold` unfolds upwards, therefore the first
-      # `.line_holder` will be an unfolded line.
-      let(:line_holder) { first('.line_holder[id="a5cc2925ca8258af241be7e5b0381edf30266302_1_1"]') }
+    #   # The first `.js-unfold` unfolds upwards, therefore the first
+    #   # `.line_holder` will be an unfolded line.
+    #   let(:line_holder) { first('.line_holder[id="a5cc2925ca8258af241be7e5b0381edf30266302_1_1"]') }
 
-      it 'allows commenting' do
-        should_allow_commenting line_holder
-      end
-    end
+    #   it 'allows commenting' do
+    #     should_allow_commenting line_holder
+    #   end
+    # end
 
     context 'when hovering over a diff discussion' do
       before do

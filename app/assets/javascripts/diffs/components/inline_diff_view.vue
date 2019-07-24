@@ -56,7 +56,7 @@ export default {
           :is-bottom="index + 1 === diffLinesLength"
         />
         <inline-diff-table-row
-          :key="`table-${line.line_code || index}`"
+          :key="`${line.line_code || index}`"
           :file-hash="diffFile.file_hash"
           :context-lines-path="diffFile.context_lines_path"
           :line="line"
