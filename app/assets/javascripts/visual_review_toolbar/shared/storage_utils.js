@@ -14,9 +14,9 @@ const createStorageStub = () => {
       delete items[key];
     },
   };
-}
+};
 
-const hasStorageSupport = (storage) => {
+const hasStorageSupport = storage => {
   // Support test taken from https://stackoverflow.com/a/11214467/1708147
   try {
     storage.setItem(TEST_KEY, TEST_KEY);
@@ -26,14 +26,13 @@ const hasStorageSupport = (storage) => {
   } catch (err) {
     return false;
   }
-}
+};
 
-const useGracefulStorage = (storage) => {
+const useGracefulStorage = storage =>
   // If a browser does not support local storage, let's return a graceful implementation.
-  return hasStorageSupport(storage) ? storage : createStorageStub();
-}
+  hasStorageSupport(storage) ? storage : createStorageStub();
 
 const localStorage = useGracefulStorage(window.localStorage);
 const sessionStorage = useGracefulStorage(window.sessionStorage);
 
-export { localStorage, sessionStorage }
+export { localStorage, sessionStorage };
