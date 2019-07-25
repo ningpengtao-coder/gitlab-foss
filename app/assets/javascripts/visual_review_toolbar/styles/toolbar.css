@@ -182,9 +182,3 @@
   min-height: 2rem;
   max-width: 17rem;
 }
-
-.gitlab-input[type=number]::-webkit-inner-spin-button,
-.gitlab-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none;
-  margin: 0;
-}

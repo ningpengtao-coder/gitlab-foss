@@ -1,7 +1,7 @@
 import { nextView } from '../store';
 import { LOGIN, TOKEN_BOX } from './constants';
 import { clearNote, postError } from './note';
-import singleForm from './single_line_form';
+import { rememberBox, submitButton } from './form_elements';
 import { selectRemember, selectToken } from './utils';
 import { addForm } from './wrapper';
 
@@ -9,13 +9,14 @@ const labelText = `
   Enter your <a class="gitlab-link" href="https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html">personal access token</a>
 `;
 
-const login = singleForm({
-  inputId: TOKEN_BOX,
-  buttonId: LOGIN,
-  labelText,
-  autocomplete: 'current-password',
-  type: 'password',
-});
+const login = `
+    <div>
+      <label for="${TOKEN_BOX}" class="gitlab-label">${labelText}</label>
+      <input class="gitlab-input" type="password" id="${TOKEN_BOX}" name="${TOKEN_BOX}" autocomplete="current-password" aria-required="true">
+    </div>
+    ${rememberBox()}
+    ${submitButton(LOGIN)}
+`;
 
 const storeToken = (token, state) => {
   const { localStorage } = window;

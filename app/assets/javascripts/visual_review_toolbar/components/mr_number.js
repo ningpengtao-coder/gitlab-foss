@@ -1,7 +1,7 @@
 import { nextView } from '../store';
 import { MR_ID, MR_ID_BUTTON } from './constants';
 import { clearNote, postError } from './note';
-import singleForm from './single_line_form';
+import { rememberBox, submitButton } from './form_elements';
 import { selectMrBox, selectRemember } from './utils';
 import { addForm } from './wrapper';
 
@@ -10,19 +10,14 @@ const mrLabel = `Enter your merge request ID`;
 /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
 const mrRememberText = `Remember this number`;
 
-const texts = {
-  labelText: mrLabel,
-  rememberText: mrRememberText,
-};
-
-const mrForm = singleForm({
-  inputId: MR_ID,
-  buttonId: MR_ID_BUTTON,
-  autocomplete: '',
-  type: 'number',
-  placeholder: 'e.g., 321',
-  ...texts,
-});
+const mrForm = `
+    <div>
+      <label for="${MR_ID}" class="gitlab-label">${mrLabel}</label>
+      <input class="gitlab-input" type="number" pattern="[1-9][0-9]*" id="${MR_ID}" name="${MR_ID}" placeholder="e.g., 321" aria-required="true">
+    </div>
+    ${rememberBox(mrRememberText)}
+    ${submitButton(MR_ID_BUTTON)}
+`;
 
 const storeMR = (id, state) => {
   const { localStorage } = window;
