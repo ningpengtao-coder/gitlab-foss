@@ -12,7 +12,7 @@ import {
   REVIEW_CONTAINER,
 } from './constants';
 import { authorizeUser, login } from './login';
-import { addMr, mrForm } from './mr_number';
+import { addMr, mrForm } from './mr_id';
 import { note } from './note';
 import { selectContainer } from './utils';
 import { buttonAndForm, toggleForm } from './wrapper';
