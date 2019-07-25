@@ -13,7 +13,7 @@ const mrRememberText = `Remember this number`;
 const mrForm = `
     <div>
       <label for="${MR_ID}" class="gitlab-label">${mrLabel}</label>
-      <input class="gitlab-input" type="number" pattern="[1-9][0-9]*" id="${MR_ID}" name="${MR_ID}" placeholder="e.g., 321" aria-required="true">
+      <input class="gitlab-input" type="text" pattern="[1-9][0-9]*" id="${MR_ID}" name="${MR_ID}" placeholder="e.g., 321" aria-required="true">
     </div>
     ${rememberBox(mrRememberText)}
     ${submitButton(MR_ID_BUTTON)}
