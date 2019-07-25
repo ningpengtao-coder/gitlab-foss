@@ -47,7 +47,7 @@ Navigate to the **Design Management** page from any issue by clicking the **Desi
 
 ## Adding designs
 
-To upload design images, click the **Upload Designs** button and select images to upload.
+To upload design images, click the **Add designs** button and select images to upload.
 
 Designs with the same filename as an existing uploaded design will create a new version
 of the design, and will replace the previous version.
@@ -56,3 +56,6 @@ of the design, and will replace the previous version.
 
 Images on the Design Management page can be enlarged by clicking on them.
 
+## Viewing versions
+
+When you re-upload an existing image (with the same file name), it creates a new version of the design. Design management will keep track of the different versions of the images for you. You can review any version of the designs images by clicking the **version** dropdown.
