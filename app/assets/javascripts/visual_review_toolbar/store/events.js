@@ -6,13 +6,16 @@ import {
   postComment,
   saveComment,
   toggleForm,
+} from '../components';
+
+import {
   CHANGE_MR_ID_BUTTON,
   COLLAPSE_BUTTON,
   COMMENT_BUTTON,
   LOGIN,
   LOGOUT,
   MR_ID_BUTTON,
-} from '../components';
+} from '../shared';
 
 import { state } from './state';
 import debounce from './utils';
@@ -59,7 +62,7 @@ const initializeGlobalListeners = () => {
       saveComment();
     } catch (err) {
       // in this case, if saving the comment fails, the user will be warned
-      // we assign the return value because it is required by Chrome see: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload#Example, 
+      // we assign the return value because it is required by Chrome see: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload#Example,
       event.preventDefault();
       /* eslint-disable-next-line no-param-reassign */
       event.returnValue = '';

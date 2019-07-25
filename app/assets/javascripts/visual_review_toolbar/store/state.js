@@ -1,4 +1,5 @@
-import { comment, login, mrForm, COMMENT_BOX, LOGIN, MR_ID } from '../components';
+import { comment, login, mrForm,  } from '../components';
+import { localStorage, COMMENT_BOX, LOGIN, MR_ID } from '../shared';
 
 const state = {
   browser: '',
@@ -74,22 +75,20 @@ const initializeState = (wind, doc) => {
   return state;
 };
 
-const getInitialView = ({ localStorage }) => {
-  try {
-    const token = localStorage.getItem('token');
-    const mrId = localStorage.getItem('mergeRequestId');
+const getInitialView = () => {
 
-    if (token) {
-      state.token = token;
-    }
+  const token = localStorage.getItem('token');
+  const mrId = localStorage.getItem('mergeRequestId');
 
-    if (mrId) {
-      state.mergeRequestId = mrId;
-    }
-  } finally {
-    /* eslint-disable-next-line no-unsafe-finally */
-    return nextView(state);
+  if (token) {
+    state.token = token;
   }
+
+  if (mrId) {
+    state.mergeRequestId = mrId;
+     }
+
+  return nextView(state);
 };
 
 export { initializeState, getInitialView, nextView, state };

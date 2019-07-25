@@ -1,4 +1,4 @@
-import { REMEMBER_ITEM } from './constants';
+import { REMEMBER_ITEM } from '../shared';
 import { buttonClearStyles } from './utils';
 
 /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */

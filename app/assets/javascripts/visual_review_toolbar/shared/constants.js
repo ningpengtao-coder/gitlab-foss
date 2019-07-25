@@ -13,6 +13,7 @@ const NOTE = 'gitlab-validation-note';
 const NOTE_CONTAINER = 'gitlab-note-wrapper';
 const REMEMBER_ITEM = 'gitlab-remember-item';
 const REVIEW_CONTAINER = 'gitlab-review-container';
+const TEST_KEY = 'gitlab-storage-test';
 const TOKEN_BOX = 'gitlab-token';
 
 // colors — these are applied programmatically
@@ -38,6 +39,7 @@ export {
   NOTE_CONTAINER,
   REMEMBER_ITEM,
   REVIEW_CONTAINER,
+  TEST_KEY,
   TOKEN_BOX,
   BLACK,
   CLEAR,

@@ -1,4 +1,4 @@
-import { BLACK, COMMENT_BOX, MUTED } from './constants';
+import { sessionStorage, BLACK, COMMENT_BOX, MUTED } from '../shared';
 import { clearNote, postError } from './note';
 import { selectCommentBox, selectCommentButton, selectNote, selectNoteContainer } from './utils';
 
@@ -18,12 +18,9 @@ const resetCommentBox = () => {
 };
 
 const resetCommentText = () => {
-  try {
-    sessionStorage.removeItem('comment');
-  } finally {
-    const commentBox = selectCommentBox();
-    commentBox.value = '';
-  }
+  const commentBox = selectCommentBox();
+  commentBox.value = '';
+  sessionStorage.removeItem('comment');
 };
 
 const resetComment = () => {

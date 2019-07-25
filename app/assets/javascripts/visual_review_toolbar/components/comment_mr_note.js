@@ -1,5 +1,5 @@
 import { nextView } from '../store';
-import { CHANGE_MR_ID_BUTTON, COMMENT_BOX } from './constants';
+import { localStorage, sessionStorage, CHANGE_MR_ID_BUTTON, COMMENT_BOX } from '../shared';
 import { clearNote } from './note';
 import { buttonClearStyles, selectCommentBox } from './utils';
 import { addForm } from './wrapper';
@@ -17,22 +17,20 @@ const selectedMrNote = state => {
   `;
 };
 
-const changeSelectedMr = state => {
-  const { localStorage, sessionStorage } = window;
+const clearMrId = (state) => {
   const currentComment = selectCommentBox().value;
 
-  // All the browsers we support have localStorage, so let's silently fail
-  // and go on with the rest of the functionality.
-  try {
-    localStorage.removeItem('mergeRequestId');
+  localStorage.removeItem('mergeRequestId');
 
-    if (currentComment) {
-      sessionStorage.setItem('comment', currentComment);
-    }
-  } finally {
-    state.mergeRequestId = '';
+  if (currentComment) {
+    sessionStorage.setItem('comment', currentComment);
   }
 
+  state.mergeRequestId = '';
+}
+
+const changeSelectedMr = state => {
+  clearMrId(state);
   clearNote();
   addForm(nextView(state, COMMENT_BOX));
 };

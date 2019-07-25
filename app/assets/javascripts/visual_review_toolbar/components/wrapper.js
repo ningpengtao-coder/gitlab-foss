@@ -1,4 +1,4 @@
-import { CLEAR, FORM, FORM_CONTAINER, WHITE } from './constants';
+import { CLEAR, FORM, FORM_CONTAINER, WHITE } from '../shared';
 import {
   selectCollapseButton,
   selectForm,

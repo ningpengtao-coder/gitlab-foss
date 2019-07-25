@@ -1,5 +1,5 @@
 import { nextView } from '../store';
-import { COMMENT_BOX, LOGOUT } from './constants';
+import { sessionStorage, localStorage, COMMENT_BOX, LOGOUT } from '../shared';
 import { clearNote } from './note';
 import { buttonClearStyles, selectCommentBox } from './utils';
 import { addForm } from './wrapper';
@@ -16,8 +16,7 @@ const getSavedComment = () => {
   }
 };
 
-const saveComment = (onFail = () => {}) => {
-  const { sessionStorage } = window;
+const saveComment = () => {
   const currentComment = selectCommentBox();
 
   // This may be added to any view via top-level beforeunload listener
@@ -26,22 +25,17 @@ const saveComment = (onFail = () => {}) => {
     return;
   }
 
-  try {
-    if (currentComment.value) {
-      sessionStorage.setItem('comment', currentComment.value);
-    }
-  } catch (err) {
-    onFail();
+  if (currentComment.value) {
+    sessionStorage.setItem('comment', currentComment.value);
   }
 };
 
 const comment = state => {
-  const savedComment = getSavedComment(state);
+  const savedComment = sessionStorage.getItem('comment') || '';
 
   return `
     <div>
-      <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true">${savedComment ||
-    ''}</textarea>
+      <textarea id="${COMMENT_BOX}" name="${COMMENT_BOX}" rows="3" placeholder="Enter your feedback or idea" class="gitlab-input" aria-required="true">${savedComment}</textarea>
       ${selectedMrNote(state)}
       <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
     </div>
@@ -53,17 +47,11 @@ const comment = state => {
 };
 
 const logoutUser = state => {
-  const { localStorage } = window;
 
-  // All the browsers we support have localStorage, so let's silently fail
-  // and go on with the rest of the functionality.
-  try {
-    localStorage.removeItem('token');
-    localStorage.removeItem('mergeRequestId');
-  } finally {
-    state.token = '';
-    state.mergeRequestId = '';
-  }
+  localStorage.removeItem('token');
+  localStorage.removeItem('mergeRequestId');
+  state.token = '';
+  state.mergeRequestId = '';
 
   clearNote();
   addForm(nextView(state, COMMENT_BOX));

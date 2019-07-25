@@ -1,6 +1,7 @@
 import './styles/toolbar.css';
 
-import { buttonAndForm, note, selectContainer, REVIEW_CONTAINER } from './components';
+import { buttonAndForm, note, selectContainer } from './components';
+import { REVIEW_CONTAINER } from './shared';
 import { eventLookup, getInitialView, initializeGlobalListeners, initializeState } from './store';
 
 /*
@@ -20,7 +21,7 @@ import { eventLookup, getInitialView, initializeGlobalListeners, initializeState
 window.addEventListener('load', () => {
   initializeState(window, document);
 
-  const mainContent = buttonAndForm(getInitialView(window));
+  const mainContent = buttonAndForm(getInitialView());
   const container = document.createElement('div');
   container.setAttribute('id', REVIEW_CONTAINER);
   container.insertAdjacentHTML('beforeend', note);

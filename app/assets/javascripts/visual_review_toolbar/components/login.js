@@ -1,5 +1,5 @@
 import { nextView } from '../store';
-import { LOGIN, TOKEN_BOX } from './constants';
+import { localStorage, LOGIN, TOKEN_BOX } from '../shared';
 import { clearNote, postError } from './note';
 import { rememberBox, submitButton } from './form_elements';
 import { selectRemember, selectToken } from './utils';
@@ -19,18 +19,14 @@ const login = `
 `;
 
 const storeToken = (token, state) => {
-  const { localStorage } = window;
   const rememberMe = selectRemember().checked;
 
-  // All the browsers we support have localStorage, so let's silently fail
-  // and go on with the rest of the functionality.
-  try {
-    if (rememberMe) {
-      localStorage.setItem('token', token);
-    }
-  } finally {
-    state.token = token;
+  if (rememberMe) {
+    localStorage.setItem('token', token);
   }
+
+  state.token = token;
+
 };
 
 const authorizeUser = state => {

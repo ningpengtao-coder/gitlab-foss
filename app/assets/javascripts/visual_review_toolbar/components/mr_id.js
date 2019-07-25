@@ -1,5 +1,5 @@
 import { nextView } from '../store';
-import { MR_ID, MR_ID_BUTTON } from './constants';
+import { MR_ID, MR_ID_BUTTON, localStorage } from '../shared';
 import { clearNote, postError } from './note';
 import { rememberBox, submitButton } from './form_elements';
 import { selectMrBox, selectRemember } from './utils';
@@ -20,18 +20,13 @@ const mrForm = `
 `;
 
 const storeMR = (id, state) => {
-  const { localStorage } = window;
   const rememberMe = selectRemember().checked;
 
-  // All the browsers we support have localStorage, so let's silently fail
-  // and go on with the rest of the functionality.
-  try {
-    if (rememberMe) {
-      localStorage.setItem('mergeRequestId', id);
-    }
-  } finally {
-    state.mergeRequestId = id;
+  if (rememberMe) {
+    localStorage.setItem('mergeRequestId', id);
   }
+
+  state.mergeRequestId = id;
 };
 
 const addMr = state => {

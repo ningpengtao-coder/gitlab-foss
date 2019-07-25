@@ -1,16 +1,4 @@
 import { changeSelectedMr, comment, logoutUser, postComment, saveComment } from './comment';
-import {
-  CHANGE_MR_ID_BUTTON,
-  COLLAPSE_BUTTON,
-  COMMENT_BOX,
-  COMMENT_BUTTON,
-  FORM_CONTAINER,
-  LOGIN,
-  LOGOUT,
-  MR_ID,
-  MR_ID_BUTTON,
-  REVIEW_CONTAINER,
-} from './constants';
 import { authorizeUser, login } from './login';
 import { addMr, mrForm } from './mr_id';
 import { note } from './note';
@@ -31,14 +19,4 @@ export {
   saveComment,
   selectContainer,
   toggleForm,
-  CHANGE_MR_ID_BUTTON,
-  COLLAPSE_BUTTON,
-  COMMENT_BOX,
-  COMMENT_BUTTON,
-  FORM_CONTAINER,
-  LOGIN,
-  LOGOUT,
-  MR_ID,
-  MR_ID_BUTTON,
-  REVIEW_CONTAINER,
 };
