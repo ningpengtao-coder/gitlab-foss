@@ -11,6 +11,9 @@ module API
       params :optional_issues_params_ee do
       end
 
+      params :optional_issue_not_params_ee do
+      end
+
       def self.update_params_at_least_one_of
         [
           :assignee_id,
@@ -32,7 +35,9 @@ module API
 
         args.delete(:id)
         args[:milestone_title] ||= args.delete(:milestone)
+        args[:not][:milestone_title] ||= args[:not]&.delete(:milestone)
         args[:label_name] ||= args.delete(:labels)
+        args[:not][:label_name] ||= args[:not]&.delete(:labels)
         args[:scope] = args[:scope].underscore if args[:scope]
 
         IssuesFinder.new(current_user, args)
