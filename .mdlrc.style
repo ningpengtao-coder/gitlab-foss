@@ -5,9 +5,14 @@
 # for more detailed information on the rules and styles.
 
 rule "MD001"
+rule "MD002"
 rule "MD003", :style => :atx
 rule "MD011"
+rule "MD018"
+rule "MD019"
+rule "MD022"
 rule "MD023"
+rule "MD025"
 rule "MD032"
 rule "MD034"
 rule "MD037"
