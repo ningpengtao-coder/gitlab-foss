@@ -1,17 +1,7 @@
 # frozen_string_literal: true
 
 class DefaultMilestoneToNil < ActiveRecord::Migration[5.1]
-  include Gitlab::Database::MigrationHelpers
-
   DOWNTIME = false
-
-  disable_ddl_transaction!
-
-  class Board < ActiveRecord::Base
-    self.table_name = 'boards'
-
-    include ::EachBatch
-  end
 
   def up
     execute(update_board_milestones_query)
