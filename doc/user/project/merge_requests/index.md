@@ -73,6 +73,12 @@ B. Consider you're a web developer writing a webpage for your company's website:
 1. Once approved, your merge request is [squashed and merged](squash_and_merge.md), and [deployed to staging with GitLab Pages](https://about.gitlab.com/2016/08/26/ci-deployment-and-environments/)
 1. Your production team [cherry picks](#cherry-pick-changes) the merge commit into production
 
+C. Consider you are a GitLab Team Member
+
+1. You are wanting to edit the GitLab handbook
+1. See steps above
+1. You are not overly technical and are stuck on how to do the MR? Learn about our internal [Merge Request Buddies] (/handbook/general-onboarding/mr-buddies/).
+
 ## Merge requests per project
 
 View all the merge requests within a project by navigating to **Project > Merge Requests**.
