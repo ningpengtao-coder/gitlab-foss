@@ -18,16 +18,17 @@ module Gitlab
 
         def enabled?
           # Raindrops::Linux.tcp_listener_stats is only present on Linux
-          unicorn_with_listeners? && Raindrops::Linux.respond_to?(:tcp_listener_stats)
+          # unicorn_with_listeners? && Raindrops::Linux.respond_to?(:tcp_listener_stats)
+          true
         end
 
         def sample
-          Raindrops::Linux.tcp_listener_stats(tcp_listeners).each do |addr, stats|
-            set_unicorn_connection_metrics('tcp', addr, stats)
-          end
-          Raindrops::Linux.unix_listener_stats(unix_listeners).each do |addr, stats|
-            set_unicorn_connection_metrics('unix', addr, stats)
-          end
+          # Raindrops::Linux.tcp_listener_stats(tcp_listeners).each do |addr, stats|
+          #   set_unicorn_connection_metrics('tcp', addr, stats)
+          # end
+          # Raindrops::Linux.unix_listener_stats(unix_listeners).each do |addr, stats|
+          #   set_unicorn_connection_metrics('unix', addr, stats)
+          # end
 
           metrics[:unicorn_workers].set({}, unicorn_workers_count)
         end

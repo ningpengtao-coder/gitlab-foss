@@ -22,7 +22,7 @@ Prometheus::Client.configure do |config|
 
   config.multiprocess_files_dir = ENV['prometheus_multiproc_dir'] || prometheus_default_multiproc_dir
 
-  config.pid_provider = Prometheus::PidProvider.method(:worker_id)
+  config.pid_provider = Prometheus::PidProviderOld.method(:worker_id)
 end
 
 Gitlab::Application.configure do |config|
@@ -40,13 +40,29 @@ if !Rails.env.test? && Gitlab::Metrics.prometheus_metrics_enabled?
   Gitlab::Cluster::LifecycleEvents.on_worker_start do
     defined?(::Prometheus::Client.reinitialize_on_pid_change) && Prometheus::Client.reinitialize_on_pid_change
 
+    Prometheus::Client.configure do |config|
+      if defined?(::Unicorn)
+        config.pid_provider = Prometheus::UnicornPidProvider.new(for_master: false).method(:process_id)
+      elsif defined?(::Puma)
+        config.pid_provider = Prometheus::PumaPidProvider.new(for_master: false).method(:process_id)
+      end
+    end
+
     Gitlab::Metrics::Samplers::RubySampler.initialize_instance(Settings.monitoring.ruby_sampler_interval).start
   end
 
   Gitlab::Cluster::LifecycleEvents.on_master_start do
     if defined?(::Unicorn)
+      Prometheus::Client.configure do |config|
+        config.pid_provider = Prometheus::UnicornPidProvider.new(for_master: true).method(:process_id)
+      end
+
       Gitlab::Metrics::Samplers::UnicornSampler.initialize_instance(Settings.monitoring.unicorn_sampler_interval).start
     elsif defined?(::Puma)
+      Prometheus::Client.configure do |config|
+        config.pid_provider = Prometheus::PumaPidProvider.new(for_master: true).method(:process_id)
+      end
+
       Gitlab::Metrics::Samplers::PumaSampler.initialize_instance(Settings.monitoring.puma_sampler_interval).start
     end
   end
