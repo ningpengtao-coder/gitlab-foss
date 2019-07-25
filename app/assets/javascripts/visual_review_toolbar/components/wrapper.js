@@ -7,10 +7,12 @@ import {
 } from './utils';
 import { collapseButton, commentIcon, compressIcon } from './wrapper_icons';
 
+// this is a div with role form to prevent submitting when the input is selected
+// and the user hits enter; tab-selecting the button and hitting enter will still work
 const form = content => `
-  <form id="${FORM}">
+  <div role="form" id="${FORM}">
     ${content}
-  </form>
+  </div>
 `;
 
 const buttonAndForm = content => `
