@@ -262,8 +262,7 @@ describe Todo do
       todo2 = create(:todo, group: child_group)
       todos = described_class.for_group_and_descendants(parent_group)
 
-      expect(todos).to include(todo1)
-      expect(todos).to include(todo2)
+      expect(todos).to contain_exactly(todo1, todo2)
     end
   end
 
