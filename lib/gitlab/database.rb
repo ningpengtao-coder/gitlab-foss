@@ -39,7 +39,11 @@ module Gitlab
     end
 
     def self.human_adapter_name
-      'PostgreSQL'
+      if postgresql?
+        'PostgreSQL'
+      else
+        'Unknown'
+      end
     end
 
     # @deprecated
