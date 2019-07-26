@@ -22,7 +22,8 @@ const NO_SOURCEMAPS = process.env.NO_SOURCEMAPS;
 const VUE_VERSION = require('vue/package.json').version;
 const VUE_LOADER_VERSION = require('vue-loader/package.json').version;
 
-const devtool = process.env.WEBPACK_DEVTOOL || IS_PRODUCTION ? 'source-map' : 'cheap-module-eval-source-map';
+const devtool =
+  process.env.WEBPACK_DEVTOOL || (IS_PRODUCTION ? 'source-map' : 'cheap-module-eval-source-map');
 
 let autoEntriesCount = 0;
 let watchAutoEntries = [];
