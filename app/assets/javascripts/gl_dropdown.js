@@ -545,6 +545,21 @@ GitLabDropdown = (function() {
     if (group == null) {
       group = false;
     }
+    if (this.el.dataset.selected) {
+      const selectedAll = this.el.dataset.selected.split(',');
+      let i = 0;
+      data.forEach((entry, index) => {
+        if (
+          selectedAll.indexOf(entry.title) !== -1 ||
+          selectedAll.indexOf(entry.name_with_namespace) !== -1
+        ) {
+          data.splice(i, 0, entry);
+          data.splice(index + 1, 1);
+          i += 1;
+        }
+      });
+      data.splice(i, 0, 'divider');
+    }
     return data.map(
       (function(_this) {
         return function(obj, index) {

@@ -3,7 +3,7 @@
 - if params[:project_id].present?
   = hidden_field_tag :project_id, params[:project_id]
 .dropdown
-  %button.dropdown-menu-toggle.js-search-group-dropdown{ type: "button", data: { toggle: "dropdown", default_label: _('Group:'), group_id: params[:group_id] } }
+  %button.dropdown-menu-toggle.js-search-group-dropdown{ type: "button", data: { toggle: "dropdown", default_label: _('Group:'), group_id: params[:group_id], selected: (@group ? @group.name : nil) } }
     %span.dropdown-toggle-text
       = _("Group:")
       - if @group.present?
@@ -18,7 +18,7 @@
     = dropdown_loading
 
 .dropdown.project-filter
-  %button.dropdown-menu-toggle.js-search-project-dropdown{ type: "button", data: { toggle: "dropdown", default_label: _('Project:') } }
+  %button.dropdown-menu-toggle.js-search-project-dropdown{ type: "button", data: { toggle: "dropdown", default_label: _('Project:'), selected: (@project ? @project.full_name : nil) } }
     %span.dropdown-toggle-text
       = _("Project:")
       - if @project.present?
