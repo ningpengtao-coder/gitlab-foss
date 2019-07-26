@@ -45,4 +45,24 @@ describe Gitlab::Database::Count do
       end
     end
   end
+
+  describe '.batched_count' do
+    subject { described_class.batched_count(Project.all) }
+
+    it 'counts the given relation' do
+      expect(subject).to eq(Project.all.size)
+    end
+
+    it 'raises an error when run inside a transaction' do
+      expect { ActiveRecord::Base.transaction { subject } }.to raise_error(/must not run inside transaction/)
+    end
+
+    it 'makes batch_size configurable' do
+      expect(described_class.batched_count(Project.all, batch_size: 1)).to eq(Project.all.size)
+    end
+
+    it 'allows to specify a primary key' do
+      expect(described_class.batched_count(Project.all, primary_key: :id)).to eq(Project.all.size)
+    end
+  end
 end

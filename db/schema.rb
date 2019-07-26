@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_25_012225) do
+ActiveRecord::Schema.define(version: 2019_07_26_114448) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -353,6 +353,13 @@ ActiveRecord::Schema.define(version: 2019_07_25_012225) do
     t.datetime "updated_at"
     t.index ["awardable_type", "awardable_id"], name: "index_award_emoji_on_awardable_type_and_awardable_id"
     t.index ["user_id", "name"], name: "index_award_emoji_on_user_id_and_name"
+  end
+
+  create_table "background_counters", force: :cascade do |t|
+    t.string "identifier", limit: 100, null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.bigint "counter_value", default: 0, null: false
+    t.index ["identifier"], name: "index_background_counters_on_identifier", unique: true
   end
 
   create_table "badges", id: :serial, force: :cascade do |t|

@@ -447,6 +447,9 @@ Settings.cron_jobs['schedule_migrate_external_diffs_worker']['job_class'] = 'Sch
 Settings.cron_jobs['namespaces_prune_aggregation_schedules_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['namespaces_prune_aggregation_schedules_worker']['cron'] ||= '5 1 * * *'
 Settings.cron_jobs['namespaces_prune_aggregation_schedules_worker']['job_class'] = 'Namespaces::PruneAggregationSchedulesWorker'
+Settings.cron_jobs['batch_count_projects_batch_count_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['batch_count_projects_batch_count_worker']['cron'] ||= '*/10 * * * *'
+Settings.cron_jobs['batch_count_projects_batch_count_worker']['job_class'] ||= 'BatchCount::ProjectsBatchCountWorker'
 
 Gitlab.ee do
   Settings.cron_jobs['clear_shared_runners_minutes_worker'] ||= Settingslogic.new({})

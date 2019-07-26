@@ -48,6 +48,25 @@ module Gitlab
           end
         end
       end
+
+      # Performs an exact count on the given relation.
+      #
+      # It executes the counting in batches, which is useful on larger relations.
+      # For batching to work, the a primary key needs to be specified. For models,
+      # this gets automatically derived.
+      #
+      # Note the method must not be called inside a transaction.
+      #
+      # TODO: Optimize for memory with `select MAX(id), count(*) FROM (...)`
+      def self.batched_count(relation, batch_size: 10000, primary_key: nil)
+        raise "Batched counting must not run inside transaction" if ::Gitlab::Database.inside_transaction?
+
+        primary_key ||= relation.primary_key if relation.respond_to?(:primary_key)
+
+        relation.select(primary_key).find_in_batches(batch_size: batch_size).reduce(0) do |counter, batch|
+          counter += batch.size
+        end
+      end
     end
   end
 end
