@@ -262,10 +262,6 @@ RSpec.configure do |config|
     example.run if Group.supports_nested_objects?
   end
 
-  config.around(:each, :postgresql) do |example|
-    example.run
-  end
-
   # This makes sure the `ApplicationController#can?` method is stubbed with the
   # original implementation for all view specs.
   config.before(:each, type: :view) do
