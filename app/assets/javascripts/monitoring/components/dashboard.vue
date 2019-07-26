@@ -20,7 +20,7 @@ export default {
   components: {
     MonitorAreaChart,
     MonitorSingleStatChart,
-    PanelType,
+    PanelType: () => import('ee_else_ce/monitoring/components/panel_type.vue'),
     GraphGroup,
     EmptyState,
     Icon,
@@ -127,6 +127,16 @@ export default {
       default: '',
     },
     smallEmptyState: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    alertsEndpoint: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    prometheusAlertsAvailable: {
       type: Boolean,
       required: false,
       default: false,
@@ -381,6 +391,8 @@ export default {
             :key="`panel-type-${graphIndex}`"
             :graph-data="graphData"
             :dashboard-width="elWidth"
+            :alerts-endpoint="alertsEndpoint"
+            :prometheus-alerts-available="prometheusAlertsAvailable"
           />
         </template>
         <template v-else>
