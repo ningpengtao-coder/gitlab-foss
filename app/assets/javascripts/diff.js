@@ -32,7 +32,7 @@ export default class Diff {
 
     if (!isBound) {
       $(document)
-        .on('click', '.js-unfold', this.handleClickUnfold.bind(this))
+        .on('click', '.js-unfold', this.handleClickUnfold.bind(this)) // SAM: remove this?
         .on('click', '.diff-line-num a', this.handleClickLineNum.bind(this))
         .on('mousedown', 'td.line_content.parallel', this.handleParallelLineDown.bind(this));
       isBound = true;
