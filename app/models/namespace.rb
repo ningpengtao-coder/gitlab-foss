@@ -232,7 +232,23 @@ class Namespace < ApplicationRecord
   # Includes projects from this namespace and projects from all subgroups
   # that belongs to this namespace
   def all_projects
-    Project.inside_path(full_path)
+    return Project.none unless id
+
+    cte = <<~SQL
+      (WITH RECURSIVE groups AS
+         (SELECT id,
+                 parent_id
+          FROM namespaces
+          WHERE id = #{id}
+          UNION SELECT namespaces.id,
+                       namespaces.parent_id
+          FROM namespaces
+          INNER JOIN groups ON groups.id = namespaces.parent_id) SELECT projects.*
+       FROM groups
+       JOIN projects ON projects.namespace_id = groups.id)
+    SQL
+
+    Project.from("#{cte} AS projects")
   end
 
   # Includes pipelines from this namespace and pipelines from all subgroups
