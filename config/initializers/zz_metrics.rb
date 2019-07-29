@@ -135,6 +135,7 @@ end
 # In development mode, we turn off eager loading when we're running
 # `rails generate migration` because eager loading short-circuits the
 # loading of our custom migration templates.
+p "-1. ZZ_METRICS: $0=#{$0}, expr=#{Gitlab::Metrics.enabled? && !Rails.env.test? && !(Rails.env.development? && defined?(Rails::Generators))}"
 if Gitlab::Metrics.enabled? && !Rails.env.test? && !(Rails.env.development? && defined?(Rails::Generators))
   require 'pathname'
   require 'influxdb'

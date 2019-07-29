@@ -52,6 +52,7 @@ module Gitlab
         end
 
         def sample
+          p "---> 0. SAMPLE: #{$0}"
           start_time = System.monotonic_time
 
           metrics[:file_descriptors].set(labels, System.file_descriptor_count)
@@ -68,11 +69,20 @@ module Gitlab
         # TODO: move most of the logic to a separate class
         def sample_gc
           current_gc_count = GC.stat[:count]
+          p "---> 1.CURRENT_GC_COUNT: #{current_gc_count}"
           new_events_since_last_sample = current_gc_count - @last_gc_count
+          p "---> 2.NEW_EVENTS_SINCE_LAST_SAMPLE: #{new_events_since_last_sample}"
 
+          p "#{GC::Profiler}"
+          p "#{GC::Profiler.enabled?}"
+          p "#{GC::Profiler.raw_data}"
+          p "#{GC::Profiler.raw_data.class}"
           profiled_events = GC::Profiler.raw_data.count
+          p "---> 3.PROFILED_EVENTS: #{profiled_events}"
 
           lost_profiled_events = new_events_since_last_sample - profiled_events
+          p "---> 4.LOST_PROFILED_EVENTS: #{lost_profiled_events}"
+
           unless lost_profiled_events.zero?
             ruby_gc_lost_profile_events.increment(lost_profiled_events)
           end
