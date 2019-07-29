@@ -195,7 +195,19 @@ if Gitlab::Metrics.enabled? && !Rails.env.test? && !(Rails.env.development? && d
     instrument_classes(config)
   end
 
-  GC::Profiler.enable
+  def start_trace
+    trace =
+    TracePoint.new(:call) { |tp| p [tp.path, tp.lineno, tp.event, tp.method_id] }
+    trace.enable
+    yield
+    trace.disable
+  end
+
+  def my_test
+    p "MY TEST"
+  end
+
+  # start_trace { x = Hash.new; my_test; GC::Profiler.enable }
 
   Gitlab::Cluster::LifecycleEvents.on_worker_start do
     Gitlab::Metrics::Samplers::InfluxSampler.initialize_instance.start

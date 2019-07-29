@@ -9,7 +9,6 @@ module Gitlab
         def initialize(interval)
           metrics[:process_start_time_seconds].set(labels, Time.now.to_i)
 
-          GC::Profiler.enable
           @last_gc_count = GC.stat[:count]
 
           super
@@ -92,7 +91,7 @@ module Gitlab
           lost_profiled_events = new_events_since_last_sample - profiled_events
           # p "---> 4.LOST_PROFILED_EVENTS: #{lost_profiled_events}, $0=#{$0}"
           unless lost_profiled_events.zero?
-            ruby_gc_lost_profile_events.increment(lost_profiled_events)
+            metrics[:ruby_gc_lost_profile_events].increment(lost_profiled_events)
           end
 
           metrics[:total_time].increment(labels, profiler_total_time)
