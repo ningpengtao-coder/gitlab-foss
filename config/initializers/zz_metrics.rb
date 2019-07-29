@@ -1,3 +1,4 @@
+p "-2.IN  ZZ_METRICS INITIALIZER"
 # This file was prefixed with zz_ because we want to load it the last!
 # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/55611
 

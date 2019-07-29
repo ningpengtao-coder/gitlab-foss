@@ -9,6 +9,7 @@ module Gitlab
         def initialize(interval)
           metrics[:process_start_time_seconds].set(labels, Time.now.to_i)
 
+          GC::Profiler.enable
           @last_gc_count = GC.stat[:count]
 
           super
@@ -52,7 +53,6 @@ module Gitlab
         end
 
         def sample
-          p "---> 0. SAMPLE: #{$0}"
           start_time = System.monotonic_time
 
           metrics[:file_descriptors].set(labels, System.file_descriptor_count)
@@ -69,26 +69,37 @@ module Gitlab
         # TODO: move most of the logic to a separate class
         def sample_gc
           current_gc_count = GC.stat[:count]
-          p "---> 1.CURRENT_GC_COUNT: #{current_gc_count}"
+          # p "---> 1.CURRENT_GC_COUNT: #{current_gc_count}, $0=#{$0}"
           new_events_since_last_sample = current_gc_count - @last_gc_count
-          p "---> 2.NEW_EVENTS_SINCE_LAST_SAMPLE: #{new_events_since_last_sample}"
+          # p "---> 2.NEW_EVENTS_SINCE_LAST_SAMPLE: #{new_events_since_last_sample}, $0=#{$0}"
 
-          p "#{GC::Profiler}"
-          p "#{GC::Profiler.enabled?}"
-          p "#{GC::Profiler.raw_data}"
-          p "#{GC::Profiler.raw_data.class}"
-          profiled_events = GC::Profiler.raw_data.count
-          p "---> 3.PROFILED_EVENTS: #{profiled_events}"
+          # p "#{GC::Profiler}"
+          # p "#{GC::Profiler.enabled?}"
+          # p "#{GC::Profiler.raw_data}"
+          # p "#{GC::Profiler.raw_data.class}"
+          if GC::Profiler.enabled?
+            profiled_events = GC::Profiler.raw_data.count
+            # p "---> 3.PROFILED_EVENTS: #{profiled_events}, $0=#{$0}"
+
+            # Collect the GC time since last sample in float seconds.
+            profiler_total_time = GC::Profiler.total_time
+          else
+            p "ISSUE: PROFILER DISABLED. $0=#{$0}"
+            return
+          end
+
 
           lost_profiled_events = new_events_since_last_sample - profiled_events
-          p "---> 4.LOST_PROFILED_EVENTS: #{lost_profiled_events}"
-
+          # p "---> 4.LOST_PROFILED_EVENTS: #{lost_profiled_events}, $0=#{$0}"
           unless lost_profiled_events.zero?
             ruby_gc_lost_profile_events.increment(lost_profiled_events)
           end
 
-          # Collect the GC time since last sample in float seconds.
-          metrics[:total_time].increment(labels, GC::Profiler.total_time)
+          metrics[:total_time].increment(labels, profiler_total_time)
+
+
+          p "DEBUG: #{{current_gc_count: current_gc_count, last_gc_count: @last_gc_count, new_events_since_last_sample: new_events_since_last_sample, profiled_events: profiled_events, lost_profiled_events: lost_profiled_events}}, $0=#{$0}"
+
 
           @last_gc_count = current_gc_count
           # TODO: ensure it's not called somewhere else (wrap into separate class + cop)
