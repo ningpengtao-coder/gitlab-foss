@@ -243,10 +243,8 @@ describe 'Merge request > User posts diff notes', :js do
     assert_comment_dismissal(line_holder)
   end
 
-  def should_not_allow_commenting(line_holder, diff_side = nil)
-    line = get_line_components(line_holder, diff_side)
-    line[:content].hover
-    expect(line[:num]).not_to have_css comment_button_class
+  def should_not_allow_commenting(line_holder)
+    expect(line_holder).not_to have_css comment_button_class
   end
 
   def write_comment_on_line(line_holder, diff_side)
