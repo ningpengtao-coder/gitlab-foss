@@ -75,8 +75,6 @@ export default {
           :class="buildConnnectorClass(index)"
           class="build"
         >
-          <div class="curve"></div>
-
           <job-item
             v-if="group.size === 1"
             :job="group.jobs[0]"
