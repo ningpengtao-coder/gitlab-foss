@@ -12,6 +12,7 @@ export default class IssuableTemplateSelector extends TemplateSelector {
     this.namespacePath = this.dropdown.data('namespacePath');
     this.issuableType = this.$dropdownContainer.data('issuableType');
     this.titleInput = $(`#${this.issuableType}_title`);
+    this.templateWarningEl = $('.js-issuable-template-warning');
 
     const initialQuery = {
       name: this.dropdown.data('selected'),
@@ -28,10 +29,34 @@ export default class IssuableTemplateSelector extends TemplateSelector {
       this.setInputValueToTemplateContent();
       $('.dropdown-toggle-text', this.dropdown).text(__('Choose a template'));
     });
+
+    this.templateWarningEl.find('.js-close-btn').on('click', () => {
+      this.templateWarningEl.addClass('hidden');
+    });
+
+    this.templateWarningEl.find('.js-override-template').on('click', () => {
+      this.requestFile(this.overridingTemplate);
+      this.templateWarningEl.addClass('hidden');
+      this.overridingTemplate = null;
+    });
+  }
+
+  onDropdownClicked(query) {
+    const content = this.getEditorContent();
+
+    if (this.templateApplied && content !== '' && content !== this.currentTemplate.content) {
+      this.overridingTemplate = query.selectedObj;
+      this.templateWarningEl.removeClass('hidden');
+
+      return;
+    }
+
+    super.onDropdownClicked(query);
   }
 
   requestFile(query) {
     this.startLoadingSpinner();
+
     Api.issueTemplate(
       this.namespacePath,
       this.projectPath,

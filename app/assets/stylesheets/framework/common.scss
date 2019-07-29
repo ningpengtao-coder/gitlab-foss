@@ -222,6 +222,12 @@ li.note {
 
 .warning_message {
   @include message($orange-100, $orange-200, $orange-700);
+
+  .close {
+    font-size: $gl-font-size-large;
+    color: $orange-700;
+    cursor: pointer;
+  }
 }
 
 .danger_message {

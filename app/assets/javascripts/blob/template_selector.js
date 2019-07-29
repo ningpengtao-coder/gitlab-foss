@@ -10,6 +10,7 @@ export default class TemplateSelector {
     this.$dropdownContainer = wrapper;
     this.$filenameInput = $input || $('#file_name');
     this.$dropdownIcon = $('.fa-chevron-down', dropdown);
+    this.templateApplied = false;
 
     this.initDropdown(dropdown, data);
     this.listenForFilenameInput();
@@ -26,9 +27,14 @@ export default class TemplateSelector {
       search: {
         fields: ['name'],
       },
-      clicked: options => this.fetchFileTemplate(options),
+      clicked: options => this.onDropdownClicked(options),
       text: item => item.name,
     });
+  }
+
+  // Subclasses can override this method to conditionally prevent fetching file templates
+  onDropdownClicked(options) {
+    this.fetchFileTemplate(options);
   }
 
   initAutosizeUpdateEvent() {
@@ -72,12 +78,17 @@ export default class TemplateSelector {
     const newValue = file.content;
 
     this.editor.setValue(newValue, 1);
+    this.templateApplied = true;
 
     if (!skipFocus) this.editor.focus();
 
     if (this.editor instanceof $) {
       this.editor.get(0).dispatchEvent(this.autosizeUpdateEvent);
     }
+  }
+
+  getEditorContent() {
+    return this.editor.getValue();
   }
 
   startLoadingSpinner() {
