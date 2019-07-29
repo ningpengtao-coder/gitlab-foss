@@ -7,5 +7,5 @@ export {
   initializeGlobalListeners,
   initializeState,
   nextView,
-  setUsingGracefulStorageFlag
+  setUsingGracefulStorageFlag,
 };

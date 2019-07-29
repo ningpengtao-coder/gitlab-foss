@@ -46,4 +46,4 @@ export {
   MUTED,
   RED,
   WHITE,
-}
+};

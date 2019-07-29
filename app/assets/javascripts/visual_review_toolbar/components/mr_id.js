@@ -41,7 +41,7 @@ const getFormError = (mrNumber, form) => {
   }
 
   return null;
-}
+};
 
 const addMr = state => {
   // Clear any old errors

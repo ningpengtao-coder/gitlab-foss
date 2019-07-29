@@ -25,7 +25,7 @@ const noop = () => {};
 // State needs to be bound here to be acted on
 // because these are called by click events and
 // as such are called with only the `event` object
-const eventLookup = (id) => {
+const eventLookup = id => {
   switch (id) {
     case CHANGE_MR_ID_BUTTON:
       return () => {
@@ -67,7 +67,6 @@ const initializeGlobalListeners = () => {
     }
 
     saveComment();
-
   });
 };
 

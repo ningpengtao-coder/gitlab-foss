@@ -17,10 +17,10 @@ const selectedMrNote = state => {
   `;
 };
 
-const clearMrId = (state) => {
+const clearMrId = state => {
   localStorage.removeItem('mergeRequestId');
   state.mergeRequestId = '';
-}
+};
 
 const changeSelectedMr = state => {
   clearMrId(state);

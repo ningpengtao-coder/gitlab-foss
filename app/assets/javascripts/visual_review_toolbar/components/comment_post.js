@@ -89,7 +89,7 @@ const postComment = ({
 
   const commentText = selectCommentBox().value.trim();
   // Get the href at the last moment to support SPAs
-  const href = window.location.href
+  const { href } = window.location;
 
   if (!commentText) {
     /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */

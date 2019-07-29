@@ -26,7 +26,6 @@ const storeToken = (token, state) => {
   }
 
   state.token = token;
-
 };
 
 const authorizeUser = state => {

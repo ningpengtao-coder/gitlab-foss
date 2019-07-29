@@ -1,9 +1,7 @@
 import { selectCommentBox } from './utils';
 import { sessionStorage } from '../shared';
 
-const getSavedComment = () => {
-  return sessionStorage.getItem('comment') || '';
-};
+const getSavedComment = () => sessionStorage.getItem('comment') || '';
 
 const saveComment = () => {
   const currentComment = selectCommentBox();

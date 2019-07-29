@@ -9,9 +9,9 @@ const rememberBox = (rememberText = 'Remember me') => `
   </div>
 `;
 
-const submitButton = (buttonId) => `
+const submitButton = buttonId => `
   <div class="gitlab-button-wrapper">
     <button class="gitlab-button-wide gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="${buttonId}"> Submit </button>
   </div>
-`
-export { rememberBox, submitButton }
+`;
+export { rememberBox, submitButton };

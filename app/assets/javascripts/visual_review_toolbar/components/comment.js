@@ -5,7 +5,7 @@ import { buttonClearStyles } from './utils';
 import { addForm } from './wrapper';
 import { changeSelectedMr, selectedMrNote } from './comment_mr_note';
 import postComment from './comment_post';
-import { saveComment, getSavedComment, clearSavedComment } from './comment_storage';
+import { saveComment, getSavedComment } from './comment_storage';
 
 const comment = state => {
   const savedComment = getSavedComment();
@@ -27,7 +27,6 @@ const comment = state => {
 // If we reach a design where we can logout from multiple views, promote this
 // to it's own package
 const logoutUser = state => {
-
   localStorage.removeItem('token');
   localStorage.removeItem('mergeRequestId');
   state.token = '';

@@ -1,4 +1,4 @@
-import { comment, login, mrForm,  } from '../components';
+import { comment, login, mrForm } from '../components';
 import { localStorage, COMMENT_BOX, LOGIN, MR_ID } from '../shared';
 
 const state = {
@@ -74,7 +74,6 @@ const initializeState = (wind, doc) => {
 };
 
 const getInitialView = () => {
-
   const token = localStorage.getItem('token');
   const mrId = localStorage.getItem('mergeRequestId');
 
@@ -89,9 +88,8 @@ const getInitialView = () => {
   return nextView(state);
 };
 
-const setUsingGracefulStorageFlag = (flag) => {
+const setUsingGracefulStorageFlag = flag => {
   state.usingGracefulStorage = !flag;
-  return;
 };
 
 export { initializeState, getInitialView, nextView, setUsingGracefulStorageFlag, state };
