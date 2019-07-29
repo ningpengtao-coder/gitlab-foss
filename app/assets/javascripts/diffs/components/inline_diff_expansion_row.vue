@@ -41,7 +41,7 @@ export default {
 </script>
 
 <template>
-  <tr v-if="isMatchLine" class="line_expansion">
+  <tr v-if="isMatchLine" class="line_expansion match">
     <diff-expansion-cell
       :file-hash="fileHash"
       :context-lines-path="contextLinesPath"

@@ -205,7 +205,7 @@ export default {
 <template>
   <td colspan="3">
     <div class="content">
-      <a v-if="canExpandUp" class="cursor-pointer" @click="handleExpandLines(EXPAND_UP)">
+      <a v-if="canExpandUp" class="cursor-pointer js-unfold" @click="handleExpandLines(EXPAND_UP)">
         <icon :size="12" name="expand-left" aria-hidden="true" style="transform: rotate(270deg);" />
         <span>{{ s__('Diffs|Expand Up') }}</span>
       </a>

@@ -4,6 +4,9 @@ import draftCommentsMixin from 'ee_else_ce/diffs/mixins/draft_comments';
 import inlineDiffTableRow from './inline_diff_table_row.vue';
 import inlineDiffCommentRow from './inline_diff_comment_row.vue';
 import inlineDiffExpansionRow from './inline_diff_expansion_row.vue';
+import {
+  MATCH_LINE_TYPE,
+} from '../constants';
 
 export default {
   components: {
@@ -35,6 +38,11 @@ export default {
       return this.diffLines.length;
     },
   },
+  methods: {
+    isMatchLine(line) {
+      return line.type === MATCH_LINE_TYPE;
+    },
+  },
   userColorScheme: window.gon.user_color_scheme,
 };
 </script>
@@ -57,6 +65,7 @@ export default {
         />
         <inline-diff-table-row
           :key="`${line.line_code || index}`"
+          v-if="!isMatchLine(line)"
           :file-hash="diffFile.file_hash"
           :context-lines-path="diffFile.context_lines_path"
           :line="line"
