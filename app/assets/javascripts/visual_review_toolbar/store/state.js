@@ -3,7 +3,7 @@ import { localStorage, COMMENT_BOX, LOGIN, MR_ID } from '../shared';
 
 const state = {
   browser: '',
-  href: '',
+  usingGracefulStorage: '',
   innerWidth: '',
   innerHeight: '',
   mergeRequestId: '',
@@ -49,7 +49,6 @@ const initializeState = (wind, doc) => {
   const {
     innerWidth,
     innerHeight,
-    location: { href },
     navigator: { platform, userAgent },
   } = wind;
 
@@ -61,7 +60,6 @@ const initializeState = (wind, doc) => {
   // This mutates our default state object above. It's weird but it makes the linter happy.
   Object.assign(state, {
     browser,
-    href,
     innerWidth,
     innerHeight,
     mergeRequestId,
@@ -86,9 +84,14 @@ const getInitialView = () => {
 
   if (mrId) {
     state.mergeRequestId = mrId;
-     }
+  }
 
   return nextView(state);
 };
 
-export { initializeState, getInitialView, nextView, state };
+const setUsingGracefulStorageFlag = (flag) => {
+  state.usingGracefulStorage = !flag;
+  return;
+};
+
+export { initializeState, getInitialView, nextView, setUsingGracefulStorageFlag, state };

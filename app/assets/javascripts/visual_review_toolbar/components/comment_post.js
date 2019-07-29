@@ -1,4 +1,5 @@
-import { sessionStorage, BLACK, COMMENT_BOX, MUTED } from '../shared';
+import { BLACK, COMMENT_BOX, MUTED } from '../shared';
+import { clearSavedComment } from './comment_storage';
 import { clearNote, postError } from './note';
 import { selectCommentBox, selectCommentButton, selectNote, selectNoteContainer } from './utils';
 
@@ -20,7 +21,7 @@ const resetCommentBox = () => {
 const resetCommentText = () => {
   const commentBox = selectCommentBox();
   commentBox.value = '';
-  sessionStorage.removeItem('comment');
+  clearSavedComment();
 };
 
 const resetComment = () => {
@@ -70,7 +71,6 @@ const commentErrors = error => {
 };
 
 const postComment = ({
-  href,
   platform,
   browser,
   userAgent,
@@ -88,6 +88,8 @@ const postComment = ({
   setInProgressState();
 
   const commentText = selectCommentBox().value.trim();
+  // Get the href at the last moment to support SPAs
+  const href = window.location.href
 
   if (!commentText) {
     /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */

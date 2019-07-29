@@ -1,37 +1,14 @@
 import { nextView } from '../store';
-import { sessionStorage, localStorage, COMMENT_BOX, LOGOUT } from '../shared';
+import { localStorage, COMMENT_BOX, LOGOUT } from '../shared';
 import { clearNote } from './note';
-import { buttonClearStyles, selectCommentBox } from './utils';
+import { buttonClearStyles } from './utils';
 import { addForm } from './wrapper';
 import { changeSelectedMr, selectedMrNote } from './comment_mr_note';
 import postComment from './comment_post';
-
-const getSavedComment = () => {
-  const { sessionStorage } = window;
-
-  try {
-    return sessionStorage.getItem('comment');
-  } catch (err) {
-    return null;
-  }
-};
-
-const saveComment = () => {
-  const currentComment = selectCommentBox();
-
-  // This may be added to any view via top-level beforeunload listener
-  // so let's exit if it does not apply
-  if (!currentComment) {
-    return;
-  }
-
-  if (currentComment.value) {
-    sessionStorage.setItem('comment', currentComment.value);
-  }
-};
+import { saveComment, getSavedComment, clearSavedComment } from './comment_storage';
 
 const comment = state => {
-  const savedComment = sessionStorage.getItem('comment') || '';
+  const savedComment = getSavedComment();
 
   return `
     <div>
@@ -40,12 +17,15 @@ const comment = state => {
       <p class="gitlab-metadata-note">Additional metadata will be included: browser, OS, current page, user agent, and viewport dimensions.</p>
     </div>
     <div class="gitlab-button-wrapper">
-      <button class="gitlab-button gitlab-button-secondary" style="${buttonClearStyles}" type="button" id="${LOGOUT}"> Log out </button>
       <button class="gitlab-button gitlab-button-success" style="${buttonClearStyles}" type="button" id="gitlab-comment-button"> Send feedback </button>
+      <button class="gitlab-button gitlab-button-secondary" style="${buttonClearStyles}" type="button" id="${LOGOUT}"> Log out </button>
     </div>
   `;
 };
 
+// This function is here becaause it is called only from the comment view
+// If we reach a design where we can logout from multiple views, promote this
+// to it's own package
 const logoutUser = state => {
 
   localStorage.removeItem('token');

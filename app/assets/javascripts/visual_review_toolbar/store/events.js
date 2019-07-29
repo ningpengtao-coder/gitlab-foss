@@ -25,7 +25,7 @@ const noop = () => {};
 // State needs to be bound here to be acted on
 // because these are called by click events and
 // as such are called with only the `event` object
-const eventLookup = ({ target: { id } }) => {
+const eventLookup = (id) => {
   switch (id) {
     case CHANGE_MR_ID_BUTTON:
       return () => {
@@ -58,15 +58,16 @@ const updateWindowSize = wind => {
 const initializeGlobalListeners = () => {
   window.addEventListener('resize', debounce(updateWindowSize.bind(null, window), 200));
   window.addEventListener('beforeunload', event => {
-    try {
-      saveComment();
-    } catch (err) {
-      // in this case, if saving the comment fails, the user will be warned
+    if (state.usingGracefulStorage) {
+      // if there is no browser storage support, reloading will lose the comment; this way, the user will be warned
       // we assign the return value because it is required by Chrome see: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload#Example,
       event.preventDefault();
       /* eslint-disable-next-line no-param-reassign */
       event.returnValue = '';
     }
+
+    saveComment();
+
   });
 };
 

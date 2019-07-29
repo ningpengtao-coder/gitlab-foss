@@ -2,7 +2,7 @@ import { nextView } from '../store';
 import { MR_ID, MR_ID_BUTTON, localStorage } from '../shared';
 import { clearNote, postError } from './note';
 import { rememberBox, submitButton } from './form_elements';
-import { selectMrBox, selectRemember } from './utils';
+import { selectForm, selectMrBox, selectRemember } from './utils';
 import { addForm } from './wrapper';
 
 /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
@@ -29,15 +29,30 @@ const storeMR = (id, state) => {
   state.mergeRequestId = id;
 };
 
+const getFormError = (mrNumber, form) => {
+  if (!mrNumber) {
+    /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+    return 'Please enter your merge request ID number.';
+  }
+
+  if (!form.checkValidity()) {
+    /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+    return 'Please remove any non-number values from the field.';
+  }
+
+  return null;
+}
+
 const addMr = state => {
   // Clear any old errors
   clearNote(MR_ID);
 
   const mrNumber = selectMrBox().value;
+  const form = selectForm();
+  const formError = getFormError(mrNumber, form);
 
-  if (!mrNumber) {
-    /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
-    postError('Please enter your merge request ID number.', MR_ID);
+  if (formError) {
+    postError(formError, MR_ID);
     return;
   }
 
@@ -45,4 +60,4 @@ const addMr = state => {
   addForm(nextView(state, MR_ID));
 };
 
-export { addMr, mrForm };
+export { addMr, mrForm, storeMR };

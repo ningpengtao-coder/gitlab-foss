@@ -1,4 +1,6 @@
-import { TEST_KEY } from '../shared';
+import { setUsingGracefulStorageFlag } from '../store/state';
+
+const TEST_KEY = 'gitlab-storage-test';
 
 const createStorageStub = () => {
   const items = {};
@@ -21,9 +23,11 @@ const hasStorageSupport = (storage) => {
   try {
     storage.setItem(TEST_KEY, TEST_KEY);
     storage.removeItem(TEST_KEY);
+    setUsingGracefulStorageFlag(true);
 
     return true;
   } catch (err) {
+    setUsingGracefulStorageFlag(false);
     return false;
   }
 }

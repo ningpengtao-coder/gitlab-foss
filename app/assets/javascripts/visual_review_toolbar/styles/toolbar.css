@@ -110,7 +110,11 @@
   margin-top: 0.5rem;
   display: flex;
   align-items: baseline;
-  justify-content: flex-end;
+  /*
+    this makes sure the hit enter to submit picks the correct button
+    on the comment view
+   */
+  flex-direction: row-reverse;
 }
 
 .gitlab-collapse {

@@ -1,7 +1,7 @@
 import { nextView } from '../store';
-import { localStorage, sessionStorage, CHANGE_MR_ID_BUTTON, COMMENT_BOX } from '../shared';
+import { localStorage, CHANGE_MR_ID_BUTTON, COMMENT_BOX } from '../shared';
 import { clearNote } from './note';
-import { buttonClearStyles, selectCommentBox } from './utils';
+import { buttonClearStyles } from './utils';
 import { addForm } from './wrapper';
 
 const selectedMrNote = state => {
@@ -18,14 +18,7 @@ const selectedMrNote = state => {
 };
 
 const clearMrId = (state) => {
-  const currentComment = selectCommentBox().value;
-
   localStorage.removeItem('mergeRequestId');
-
-  if (currentComment) {
-    sessionStorage.setItem('comment', currentComment);
-  }
-
   state.mergeRequestId = '';
 }
 

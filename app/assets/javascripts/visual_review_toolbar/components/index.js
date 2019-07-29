@@ -2,7 +2,7 @@ import { changeSelectedMr, comment, logoutUser, postComment, saveComment } from 
 import { authorizeUser, login } from './login';
 import { addMr, mrForm } from './mr_id';
 import { note } from './note';
-import { selectContainer } from './utils';
+import { selectContainer, selectForm } from './utils';
 import { buttonAndForm, toggleForm } from './wrapper';
 
 export {
@@ -18,5 +18,6 @@ export {
   postComment,
   saveComment,
   selectContainer,
+  selectForm,
   toggleForm,
 };
