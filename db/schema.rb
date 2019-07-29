@@ -3614,7 +3614,7 @@ ActiveRecord::Schema.define(version: 2019_08_02_012622) do
 
   add_foreign_key "application_settings", "namespaces", column: "custom_project_templates_group_id", on_delete: :nullify
   add_foreign_key "application_settings", "projects", column: "file_template_project_id", name: "fk_ec757bd087", on_delete: :nullify
-  add_foreign_key "application_settings", "projects", column: "instance_administration_project_id"
+  add_foreign_key "application_settings", "projects", column: "instance_administration_project_id", on_delete: :nullify
   add_foreign_key "application_settings", "users", column: "usage_stats_set_by_user_id", name: "fk_964370041d", on_delete: :nullify
   add_foreign_key "approval_merge_request_rule_sources", "approval_merge_request_rules", on_delete: :cascade
   add_foreign_key "approval_merge_request_rule_sources", "approval_project_rules", on_delete: :cascade
