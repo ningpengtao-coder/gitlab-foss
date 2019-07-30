@@ -69,6 +69,9 @@ module Projects
         # Directories on disk
         move_project_folders(project)
 
+        # Remove missing group milestones
+        filter_issuable_milestones(project)
+
         # Move missing group labels to project
         Labels::TransferService.new(current_user, @old_group, project).execute
 
@@ -162,6 +165,22 @@ module Projects
         @old_namespace.full_path,
         @new_namespace.full_path
       )
+    end
+
+    def filter_issuable_milestones(project)
+      %i[issues merge_requests].each do |type|
+        remove_group_milestones(project.try(type))
+      end
+    end
+
+    def remove_group_milestones(issuables)
+      return unless issuables.any?
+
+      issuables.each do |issuable|
+        next unless issuable.milestone&.group_milestone?
+
+        issuable.update(milestone: nil)
+      end
     end
   end
 end

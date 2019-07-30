@@ -73,6 +73,25 @@ describe Projects::TransferService do
         shard_name: project.repository_storage
       )
     end
+
+    context 'with project issuables' do
+      let(:group2) { create(:group) }
+      let(:project) { create(:project, group: group2) }
+      let(:group_milestone) { create(:milestone, group: group2) }
+      let(:project_milestone) { create(:milestone, project: project) }
+      let!(:issue) { create(:issue, project: project, milestone: group_milestone)}
+      let!(:merge_request) { create(:merge_request, source_project: project, milestone: project_milestone)}
+
+      before do
+        group2.add_owner(user)
+      end
+
+      it 'removes invalid milestones' do
+        expect { transfer_project(project, user, group) }
+          .to change { issue.reload.milestone }.from(group_milestone).to(nil)
+          .and not_change { merge_request.reload.milestone }
+      end
+    end
   end
 
   context 'when transfer fails' do
@@ -134,6 +153,25 @@ describe Projects::TransferService do
         disk_path: project.disk_path,
         shard_name: project.repository_storage
       )
+    end
+
+    context 'with project issuables' do
+      let(:group2)          { create(:group) }
+      let(:project)         { create(:project, group: group2) }
+      let(:group_milestone) { create(:milestone, group: group2) }
+      let(:project_milestone) { create(:milestone, project: project) }
+      let!(:issue) { create(:issue, project: project, milestone: group_milestone)}
+      let!(:merge_request) { create(:merge_request, source_project: project, milestone: project_milestone)}
+
+      before do
+        group2.add_owner(user)
+      end
+
+      it 'does not update issuables milestone' do
+        expect { attempt_project_transfer }
+          .to not_change { issue.reload.milestone }
+          .and not_change { merge_request.reload.milestone }
+      end
     end
   end
 
@@ -259,7 +297,7 @@ describe Projects::TransferService do
   end
 
   context 'missing group labels applied to issues or merge requests' do
-    it 'delegates tranfer to Labels::TransferService' do
+    it 'delegates transfer to Labels::TransferService' do
       group.add_owner(user)
 
       expect_any_instance_of(Labels::TransferService).to receive(:execute).once.and_call_original
