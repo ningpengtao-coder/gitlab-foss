@@ -501,7 +501,7 @@ class ProjectPolicy < BasePolicy
   end
 
   def feature_available?(feature)
-    case project.project_feature.access_level(feature)
+    case project.project_feature&.access_level(feature)
     when ProjectFeature::DISABLED
       false
     when ProjectFeature::PRIVATE

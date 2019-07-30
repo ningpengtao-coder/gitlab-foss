@@ -90,14 +90,14 @@ Sidekiq::Testing.inline! do
           # since the Sidekiq::Testing block has already exited. Force clearing
           # the `after_commit` queue to ensure the job is run now.
           project.send(:_run_after_commit_queue)
-          project.import_state.send(:_run_after_commit_queue)
+          project.import_state&.send(:_run_after_commit_queue)
         end
 
         if project.valid? && project.valid_repo?
           print '.'
         else
-          puts project.errors.full_messages
-          print 'F'
+          puts "F (#{project.name})"
+          project.errors.full_messages.each { |m| puts m.red }
         end
       end
 
