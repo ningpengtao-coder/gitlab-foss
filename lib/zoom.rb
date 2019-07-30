@@ -33,8 +33,14 @@ module Zoom
       @token_expire = token_expire
     end
 
-    def list_users
-      request(:get, '/users')
+    def list_users(status: 'active', page: 1, per_page: 30)
+      query = {
+        status: status,
+        page_size: per_page,
+        page_number: page
+      }
+
+      request(:get, '/users', query: query)
     end
 
     def list_meetings(user_id:)
@@ -53,7 +59,7 @@ module Zoom
         password: password
       }
 
-      request(:post, "/users/#{user_id}/meetings", payload)
+      request(:post, "/users/#{user_id}/meetings", json: payload)
     end
 
     def delete_meeting(meeting_id:)
@@ -62,16 +68,16 @@ module Zoom
 
     private
 
-    def request(method, path, json=nil)
+    def request(method, path, **params)
       url = @api_url + path
 
-      Gitlab::HTTP.public_send(method, url, **request_params(json))
+      Gitlab::HTTP.public_send(method, url, **request_params(**params))
     rescue => e
       # TODO log?
       raise Error, e.message
     end
 
-    def request_params(json)
+    def request_params(json: nil, query: nil)
       {
         headers: {
           'Accept' => 'application/json',
@@ -80,6 +86,7 @@ module Zoom
         },
         follow_redirects: false
       }.tap do |hash|
+        hash[:query] = query if query
         hash[:body] = json.to_json if json
       end
     end
