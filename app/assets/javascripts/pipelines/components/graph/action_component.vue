@@ -91,7 +91,7 @@ export default {
     class="js-ci-action btn btn-blank btn-transparent ci-action-icon-container ci-action-icon-wrapper"
     @click="onClickAction"
   >
-    <gl-loading-icon v-if="isLoading" class="js-action-icon-loading" />
+    <gl-loading-icon v-if="isLoading" class="js-action-icon-loading prepend-top-4" />
     <icon v-else :name="actionIcon" />
   </gl-button>
 </template>

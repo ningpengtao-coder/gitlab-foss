@@ -506,9 +506,11 @@
 
     .ci-job-dropdown-container {
       // highlight job whose dropdown is shown
-      .dropdown.show {
-        button, a {
-          background-color: #f6fafd;
+      &.dropdown.show > .build-content {
+        background-color: $ci-action-dropdown-expanded-background;
+
+        &:hover {
+          background-color: $gray-100;
         }
       }
 
@@ -536,7 +538,7 @@
     }
 
     // ensure .build-content has hover style when action-icon is hovered
-    .ci-job-dropdown-container:hover .build-content {
+    .ci-job-component:hover .build-content {
       @extend .build-content:hover;
     }
 
@@ -567,21 +569,18 @@
 
   .ci-action-icon-container {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 9px;
+    top: 11px;
 
     // Action Icons in big pipeline-graph nodes
     &.ci-action-icon-wrapper {
-      height: 30px;
-      width: 30px;
-      background: $white-light;
-      border: 1px solid $border-color;
-      border-radius: 100%;
+      height: $ci-action-icon-size-lg;
+      width: $ci-action-icon-size-lg;
+      border-radius: $ci-action-icon-border-radius;
       display: block;
 
       &:hover {
-        background-color: $gray-darker;
-        border: 1px solid $dropdown-toggle-active-border-color;
+        background-color: $ci-action-icon-hover-background;
 
         svg {
           fill: $gl-text-color;
@@ -589,7 +588,7 @@
       }
 
       svg {
-        fill: $gl-text-color-secondary;
+        fill: $gl-text-color;
         position: relative;
         top: -1px;
       }
@@ -617,7 +616,7 @@
   font-weight: 100;
   font-size: 14px;
   position: absolute;
-  right: 13px;
+  right: 14px;
   top: 13px;
 }
 
@@ -744,20 +743,16 @@ button.mini-pipeline-graph-dropdown-toggle {
   .ci-action-icon-container {
     position: absolute;
     right: 8px;
-    top: 8px;
+    top: 4px;
 
     &.ci-action-icon-wrapper {
       height: $ci-action-dropdown-button-size;
       width: $ci-action-dropdown-button-size;
-
-      background: $white-light;
-      border: 1px solid $border-color;
-      border-radius: 50%;
+      border-radius: $ci-action-icon-border-radius;
       display: block;
 
       &:hover {
-        background-color: $gray-darker;
-        border: 1px solid $dropdown-toggle-active-border-color;
+        background-color: $ci-action-icon-hover-background;
 
         svg {
           fill: $gl-text-color;
