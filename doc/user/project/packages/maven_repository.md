@@ -152,6 +152,8 @@ project's ID can be used for uploading.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8798) in GitLab Premium 11.7.
 
+NOTE: **Note:** Subgroups are not currently supported but you can use them if you use the URL encoded version of the group path (group%2Fsubgroup). See [this issue](https://gitlab.com/gitlab-org/gitlab-ee/issues/9947) for subgroup support.
+
 If you rely on many packages, it might be inefficient to include the `repository` section
 with a unique URL for each package. Instead, you can use the group level endpoint for
 all your Maven packages stored within one GitLab group. Only packages you have access to
