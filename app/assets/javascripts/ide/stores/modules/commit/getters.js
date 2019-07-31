@@ -48,11 +48,5 @@ export const preBuiltCommitMessage = (state, _, rootState) => {
 
 export const isCreatingNewBranch = state => state.commitAction === consts.COMMIT_TO_NEW_BRANCH;
 
-export const isCommittingToCurrentBranch = state =>
-  state.commitAction === consts.COMMIT_TO_CURRENT_BRANCH;
-
-export const isCommittingToDefaultBranch = (_state, getters, _rootState, rootGetters) =>
-  getters.isCommittingToCurrentBranch && rootGetters.isOnDefaultBranch;
-
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
