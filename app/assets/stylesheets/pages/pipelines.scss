@@ -483,6 +483,13 @@
       margin-right: 16px;
     }
 
+    &:not(:first-child) {
+      .stage-name {
+        overflow: visible;
+        @include flat-connector-before;
+      }
+    }
+
     li {
       list-style: none;
     }
