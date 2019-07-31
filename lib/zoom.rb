@@ -51,12 +51,16 @@ module Zoom
       request(:get, "/meetings/#{meeting_id}")
     end
 
-    def create_meeting(user_id:, topic: nil, agenda: nil, password: nil, schedule_for: nil)
-      payload = {
+    def create_meeting(user_id:, topic: nil, agenda: nil, password: nil, enforce_login: false, enforce_login_domains: nil)
+       payload = {
         topic: topic,
-        schedule_for: schedule_for,
         agenda: agenda,
-        password: password
+        password: password,
+        settings: {
+          enforce_login: enforce_login,
+        }.tap do |hash|
+          hash[:enforce_login_domains] = enforce_login_domains if enforce_login_domains
+        end
       }
 
       request(:post, "/users/#{user_id}/meetings", json: payload)
@@ -88,6 +92,7 @@ module Zoom
       }.tap do |hash|
         hash[:query] = query if query
         hash[:body] = json.to_json if json
+        hash[:debug_output] = $stdout if $DEBUG
       end
     end
 
