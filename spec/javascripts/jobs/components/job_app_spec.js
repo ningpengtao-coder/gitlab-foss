@@ -503,12 +503,12 @@ describe('Job App ', () => {
           }),
         );
 
-        setTimeout(() => {
+        vm.$nextTick(() => {
           vm.$el.querySelectorAll('.blocks-container > *').forEach(block => {
             expect(block.textContent.trim()).not.toBe('');
           });
           done();
-        }, 0);
+        });
       });
     });
   });
