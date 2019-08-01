@@ -217,6 +217,7 @@ Gitlab.ee do
   Settings['elasticsearch'] ||= Settingslogic.new({})
   Settings.elasticsearch['enabled'] = false if Settings.elasticsearch['enabled'].nil?
   Settings.elasticsearch['url'] = ENV['ELASTIC_URL'] || "http://localhost:9200"
+  Settings.elasticsearch['indexer_path'] ||= Gitlab::Utils.which('gitlab-elasticsearch-indexer')
 end
 
 #
@@ -258,6 +259,7 @@ Settings.registry['key']           ||= nil
 Settings.registry['issuer']        ||= nil
 Settings.registry['host_port']     ||= [Settings.registry['host'], Settings.registry['port']].compact.join(':')
 Settings.registry['path']            = Settings.absolute(Settings.registry['path'] || File.join(Settings.shared['path'], 'registry'))
+Settings.registry['notifications'] ||= []
 
 #
 # Error Reporting and Logging with Sentry

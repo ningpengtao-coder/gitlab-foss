@@ -78,9 +78,9 @@ Issues and merge requests are part of projects. For a given group, you can view 
 [issues](../project/issues/index.md#issues-list) and [merge requests](../project/merge_requests/index.md#merge-requests-per-group) across all projects in that group,
 together in a single list view.
 
-### Bulk editing issues
+### Bulk editing issues and merge requests
 
-For details, see [bulk editing issues](../group/bulk_editing/index.md).
+For details, see [bulk editing issues and merge requests](../group/bulk_editing/index.md).
 
 ## Create a new group
 
@@ -331,7 +331,7 @@ This will disable the option for all users who previously had permissions to
 operate project memberships, so no new users can be added. Furthermore, any
 request to add a new user to a project through API will not be possible.
 
-#### IP access restriction **(ULTIMATE)**
+#### IP access restriction **(ULTIMATE ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1985) in
 [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.

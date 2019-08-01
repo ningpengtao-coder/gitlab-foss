@@ -22,11 +22,6 @@ module Gitlab
     require_dependency Rails.root.join('lib/gitlab/middleware/read_only')
     require_dependency Rails.root.join('lib/gitlab/middleware/basic_health_check')
 
-    # This needs to be loaded before DB connection is made
-    # to make sure that all connections have NO_ZERO_DATE
-    # setting disabled
-    require_dependency Rails.root.join('lib/mysql_zero_date')
-
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -168,7 +163,6 @@ module Gitlab
 
     # Import gitlab-svgs directly from vendored directory
     config.assets.paths << "#{config.root}/node_modules/@gitlab/svgs/dist"
-    config.assets.paths << "#{config.root}/node_modules"
     config.assets.precompile << "icons.svg"
     config.assets.precompile << "icons.json"
     config.assets.precompile << "illustrations/*.svg"
@@ -183,8 +177,18 @@ module Gitlab
       config.assets.precompile << "pages/jira_connect.css"
     end
 
+    # Import path for EE specific SCSS entry point
+    # In CE it will import a noop file, in EE a functioning file
+    # Order is important, so that the ee file takes precedence:
+    config.assets.paths << "#{config.root}/ee/app/assets/stylesheets/_ee"
+    config.assets.paths << "#{config.root}/app/assets/stylesheets/_ee"
+
     config.assets.paths << "#{config.root}/vendor/assets/javascripts/"
     config.assets.precompile << "snowplow/sp.js"
+
+    # This path must come last to avoid confusing sprockets
+    # See https://gitlab.com/gitlab-org/gitlab-ce/issues/64091#note_194512508
+    config.assets.paths << "#{config.root}/node_modules"
 
     # Compile non-JS/CSS assets in the ee/app/assets folder by default
     # Mimic sprockets-rails default: https://github.com/rails/sprockets-rails/blob/v3.2.1/lib/sprockets/railtie.rb#L84-L87

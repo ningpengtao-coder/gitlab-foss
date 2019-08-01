@@ -173,24 +173,6 @@ describe Project do
     it { is_expected.to include_module(Sortable) }
   end
 
-  describe '.missing_kubernetes_namespace' do
-    let!(:project) { create(:project) }
-    let!(:cluster) { create(:cluster, :provided_by_user, :group) }
-    let(:kubernetes_namespaces) { project.kubernetes_namespaces }
-
-    subject { described_class.missing_kubernetes_namespace(kubernetes_namespaces) }
-
-    it { is_expected.to contain_exactly(project) }
-
-    context 'kubernetes namespace exists' do
-      before do
-        create(:cluster_kubernetes_namespace, project: project, cluster: cluster)
-      end
-
-      it { is_expected.to be_empty }
-    end
-  end
-
   describe 'validation' do
     let!(:project) { create(:project) }
 
@@ -1190,12 +1172,32 @@ describe Project do
       subject { project.pipeline_for('master', pipeline.sha) }
 
       it_behaves_like 'giving the correct pipeline'
+
+      context 'with supplied id' do
+        let!(:other_pipeline) { create_pipeline(project) }
+
+        subject { project.pipeline_for('master', pipeline.sha, other_pipeline.id) }
+
+        it { is_expected.to eq(other_pipeline) }
+      end
     end
 
     context 'with implicit sha' do
       subject { project.pipeline_for('master') }
 
       it_behaves_like 'giving the correct pipeline'
+    end
+  end
+
+  describe '#pipelines_for' do
+    let(:project) { create(:project, :repository) }
+    let!(:pipeline) { create_pipeline(project) }
+    let!(:other_pipeline) { create_pipeline(project) }
+
+    context 'with implicit sha' do
+      subject { project.pipelines_for('master') }
+
+      it { is_expected.to contain_exactly(pipeline, other_pipeline) }
     end
   end
 
@@ -1999,62 +2001,33 @@ describe Project do
     end
   end
 
-  describe '#latest_successful_build_for' do
+  describe '#latest_successful_build_for_ref' do
     let(:project) { create(:project, :repository) }
     let(:pipeline) { create_pipeline(project) }
 
-    context 'with many builds' do
-      it 'gives the latest builds from latest pipeline' do
-        pipeline1 = create_pipeline(project)
-        pipeline2 = create_pipeline(project)
-        create_build(pipeline1, 'test')
-        create_build(pipeline1, 'test2')
-        build1_p2 = create_build(pipeline2, 'test')
-        create_build(pipeline2, 'test2')
+    it_behaves_like 'latest successful build for sha or ref'
 
-        expect(project.latest_successful_build_for(build1_p2.name))
-          .to eq(build1_p2)
-      end
-    end
+    subject { project.latest_successful_build_for_ref(build_name) }
 
-    context 'with succeeded pipeline' do
-      let!(:build) { create_build }
+    context 'with a specified ref' do
+      let(:build) { create_build }
 
-      context 'standalone pipeline' do
-        it 'returns builds for ref for default_branch' do
-          expect(project.latest_successful_build_for(build.name))
-            .to eq(build)
-        end
+      subject { project.latest_successful_build_for_ref(build.name, project.default_branch) }
 
-        it 'returns empty relation if the build cannot be found' do
-          expect(project.latest_successful_build_for('TAIL'))
-            .to be_nil
-        end
-      end
-
-      context 'with some pending pipeline' do
-        before do
-          create_build(create_pipeline(project, 'pending'))
-        end
-
-        it 'gives the latest build from latest pipeline' do
-          expect(project.latest_successful_build_for(build.name))
-            .to eq(build)
-        end
-      end
-    end
-
-    context 'with pending pipeline' do
-      it 'returns empty relation' do
-        pipeline.update(status: 'pending')
-        pending_build = create_build(pipeline)
-
-        expect(project.latest_successful_build_for(pending_build.name)).to be_nil
-      end
+      it { is_expected.to eq(build) }
     end
   end
 
-  describe '#latest_successful_build_for!' do
+  describe '#latest_successful_build_for_sha' do
+    let(:project) { create(:project, :repository) }
+    let(:pipeline) { create_pipeline(project) }
+
+    it_behaves_like 'latest successful build for sha or ref'
+
+    subject { project.latest_successful_build_for_sha(build_name, project.commit.sha) }
+  end
+
+  describe '#latest_successful_build_for_ref!' do
     let(:project) { create(:project, :repository) }
     let(:pipeline) { create_pipeline(project) }
 
@@ -2067,7 +2040,7 @@ describe Project do
         build1_p2 = create_build(pipeline2, 'test')
         create_build(pipeline2, 'test2')
 
-        expect(project.latest_successful_build_for(build1_p2.name))
+        expect(project.latest_successful_build_for_ref!(build1_p2.name))
           .to eq(build1_p2)
       end
     end
@@ -2077,12 +2050,12 @@ describe Project do
 
       context 'standalone pipeline' do
         it 'returns builds for ref for default_branch' do
-          expect(project.latest_successful_build_for!(build.name))
+          expect(project.latest_successful_build_for_ref!(build.name))
             .to eq(build)
         end
 
         it 'returns exception if the build cannot be found' do
-          expect { project.latest_successful_build_for!(build.name, 'TAIL') }
+          expect { project.latest_successful_build_for_ref!(build.name, 'TAIL') }
             .to raise_error(ActiveRecord::RecordNotFound)
         end
       end
@@ -2093,7 +2066,7 @@ describe Project do
         end
 
         it 'gives the latest build from latest pipeline' do
-          expect(project.latest_successful_build_for!(build.name))
+          expect(project.latest_successful_build_for_ref!(build.name))
             .to eq(build)
         end
       end
@@ -2104,7 +2077,7 @@ describe Project do
         pipeline.update(status: 'pending')
         pending_build = create_build(pipeline)
 
-        expect { project.latest_successful_build_for!(pending_build.name) }
+        expect { project.latest_successful_build_for_ref!(pending_build.name) }
           .to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -2272,7 +2245,7 @@ describe Project do
     end
   end
 
-  describe '#ancestors_upto', :nested_groups do
+  describe '#ancestors_upto' do
     let(:parent) { create(:group) }
     let(:child) { create(:group, parent: parent) }
     let(:child2) { create(:group, parent: child) }
@@ -2311,7 +2284,7 @@ describe Project do
       it { is_expected.to eq(group) }
     end
 
-    context 'in a nested group', :nested_groups do
+    context 'in a nested group' do
       let(:root) { create(:group) }
       let(:child) { create(:group, parent: root) }
       let(:project) { create(:project, group: child) }
@@ -2459,7 +2432,7 @@ describe Project do
         expect(forked_project.in_fork_network_of?(project)).to be_truthy
       end
 
-      it 'is true for a fork of a fork', :postgresql do
+      it 'is true for a fork of a fork' do
         other_fork = fork_project(forked_project)
 
         expect(other_fork.in_fork_network_of?(project)).to be_truthy
@@ -2977,6 +2950,16 @@ describe Project do
           expect(project.public_path_for_source_path('file.html', sha)).to be_nil
         end
       end
+
+      it 'returns a public path with a leading slash unmodified' do
+        route_map = Gitlab::RouteMap.new(<<-MAP.strip_heredoc)
+          - source: 'source/file.html'
+            public: '/public/file'
+        MAP
+        allow(project).to receive(:route_map_for).with(sha).and_return(route_map)
+
+        expect(project.public_path_for_source_path('source/file.html', sha)).to eq('/public/file')
+      end
     end
 
     context 'when there is no route map' do
@@ -3097,11 +3080,8 @@ describe Project do
     let(:project) { create(:project) }
 
     it 'shows full error updating an invalid MR' do
-      error_message = 'Failed to replace merge_requests because one or more of the new records could not be saved.'\
-        ' Validate fork Source project is not a fork of the target project'
-
       expect { project.append_or_update_attribute(:merge_requests, [create(:merge_request)]) }
-        .to raise_error(ActiveRecord::RecordNotSaved, error_message)
+        .to raise_error(ActiveRecord::RecordInvalid, /Failed to set merge_requests:/)
     end
 
     it 'updates the project successfully' do
@@ -3784,7 +3764,7 @@ describe Project do
         end
       end
 
-      context 'when enabled on root parent', :nested_groups do
+      context 'when enabled on root parent' do
         let(:parent_group) { create(:group, parent: create(:group, :auto_devops_enabled)) }
 
         context 'when auto devops instance enabled' do
@@ -3804,7 +3784,7 @@ describe Project do
         end
       end
 
-      context 'when disabled on root parent', :nested_groups do
+      context 'when disabled on root parent' do
         let(:parent_group) { create(:group, parent: create(:group, :auto_devops_disabled)) }
 
         context 'when auto devops instance enabled' do
@@ -4016,7 +3996,7 @@ describe Project do
 
     context 'with a ref that is not the default branch' do
       it 'returns the latest successful pipeline for the given ref' do
-        expect(project.ci_pipelines).to receive(:latest_successful_for).with('foo')
+        expect(project.ci_pipelines).to receive(:latest_successful_for_ref).with('foo')
 
         project.latest_successful_pipeline_for('foo')
       end
@@ -4044,7 +4024,7 @@ describe Project do
     it 'memoizes and returns the latest successful pipeline for the default branch' do
       pipeline = double(:pipeline)
 
-      expect(project.ci_pipelines).to receive(:latest_successful_for)
+      expect(project.ci_pipelines).to receive(:latest_successful_for_ref)
         .with(project.default_branch)
         .and_return(pipeline)
         .once
@@ -4247,18 +4227,16 @@ describe Project do
       expect(project.badges.count).to eq 3
     end
 
-    if Group.supports_nested_objects?
-      context 'with nested_groups' do
-        let(:parent_group) { create(:group) }
+    context 'with nested_groups' do
+      let(:parent_group) { create(:group) }
 
-        before do
-          create_list(:group_badge, 2, group: project_group)
-          project_group.update(parent: parent_group)
-        end
+      before do
+        create_list(:group_badge, 2, group: project_group)
+        project_group.update(parent: parent_group)
+      end
 
-        it 'returns the project and the project nested groups badges' do
-          expect(project.badges.count).to eq 5
-        end
+      it 'returns the project and the project nested groups badges' do
+        expect(project.badges.count).to eq 5
       end
     end
   end

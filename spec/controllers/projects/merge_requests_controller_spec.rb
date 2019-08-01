@@ -621,10 +621,100 @@ describe Projects::MergeRequestsController do
           format: :json
     end
 
-    it 'responds with serialized pipelines' do
-      expect(json_response['pipelines']).not_to be_empty
-      expect(json_response['count']['all']).to eq 1
-      expect(response).to include_pagination_headers
+    context 'with "enabled" builds on a public project' do
+      let(:project) { create(:project, :repository, :public) }
+
+      context 'for a project owner' do
+        it 'responds with serialized pipelines' do
+          expect(json_response['pipelines']).to be_present
+          expect(json_response['count']['all']).to eq(1)
+          expect(response).to include_pagination_headers
+        end
+      end
+
+      context 'for an unassociated user' do
+        let(:user) { create :user }
+
+        it 'responds with no pipelines' do
+          expect(json_response['pipelines']).to be_present
+          expect(json_response['count']['all']).to eq(1)
+          expect(response).to include_pagination_headers
+        end
+      end
+    end
+
+    context 'with private builds on a public project' do
+      let(:project) { create(:project, :repository, :public, :builds_private) }
+
+      context 'for a project owner' do
+        it 'responds with serialized pipelines' do
+          expect(json_response['pipelines']).to be_present
+          expect(json_response['count']['all']).to eq(1)
+          expect(response).to include_pagination_headers
+        end
+      end
+
+      context 'for an unassociated user' do
+        let(:user) { create :user }
+
+        it 'responds with no pipelines' do
+          expect(json_response['pipelines']).to be_empty
+          expect(json_response['count']['all']).to eq(0)
+          expect(response).to include_pagination_headers
+        end
+      end
+
+      context 'from a project fork' do
+        let(:fork_user)      { create :user }
+        let(:forked_project) { fork_project(project, fork_user, repository: true) } # Forked project carries over :builds_private
+        let(:merge_request)  { create(:merge_request_with_diffs, target_project: project, source_project: forked_project) }
+
+        context 'with private builds' do
+          context 'for the target project member' do
+            it 'does not respond with serialized pipelines' do
+              expect(json_response['pipelines']).to be_empty
+              expect(json_response['count']['all']).to eq(0)
+              expect(response).to include_pagination_headers
+            end
+          end
+
+          context 'for the source project member' do
+            let(:user) { fork_user }
+
+            it 'responds with serialized pipelines' do
+              expect(json_response['pipelines']).to be_present
+              expect(json_response['count']['all']).to eq(1)
+              expect(response).to include_pagination_headers
+            end
+          end
+        end
+
+        context 'with public builds' do
+          let(:forked_project) do
+            fork_project(project, fork_user, repository: true).tap do |new_project|
+              new_project.project_feature.update(builds_access_level: ProjectFeature::ENABLED)
+            end
+          end
+
+          context 'for the target project member' do
+            it 'does not respond with serialized pipelines' do
+              expect(json_response['pipelines']).to be_present
+              expect(json_response['count']['all']).to eq(1)
+              expect(response).to include_pagination_headers
+            end
+          end
+
+          context 'for the source project member' do
+            let(:user) { fork_user }
+
+            it 'responds with serialized pipelines' do
+              expect(json_response['pipelines']).to be_present
+              expect(json_response['count']['all']).to eq(1)
+              expect(response).to include_pagination_headers
+            end
+          end
+        end
+      end
     end
   end
 
@@ -885,10 +975,9 @@ describe Projects::MergeRequestsController do
         environment2 = create(:environment, project: forked)
         create(:deployment, :succeed, environment: environment2, sha: sha, ref: 'master', deployable: build)
 
-        # TODO address the last 11 queries
+        # TODO address the last 5 queries
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/63952 (5 queries)
-        # And https://gitlab.com/gitlab-org/gitlab-ce/issues/64105 (6 queries)
-        leeway = 11
+        leeway = 5
         expect { get_ci_environments_status }.not_to exceed_all_query_limit(control_count + leeway)
       end
     end

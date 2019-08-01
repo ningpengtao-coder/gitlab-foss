@@ -5,11 +5,12 @@ be added directly to your configured cluster. These applications are
 needed for [Review Apps](../../ci/review_apps/index.md) and
 [deployments](../../ci/environments.md) when using [Auto DevOps](../../topics/autodevops/index.md).
 You can install them after you
-[create a cluster](../project/clusters/index.md#adding-and-creating-a-new-gke-cluster-via-gitlab).
+[create a cluster](../project/clusters/index.md#add-new-gke-cluster).
 
 ## Installing applications
 
 Applications managed by GitLab will be installed onto the `gitlab-managed-apps` namespace.
+
 This namespace:
 
 - Is different from the namespace used for project deployments.
@@ -94,7 +95,7 @@ CI/CD](../../ci/README.md), the open-source continuous integration
 service included with GitLab that coordinates the jobs. When installing
 the GitLab Runner via the applications, it will run in **privileged
 mode** by default. Make sure you read the [security
-implications](../project/clusters/index.md/#security-implications) before doing so.
+implications](../project/clusters/index.md#security-implications) before doing so.
 
 NOTE: **Note:**
 The
@@ -254,6 +255,7 @@ The applications below can be uninstalled.
 | GitLab Runner  | 12.2+         | Any running pipelines will be canceled. |
 | Ingress  | 12.1+         | The associated load balancer and IP will be deleted and cannot be restored. Furthermore, it can only be uninstalled if JupyterHub is not installed. |
 | JupyterHub  | 12.1+         | All data not committed to GitLab will be deleted and cannot be restored. |
+| Knative  | 12.1+         | The associated IP will be deleted and cannot be restored. |
 | Prometheus  | 11.11+         | All data will be deleted and cannot be restored. |
 
 To uninstall an application:

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :clusters_applications_helm, class: Clusters::Applications::Helm do
     cluster factory: %i(cluster provided_by_gcp)
@@ -58,7 +60,7 @@ FactoryBot.define do
       cluster factory: %i(cluster with_installed_helm provided_by_gcp)
     end
 
-    factory :clusters_applications_cert_managers, class: Clusters::Applications::CertManager do
+    factory :clusters_applications_cert_manager, class: Clusters::Applications::CertManager do
       email 'admin@example.com'
       cluster factory: %i(cluster with_installed_helm provided_by_gcp)
     end

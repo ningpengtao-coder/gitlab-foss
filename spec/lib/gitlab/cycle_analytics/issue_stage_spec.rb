@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'lib/gitlab/cycle_analytics/shared_stage_spec'
 
@@ -68,6 +70,29 @@ describe Gitlab::CycleAnalytics::IssueStage do
       it 'exposes merge requests that close issues' do
         expect(subject.count).to eq(2)
         expect(subject.map { |event| event[:title] }).to contain_exactly(issue_2_1.title, issue_2_2.title)
+      end
+    end
+
+    context 'when only part of projects is chosen' do
+      let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: user, group: group, projects: [project_2.id] }) }
+
+      describe '#group_median' do
+        around do |example|
+          Timecop.freeze { example.run }
+        end
+
+        it 'counts median from issues with metrics' do
+          expect(stage.group_median).to eq(ISSUES_MEDIAN)
+        end
+      end
+
+      describe '#events' do
+        subject { stage.events }
+
+        it 'exposes merge requests that close issues' do
+          expect(subject.count).to eq(1)
+          expect(subject.map { |event| event[:title] }).to contain_exactly(issue_2_1.title)
+        end
       end
     end
 

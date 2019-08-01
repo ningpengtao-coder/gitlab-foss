@@ -29,7 +29,7 @@ The following API resources are available in the project context:
 | [Commits](commits.md)                                               | `/projects/:id/repository/commits`, `/projects/:id/statuses`                                                                                                                                          |
 | [Container Registry](container_registry.md)                         | `/projects/:id/registry/repositories`                                                                                                                                                                 |
 | [Custom attributes](custom_attributes.md)                           | `/projects/:id/custom_attributes` (also available for groups and users)                                                                                                                               |
-| [Dependencies](dependencies.md) **[ULTIMATE]**                      | `/projects/:id/dependencies`
+| [Dependencies](dependencies.md) **(ULTIMATE)**                      | `/projects/:id/dependencies`
 | [Deploy keys](deploy_keys.md)                                       | `/projects/:id/deploy_keys` (also available standalone)                                                                                                                                               |
 | [Deployments](deployments.md)                                       | `/projects/:id/deployments`                                                                                                                                                                           |
 | [Discussions](discussions.md) (threaded comments)                   | `/projects/:id/issues/.../discussions`, `/projects/:id/snippets/.../discussions`, `/projects/:id/merge_requests/.../discussions`, `/projects/:id/commits/.../discussions` (also available for groups) |
@@ -515,7 +515,7 @@ more than 10,000, the `X-Total` and `X-Total-Pages` headers as well as the
 
 ## Namespaced path encoding
 
-If using namespaced API calls, make sure that the `NAMESPACE/PROJECT_NAME` is
+If using namespaced API calls, make sure that the `NAMESPACE/PROJECT_PATH` is
 URL-encoded.
 
 For example, `/` is represented by `%2F`:
@@ -523,6 +523,11 @@ For example, `/` is represented by `%2F`:
 ```
 GET /api/v4/projects/diaspora%2Fdiaspora
 ```
+
+NOTE: **Note:**
+A project's **path** is not necessarily the same as its **name**.  A
+project's path can found in the project's URL or in the project's settings
+under **General > Advanced > Change path**.
 
 ## Branches and tags name encoding
 

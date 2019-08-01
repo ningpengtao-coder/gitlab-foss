@@ -2,6 +2,50 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.1.3
+
+### Fixed (11 changes)
+
+- Prevent multiple confirmation modals from opening when deleting a repository. !30532
+- Fix the project auto devops API. !30946
+- Fix "Certificate misses intermediates" UI error when enabling Let's Encrypt integration for pages domain. !30995
+- Fix xterm css not loading for environment terminal. !31023
+- Set DOCKER_TLS_CERTDIR in Auto Dev-Ops CI template to fix jobs using Docker-in-Docker. !31078
+- Set DOCKER_TLS_CERTDIR in CI job templates to fix Docker-in-Docker service. !31080
+- Support Docker OCI images. !31127
+- Fix error rendering submodules in MR diffs when there is no .gitmodules. !31162
+- Fix pdf.js rendering pages in the wrong order. !31222
+- Fix exception handling in Gitaly autodetection. !31285
+- Fix bug that caused diffs not to show on MRs with changes to submodules.
+
+### Performance (1 change)
+
+- Optimise import performance. !31045
+
+
+## 12.1.2
+
+### Security (1 change)
+
+- Use source project as permissions reference for MergeRequestsController#pipelines.
+
+### Security (9 changes)
+
+- Restrict slash commands to users who can log in.
+- Patch XSS issue in wiki links.
+- Queries for Upload should be scoped by model.
+- Filter merge request params on the new merge request page.
+- Fix Server Side Request Forgery mitigation bypass.
+- Show badges if pipelines are public otherwise default to project permissions.
+- Do not allow localhost url redirection in GitHub Integration.
+- Do not show moved issue id for users that cannot read issue.
+- Drop feature to take ownership of trigger token.
+
+
+## 12.1.1
+
+- No changes.
+
 ## 12.1.0
 
 ### Security (11 changes, 2 of them are from the community)
@@ -619,6 +663,21 @@ entry.
 - Increase height of move issue dropdown.
 - Use grid and correct border radius for status badge.
 - Moves snowplow to CE repo.
+
+
+## 11.11.7
+
+### Security (9 changes)
+
+- Restrict slash commands to users who can log in.
+- Patch XSS issue in wiki links.
+- Filter merge request params on the new merge request page.
+- Fix Server Side Request Forgery mitigation bypass.
+- Show badges if pipelines are public otherwise default to project permissions.
+- Do not allow localhost url redirection in GitHub Integration.
+- Do not show moved issue id for users that cannot read issue.
+- Use source project as permissions reference for MergeRequestsController#pipelines.
+- Drop feature to take ownership of trigger token.
 
 
 ## 11.11.4 (2019-06-26)

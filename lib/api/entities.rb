@@ -2,6 +2,19 @@
 
 module API
   module Entities
+    class BlameRangeCommit < Grape::Entity
+      expose :id
+      expose :parent_ids
+      expose :message
+      expose :authored_date, :author_name, :author_email
+      expose :committed_date, :committer_name, :committer_email
+    end
+
+    class BlameRange < Grape::Entity
+      expose :commit, using: BlameRangeCommit
+      expose :lines
+    end
+
     class WikiPageBasic < Grape::Entity
       expose :format
       expose :slug
@@ -366,10 +379,7 @@ module API
       end
       expose :request_access_enabled
       expose :full_name, :full_path
-
-      if ::Group.supports_nested_objects?
-        expose :parent_id
-      end
+      expose :parent_id
 
       expose :custom_attributes, using: 'API::Entities::CustomAttribute', if: :with_custom_attributes
 
@@ -1052,15 +1062,8 @@ module API
       # rubocop: disable CodeReuse/ActiveRecord
       def self.preload_relation(projects_relation, options = {})
         relation = super(projects_relation, options)
-
-        # MySQL doesn't support LIMIT inside an IN subquery
-        if Gitlab::Database.mysql?
-          project_ids = relation.pluck('projects.id')
-          namespace_ids = relation.pluck(:namespace_id)
-        else
-          project_ids = relation.select('projects.id')
-          namespace_ids = relation.select(:namespace_id)
-        end
+        project_ids = relation.select('projects.id')
+        namespace_ids = relation.select(:namespace_id)
 
         options[:project_members] = options[:current_user]
           .project_members

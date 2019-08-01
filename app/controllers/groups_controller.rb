@@ -7,10 +7,6 @@ class GroupsController < Groups::ApplicationController
   include PreviewMarkdown
   include RecordUserLastActivity
 
-  before_action do
-    push_frontend_feature_flag(:manual_sorting)
-  end
-
   respond_to :html
 
   prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
@@ -192,7 +188,8 @@ class GroupsController < Groups::ApplicationController
       :chat_team_name,
       :require_two_factor_authentication,
       :two_factor_grace_period,
-      :project_creation_level
+      :project_creation_level,
+      :subgroup_creation_level
     ]
   end
 

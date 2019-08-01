@@ -1,7 +1,16 @@
+---
+type: reference, howto
+---
+
 # Dynamic Application Security Testing (DAST) **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4348)
 in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
+
+NOTE: **4 of the top 6 attacks were application based.**
+Download our whitepaper,
+["A Seismic Shift in Application Security"](https://about.gitlab.com/resources/whitepaper-seismic-shift-application-security/)
+to learn how to protect your organization.
 
 Running [static checks](../sast/index.md) on your code is the first step to detect
 vulnerabilities that can put the security of your code at risk. Yet, once
@@ -199,3 +208,15 @@ Once a vulnerability is found, you can interact with it. Read more on how to
 
 For more information about the vulnerabilities database update, check the
 [maintenance table](../index.md#maintenance-and-update-of-the-vulnerabilities-database).
+
+<!-- ## Troubleshooting
+
+Include any troubleshooting steps that you can foresee. If you know beforehand what issues
+one might have when setting this up, or when something is changed, or on upgrading, it's
+important to describe those, too. Think of things that may go wrong and include them here.
+This is important to minimize requests for support, and to avoid doc comments with
+questions that you know someone might ask.
+
+Each scenario can be a third-level heading, e.g. `### Getting error message X`.
+If you have none to add when creating a doc, leave this section in place
+but commented out to help encourage others to add to it in the future. -->

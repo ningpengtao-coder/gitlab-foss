@@ -47,6 +47,7 @@ With **[GitLab Enterprise Edition][ee]**, you can also:
 - Analyze your dependencies for vulnerabilities with [Dependency Scanning](../../application_security/dependency_scanning/index.md) **(ULTIMATE)**
 - Analyze your Docker images for vulnerabilities with [Container Scanning](../../application_security/container_scanning/index.md) **(ULTIMATE)**
 - Determine the performance impact of changes with [Browser Performance Testing](#browser-performance-testing-premium) **(PREMIUM)**
+- Specify merge order dependencies with [Blocking Merge Requests](#blocking-merge-requests-premium) **(PREMIUM)**
 
 ## Use cases
 
@@ -285,6 +286,7 @@ as pushing changes:
 - Create a new merge request for the pushed branch.
 - Set the target of the merge request to a particular branch.
 - Set the merge request to merge when its pipeline succeeds.
+- Set the merge request to remove the source branch when it's merged.
 
 ### Create a new merge request using git push options
 
@@ -327,6 +329,43 @@ pipeline succeeds at the same time using a `-o` flag per push option:
 ```sh
 git push -o merge_request.create -o merge_request.merge_when_pipeline_succeeds
 ```
+
+### Set removing the source branch using git push options
+
+To set an existing merge request to remove the source branch when the
+merge request is merged, the
+`merge_request.remove_source_branch` push option can be used:
+
+```sh
+git push -o merge_request.remove_source_branch
+```
+
+You can also use this push option in addition to the
+`merge_request.create` push option.
+
+### Set merge request title using git push options
+
+To set the title of an existing merge request, use
+the `merge_request.title` push option:
+
+```sh
+git push -o merge_request.title="The title I want"
+```
+
+You can also use this push option in addition to the
+`merge_request.create` push option.
+
+### Set merge request description using git push options
+
+To set the description of an existing merge request, use
+the `merge_request.description` push option:
+
+```sh
+git push -o merge_request.description="The description I want"
+```
+
+You can also use this push option in addition to the
+`merge_request.create` push option.
 
 ## Find the merge request that introduced a change
 
@@ -411,6 +450,21 @@ If your application offers a web interface and you are using [GitLab CI/CD][ci],
 GitLab runs the [Sitespeed.io container][sitespeed-container] and displays the difference in overall performance scores between the source and target branches.
 
 [Read more about Browser Performance Testing.](browser_performance_testing.md)
+
+## Blocking Merge Requests **(PREMIUM)**
+
+> Introduced in [GitLab Premium][products] 12.2.
+
+A single logical change may be split across several merge requests, and perhaps
+even across several projects. When this happens, the order in which MRs are
+merged is important.
+
+GitLab allows you to specify that a merge request is blocked by other MRs. With
+this relationship in place, the merge request cannot be merged until all of its
+blockers have also been merged, helping to maintain the consistency of a single
+logical change.
+
+[Read more about Blocking Merge Requests.](blocking_merge_requests.md)
 
 ## Security reports **(ULTIMATE)**
 

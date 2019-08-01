@@ -111,7 +111,7 @@ describe NotificationService, :mailer do
       should_email(participant)
     end
 
-    context 'for subgroups', :nested_groups do
+    context 'for subgroups' do
       before do
         build_group(project)
       end
@@ -337,7 +337,7 @@ describe NotificationService, :mailer do
 
         it_behaves_like 'new note notifications'
 
-        context 'which is a subgroup', :nested_groups do
+        context 'which is a subgroup' do
           let!(:parent) { create(:group) }
           let!(:group) { create(:group, parent: parent) }
 
@@ -388,7 +388,7 @@ describe NotificationService, :mailer do
         should_email(admin)
       end
 
-      context 'on project that belongs to subgroup', :nested_groups do
+      context 'on project that belongs to subgroup' do
         let(:group_reporter) { create(:user) }
         let(:group_guest) { create(:user) }
         let(:parent_group) { create(:group) }
@@ -458,7 +458,7 @@ describe NotificationService, :mailer do
           should_not_email_nested_group_user(@pg_disabled)
         end
 
-        it 'notifies parent group members with mention level', :nested_groups do
+        it 'notifies parent group members with mention level' do
           note = create(:note_on_issue, noteable: issue, project_id: issue.project_id, note: "@#{@pg_mention.username}")
 
           notification.new_note(note)
@@ -2063,26 +2063,58 @@ describe NotificationService, :mailer do
         end
 
         context 'when the creator has custom notifications enabled' do
-          before do
-            pipeline = create_pipeline(u_custom_notification_enabled, :success)
-            notification.pipeline_finished(pipeline)
-          end
+          let(:pipeline) { create_pipeline(u_custom_notification_enabled, :success) }
 
           it 'emails only the creator' do
+            notification.pipeline_finished(pipeline)
+
             should_only_email(u_custom_notification_enabled, kind: :bcc)
+          end
+
+          context 'when the creator has group notification email set' do
+            let(:group_notification_email) { 'user+group@example.com' }
+
+            before do
+              group = create(:group)
+
+              project.update(group: group)
+              create(:notification_setting, user: u_custom_notification_enabled, source: group, notification_email: group_notification_email)
+            end
+
+            it 'sends to group notification email' do
+              notification.pipeline_finished(pipeline)
+
+              expect(email_recipients(kind: :bcc).first).to eq(group_notification_email)
+            end
           end
         end
       end
 
       context 'with a failed pipeline' do
         context 'when the creator has no custom notification set' do
-          before do
-            pipeline = create_pipeline(u_member, :failed)
-            notification.pipeline_finished(pipeline)
-          end
+          let(:pipeline) { create_pipeline(u_member, :failed) }
 
           it 'emails only the creator' do
+            notification.pipeline_finished(pipeline)
+
             should_only_email(u_member, kind: :bcc)
+          end
+
+          context 'when the creator has group notification email set' do
+            let(:group_notification_email) { 'user+group@example.com' }
+
+            before do
+              group = create(:group)
+
+              project.update(group: group)
+              create(:notification_setting, user: u_member, source: group, notification_email: group_notification_email)
+            end
+
+            it 'sends to group notification email' do
+              notification.pipeline_finished(pipeline)
+
+              expect(email_recipients(kind: :bcc).first).to eq(group_notification_email)
+            end
           end
         end
 
@@ -2378,52 +2410,40 @@ describe NotificationService, :mailer do
     group
   end
 
-  # Creates a nested group only if supported
-  # to avoid errors on MySQL
   def create_nested_group(visibility)
-    if Group.supports_nested_objects?
-      parent_group = create(:group, visibility)
-      child_group = create(:group, visibility, parent: parent_group)
+    parent_group = create(:group, visibility)
+    child_group = create(:group, visibility, parent: parent_group)
 
-      # Parent group member: global=disabled, parent_group=watch, child_group=global
-      @pg_watcher ||= create_user_with_notification(:watch, 'parent_group_watcher', parent_group)
-      @pg_watcher.notification_settings_for(nil).disabled!
+    # Parent group member: global=disabled, parent_group=watch, child_group=global
+    @pg_watcher ||= create_user_with_notification(:watch, 'parent_group_watcher', parent_group)
+    @pg_watcher.notification_settings_for(nil).disabled!
 
-      # Parent group member: global=global, parent_group=disabled, child_group=global
-      @pg_disabled ||= create_user_with_notification(:disabled, 'parent_group_disabled', parent_group)
-      @pg_disabled.notification_settings_for(nil).global!
+    # Parent group member: global=global, parent_group=disabled, child_group=global
+    @pg_disabled ||= create_user_with_notification(:disabled, 'parent_group_disabled', parent_group)
+    @pg_disabled.notification_settings_for(nil).global!
 
-      # Parent group member: global=global, parent_group=mention, child_group=global
-      @pg_mention ||= create_user_with_notification(:mention, 'parent_group_mention', parent_group)
-      @pg_mention.notification_settings_for(nil).global!
+    # Parent group member: global=global, parent_group=mention, child_group=global
+    @pg_mention ||= create_user_with_notification(:mention, 'parent_group_mention', parent_group)
+    @pg_mention.notification_settings_for(nil).global!
 
-      # Parent group member: global=global, parent_group=participating, child_group=global
-      @pg_participant ||= create_user_with_notification(:participating, 'parent_group_participant', parent_group)
-      @pg_mention.notification_settings_for(nil).global!
+    # Parent group member: global=global, parent_group=participating, child_group=global
+    @pg_participant ||= create_user_with_notification(:participating, 'parent_group_participant', parent_group)
+    @pg_mention.notification_settings_for(nil).global!
 
-      child_group
-    else
-      create(:group, visibility)
-    end
+    child_group
   end
 
   def add_member_for_parent_group(user, project)
-    return unless Group.supports_nested_objects?
-
     project.reload
 
     project.group.parent.add_maintainer(user)
   end
 
   def should_email_nested_group_user(user, times: 1, recipients: email_recipients)
-    return unless Group.supports_nested_objects?
-
     should_email(user, times: 1, recipients: email_recipients)
   end
 
   def should_not_email_nested_group_user(user, recipients: email_recipients)
-    return unless Group.supports_nested_objects?
-
     should_not_email(user, recipients: email_recipients)
   end
 
