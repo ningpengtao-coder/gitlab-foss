@@ -217,7 +217,7 @@ describe('Area component', () => {
 
       it('utilizes all data points', () => {
         expect(chartData.length).toBe(1);
-        expect(seriesData().data.length).toBe(481);
+        expect(seriesData().data.length).toBe(32);
       });
 
       it('creates valid data', () => {
