@@ -1,0 +1,5 @@
+---
+title: Remove issuables group milestones when transfering a project
+merge_request: 31303
+author:
+type: fixed
