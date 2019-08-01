@@ -30,13 +30,12 @@ describe SelfMonitoring::Project::CreateService do
 
     context 'with admin users' do
       let(:project) { result[:project] }
-      let(:application_setting) { create(:application_setting) }
+      let(:application_setting) { Gitlab::CurrentSettings.current_application_settings }
 
       let!(:user) { create(:user, :admin) }
 
       before do
         application_setting.allow_local_requests_from_web_hooks_and_services = true
-        allow(Gitlab::CurrentSettings).to receive(:current_application_settings) { application_setting }
       end
 
       shared_examples 'has prometheus service' do |listen_address|

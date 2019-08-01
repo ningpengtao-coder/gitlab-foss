@@ -51,7 +51,7 @@ module SelfMonitoring
 
       def save_project_id
         result = ApplicationSettings::UpdateService.new(
-          Gitlab::CurrentSettings.current_application_settings,
+          application_settings,
           project_owner,
           { instance_administration_project_id: @project.id }
         ).execute
@@ -59,7 +59,7 @@ module SelfMonitoring
         if result
           success
         else
-          log_error(_("Could not save instance administration project ID, errors: %{errors}") % { errors: Gitlab::CurrentSettings.errors.full_messages })
+          log_error(_("Could not save instance administration project ID, errors: %{errors}") % { errors: application_settings.errors.full_messages })
           error(_('Could not save project ID'))
         end
       end
@@ -84,7 +84,7 @@ module SelfMonitoring
         return error(_('Prometheus listen_address is not a valid URI')) unless uri
 
         result = ApplicationSettings::UpdateService.new(
-          Gitlab::CurrentSettings.current_application_settings,
+          application_settings,
           project_owner,
           outbound_local_requests_whitelist: [uri.normalized_host]
         ).execute
@@ -92,6 +92,7 @@ module SelfMonitoring
         if result
           success
         else
+          log_error(_("Could not add prometheus URL to whitelist, errors: %{errors}") % { errors: application_settings.errors.full_messages })
           error(_('Could not add prometheus URL to whitelist'))
         end
       end
@@ -108,6 +109,10 @@ module SelfMonitoring
         end
 
         success
+      end
+
+      def application_settings
+        @application_settings ||= Gitlab::CurrentSettings.current_application_settings
       end
 
       def parse_url(uri_string)
