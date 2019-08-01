@@ -29,7 +29,7 @@ rule "MD025" # only 1 level 1 header
 rule "MD026", :punctuation => '.,;:!' # no trailing punctuation in headers
 rule "MD027" # no multiple spaces after blockquote symbol
 rule "MD028" # no blank lines within blockquote
-rule "MD029", :style => :one # ordered list item prefix, should be ordered
+rule "MD029", :style => :one # ordered list item prefix
 rule "MD030" # spaces after list markers
 rule "MD031" # fenced code blocks need line surrounding
 
