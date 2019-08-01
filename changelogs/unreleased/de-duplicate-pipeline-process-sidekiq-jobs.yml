@@ -1,0 +1,5 @@
+---
+title: De-duplicate pipeline process sidekiq jobs
+merge_request: 31370
+author:
+type: performance

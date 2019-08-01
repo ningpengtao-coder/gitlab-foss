@@ -13,6 +13,7 @@ describe StuckCiJobsWorker do
   subject(:worker) { described_class.new }
 
   before do
+    allow(PipelineProcessWorker).to receive(:perform_async) {}
     stub_exclusive_lease(worker_lease_key, worker_lease_uuid)
     job.update!(status: status, updated_at: updated_at)
   end

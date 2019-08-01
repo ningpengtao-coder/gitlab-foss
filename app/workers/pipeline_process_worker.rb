@@ -3,14 +3,15 @@
 class PipelineProcessWorker
   include ApplicationWorker
   include PipelineQueue
+  prepend SidekiqJobDeduplicater
 
   queue_namespace :pipeline_processing
 
-  # rubocop: disable CodeReuse/ActiveRecord
+  self.deduplicater_default_enabled = false
+
   def perform(pipeline_id, build_ids = nil)
-    Ci::Pipeline.find_by(id: pipeline_id).try do |pipeline|
+    Ci::Pipeline.find_by_id(pipeline_id).try do |pipeline|
       pipeline.process!(build_ids)
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end
