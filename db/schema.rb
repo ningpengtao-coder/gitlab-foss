@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_29_090456) do
+ActiveRecord::Schema.define(version: 2019_08_01_154748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -1169,7 +1169,7 @@ ActiveRecord::Schema.define(version: 2019_07_29_090456) do
     t.datetime "updated_at"
     t.string "external_url"
     t.string "environment_type"
-    t.string "state", default: "available", null: false
+    t.string "state", default: "created", null: false
     t.string "slug", null: false
     t.index ["name"], name: "index_environments_on_name_varchar_pattern_ops", opclass: :varchar_pattern_ops
     t.index ["project_id", "name"], name: "index_environments_on_project_id_and_name", unique: true

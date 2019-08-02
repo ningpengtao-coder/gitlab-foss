@@ -517,7 +517,15 @@ describe Environment, :use_clean_rails_memory_store_caching do
   describe '#has_terminals?' do
     subject { environment.has_terminals? }
 
+    context 'when the environment is created' do
+      it { is_expected.to be_falsy }
+    end
+
     context 'when the environment is available' do
+      before do
+        environment.start
+      end
+
       context 'with a deployment service' do
         context 'when user configured kubernetes from CI/CD > Clusters' do
           let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
@@ -525,6 +533,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
           context 'with deployment' do
             let!(:deployment) { create(:deployment, :success, environment: environment) }
+
             it { is_expected.to be_truthy }
           end
 
@@ -539,7 +548,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
       end
     end
 
-    context 'when the environment is unavailable' do
+    context 'when the environment is stopped' do
       before do
         environment.stop
       end
@@ -609,7 +618,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
   describe '#calculate_reactive_cache' do
     let(:cluster) { create(:cluster, :project, :provided_by_user) }
     let(:project) { cluster.project }
-    let(:environment) { create(:environment, project: project) }
+    let(:environment) { create(:environment, project: project, state: :available) }
     let!(:deployment) { create(:deployment, :success, environment: environment) }
 
     subject { environment.calculate_reactive_cache }
@@ -641,7 +650,17 @@ describe Environment, :use_clean_rails_memory_store_caching do
   describe '#has_metrics?' do
     subject { environment.has_metrics? }
 
+    context 'when the environment is created' do
+      let(:project) { create(:prometheus_project) }
+
+      it { is_expected.to be_falsy }
+    end
+
     context 'when the environment is available' do
+      before do
+        environment.start
+      end
+
       context 'with a deployment service' do
         let(:project) { create(:prometheus_project) }
 
@@ -660,7 +679,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
       end
     end
 
-    context 'when the environment is unavailable' do
+    context 'when the environment is stopped' do
       let(:project) { create(:prometheus_project) }
 
       before do

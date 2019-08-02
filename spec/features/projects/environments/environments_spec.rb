@@ -122,32 +122,28 @@ describe 'Environments page', :js do
   end
 
   describe 'environments table' do
-    let!(:environment) do
-      create(:environment, project: project, state: :available)
-    end
-
     context 'when there are no deployments' do
+      let!(:environment) do
+        create(:environment, project: project, state: :created)
+      end
+
       before do
         visit_environments(project)
       end
 
-      it 'shows environments names and counters' do
-        expect(page).to have_link(environment.name)
-
-        expect(page.find('.js-environments-tab-available .badge').text).to eq('1')
+      it 'does not shows environments names and counters' do
+        expect(page).not_to have_link(environment.name)
+        expect(page).not_to have_content('No deployments yet')
+        expect(page.find('.js-environments-tab-available .badge').text).to eq('0')
         expect(page.find('.js-environments-tab-stopped .badge').text).to eq('0')
-      end
-
-      it 'does not show deployments' do
-        expect(page).to have_content('No deployments yet')
-      end
-
-      it 'does not show stip button when environment is not stoppable' do
-        expect(page).not_to have_selector(stop_button_selector)
       end
     end
 
     context 'when there are successful deployments' do
+      let!(:environment) do
+        create(:environment, project: project, state: :available)
+      end
+
       let(:project) { create(:project, :repository) }
 
       let!(:deployment) do
@@ -215,7 +211,7 @@ describe 'Environments page', :js do
         end
 
         context 'with external_url' do
-          let(:environment) { create(:environment, project: project, external_url: 'https://git.gitlab.com') }
+          let(:environment) { create(:environment, project: project, state: :available, external_url: 'https://git.gitlab.com') }
           let(:build) { create(:ci_build, pipeline: pipeline) }
           let(:deployment) { create(:deployment, :success, environment: environment, deployable: build) }
 
@@ -338,6 +334,10 @@ describe 'Environments page', :js do
 
     context 'when there is a failed deployment' do
       let(:project) { create(:project, :repository) }
+
+      let!(:environment) do
+        create(:environment, project: project, state: :available)
+      end
 
       let!(:deployment) do
         create(:deployment, :failed,

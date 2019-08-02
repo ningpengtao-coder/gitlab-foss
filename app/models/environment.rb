@@ -59,15 +59,16 @@ class Environment < ApplicationRecord
   scope :for_project, -> (project) { where(project_id: project) }
   scope :with_deployment, -> (sha) { where('EXISTS (?)', Deployment.select(1).where('deployments.environment_id = environments.id').where(sha: sha)) }
 
-  state_machine :state, initial: :available do
+  state_machine :state, initial: :created do
     event :start do
-      transition stopped: :available
+      transition [:created, :stopped] => :available
     end
 
     event :stop do
-      transition available: :stopped
+      transition [:created, :available] => :stopped
     end
 
+    state :created
     state :available
     state :stopped
 
@@ -138,7 +139,7 @@ class Environment < ApplicationRecord
   end
 
   def stop_with_action!(current_user)
-    return unless available?
+    return unless available? || created?
 
     stop!
     stop_action&.play(current_user)
