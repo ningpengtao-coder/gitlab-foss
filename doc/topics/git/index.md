@@ -53,7 +53,7 @@ The following resources may help you become more efficient at using Git:
 
 ## Troubleshooting Git
 
-If you have problems with Git, the following may help:
+If you have problems with Git the following may help:
 
 - [Numerous _undo_ possibilities in Git](numerous_undo_possibilities_in_git/index.md)
 - Learn a few [Git troubleshooting](troubleshooting_git.md) techniques

@@ -18,7 +18,7 @@ Here you can access the complete documentation for GitLab, the single applicatio
 
 ## Overview
 
-No matter how you use GitLab, we have documentation for you.
+No matter how you use GitLab, we have documentation for you:
 
 | Essential Documentation                                                                                                                    | Essential Documentation                                                                                                    |
 |:-------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------|

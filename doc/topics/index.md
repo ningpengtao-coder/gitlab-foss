@@ -1,6 +1,6 @@
 # Topics
 
-Welcome to Topics! We have organized our content resources into topics
+Welcome to Topics. We have organized our content resources into topics
 to get you started on areas of your interest. Each topic page
 consists of an index listing all related content. It will guide
 you through better understanding GitLab's concepts
