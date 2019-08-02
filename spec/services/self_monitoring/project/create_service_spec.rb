@@ -35,6 +35,7 @@ describe SelfMonitoring::Project::CreateService do
       let!(:user) { create(:user, :admin) }
 
       before do
+        allow(ApplicationSetting).to receive(:current_without_cache) { application_setting }
         application_setting.allow_local_requests_from_web_hooks_and_services = true
       end
 
@@ -59,7 +60,7 @@ describe SelfMonitoring::Project::CreateService do
       end
 
       it 'creates project with internal visibility even when internal visibility is restricted' do
-        stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::INTERNAL])
+        application_setting.restricted_visibility_levels = [Gitlab::VisibilityLevel::INTERNAL]
 
         expect(result[:status]).to eq(:success)
         expect(project.visibility_level).to eq(Gitlab::VisibilityLevel::INTERNAL)

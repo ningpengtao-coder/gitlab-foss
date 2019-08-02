@@ -112,7 +112,8 @@ module SelfMonitoring
       end
 
       def application_settings
-        @application_settings ||= Gitlab::CurrentSettings.current_application_settings
+        @application_settings ||= ::ApplicationSetting.current_without_cache ||
+          ::ApplicationSetting.create_from_defaults
       end
 
       def parse_url(uri_string)
