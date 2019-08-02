@@ -136,7 +136,7 @@ describe ApplicationSetting do
       subject { setting }
     end
 
-    # Upgraded databases will have this sort of content
+    # Upgraded databases will have this sort of content.
     context 'repository_storages is a String, not an Array' do
       before do
         described_class.where(id: setting.id).update_all(repository_storages: 'default')
