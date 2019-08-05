@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_31_084415) do
+ActiveRecord::Schema.define(version: 2019_08_05_062636) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -2948,7 +2948,6 @@ ActiveRecord::Schema.define(version: 2019_07_31_084415) do
     t.datetime_with_timezone "released_at", null: false
     t.index ["author_id"], name: "index_releases_on_author_id"
     t.index ["project_id", "tag"], name: "index_releases_on_project_id_and_tag"
-    t.index ["project_id"], name: "index_releases_on_project_id", unique: true
   end
 
   create_table "remote_mirrors", id: :serial, force: :cascade do |t|
