@@ -8,7 +8,7 @@
 
 .use-pg: &use-pg
   services:
-    - name: postgres:9.6.11
+    - name: postgres:9.6.14
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
     - name: redis:alpine
 
@@ -19,7 +19,7 @@
   dependencies:
     - setup-test-env
   services:
-    - docker:stable-dind
+    - docker:19.03.0-dind
   variables:
     NODE_ENV: "production"
     RAILS_ENV: "production"

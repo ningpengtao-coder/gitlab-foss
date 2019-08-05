@@ -948,6 +948,12 @@ msgstr ""
 msgid "Allow requests to the local network from hooks and services."
 msgstr ""
 
+msgid "Allow requests to the local network from system hooks"
+msgstr ""
+
+msgid "Allow requests to the local network from web hooks and services"
+msgstr ""
+
 msgid "Allow this key to push to repository as well? (Default only allows pull access.)"
 msgstr ""
 
@@ -2647,7 +2653,7 @@ msgstr ""
 msgid "ClusterIntegration|Kubernetes cluster name"
 msgstr ""
 
-msgid "ClusterIntegration|Kubernetes cluster was successfully created on Google Kubernetes Engine. Refresh the page to see Kubernetes cluster's details"
+msgid "ClusterIntegration|Kubernetes cluster was successfully created on Google Kubernetes Engine."
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes clusters allow you to use review apps, deploy your applications, run your pipelines, and much more in an easy way."
@@ -2816,6 +2822,9 @@ msgid "ClusterIntegration|The URL used to access the Kubernetes API."
 msgstr ""
 
 msgid "ClusterIntegration|The associated IP and all deployed services will be deleted and cannot be restored. Uninstalling Knative will also remove Istio from your cluster. This will not effect any other applications."
+msgstr ""
+
+msgid "ClusterIntegration|The associated Tiller pod will be deleted and cannot be restored."
 msgstr ""
 
 msgid "ClusterIntegration|The associated certifcate will be deleted and cannot be restored."
