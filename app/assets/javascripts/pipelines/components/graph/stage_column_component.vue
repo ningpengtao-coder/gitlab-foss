@@ -1,6 +1,5 @@
 <script>
 import _ from 'underscore';
-import stageColumnMixin from 'ee_else_ce/pipelines/mixins/stage_column_mixin';
 import JobItem from './job_item.vue';
 import JobGroupDropdown from './job_group_dropdown.vue';
 import ActionComponent from './action_component.vue';
@@ -11,7 +10,6 @@ export default {
     JobGroupDropdown,
     ActionComponent,
   },
-  mixins: [stageColumnMixin],
   props: {
     title: {
       type: String,
@@ -56,20 +54,14 @@ export default {
         :action-icon="action.icon"
         :tooltip-text="action.title"
         :link="action.path"
-        class="js-stage-action stage-action position-absolute position-top-0 rounded"
+        class="js-stage-action stage-action position-absolute rounded"
         @pipelineActionRequestComplete="pipelineActionRequestComplete"
       />
     </div>
 
     <div class="builds-container">
       <ul>
-        <li
-          v-for="(group, index) in groups"
-          :id="groupId(group)"
-          :key="group.id"
-          :class="buildConnnectorClass(index)"
-          class="build"
-        >
+        <li v-for="group in groups" :id="groupId(group)" :key="group.id" class="build">
           <job-item
             v-if="group.size === 1"
             :job="group.jobs[0]"
