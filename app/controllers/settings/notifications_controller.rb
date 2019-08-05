@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+class Settings::NotificationsController < Settings::ApplicationController
+  # rubocop: disable CodeReuse/ActiveRecord
+  def show
+    @user                        = current_user
+    @group_notifications         = current_user.notification_settings.for_groups.order(:id)
+    @project_notifications       = current_user.notification_settings.for_projects.order(:id)
+    @global_notification_setting = current_user.global_notification_setting
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
+  def update
+    result = Users::UpdateService.new(current_user, user_params.merge(user: current_user)).execute
+
+    if result[:status] == :success
+      flash[:notice] = _("Notification settings saved")
+    else
+      flash[:alert] = _("Failed to save new settings")
+    end
+
+    redirect_back_or_default(default: settings_notifications_path)
+  end
+
+  def user_params
+    params.require(:user).permit(:notification_email, :notified_of_own_activity)
+  end
+end

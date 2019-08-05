@@ -89,7 +89,7 @@ module QA
           # Use the same profile on QA runs if CHROME_REUSE_PROFILE is true.
           # Useful to speed up local QA.
           if QA::Runtime::Env.reuse_chrome_profile?
-            qa_profile_dir = ::File.expand_path('../../tmp/qa-profile', __dir__)
+            qa_settings_dir = ::File.expand_path('../../tmp/qa-profile', __dir__)
             options.add_argument("user-data-dir=#{qa_profile_dir}")
           end
 

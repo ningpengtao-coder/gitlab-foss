@@ -110,11 +110,11 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def redirect_identity_link_failed(error_message)
-    redirect_to profile_account_path, notice: _("Authentication failed: %{error_message}") % { error_message: error_message }
+    redirect_to settings_account_path, notice: _("Authentication failed: %{error_message}") % { error_message: error_message }
   end
 
   def redirect_identity_linked
-    redirect_to profile_account_path, notice: _('Authentication method updated')
+    redirect_to settings_account_path, notice: _('Authentication method updated')
   end
 
   def handle_service_ticket(provider, ticket)

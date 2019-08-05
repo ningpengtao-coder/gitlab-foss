@@ -213,9 +213,9 @@ module ProjectsHelper
 
   def link_to_set_password
     if current_user.require_password_creation_for_git?
-      link_to s_('SetPasswordToCloneLink|set a password'), edit_profile_password_path
+      link_to s_('SetPasswordToCloneLink|set a password'), edit_settings_password_path
     else
-      link_to s_('CreateTokenToCloneLink|create a personal access token'), profile_personal_access_tokens_path
+      link_to s_('CreateTokenToCloneLink|create a personal access token'), settings_personal_access_tokens_path
     end
   end
 

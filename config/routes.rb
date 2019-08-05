@@ -180,7 +180,7 @@ Rails.application.routes.draw do
   draw :uploads
   draw :explore
   draw :admin
-  draw :profile
+  draw :settings
   draw :dashboard
   draw :group
   draw :user

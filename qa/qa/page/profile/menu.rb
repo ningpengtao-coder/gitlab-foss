@@ -5,7 +5,7 @@ module QA
     module Profile
       class Menu < Page::Base
         view 'app/views/layouts/nav/sidebar/_profile.html.haml' do
-          element :access_token_link, 'link_to profile_personal_access_tokens_path' # rubocop:disable QA/ElementWithPattern
+          element :access_token_link, 'link_to settings_personal_access_tokens_path' # rubocop:disable QA/ElementWithPattern
           element :access_token_title, 'Access Tokens' # rubocop:disable QA/ElementWithPattern
           element :top_level_items, '.sidebar-top-level-items' # rubocop:disable QA/ElementWithPattern
           element :ssh_keys, 'SSH Keys' # rubocop:disable QA/ElementWithPattern

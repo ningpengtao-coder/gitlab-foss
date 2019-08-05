@@ -14,7 +14,7 @@ module ChatNames
 
       token = request_token
 
-      new_profile_chat_name_url(token: token) if token
+      new_settings_chat_name_url(token: token) if token
     end
 
     private

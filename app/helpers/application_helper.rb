@@ -191,7 +191,7 @@ module ApplicationHelper
     if admin
       admin_user_key_path(@user, key)
     else
-      profile_key_path(key)
+      settings_key_path(key)
     end
   end
 

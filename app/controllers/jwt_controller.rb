@@ -41,7 +41,7 @@ class JwtController < ApplicationController
         { code: 'UNAUTHORIZED',
           message: _('HTTP Basic: Access denied\n' \
                    'You must use a personal access token with \'api\' scope for Git over HTTP.\n' \
-                   'You can generate one at %{profile_personal_access_tokens_url}') % { profile_personal_access_tokens_url: profile_personal_access_tokens_url } }
+                   'You can generate one at %{settings_personal_access_tokens_url}') % { profile_personal_access_tokens_url: profile_personal_access_tokens_url } }
       ]
     }, status: :unauthorized
   end

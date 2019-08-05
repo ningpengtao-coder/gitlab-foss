@@ -284,7 +284,7 @@ class ApplicationController < ActionController::Base
     password_expires_at = current_user&.password_expires_at
 
     if password_expires_at && password_expires_at < Time.now
-      return redirect_to new_profile_password_path
+      return redirect_to new_settings_password_path
     end
   end
 
@@ -341,7 +341,7 @@ class ApplicationController < ActionController::Base
 
   def require_email
     if current_user && current_user.temp_oauth_email? && session[:impersonator_id].nil?
-      return redirect_to profile_path, notice: _('Please complete your profile with email address')
+      return redirect_to settings_path, notice: _('Please complete your profile with email address')
     end
   end
 

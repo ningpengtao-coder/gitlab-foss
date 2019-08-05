@@ -20,7 +20,7 @@
             - profiles.each do |profile|
               %li
                 = link_to profile.time.to_s(:long) + ' ' + profile.profile_mode.capitalize,
-                  admin_requests_profile_path(profile)
+                  admin_requests_settings_path(profile)
   - else
     %p
       No profiles found

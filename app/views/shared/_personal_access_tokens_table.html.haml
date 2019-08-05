@@ -29,7 +29,7 @@
               - else
                 %span.token-never-expires-label= _('Never')
             %td= token.scopes.present? ? token.scopes.join(", ") : _('<no scopes selected>')
-            - path = impersonation ? revoke_admin_user_impersonation_token_path(token.user, token) : revoke_profile_personal_access_token_path(token)
+            - path = impersonation ? revoke_admin_user_impersonation_token_path(token.user, token) : revoke_settings_personal_access_token_path(token)
             %td= link_to _('Revoke'), path, method: :put, class: "btn btn-danger float-right qa-revoke-button", data: { confirm: _('Are you sure you want to revoke this %{type} Token? This action cannot be undone.') % { type: type } }
 - else
   .settings-message.text-center

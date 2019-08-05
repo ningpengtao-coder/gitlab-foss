@@ -31,7 +31,7 @@
   .row.append-bottom-10
     .col-md-12
       %p= _("Your device was successfully set up! Give it a name and register it with the GitLab server.")
-      = form_tag(create_u2f_profile_two_factor_auth_path, method: :post) do
+      = form_tag(create_u2f_settings_two_factor_auth_path, method: :post) do
         .row.append-bottom-10
           .col-md-3
             = text_field_tag 'u2f_registration[name]', nil, class: 'form-control', placeholder: _("Pick a name")

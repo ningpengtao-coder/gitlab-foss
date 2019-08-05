@@ -59,8 +59,8 @@ module SearchHelper
   # Autocomplete results for various settings pages
   def default_autocomplete
     [
-      { category: "Settings", label: _("User settings"),    url: profile_path },
-      { category: "Settings", label: _("SSH Keys"),         url: profile_keys_path },
+      { category: "Settings", label: _("User settings"),    url: settings_path },
+      { category: "Settings", label: _("SSH Keys"),         url: settings_keys_path },
       { category: "Settings", label: _("Dashboard"),        url: root_path }
     ]
   end
