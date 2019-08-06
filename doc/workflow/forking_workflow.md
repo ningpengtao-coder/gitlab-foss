@@ -39,7 +39,7 @@ access, so you can set it up as you please.
 Once you are ready to send your code back to the main project, you need
 to create a merge request. Choose your forked project's main branch as
 the source and the original project's main branch as the destination and
-create the [merge request](merge_requests.md).
+create the [merge request](../user/project/merge_requests/index.md).
 
 ![Selecting branches](forking/branch_select.png)
 
