@@ -681,6 +681,17 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
             end
           end
 
+          context 'when invalid data is provided' do
+            it 'returns a conflict' do
+              request_job(runner.token, { session: { url: 'http://###:1234/' } })
+
+              expect(response).to have_gitlab_http_status(400)
+
+              expect(json_response).to have_key('message')
+              expect(json_response['message']).to have_key('runner_session.url')
+            end
+          end
+
           context 'when project and pipeline have multiple jobs' do
             let!(:job) { create(:ci_build, :tag, pipeline: pipeline, name: 'spinach', stage: 'test', stage_idx: 0) }
             let!(:job2) { create(:ci_build, :tag, pipeline: pipeline, name: 'rubocop', stage: 'test', stage_idx: 0) }

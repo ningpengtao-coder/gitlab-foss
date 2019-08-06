@@ -9,7 +9,19 @@ module Ci
     JOB_QUEUE_DURATION_SECONDS_BUCKETS = [1, 3, 10, 30, 60, 300, 900].freeze
     JOBS_RUNNING_FOR_PROJECT_MAX_BUCKET = 5.freeze
 
-    Result = Struct.new(:build, :valid?)
+    Result = Struct.new(:build, :state) do
+      def stale?
+        state == :stale
+      end
+
+      def invalid?
+        state == :invalid
+      end
+
+      def valid?
+        !stale? && !invalid?
+      end
+    end
 
     def initialize(runner)
       @runner = runner
@@ -26,7 +38,7 @@ module Ci
           builds_for_project_runner
         end
 
-      valid = true
+      job_state = nil
 
       # pick builds that does not have other tags than runner's one
       builds = builds.matches_tag_ids(runner.tags.ids)
@@ -50,9 +62,9 @@ module Ci
           if assign_runner!(build, params)
             register_success(build)
 
-            return Result.new(build, true)
+            return Result.new(build, :valid)
           end
-        rescue StateMachines::InvalidTransition, ActiveRecord::StaleObjectError
+        rescue ActiveRecord::StaleObjectError
           # We are looping to find another build that is not conflicting
           # It also indicates that this build can be picked and passed to runner.
           # If we don't do it, basically a bunch of runners would be competing for a build
@@ -62,12 +74,27 @@ module Ci
           # In case we hit the concurrency-access lock,
           # we still have to return 409 in the end,
           # to make sure that this is properly handled by runner.
-          valid = false
+
+          job_state = :stale
+        rescue StateMachines::InvalidTransition
+          # StateMachines::InvalidTransition may also be a symptom of a conflicting
+          # situation. But it may be also returned, when a validation error happens.
+          # In that case, instead of looping, we should return a 400 Bad Request response
+          # to the Runner.
+          # https://gitlab.com/gitlab-org/gitlab-runner/issues/4360 for a context
+
+          if build.valid?
+            job_state = :stale
+          else
+            register_failure
+
+            return Result.new(build, :invalid)
+          end
         end
       end
 
       register_failure
-      Result.new(nil, valid)
+      Result.new(nil, job_state)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

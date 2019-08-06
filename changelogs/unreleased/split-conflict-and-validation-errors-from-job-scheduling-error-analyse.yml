@@ -1,0 +1,5 @@
+---
+title: Distinguish between validation errors and stale resources errors when Runner requests a new job
+merge_request: 31678
+author:
+type: fixed
