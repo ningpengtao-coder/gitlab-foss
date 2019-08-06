@@ -85,6 +85,9 @@ To change the local storage path:
 Instead of relying on the local storage, you can use an object storage to
 upload packages:
 
+CAUTION: **WARNING:**
+  Currently migrating to object storage is **non-reversible**
+
 **Omnibus GitLab installations**
 
 1. Edit `/etc/gitlab/gitlab.rb` and add the following lines (uncomment where

@@ -1,0 +1,5 @@
+---
+title: "[ObjectStorage] Allow migrating back to local storage"
+merge_request: 31502
+author:
+type: added
