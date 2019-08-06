@@ -5,7 +5,7 @@ comments: false
 # Rake tasks
 
 - [Backup restore](backup_restore.md)
-- [Check](check.md)
+- [Check](../administration/raketasks/check.md)
 - [Cleanup](cleanup.md)
 - [Features](features.md)
 - [LDAP Maintenance](../administration/raketasks/ldap.md)

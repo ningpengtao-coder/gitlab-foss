@@ -18,7 +18,7 @@ See the documentation below for details on how to configure these services.
 - [Jenkins](jenkins.md) Integrate with the Jenkins CI
 - [Jira](../user/project/integrations/jira.md) Integrate with the Jira issue tracker
 - [Kerberos](kerberos.md) Integrate with Kerberos
-- [LDAP](ldap.md) Set up sign in via LDAP
+- [LDAP](../administration/auth/ldap.md) Set up sign in via LDAP
 - [OAuth2 provider](oauth_provider.md) OAuth2 application creation
 - [OmniAuth](omniauth.md) Sign in via Twitter, GitHub, GitLab.com, Google, Bitbucket, Facebook, Shibboleth, SAML, Crowd, Azure and Authentiq ID
 - [OpenID Connect](openid_connect_provider.md) Use GitLab as an identity provider

@@ -79,8 +79,8 @@ Sometimes we need to upgrade customers from old versions of GitLab to latest, so
 Our integrations add great value to GitLab. User questions often relate to integrating GitLab with existing external services and the configuration involved
 
 - Learn about our Integrations (specially, not only):
-  - [LDAP](../../integration/ldap.md)
-  - [Jira](../../project_services/jira.md)
+  - [LDAP](../../administration/auth/ldap.md)
+  - [Jira](../../user/project/integrations/jira.md)
   - [Jenkins](../../integration/jenkins.md)
   - [SAML](../../integration/saml.md)
 
@@ -94,8 +94,8 @@ Our integrations add great value to GitLab. User questions often relate to integ
 ### Understand the gathering of diagnostics for GitLab instances
 
 - Learn about the GitLab checks that are available:
-  - [Environment Information and maintenance checks](../../raketasks/maintenance.md)
-  - [GitLab check](../../raketasks/check.md)
+  - [Environment Information and maintenance checks](../../administration/raketasks/maintenance.md)
+  - [GitLab check](../../administration/raketasks/check.md)
   - Omnibus commands
     - [Status](https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/maintenance/README.md#get-service-status)
     - [Starting and stopping services](https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/maintenance/README.md#starting-and-stopping)

@@ -202,7 +202,7 @@ Alternatively, you can [lock the sharing with group feature](#share-with-group-l
 ## Manage group memberships via LDAP
 
 In GitLab Enterprise Edition, it is possible to manage GitLab group memberships using LDAP groups.
-See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for more information.
+See [the GitLab Enterprise Edition documentation](../../administration/auth/ldap.md) for more information.
 
 ## Epics **(ULTIMATE)**
 

@@ -503,7 +503,7 @@ To serve repositories over SSH there's an add-on application called GitLab Shell
 
 ### Installation Folder Summary
 
-To summarize here's the [directory structure of the `git` user home directory](../install/structure.md).
+To summarize, here's the [directory structure of the `git` user home directory](../install/installation.md#gitlab-directory-structure).
 
 ### Processes
 

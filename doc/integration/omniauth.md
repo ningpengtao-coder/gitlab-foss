@@ -49,7 +49,7 @@ that are in common for all providers that we need to consider.
 - `allow_single_sign_on` allows you to specify the providers you want to allow to
   automatically create an account. It defaults to `false`. If `false` users must
   be created manually or they will not be able to sign in via OmniAuth.
-- `auto_link_ldap_user` can be used if you have [LDAP / ActiveDirectory](ldap.md)
+- `auto_link_ldap_user` can be used if you have [LDAP / ActiveDirectory](../administration/auth/ldap.md)
   integration enabled. It defaults to false. When enabled, users automatically
   created through OmniAuth will be linked to their LDAP entry as well.
 - `block_auto_created_users` defaults to `true`. If `true` auto created users will
