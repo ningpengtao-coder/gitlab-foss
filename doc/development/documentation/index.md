@@ -451,7 +451,7 @@ If you want to know the in-depth details, here's what's really happening:
 The following GitLab features are used among others:
 
 - [Manual actions](../../ci/yaml/README.md#whenmanual)
-- [Multi project pipelines](../../ci/multi_project_pipeline_graphs.md)
+- [Multi project pipelines](../../ci/multi_project_pipelines.md)
 - [Review Apps](../../ci/review_apps/index.md)
 - [Artifacts](../../ci/yaml/README.md#artifacts)
 - [Specific Runner](../../ci/runners/README.md#locking-a-specific-runner-from-being-enabled-for-other-projects)

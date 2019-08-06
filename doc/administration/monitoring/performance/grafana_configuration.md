@@ -152,7 +152,7 @@ For more information and further mitigation details, please refer to our [blog p
 
 Read more on:
 
-- [Introduction to GitLab Performance Monitoring](introduction.md)
+- [Introduction to GitLab Performance Monitoring](index.md)
 - [GitLab Configuration](gitlab_configuration.md)
 - [InfluxDB Installation/Configuration](influxdb_configuration.md)
 - [InfluxDB Schema](influxdb_schema.md)

@@ -60,7 +60,7 @@ With GitLab Enterprise Edition, you can also:
 - [Authenticate users with Kerberos](../integration/kerberos.md).
 - [Mirror a repository](../workflow/repository_mirroring.md) from elsewhere on your local server.
 - [Export issues as CSV](project/issues/csv_export.md).
-- View your entire CI/CD pipeline involving more than one project with [Multiple-Project Pipelines](../ci/multi_project_pipeline_graphs.md).
+- View your entire CI/CD pipeline involving more than one project with [Multiple-Project Pipelines](../ci/multi_project_pipelines.md).
 - [Lock files](project/file_lock.md) to prevent conflicts.
 - View the current health and status of each CI environment running on Kubernetes with [Deploy Boards](project/deploy_boards.md).
 - Leverage continuous delivery method with [Canary Deployments](project/canary_deployments.md).
@@ -88,7 +88,7 @@ it all at once, from one single project.
 Use built-in [GitLab CI/CD](../ci/README.md) to test, build, and deploy your applications
 directly from GitLab. No third-party integrations needed.
 
-- [GitLab Auto Deploy](../ci/autodeploy/index.md): Deploy your application out-of-the-box with GitLab Auto Deploy.
+- [GitLab Auto Deploy](../topics/autodevops/index.md#auto-deploy): Deploy your application out-of-the-box with GitLab Auto Deploy.
 - [Review Apps](../ci/review_apps/index.md): Live-preview the changes introduced by a merge request with Review Apps.
 - [GitLab Pages](project/pages/index.md): Publish your static site directly from
   GitLab with GitLab Pages. You can build, test, and deploy any Static Site Generator with Pages.
