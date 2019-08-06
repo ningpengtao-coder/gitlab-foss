@@ -26,11 +26,6 @@ export default {
       required: false,
       default: false,
     },
-    stageConnectorClass: {
-      type: String,
-      required: false,
-      default: '',
-    },
     action: {
       type: Object,
       required: false,
@@ -53,7 +48,7 @@ export default {
 };
 </script>
 <template>
-  <li :class="stageConnectorClass" class="stage-column">
+  <li class="stage-column">
     <div class="stage-name position-relative">
       {{ title }}
       <action-component
