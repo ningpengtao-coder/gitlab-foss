@@ -117,10 +117,10 @@ not without its own challenges:
   history. Concurrent jobs work fine because every build gets it's own
   instance of Docker engine so they won't conflict with each other. But this
   also means jobs can be slower because there's no caching of layers.
-- By default, `docker:dind` uses `--storage-driver vfs` which is the slowest
-  form offered. To use a different driver, see
-  [Using the overlayfs driver](#using-the-overlayfs-driver).
-- Since the `docker:dind` container and the runner container don't share their
+- By default, Docker 17.09 and higher uses `--storage-driver
+  overlay2` which is the recommended storage driver. See [Using the
+  overlayfs driver](#using-the-overlayfs-driver) for details.
+- Since the `docker:19.03.1-dind` container and the runner container don't share their
   root filesystem, the job's working directory can be used as a mount point for
   child containers. For example, if you have files you want to share with a
   child container, you may create a subdirectory under `/builds/$CI_PROJECT_PATH`
@@ -139,7 +139,7 @@ not without its own challenges:
 An example project using this approach can be found here: <https://gitlab.com/gitlab-examples/docker>.
 
 In the examples below, we are using Docker images tags to specify a
-specific version, such as `docker:19.03.1`. If tags like `docker:stable`
+specific version, such as `docker:19.03.1`. If tags like `docker:19.03.1`
 are used, you have no control over what version is going to be used and this
 can lead to unpredictable behavior, especially when new versions are
 released.
@@ -222,9 +222,6 @@ support this.
      # Kubernetes executor connects services to the job container
      # DOCKER_HOST: tcp://localhost:2376/
      #
-     # When using dind, it's wise to use the overlayfs driver for
-     # improved performance.
-     DOCKER_DRIVER: overlay2
      # Specify to Docker where to create the certificates, Docker will
      # create them automatically on boot, and will create
      # `/certs/client` that will be shared between the service and job
@@ -289,9 +286,6 @@ variables:
   #
   # For non-Kubernetes executors, we use tcp://docker:2375/
   DOCKER_HOST: tcp://docker:2375/
-  # When using dind, it's wise to use the overlayfs driver for
-  # improved performance.
-  DOCKER_DRIVER: overlay2
   #
   # This will instruct Docker not to start over TLS.
   DOCKER_TLS_CERTDIR: ""
@@ -317,7 +311,7 @@ container so that Docker is available in the context of that image.
 NOTE: **Note:**
 If you bind the Docker socket [when using GitLab Runner 11.11 or
 newer](https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/1261),
-you can no longer use `docker:dind` as a service because volume bindings
+you can no longer use `docker:19.03.1-dind` as a service because volume bindings
 are done to the services as well, making these incompatible.
 
 In order to do that, follow the steps:
@@ -332,12 +326,12 @@ In order to do that, follow the steps:
      --registration-token REGISTRATION_TOKEN \
      --executor docker \
      --description "My Docker Runner" \
-     --docker-image "docker:stable" \
+     --docker-image "docker:19.03.1" \
      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
    ```
 
    The above command will register a new Runner to use the special
-   `docker:stable` image which is provided by Docker. **Notice that it's using
+   `docker:19.03.1` image which is provided by Docker. **Notice that it's using
    the Docker daemon of the Runner itself, and any containers spawned by docker
    commands will be siblings of the Runner rather than children of the runner.**
    This may have complications and limitations that are unsuitable for your workflow.
@@ -351,7 +345,7 @@ In order to do that, follow the steps:
      executor = "docker"
      [runners.docker]
        tls_verify = false
-       image = "docker:stable"
+       image = "docker:19.03.1"
        privileged = false
        disable_cache = false
        volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
@@ -360,10 +354,10 @@ In order to do that, follow the steps:
    ```
 
 1. You can now use `docker` in the build script (note that you don't need to
-   include the `docker:dind` service as when using the Docker in Docker executor):
+   include the `docker:19.03.1-dind` service as when using the Docker in Docker executor):
 
    ```yaml
-   image: docker:stable
+   image: docker:19.03.1
 
    before_script:
      - docker info
@@ -417,10 +411,10 @@ any image that's used with the `--cache-from` argument must first be pulled
 Here's a simple `.gitlab-ci.yml` file showing how Docker caching can be utilized:
 
 ```yaml
-image: docker:stable
+image: docker:19.03.1
 
 services:
-  - docker:dind
+  - docker:19.03.1-dind
 
 variables:
   DOCKER_HOST: tcp://docker:2375
@@ -453,7 +447,7 @@ The steps in the `script` section for the `build` stage can be summed up to:
 NOTE: **Note:**
 The shared Runners on GitLab.com use the `overlay2` driver by default.
 
-By default, when using `docker:dind`, Docker uses the `vfs` storage driver which
+By default, when using `docker:19.03.1-dind`, Docker uses the `vfs` storage driver which
 copies the filesystem on every run. This is a disk-intensive operation
 which can be avoided if a different driver is used, for example `overlay2`.
 
@@ -582,9 +576,9 @@ could look like:
 
 ```yaml
  build:
-   image: docker:stable
+   image: docker:19.03.1
    services:
-     - docker:dind
+     - docker:19.03.1-dind
    variables:
      DOCKER_HOST: tcp://docker:2375
      DOCKER_DRIVER: overlay2
@@ -599,7 +593,7 @@ You can also make use of [other variables](../variables/README.md) to avoid hard
 
 ```yaml
 services:
-  - docker:dind
+  - docker:19.03.1-dind
 
 variables:
   DOCKER_HOST: tcp://docker:2375
@@ -630,9 +624,9 @@ when needed. Changes to `master` also get tagged as `latest` and deployed using
 an application-specific deploy script:
 
 ```yaml
-image: docker:stable
+image: docker:19.03.1
 services:
-  - docker:dind
+  - docker:19.03.1-dind
 
 stages:
   - build
