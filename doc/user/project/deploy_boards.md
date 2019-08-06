@@ -122,7 +122,7 @@ version of your application.
 [environment]: ../../ci/environments.md "Environments and deployments documentation"
 [docker-exec]: https://docs.gitlab.com/runner/executors/docker.html "GitLab Runner Docker executor"
 [kube-exec]: https://docs.gitlab.com/runner/executors/kubernetes.html "GitLab Runner Kubernetes executor"
-[kube-service]: integrations/kubernetes.md "Kubernetes project service"
+[kube-service]: clusters/index.md "Kubernetes project service"
 [review apps]: ../../ci/review_apps/index.md "Review Apps documentation"
 [variables]: ../../ci/variables/README.md "GitLab CI variables"
 [autodeploy]: ../../topics/autodevops/index.md#auto-deploy "GitLab Autodeploy"

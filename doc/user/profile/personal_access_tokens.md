@@ -50,7 +50,7 @@ the following table.
 | `read_repository`  | [GitLab 10.7](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17894)  | Allows read-only access (pull) to the repository through git clone. |
 | `write_repository` | [GitLab 11.11](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/26021) | Allows read-write access (pull, push) to the repository through git clone. Required for accessing Git repositories over HTTP when 2FA is enabled. |
 
-[2fa]: ../account/two_factor_authentication.md
+[2fa]: account/two_factor_authentication.md
 [api]: ../../api/README.md
 [ce-3749]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/3749
 [container registry]: ../project/container_registry.md

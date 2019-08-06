@@ -70,7 +70,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Header logo](../customization/branded_page_and_email_header.md): Change the logo on all pages and email headers.
 - [Favicon](../customization/favicon.md): Change the default favicon to your own logo.
 - [Branded login page](../customization/branded_login_page.md): Customize the login page with your own logo, title, and description.
-- [Welcome message](../customization/welcome_message.md): Add a custom welcome message to the sign-in page.
+- [Welcome message](../customization/branded_login_page.md): Add a custom welcome message to the sign-in page.
 - ["New Project" page](../customization/new_project_page.md): Customize the text to be displayed on the page that opens whenever your users create a new project.
 - [Additional custom email text](../user/admin_area/settings/email.md#custom-additional-text-premium-only): Add additional custom text to emails sent from GitLab. **(PREMIUM ONLY)**
 
@@ -111,7 +111,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
   - [Kerberos authentication](../integration/kerberos.md) **(STARTER ONLY)**
   - See also other [authentication](../topics/authentication/index.md#gitlab-administrators) topics (for example, enforcing 2FA).
 - [Email users](../tools/email.md): Email GitLab users from within GitLab. **(STARTER ONLY)**
-- [User Cohorts](../user/admin_area/user_cohorts.md): Display the monthly cohorts of new users and their activities over time.
+- [User Cohorts](../user/instance_statistics/user_cohorts.md): Display the monthly cohorts of new users and their activities over time.
 - [Audit logs and events](audit_events.md): View the changes made within the GitLab server for:
   - Groups and projects. **(STARTER)**
   - Instances. **(PREMIUM ONLY)**
