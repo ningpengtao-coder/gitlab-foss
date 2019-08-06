@@ -26,6 +26,7 @@ stages:
   - merge
   - test
   - review
+  - dast
   - qa
   - post-test
   - pages
@@ -44,3 +45,4 @@ include:
   # - local: .gitlab/ci/setup.gitlab-ci.yml
   - local: .gitlab/ci/test-metadata.gitlab-ci.yml
   - local: .gitlab/ci/yaml.gitlab-ci.yml
+  - local: .gitlab/ci/dast.gitlab-ci.yml
