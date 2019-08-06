@@ -10,7 +10,8 @@ describe Gitlab::CycleAnalytics::PlanStage do
   let!(:issue_2) { create(:issue, project: project, created_at: 60.minutes.ago) }
   let!(:issue_3) { create(:issue, project: project, created_at: 30.minutes.ago) }
   let!(:issue_without_milestone) { create(:issue, project: project, created_at: 1.minute.ago) }
-  let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: project.creator, project: project }) }
+  let(:from) { 2.days.ago }
+  let(:stage) { described_class.new(options: { from: from, current_user: project.creator, project: project }) }
 
   before do
     issue_1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago, first_mentioned_in_commit_at: 10.minutes.ago)
@@ -27,6 +28,11 @@ describe Gitlab::CycleAnalytics::PlanStage do
 
     it 'counts median from issues with metrics' do
       expect(stage.project_median).to eq(ISSUES_MEDIAN)
+    end
+
+    it_behaves_like 'using Gitlab::CycleAnalytics::DataCollector as backend' do
+      let(:expected_record_count) { 2 }
+      let(:expected_record_titles) { [issue_1.title, issue_2.title] }
     end
   end
 

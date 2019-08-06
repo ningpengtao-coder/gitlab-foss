@@ -427,9 +427,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resource :cycle_analytics, only: [:show]
+      resource :cycle_analytics, only: [:show] do
+        get 'median/:stage_id' => 'cycle_analytics#median'
+      end
 
       namespace :cycle_analytics do
+        resources :records, only: [] do
+          get '/:stage_id' => 'records#index', on: :collection
+        end
         scope :events, controller: 'events' do
           get :issue
           get :plan

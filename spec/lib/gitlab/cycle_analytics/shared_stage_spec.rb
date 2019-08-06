@@ -32,3 +32,19 @@ shared_examples 'base stage' do
     expect(stage.events).not_to be_nil
   end
 end
+
+shared_examples 'using Gitlab::CycleAnalytics::DataCollector as backend' do
+  let(:stage_params) { Gitlab::CycleAnalytics::DefaultStages.send("params_for_#{stage_name}_stage").merge(project: project) }
+  let(:stage) { CycleAnalytics::ProjectStage.new(stage_params) }
+  let(:data_collector) { Gitlab::CycleAnalytics::DataCollector.new(stage, from: from, current_user: project.creator) }
+
+  it 'provides the same median value' do
+    expect(data_collector.median.seconds).to eq(ISSUES_MEDIAN)
+  end
+
+  it 'provides the same event records' do
+    records = data_collector.records_fetcher.serialized_records
+    expect(records.count).to eq(expected_record_count)
+    expect(records.map { |event| event[:title] }).to eq(expected_record_titles)
+  end
+end
