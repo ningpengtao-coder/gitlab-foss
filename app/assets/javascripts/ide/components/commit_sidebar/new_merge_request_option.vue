@@ -22,7 +22,12 @@ export default {
   <fieldset v-if="!shouldHideNewMrOption">
     <hr class="my-2" />
     <label class="mb-0 js-ide-commit-new-mr">
-      <input :checked="shouldCreateMR" type="checkbox" @change="toggleShouldCreateMR" />
+      <input
+        :checked="shouldCreateMR"
+        type="checkbox"
+        data-qa-selector="start_new_mr_checkbox"
+        @change="toggleShouldCreateMR"
+      />
       <span class="prepend-left-10">
         {{ __('Start a new merge request') }}
       </span>
