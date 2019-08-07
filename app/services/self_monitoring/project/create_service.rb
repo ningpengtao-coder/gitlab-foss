@@ -5,16 +5,20 @@ module SelfMonitoring
     class CreateService < ::BaseService
       include Stepable
 
-      DEFAULT_VISIBILITY_LEVEL = Gitlab::VisibilityLevel::INTERNAL
-      DEFAULT_NAME = 'GitLab Instance Administration'
-      DEFAULT_DESCRIPTION = <<~HEREDOC
+      VISIBILITY_LEVEL = Gitlab::VisibilityLevel::INTERNAL
+      PROJECT_NAME = 'GitLab Instance Administration'
+      PROJECT_DESCRIPTION = <<~HEREDOC
         This project is automatically generated and will be used to help monitor this GitLab instance.
       HEREDOC
 
+      GROUP_NAME = 'GitLab Instance Administrators'
+      GROUP_PATH = 'gitlab-instance-administrators'
+
       steps :validate_admins,
+        :create_group,
         :create_project,
         :save_project_id,
-        :add_project_members,
+        :add_group_members,
         :add_to_whitelist,
         :add_prometheus_manual_configuration
 
@@ -37,8 +41,31 @@ module SelfMonitoring
         success
       end
 
+      def create_group
+        if project_created?
+          log_info(_('Instance administrators group already exists'))
+          @group = application_settings.instance_administration_project.owner
+          return success(group: @group)
+        end
+
+        admin_user = group_owner
+        @group = ::Groups::CreateService.new(admin_user, create_group_params).execute
+
+        if @group.persisted?
+          success(group: @group)
+        else
+          error('Could not create group')
+        end
+      end
+
       def create_project
-        admin_user = project_owner
+        if project_created?
+          log_info(_('Instance administration project already exists'))
+          @project = application_settings.instance_administration_project
+          return success(project: project)
+        end
+
+        admin_user = group_owner
         @project = ::Projects::CreateService.new(admin_user, create_project_params).execute
 
         if project.persisted?
@@ -50,9 +77,11 @@ module SelfMonitoring
       end
 
       def save_project_id
+        return success if project_created?
+
         result = ApplicationSettings::UpdateService.new(
           application_settings,
-          project_owner,
+          group_owner,
           { instance_administration_project_id: @project.id }
         ).execute
 
@@ -64,8 +93,8 @@ module SelfMonitoring
         end
       end
 
-      def add_project_members
-        members = project.add_users(project_maintainers, Gitlab::Access::MAINTAINER)
+      def add_group_members
+        members = @group.add_users(group_maintainers, Gitlab::Access::MAINTAINER)
         errors = members.flat_map { |member| member.errors.full_messages }
 
         if errors.any?
@@ -85,8 +114,8 @@ module SelfMonitoring
 
         result = ApplicationSettings::UpdateService.new(
           application_settings,
-          project_owner,
-          outbound_local_requests_whitelist: [uri.normalized_host]
+          group_owner,
+          add_to_outbound_local_requests_whitelist: [uri.normalized_host]
         ).execute
 
         if result
@@ -116,6 +145,10 @@ module SelfMonitoring
           ::ApplicationSetting.create_from_defaults
       end
 
+      def project_created?
+        application_settings.instance_administration_project.present?
+      end
+
       def parse_url(uri_string)
         Addressable::URI.parse(uri_string)
       rescue Addressable::URI::InvalidURIError, TypeError
@@ -136,21 +169,30 @@ module SelfMonitoring
         @instance_admins ||= User.admins.active
       end
 
-      def project_owner
+      def group_owner
         instance_admins.first
       end
 
-      def project_maintainers
-        # Exclude the first so that the project_owner is not added again as a member.
-        instance_admins - [project_owner]
+      def group_maintainers
+        # Exclude the first so that the group_owner is not added again as a member.
+        instance_admins - [group_owner]
+      end
+
+      def create_group_params
+        {
+          name: GROUP_NAME,
+          path: "#{GROUP_PATH}-#{SecureRandom.hex(4)}",
+          visibility_level: VISIBILITY_LEVEL
+        }
       end
 
       def create_project_params
         {
           initialize_with_readme: true,
-          visibility_level: DEFAULT_VISIBILITY_LEVEL,
-          name: DEFAULT_NAME,
-          description: DEFAULT_DESCRIPTION
+          visibility_level: VISIBILITY_LEVEL,
+          name: PROJECT_NAME,
+          description: PROJECT_DESCRIPTION,
+          namespace_id: @group.id
         }
       end
 
