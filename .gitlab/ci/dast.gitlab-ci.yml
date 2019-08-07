@@ -4,8 +4,12 @@
 # List of the variables: https://gitlab.com/gitlab-org/security-products/dependency-scanning#settings
 # How to set: https://docs.gitlab.com/ee/ci/yaml/#variables
 
-dependency_scanning:
+dast:
   stage: dast
+  extends: .dedicated-no-docs
+  tags: []
+  before_script: []
+  cache: {}
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
@@ -50,7 +54,7 @@ dependency_scanning:
         "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION" /analyze
   artifacts:
     reports:
-      dependency_scanning: gl-dependency-scanning-report.json
+      dependency_scanning: gl-dast-report.json
   dependencies: []
   only:
     refs:
