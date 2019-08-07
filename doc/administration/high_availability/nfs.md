@@ -134,7 +134,7 @@ Below is an example of an NFS mount point defined in `/etc/fstab` we use on
 GitLab.com:
 
 ```
-10.1.1.1:/var/opt/gitlab/git-data /var/opt/gitlab/git-data nfs4 defaults,soft,rsize=1048576,wsize=1048576,noatime,nofail,lookupcache=positive 0 2
+10.1.1.1:/var/opt/gitlab/git-data /var/opt/gitlab/git-data nfs4 defaults,rsize=1048576,wsize=1048576,noatime,nofail,lookupcache=positive 0 2
 ```
 
 Note there are several options that you should consider using:

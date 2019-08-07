@@ -97,7 +97,7 @@ We recommend using version 4 and do not specifically test NFSv3.
 
 ```text
 #/etc/fstab
-165.227.159.85:/home       /nfs/home      nfs4 defaults,soft,rsize=1048576,wsize=1048576,noatime,nofail,lookupcache=positive 0 2
+165.227.159.85:/home       /nfs/home      nfs4 defaults,rsize=1048576,wsize=1048576,noatime,nofail,lookupcache=positive 0 2
 ```
 
 Reboot the client and confirm that the mount point is mounted automatically.
