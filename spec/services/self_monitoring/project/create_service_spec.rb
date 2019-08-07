@@ -36,7 +36,6 @@ describe SelfMonitoring::Project::CreateService do
       let!(:user) { create(:user, :admin) }
 
       before do
-        allow(ApplicationSetting).to receive(:current_without_cache) { application_setting }
         application_setting.allow_local_requests_from_web_hooks_and_services = true
       end
 

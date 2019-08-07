@@ -141,8 +141,11 @@ module SelfMonitoring
       end
 
       def application_settings
-        @application_settings ||= ::ApplicationSetting.current_without_cache ||
-          ::ApplicationSetting.create_from_defaults
+        return @application_settings if @application_settings
+
+        Gitlab::CurrentSettings.expire_current_application_settings
+
+        @application_settings = Gitlab::CurrentSettings.current_application_settings
       end
 
       def project_created?
