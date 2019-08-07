@@ -4,6 +4,7 @@ module SelfMonitoring
   module Project
     class CreateService < ::BaseService
       include Stepable
+      include Gitlab::Utils::StrongMemoize
 
       VISIBILITY_LEVEL = Gitlab::VisibilityLevel::INTERNAL
       PROJECT_NAME = 'GitLab Instance Administration'
@@ -141,11 +142,10 @@ module SelfMonitoring
       end
 
       def application_settings
-        return @application_settings if @application_settings
-
-        Gitlab::CurrentSettings.expire_current_application_settings
-
-        @application_settings = Gitlab::CurrentSettings.current_application_settings
+        strong_memoize(:application_settings) do
+          Gitlab::CurrentSettings.expire_current_application_settings
+          Gitlab::CurrentSettings.current_application_settings
+        end
       end
 
       def project_created?
