@@ -2,5 +2,4 @@
   .search_glyph
   %h4
     = icon('search')
-    = _("We couldn't find any results matching")
-    %code= @search_term
+    = search_scope_empty_message(@scope, @search_term).html_safe

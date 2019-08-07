@@ -225,4 +225,63 @@ module SearchHelper
       can?(current_user, :read_users_list)
     end
   end
+
+  def search_scopes
+    {
+      blobs: {
+        label: _("Code"),
+        empty_message: _("We couldn't find any code matching %{term_start}%{search_term}%{term_end}")
+      },
+      issues: {
+        label: _("Issues"),
+        empty_message: _("We couldn't find any issues matching %{term_start}%{search_term}%{term_end}")
+      },
+      merge_requests: {
+        label: _("Merge requests"),
+        empty_message: _("We couldn't find any merge requests matching %{term_start}%{search_term}%{term_end}")
+      },
+      milestones: {
+        label: _("Milestones"),
+        empty_message: _("We couldn't find any milestones matching %{term_start}%{search_term}%{term_end}")
+      },
+      notes: {
+        label: _("Comments"),
+        empty_message: _("We couldn't find any comments matching %{term_start}%{search_term}%{term_end}")
+      },
+      wiki_blobs: {
+        label: _("Wiki"),
+        empty_message: _("We couldn't find any wiki entries matching %{term_start}%{search_term}%{term_end}")
+      },
+      commits: {
+        label: _("Commits"),
+        empty_message: _("We couldn't find any commits matching %{term_start}%{search_term}%{term_end}")
+      },
+      snippet_blobs: {
+        label: _("Snippet Contents"),
+        empty_message: _("We couldn't find any snippet content matching %{term_start}%{search_term}%{term_end}")
+      },
+      snippet_titles: {
+        label: _("Titles and Filenames"),
+        empty_message: _("We couldn't find any snippet names matching %{term_start}%{search_term}%{term_end}")
+      },
+      projects: {
+        label: _("Projects"),
+        empty_message: _("We couldn't find any projects matching %{term_start}%{search_term}%{term_end}")
+      },
+      users: {
+        label: _("Users"),
+        empty_message: _("We couldn't find any users matching %{term_start}%{search_term}%{term_end}")
+      }
+    }
+  end
+
+  def search_scope_label(scope)
+    search_scopes[scope.to_sym][:label]  
+  end
+
+  def search_scope_empty_message(scope, search_term)
+    empty_message = search_scopes[scope.to_sym][:empty_message]
+
+    empty_message % { search_term: search_term, term_start: '<code>', term_end: '</code>'}
+  end
 end

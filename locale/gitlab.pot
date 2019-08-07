@@ -12401,7 +12401,37 @@ msgstr ""
 msgid "Want to see the data? Please ask an administrator for access."
 msgstr ""
 
-msgid "We couldn't find any results matching"
+msgid "We couldn't find any code matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any comments matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any commits matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any issues matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any merge requests matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any milestones matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any projects matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any snippet content matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any snippet names matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any users matching %{term_start}%{search_term}%{term_end}"
+msgstr ""
+
+msgid "We couldn't find any wiki entries matching %{term_start}%{search_term}%{term_end}"
 msgstr ""
 
 msgid "We detected potential spam in the %{humanized_resource_name}. Please solve the reCAPTCHA to proceed."
