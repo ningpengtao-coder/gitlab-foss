@@ -320,6 +320,59 @@ actions. In the same way a GET-request should not modify data, we
 cannot modify data in a regular GraphQL-query. We can however in a
 mutation.
 
+### Errors
+
+
+Errors encountered during a mutation can be returned to the client in two
+ways:
+
+* by raising an error, in which case a top-level error will be returned to the user, available
+  on the result under the `errors` key. In this case the returned value is equivalent to:
+
+```
+{
+    errors: ["argument error: expected an integer, got null"],
+    data: null,
+}
+```
+ 
+
+* in the `errors` field of the result (see below). In this case the returned value is
+  equivalent to:
+  
+```
+{
+    errors: [],
+    data: {
+      doTheThing: {
+        errors: ["you cannot touch the thing"],
+        theThing: null,
+      },
+    },
+}
+```
+
+These two error handling mechanisms differ in intent. The former is for *non-recoverable*
+errors. This is things that are probably our fault as developers (e.g. a GraphQL syntax error)
+, or they not really anyone's fault (e.g. a git storage exception), and the user should
+not be able in the course of normal usage to cause them. This category of errors is
+should be treated as an internal error, and not shown to the user. We will need to inform
+the user when the mutation fails, but we do not need to tell them why.
+
+In the second case the errors are relevant to the user. They are things they need to know about,
+and may be able to change. Examples of this are things like model validation errors, permission
+errors, etc. Ideally we would like to prevent the user from getting as far as making the request,
+but if they do, they need to be told what is wrong. In this case the user needs to be shown the
+error, and possibly be given an opportunity to amend their mistake.
+
+As mutation writers on the back-end, we need to be conscious about which of
+these two categories an error state falls into (and communicate about this with
+front-end developers to verify our assumptions).
+
+On the front-end we need be aware of the three states a mutation response can
+have, and handle each one correctly. Never issue a mutation without also
+requesting the errors.
+
 ### Fields
 
 In the most common situations, a mutation would return 2 fields:
@@ -332,6 +385,21 @@ By inheriting any new mutations from `Mutations::BaseMutation` the
 `errors` field is automatically added. A `clientMutationId` field is
 also added, this can be used by the client to identify the result of a
 single mutation when multiple are performed within a single request.
+
+#### Preventing additional requests
+
+Above all, the result value of a mutation is meant to be useful to the client.
+This means that if the client issues a mutation, and then immediately has to
+send a second query to fetch current data about the system, then we may have got
+things wrong. This means that back-end and front-end must talk about what the
+client will need from a mutation. It is OK to add extra values to the result if
+it prevents additional requests.
+
+For example if a `deleteResource` mutation removes an item, and then the client needs
+to query to find out what the current list of resources is, we can add the current
+list of resources to the response value of the mutation. It will only be returned if
+the client requests it of course, but it enables them perform the deletion and fetch
+in a single request!
 
 ### Building Mutations
 
