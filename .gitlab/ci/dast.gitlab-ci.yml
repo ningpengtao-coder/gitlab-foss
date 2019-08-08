@@ -14,7 +14,6 @@ dast:
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
-    DAST_WEBSITE: "https://gitlab-review-da-enable-fee5k4.ce.gitlab-review.app/explore/projects/starred" # this needs to be set dynamically
   environment:
     DAST_WEBSITE: https://gitlab-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}
   allow_failure: true
