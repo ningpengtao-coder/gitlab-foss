@@ -9,7 +9,8 @@ dast:
   extends: .dedicated-no-docs
   tags: []
   before_script:
-    - echo "ASDF ${CI_ENVIRONMENT_URL}"
+    - echo "ASDF"
+    - echo "https://gitlab-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
     - echo "${CI_ENVIRONMENT_URL}" > review_app_url.txt
   cache: {}
   image: docker:stable
