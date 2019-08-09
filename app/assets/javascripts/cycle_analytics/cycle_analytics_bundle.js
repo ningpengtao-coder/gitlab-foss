@@ -15,6 +15,12 @@ import { __ } from '~/locale';
 
 Vue.use(Translate);
 
+const {
+  gon: { features = null },
+} = window;
+// const withCustomisableCycleAnalytics = features && features.customisableCycleAnalyticsForm;
+const withCustomisableCycleAnalytics = false;
+
 export default () => {
   const OVERVIEW_DIALOG_COOKIE = 'cycle_analytics_help_dismissed';
   const cycleAnalyticsEl = document.querySelector('#cycle-analytics');
@@ -82,18 +88,25 @@ export default () => {
             this.startDate = $target.data('value');
 
             $label.text($target.text().trim());
-            this.fetchCycleAnalyticsData({ startDate: this.startDate });
+            this.fetchCycleAnalyticsData({
+              startDate: this.startDate,
+              // withCustomisableCycleAnalytics,
+            });
           });
       },
       fetchCycleAnalyticsData(options) {
-        const fetchOptions = options || { startDate: this.startDate };
+        console.log('fetchCycleAnalyticsData::options', options);
+        const fetchOptions = options || {
+          startDate: this.startDate,
+          withCustomisableCycleAnalytics,
+        };
 
         this.isLoading = true;
 
         this.service
           .fetchCycleAnalyticsData(fetchOptions)
           .then(response => {
-            this.store.setCycleAnalyticsData(response);
+            this.store.setCycleAnalyticsData(response, withCustomisableCycleAnalytics);
             this.selectDefaultStage();
             this.initDropdown();
             this.isLoading = false;

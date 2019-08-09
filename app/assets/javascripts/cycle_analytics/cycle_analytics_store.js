@@ -28,6 +28,11 @@ const EMPTY_STAGE_TEXTS = {
   ),
 };
 
+const extractCustomStages = data => {
+  console.log('cycleAnalyticsStore::extractCustomStages', data);
+  return data;
+};
+
 export default {
   state: {
     summary: '',
@@ -36,8 +41,11 @@ export default {
     events: [],
     stages: [],
   },
-  setCycleAnalyticsData(data) {
-    this.state = Object.assign(this.state, this.decorateData(data));
+  setCycleAnalyticsData(data, withCustomCycleAnalytics = false) {
+    const cycleAnalyticsData = withCustomCycleAnalytics ? extractCustomStages(data) : data;
+    console.log('setCycleAnalyticsData::withCustomCycleAnalytics', withCustomCycleAnalytics);
+    console.log('setCycleAnalyticsData::cycleAnalyticsData', cycleAnalyticsData);
+    this.state = Object.assign(this.state, this.decorateData(cycleAnalyticsData));
   },
   decorateData(data) {
     const newData = {};

@@ -9,6 +9,8 @@ class Projects::CycleAnalyticsController < Projects::ApplicationController
   before_action :authorize_read_cycle_analytics!
 
   def show
+    push_frontend_feature_flag(:customisable_cycle_analytics_form)
+
     @cycle_analytics = ::CycleAnalytics::ProjectLevel.new(@project, options: options(cycle_analytics_params))
 
     respond_to do |format|

@@ -15,6 +15,7 @@ export default class CycleAnalyticsService {
         params: {
           'cycle_analytics[start_date]': startDate,
           'cycle_analytics[project_ids]': projectIds,
+          // new_api: options && options.withCustomisableCycleAnalytics,
         },
       })
       .then(x => x.data);
@@ -28,6 +29,7 @@ export default class CycleAnalyticsService {
         params: {
           'cycle_analytics[start_date]': startDate,
           'cycle_analytics[project_ids]': projectIds,
+          // new_api: options && options.withCustomisableCycleAnalytics,
         },
       })
       .then(x => x.data);
