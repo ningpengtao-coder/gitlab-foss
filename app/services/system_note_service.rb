@@ -621,8 +621,11 @@ module SystemNoteService
   # rubocop: enable CodeReuse/ActiveRecord
 
   def create_note(note_summary)
-    note = Note.create(note_summary.note.merge(system: true))
-    note.system_note_metadata = SystemNoteMetadata.new(note_summary.metadata) if note_summary.metadata?
+    note = Note.create!(note_summary.note.merge(system: true))
+    if note_summary.metadata?
+      metadata = SystemNoteMetadata.create!(note_summary.metadata.merge(note: note))
+      note.system_note_metadata = metadata
+    end
 
     note
   end

@@ -39,6 +39,41 @@ describe SystemNoteService do
     end
   end
 
+  describe '.create_note' do
+    set(:noteable) { create(:issue) }
+    let(:project) { issue.project }
+    let(:user) { build(:user) }
+    let(:body) { 'some content' }
+    let(:opts) { {} }
+    let(:summary) do
+      NoteSummary.new(noteable, project, user, body, opts)
+    end
+
+    def create_note
+      described_class.send(:create_note, summary)
+    end
+
+    shared_examples 'an invalid note' do
+      it 'raises an error telling us what is wrong' do
+        expect { create_note }.to raise_error(error)
+      end
+    end
+
+    context 'the note is invalid' do
+      let(:body) { '' }
+      let(:error) { /blank/ }
+
+      it_behaves_like 'an invalid note'
+    end
+
+    context 'the metadata is invalid' do
+      let(:opts) { { action: 'non-existant-action' } }
+      let(:error) { /Action/ }
+
+      it_behaves_like 'an invalid note'
+    end
+  end
+
   describe '.add_commits' do
     subject { described_class.add_commits(noteable, project, author, new_commits, old_commits, oldrev) }
 
