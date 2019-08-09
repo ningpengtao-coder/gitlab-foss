@@ -170,6 +170,20 @@ module API
               desc: 'Comma-separated list of branches which will be automatically inspected. Leave blank to include all branches'
             }
           ],
+          'zoom' => [
+            {
+              required: true,
+              name: :api_key,
+              type: String,
+              desc: 'Zoom api key'
+            },
+            {
+              required: true,
+              name: :api_secret,
+              type: String,
+              desc: 'Zoom secret key'
+            }
+          ],
           'assembla' => [
             {
               required: true,
@@ -752,7 +766,8 @@ module API
           ::SlackService,
           ::MattermostService,
           ::MicrosoftTeamsService,
-          ::TeamcityService
+          ::TeamcityService,
+          ::ZoomService
         ]
       end
 

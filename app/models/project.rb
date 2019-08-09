@@ -147,6 +147,7 @@ class Project < ApplicationRecord
   has_one :flowdock_service
   has_one :assembla_service
   has_one :asana_service
+  has_one :zoom_service
   has_one :mattermost_slash_commands_service
   has_one :mattermost_service
   has_one :slack_slash_commands_service

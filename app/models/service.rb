@@ -280,6 +280,10 @@ class Service < ApplicationRecord
       service_names += %w[mock_ci mock_deployment mock_monitoring]
     end
 
+    if Feature.enabled?(:zoom_integration)
+      service_names += %w[zoom]
+    end
+
     service_names.sort_by(&:downcase)
   end
 
