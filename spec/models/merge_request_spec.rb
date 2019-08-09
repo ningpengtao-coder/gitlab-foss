@@ -3059,6 +3059,12 @@ describe MergeRequest do
 
       expect(subject.rebase_in_progress?).to be_falsey
     end
+
+    it 'returns false when the repository on source project is not present on disk' do
+      FileUtils.rm_rf(repo_path)
+
+      expect(subject.rebase_in_progress?).to be_falsey
+    end
   end
 
   describe '#allow_collaboration' do

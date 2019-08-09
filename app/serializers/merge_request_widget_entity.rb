@@ -17,10 +17,14 @@ class MergeRequestWidgetEntity < IssuableEntity
   expose :source_branch
   expose :source_branch_protected do |merge_request|
     merge_request.source_project.present? && ProtectedBranch.protected?(merge_request.source_project, merge_request.source_branch)
+  rescue Gitlab::Git::Repository::NoRepository
+    false
   end
   expose :source_project_id
   expose :source_project_full_path do |merge_request|
     merge_request.source_project&.full_path
+  rescue Gitlab::Git::Repository::NoRepository
+    nil
   end
   expose :squash
   expose :target_branch
@@ -28,6 +32,8 @@ class MergeRequestWidgetEntity < IssuableEntity
   expose :target_project_id
   expose :target_project_full_path do |merge_request|
     merge_request.project&.full_path
+  rescue Gitlab::Git::Repository::NoRepository
+    nil
   end
   expose :allow_collaboration
 

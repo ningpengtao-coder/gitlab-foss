@@ -230,6 +230,8 @@ class MergeRequest < ApplicationRecord
       next false unless source_project
 
       source_project.repository.rebase_in_progress?(id)
+    rescue Gitlab::Git::Repository::NoRepository
+      false
     end
   end
 

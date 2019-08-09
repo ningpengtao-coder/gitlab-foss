@@ -236,8 +236,20 @@ FactoryBot.define do
       after(:create) do |project|
         raise "Failed to create repository!" unless project.create_repository
 
-        project.gitlab_shell.rm_directory(project.repository_storage,
-                                          File.join("#{project.disk_path}.git", 'refs'))
+        Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+          project.gitlab_shell.rm_directory(project.repository_storage,
+                                            File.join("#{project.disk_path}.git", 'refs'))
+        end
+      end
+    end
+
+    trait :missing_repo do
+      after(:create) do |project|
+        raise "Failed to create repository!" unless project.create_repository
+
+        Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+          project.gitlab_shell.rm_directory(project.repository_storage, "#{project.disk_path}.git")
+        end
       end
     end
 
