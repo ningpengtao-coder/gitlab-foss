@@ -28,11 +28,6 @@ const EMPTY_STAGE_TEXTS = {
   ),
 };
 
-const extractCustomStages = data => {
-  console.log('cycleAnalyticsStore::extractCustomStages', data);
-  return data;
-};
-
 export default {
   state: {
     summary: '',
@@ -42,29 +37,44 @@ export default {
     stages: [],
   },
   setCycleAnalyticsData(data, withCustomCycleAnalytics = false) {
-    const cycleAnalyticsData = withCustomCycleAnalytics ? extractCustomStages(data) : data;
-    console.log('setCycleAnalyticsData::withCustomCycleAnalytics', withCustomCycleAnalytics);
-    console.log('setCycleAnalyticsData::cycleAnalyticsData', cycleAnalyticsData);
-    this.state = Object.assign(this.state, this.decorateData(cycleAnalyticsData));
+    const decorated = this.decorateData(data, withCustomCycleAnalytics);
+    this.state = Object.assign(this.state, decorated);
   },
-  decorateData(data) {
+  decorateData(data, withCustomCycleAnalytics = false) {
     const newData = {};
 
-    newData.stages = data.stats || [];
+    newData.stages = (withCustomCycleAnalytics ? data.stages : data.stats) || [];
     newData.summary = data.summary || [];
 
     newData.summary.forEach(item => {
       item.value = item.value || '-';
     });
 
-    newData.stages.forEach(item => {
-      const stageSlug = dasherize(item.name.toLowerCase());
-      item.active = false;
-      item.isUserAllowed = data.permissions[stageSlug];
-      item.emptyStageText = EMPTY_STAGE_TEXTS[stageSlug];
-      item.component = `stage-${stageSlug}-component`;
-      item.slug = stageSlug;
-    });
+    if (withCustomCycleAnalytics) {
+      const { stages } = newData;
+      const { permissions } = data;
+      newData.stages = stages.map(item => {
+        const slug = dasherize(item.name.toLowerCase()); // TODO: is this just the id?
+        return {
+          ...item,
+          slug,
+          component: `stage-${slug}-component`,
+          active: false,
+          emptyStageText: EMPTY_STAGE_TEXTS[slug],
+          isUserAllowed: permissions[slug],
+          title: item.name, // can we get the proper title from the BE so we get the correct spacing / capitalization?
+        };
+      });
+    } else {
+      newData.stages.forEach(item => {
+        const stageSlug = dasherize(item.name.toLowerCase());
+        item.active = false;
+        item.isUserAllowed = data.permissions[stageSlug];
+        item.emptyStageText = EMPTY_STAGE_TEXTS[stageSlug];
+        item.component = `stage-${stageSlug}-component`;
+        item.slug = stageSlug;
+      });
+    }
     newData.analytics = data;
     return newData;
   },

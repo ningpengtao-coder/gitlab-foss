@@ -15,12 +15,6 @@ import { __ } from '~/locale';
 
 Vue.use(Translate);
 
-const {
-  gon: { features = null },
-} = window;
-// const withCustomisableCycleAnalytics = features && features.customisableCycleAnalyticsForm;
-const withCustomisableCycleAnalytics = false;
-
 export default () => {
   const OVERVIEW_DIALOG_COOKIE = 'cycle_analytics_help_dismissed';
   const cycleAnalyticsEl = document.querySelector('#cycle-analytics');
@@ -44,6 +38,10 @@ export default () => {
         requestPath: cycleAnalyticsEl.dataset.requestPath,
       });
 
+      const {
+        gon: { features = null },
+      } = window;
+
       return {
         store: CycleAnalyticsStore,
         state: CycleAnalyticsStore.state,
@@ -54,6 +52,7 @@ export default () => {
         startDate: 30,
         isOverviewDialogDismissed: Cookies.get(OVERVIEW_DIALOG_COOKIE),
         service: cycleAnalyticsService,
+        withCustomisableCycleAnalytics: features && features.customisableCycleAnalyticsForm,
       };
     },
     computed: {
@@ -90,12 +89,11 @@ export default () => {
             $label.text($target.text().trim());
             this.fetchCycleAnalyticsData({
               startDate: this.startDate,
-              // withCustomisableCycleAnalytics,
             });
           });
       },
       fetchCycleAnalyticsData(options) {
-        console.log('fetchCycleAnalyticsData::options', options);
+        const { withCustomisableCycleAnalytics } = this;
         const fetchOptions = options || {
           startDate: this.startDate,
           withCustomisableCycleAnalytics,

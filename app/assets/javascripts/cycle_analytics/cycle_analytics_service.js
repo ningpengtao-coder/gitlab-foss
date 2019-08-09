@@ -9,13 +9,15 @@ export default class CycleAnalyticsService {
 
   fetchCycleAnalyticsData(options = { startDate: 30 }) {
     const { startDate, projectIds } = options;
+    const additionalParams =
+      options && options.withCustomisableCycleAnalytics ? { new_api: true } : {};
 
     return this.axios
       .get('', {
         params: {
           'cycle_analytics[start_date]': startDate,
           'cycle_analytics[project_ids]': projectIds,
-          // new_api: options && options.withCustomisableCycleAnalytics,
+          ...additionalParams,
         },
       })
       .then(x => x.data);
@@ -23,13 +25,15 @@ export default class CycleAnalyticsService {
 
   fetchStageData(options) {
     const { stage, startDate, projectIds } = options;
+    const additionalParams =
+      options && options.withCustomisableCycleAnalytics ? { new_api: true } : {};
 
     return this.axios
       .get(`events/${stage.name}.json`, {
         params: {
           'cycle_analytics[start_date]': startDate,
           'cycle_analytics[project_ids]': projectIds,
-          // new_api: options && options.withCustomisableCycleAnalytics,
+          ...additionalParams,
         },
       })
       .then(x => x.data);
