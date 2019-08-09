@@ -156,6 +156,7 @@ class Clusters::ClustersController < Clusters::BaseController
       :name,
       :environment_scope,
       :managed,
+      :cloud_run,
       provider_gcp_attributes: [
         :gcp_project_id,
         :zone,
