@@ -323,55 +323,92 @@ mutation.
 ### Errors
 
 
-Errors encountered during a mutation can be returned to the client in two
-ways:
+There are three states a mutation response should be in:
 
-* by raising an error, in which case a top-level error will be returned to the user, available
-  on the result under the `errors` key. In this case the returned value is equivalent to:
+* Success:
 
-```
+```javascript
 {
-    errors: ["argument error: expected an integer, got null"],
-    data: null,
-}
-```
- 
-
-* in the `errors` field of the result (see below). In this case the returned value is
-  equivalent to:
-  
-```
-{
-    errors: [],
     data: {
       doTheThing: {
-        errors: ["you cannot touch the thing"],
-        theThing: null,
-      },
-    },
+        errors: [] // if successful, this array will be empty.
+        thing:  { .. }
+      }
+    }
 }
 ```
 
-These two error handling mechanisms differ in intent. The former is for *non-recoverable*
-errors. This is things that are probably our fault as developers (e.g. a GraphQL syntax error)
-, or they not really anyone's fault (e.g. a git storage exception), and the user should
-not be able in the course of normal usage to cause them. This category of errors is
-should be treated as an internal error, and not shown to the user. We will need to inform
-the user when the mutation fails, but we do not need to tell them why.
+* One or more top-level errors can be returned. In this case there is no `data`:
 
-In the second case the errors are relevant to the user. They are things they need to know about,
-and may be able to change. Examples of this are things like model validation errors, permission
-errors, etc. Ideally we would like to prevent the user from getting as far as making the request,
-but if they do, they need to be told what is wrong. In this case the user needs to be shown the
-error, and possibly be given an opportunity to amend their mistake.
+```javascript
+{
+    errors: [
+      {"message": "argument error: expected an integer, got null"},
+    ]
+}
+```
+
+  This is the result of raising an error during the mutation.
+
+* An error occurred which was caught during the mutation, and returned as part
+  of the result. We will refer to these as _mutation errors_. In this case there
+  is no `thing`:
+  
+```javascript
+{
+    data: {
+      doTheThing: {
+        errors: ["you cannot touch the thing"]
+      }
+    }
+}
+```
+
+These two error handling mechanisms differ in their *semantics*:
+
+- Top level errors are *non-recoverable* (think `HTTP 500`)
+
+    These probably our fault as developers (e.g. a GraphQL syntax error) , or
+    they not really anyone's fault (e.g. a git storage exception), and the user
+    should not be able in the course of normal usage to cause them. This
+    category of errors should be treated as an internal error, and not shown
+    to the user.
+    
+    We need to inform the user when the mutation fails, but we do not need to
+    tell them why.
+
+* Mutation errors are *recoverable* (think `HTTP 4xx`)
+
+    In the second case the errors are relevant to the user. They are things they
+    need to know about, and may be able to change. Examples of this are things like
+    model validation errors, permission errors, etc. Ideally we would like to
+    prevent the user from getting as far as making the request, but if they do, they
+    need to be told what is wrong.
+    
+    The user needs to be shown the error, and possibly be given an opportunity
+    to fix the situation (log in, change the inputs, etc.).
+
+A mutation response is thus a three-valued sum-type, a bit like the
+type `Either Errors (Either Errors Value)`{.haskell}
+
+#### Back-End considerations
 
 As mutation writers on the back-end, we need to be conscious about which of
 these two categories an error state falls into (and communicate about this with
-front-end developers to verify our assumptions).
+front-end developers to verify our assumptions). This means distinguishing the
+needs of the _user_ from the needs of the _client_.
+
+*Never catch an error unless the user needs to know about it*
+
+#### Front-End considerations
 
 On the front-end we need be aware of the three states a mutation response can
-have, and handle each one correctly. Never issue a mutation without also
-requesting the errors.
+have, and handle each one correctly. It is very easy to handle the top level
+errors and forget about the mutation errors, since top level errors will cause
+promises to be rejected, but we have to remember to request the `errors` field
+explicitly in our `mutation.graphql`.
+
+*Never issue a mutation without also requesting the errors.*
 
 ### Fields
 
@@ -386,22 +423,38 @@ By inheriting any new mutations from `Mutations::BaseMutation` the
 also added, this can be used by the client to identify the result of a
 single mutation when multiple are performed within a single request.
 
-#### Preventing additional requests
+#### What fields should I add?
 
-Above all, the result value of a mutation is meant to be useful to the client.
+Useful ones!
+
+Above all, the result value of a mutation is meant to be _useful_ to the client.
+By client we mean the `vue.js` app on our website first-and-foremost. We assume
+that the client has a notion of state, and will need to update its internal
+state after the mutation successfully completes. We should add fields to the
+response that reflect the new state.
+
 This means that if the client issues a mutation, and then immediately has to
 send a second query to fetch current data about the system, then we may have got
-things wrong. This means that back-end and front-end must talk about what the
+things wrong.
+
+In many cases this is obvious - if the mutation changes a resource, return that
+resource. For example, if the mutation increments a `like` counter on an issue,
+then we should return the issue. Since this is GraphQL the user is free to
+ignore the return values, so feel free to add fields that make sense. They will
+only be returned if the client wants them.
+
+In some situations this is a bit trickier. Resource deletion is a good example
+of where the resource itself may not make sense to be returned, but the client
+will still have state it needs to update, so talk to the front-end developer to
+find out what they need. Where possible try to write mutations in terms of
+`modifying` resources or `adding` them (for example deleting a resource may
+create a new version, or a new server time-stamp, or something meaningful).
+
+*Back-end and front-end must talk about what the
 client will need from a mutation. It is OK to add extra values to the result if
-it prevents additional requests.
+it prevents additional requests.*
 
-For example if a `deleteResource` mutation removes an item, and then the client needs
-to query to find out what the current list of resources is, we can add the current
-list of resources to the response value of the mutation. It will only be returned if
-the client requests it of course, but it enables them perform the deletion and fetch
-in a single request!
-
-### Building Mutations
+### Writing Mutations
 
 Mutations live in `app/graphql/mutations` ideally grouped per
 resources they are mutating, similar to our services. They should
