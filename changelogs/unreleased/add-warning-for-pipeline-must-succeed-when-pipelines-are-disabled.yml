@@ -1,0 +1,5 @@
+---
+title: Add pipeline must succeed warning to MR widget
+merge_request: 30815
+author:
+type: fixed

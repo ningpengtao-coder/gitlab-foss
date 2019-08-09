@@ -900,6 +900,23 @@ describe('ReadyToMerge', () => {
       });
     });
 
+    describe('when pipeline must succeed but there is no pipeline information', () => {
+      beforeEach(() => {
+        vm = createComponent({
+          mr: {
+            onlyAllowMergeIfPipelineSucceeds: true,
+            hasCI: false,
+            isMergeAllowed: false,
+            availableAutoMergeStrategies: [],
+          },
+        });
+      });
+
+      it('shows a specific warning', () => {
+        expect(vm.$el.querySelector('.js-pipeline-must-succeed-conflict')).not.toBeNull();
+      });
+    });
+
     describe('when not allowed to merge', () => {
       beforeEach(() => {
         vm = createComponent({

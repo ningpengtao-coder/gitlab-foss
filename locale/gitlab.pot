@@ -7439,6 +7439,9 @@ msgstr ""
 msgid "Only admins"
 msgstr ""
 
+msgid "Only merge requests with pipelines that succeed are allowed to be merged. For more information, see the %{linkStart}documentation.%{linkEnd}"
+msgstr ""
+
 msgid "Only mirror protected branches"
 msgstr ""
 

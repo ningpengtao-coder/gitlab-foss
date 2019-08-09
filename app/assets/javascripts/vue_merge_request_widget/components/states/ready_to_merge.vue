@@ -3,7 +3,7 @@ import _ from 'underscore';
 import successSvg from 'icons/_icon_status_success.svg';
 import warningSvg from 'icons/_icon_status_warning.svg';
 import simplePoll from '~/lib/utils/simple_poll';
-import { __ } from '~/locale';
+import { sprintf, __ } from '~/locale';
 import readyToMergeMixin from 'ee_else_ce/vue_merge_request_widget/mixins/ready_to_merge';
 import MergeRequest from '../../../merge_request';
 import { refreshUserMergeRequestCounts } from '~/commons/nav/user_merge_requests';
@@ -112,6 +112,21 @@ export default {
     },
     shouldShowMergeEdit() {
       return !this.mr.ffOnlyEnabled;
+    },
+    hasPipelineMustSucceedConflict() {
+      return this.mr.onlyAllowMergeIfPipelineSucceeds && !this.mr.hasCi;
+    },
+    pipelineMustSucceedText() {
+      return sprintf(
+        __(
+          'Only merge requests with pipelines that succeed are allowed to be merged. For more information, see the %{linkStart}documentation.%{linkEnd}',
+        ),
+        {
+          linkStart: `<a href="${this.mr.pipelineMustSucceedDocsPath}">`,
+          linkEnd: '</a>',
+        },
+        false,
+      );
     },
   },
   methods: {
@@ -306,6 +321,12 @@ export default {
                 :help-path="mr.squashBeforeMergeHelpPath"
                 :is-disabled="isMergeButtonDisabled"
               />
+            </template>
+            <template v-else-if="hasPipelineMustSucceedConflict">
+              <div
+                class="bold js-pipeline-must-succeed-conflict"
+                v-html="pipelineMustSucceedText"
+              ></div>
             </template>
             <template v-else>
               <span class="bold js-resolve-mr-widget-items-message">
