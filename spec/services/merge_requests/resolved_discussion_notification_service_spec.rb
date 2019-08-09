@@ -38,7 +38,7 @@ describe MergeRequests::ResolvedDiscussionNotificationService do
         subject.execute(merge_request)
       end
 
-      it "sends a notification email" do
+      it "sends a notification email", :sidekiq_inline_tech_debt do
         expect_any_instance_of(NotificationService).to receive(:resolve_all_discussions).with(merge_request, user)
 
         subject.execute(merge_request)

@@ -55,7 +55,7 @@ describe 'Projects > Files > User replaces files', :js do
       wait_for_requests
     end
 
-    it 'replaces an existed file with a new one in a forked project' do
+    it 'replaces an existed file with a new one in a forked project', :sidekiq_inline_tech_debt do
       click_link('.gitignore')
 
       expect(page).to have_content('.gitignore')

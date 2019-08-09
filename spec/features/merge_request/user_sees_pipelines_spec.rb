@@ -124,7 +124,7 @@ describe 'Merge request > User sees pipelines', :js do
         threads.each { |thr| thr.join }
       end
 
-      it 'user sees pipeline in merge request widget' do
+      it 'user sees pipeline in merge request widget', :sidekiq_inline_tech_debt do
         visit project_merge_request_path(project, @merge_request)
 
         expect(page.find(".ci-widget")).to have_content(TestEnv::BRANCH_SHA['feature'])

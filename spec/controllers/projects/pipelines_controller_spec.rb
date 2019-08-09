@@ -93,7 +93,7 @@ describe Projects::PipelinesController do
     end
 
     context 'when performing gitaly calls', :request_store do
-      it 'limits the Gitaly requests' do
+      it 'limits the Gitaly requests', :sidekiq_inline_tech_debt do
         # Isolate from test preparation (Repository#exists? is also cached in RequestStore)
         RequestStore.end!
         RequestStore.clear!
@@ -384,7 +384,7 @@ describe Projects::PipelinesController do
                     format: :json
     end
 
-    it 'cancels a pipeline without returning any content' do
+    it 'cancels a pipeline without returning any content', :sidekiq_inline_tech_debt do
       expect(response).to have_gitlab_http_status(:no_content)
       expect(pipeline.reload).to be_canceled
     end

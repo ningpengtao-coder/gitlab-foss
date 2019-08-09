@@ -78,7 +78,7 @@ describe Projects::ForkService do
             expect(fork_network.projects).to contain_exactly(@from_project, to_project)
           end
 
-          it 'imports the repository of the forked project' do
+          it 'imports the repository of the forked project', :sidekiq_inline_tech_debt do
             to_project = fork_project(@from_project, @to_user, repository: true)
 
             expect(to_project.empty_repo?).to be_falsy

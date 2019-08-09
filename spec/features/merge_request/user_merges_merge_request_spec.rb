@@ -10,7 +10,7 @@ describe "User merges a merge request", :js do
   end
 
   shared_examples "fast forward merge a merge request" do
-    it "merges a merge request" do
+    it "merges a merge request", :sidekiq_inline_tech_debt do
       expect(page).to have_content("Fast-forward merge without a merge commit").and have_button("Merge")
 
       page.within(".mr-state-widget") do

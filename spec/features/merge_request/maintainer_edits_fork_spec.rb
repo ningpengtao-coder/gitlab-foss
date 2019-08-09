@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'a maintainer edits files on a source-branch of an MR from a fork', :js do
+describe 'a maintainer edits files on a source-branch of an MR from a fork', :js, :sidekiq_inline_tech_debt do
   include ProjectForksHelper
   let(:user) { create(:user, username: 'the-maintainer') }
   let(:target_project) { create(:project, :public, :repository) }

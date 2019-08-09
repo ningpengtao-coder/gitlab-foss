@@ -26,7 +26,7 @@ describe Gitlab::Badge::Pipeline::Status do
     end
   end
 
-  context 'pipeline exists' do
+  context 'pipeline exists', :sidekiq_inline_tech_debt do
     let!(:pipeline) { create_pipeline(project, sha, branch) }
 
     context 'pipeline success' do

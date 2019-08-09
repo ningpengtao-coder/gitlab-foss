@@ -32,7 +32,7 @@ describe ScheduleDigestPersonalAccessTokens, :migration, :sidekiq do
     end
   end
 
-  it 'schedules background migrations' do
+  it 'schedules background migrations', :sidekiq_inline_tech_debt do
     perform_enqueued_jobs do
       plain_text_token = 'token IS NOT NULL'
 

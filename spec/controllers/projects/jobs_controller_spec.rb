@@ -155,7 +155,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           .and_return(merge_request)
       end
 
-      it 'does not serialize builds in exposed stages' do
+      it 'does not serialize builds in exposed stages', :sidekiq_inline_tech_debt do
         get_show_json
 
         json_response.dig('pipeline', 'details', 'stages').tap do |stages|
@@ -184,7 +184,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         context 'job is cancelable' do
           let(:job) { create(:ci_build, :running, pipeline: pipeline) }
 
-          it 'cancel_path is present with correct redirect' do
+          it 'cancel_path is present with correct redirect', :sidekiq_inline_tech_debt do
             expect(response).to have_gitlab_http_status(:ok)
             expect(response).to match_response_schema('job/job_details')
             expect(json_response['cancel_path']).to include(CGI.escape(json_response['build_path']))
@@ -194,7 +194,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         context 'with web terminal' do
           let(:job) { create(:ci_build, :running, :with_runner_session, pipeline: pipeline) }
 
-          it 'exposes the terminal path' do
+          it 'exposes the terminal path', :sidekiq_inline_tech_debt do
             expect(response).to have_gitlab_http_status(:ok)
             expect(response).to match_response_schema('job/job_details')
             expect(json_response['terminal_path']).to match(%r{/terminal})
@@ -291,7 +291,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
             sign_in(user)
           end
 
-          it 'user can edit runner' do
+          it 'user can edit runner', :sidekiq_inline_tech_debt do
             get_show_json
 
             expect(response).to have_gitlab_http_status(:ok)
@@ -311,7 +311,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
             sign_in(user)
           end
 
-          it 'user can not edit runner' do
+          it 'user can not edit runner', :sidekiq_inline_tech_debt do
             get_show_json
 
             expect(response).to have_gitlab_http_status(:ok)
@@ -330,7 +330,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
             sign_in(user)
           end
 
-          it 'user can not edit runner' do
+          it 'user can not edit runner', :sidekiq_inline_tech_debt do
             get_show_json
 
             expect(response).to have_gitlab_http_status(:ok)
@@ -411,7 +411,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
       context 'when job has trace' do
         let(:job) { create(:ci_build, :running, :trace_live, pipeline: pipeline) }
 
-        it "has_trace is true" do
+        it "has_trace is true", :sidekiq_inline_tech_debt do
           get_show_json
 
           expect(response).to match_response_schema('job/job_details')
@@ -457,7 +457,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           create(:ci_pipeline_variable, pipeline: pipeline, key: :TRIGGER_KEY_1, value: 'TRIGGER_VALUE_1')
         end
 
-        context 'user is a maintainer' do
+        context 'user is a maintainer', :sidekiq_inline_tech_debt do
           before do
             project.add_maintainer(user)
 

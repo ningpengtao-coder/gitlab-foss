@@ -396,7 +396,7 @@ describe Projects::MergeRequestsController do
       context 'when a squash commit message is passed' do
         let(:message) { 'My custom squash commit message' }
 
-        it 'passes the same message to SquashService' do
+        it 'passes the same message to SquashService', :sidekiq_inline_tech_debt do
           params = { squash: '1', squash_commit_message: message }
 
           expect_next_instance_of(MergeRequests::SquashService, project, user, params.merge(merge_request: merge_request)) do |squash_service|
@@ -689,7 +689,7 @@ describe Projects::MergeRequestsController do
 
         context 'with private builds' do
           context 'for the target project member' do
-            it 'does not respond with serialized pipelines' do
+            it 'does not respond with serialized pipelines', :sidekiq_inline_tech_debt do
               expect(json_response['pipelines']).to be_empty
               expect(json_response['count']['all']).to eq(0)
               expect(response).to include_pagination_headers
@@ -699,7 +699,7 @@ describe Projects::MergeRequestsController do
           context 'for the source project member' do
             let(:user) { fork_user }
 
-            it 'responds with serialized pipelines' do
+            it 'responds with serialized pipelines', :sidekiq_inline_tech_debt do
               expect(json_response['pipelines']).to be_present
               expect(json_response['count']['all']).to eq(1)
               expect(response).to include_pagination_headers
@@ -715,7 +715,7 @@ describe Projects::MergeRequestsController do
           end
 
           context 'for the target project member' do
-            it 'does not respond with serialized pipelines' do
+            it 'does not respond with serialized pipelines', :sidekiq_inline_tech_debt do
               expect(json_response['pipelines']).to be_present
               expect(json_response['count']['all']).to eq(1)
               expect(response).to include_pagination_headers
@@ -725,7 +725,7 @@ describe Projects::MergeRequestsController do
           context 'for the source project member' do
             let(:user) { fork_user }
 
-            it 'responds with serialized pipelines' do
+            it 'responds with serialized pipelines', :sidekiq_inline_tech_debt do
               expect(json_response['pipelines']).to be_present
               expect(json_response['count']['all']).to eq(1)
               expect(response).to include_pagination_headers
@@ -985,13 +985,13 @@ describe Projects::MergeRequestsController do
         create(:merge_request, source_project: forked, target_project: project, target_branch: 'master', head_pipeline: pipeline)
       end
 
-      it 'links to the environment on that project' do
+      it 'links to the environment on that project', :sidekiq_inline_tech_debt do
         get_ci_environments_status
 
         expect(json_response.first['url']).to match /#{forked.full_path}/
       end
 
-      context "when environment_target is 'merge_commit'" do
+      context "when environment_target is 'merge_commit'", :sidekiq_inline_tech_debt do
         it 'returns nothing' do
           get_ci_environments_status(environment_target: 'merge_commit')
 
@@ -1022,13 +1022,13 @@ describe Projects::MergeRequestsController do
 
       # we're trying to reduce the overall number of queries for this method.
       # set a hard limit for now. https://gitlab.com/gitlab-org/gitlab-ce/issues/52287
-      it 'keeps queries in check' do
+      it 'keeps queries in check', :sidekiq_inline_tech_debt do
         control_count = ActiveRecord::QueryRecorder.new { get_ci_environments_status }.count
 
         expect(control_count).to be <= 137
       end
 
-      it 'has no N+1 SQL issues for environments', :request_store, retry: 0 do
+      it 'has no N+1 SQL issues for environments', :request_store, :sidekiq_inline_tech_debt, retry: 0 do
         # First run to insert test data from lets, which does take up some 30 queries
         get_ci_environments_status
 
@@ -1219,7 +1219,7 @@ describe Projects::MergeRequestsController do
           sign_in(fork_owner)
         end
 
-        it 'returns 200' do
+        it 'returns 200', :sidekiq_inline_tech_debt do
           expect_rebase_worker_for(fork_owner)
 
           post_rebase

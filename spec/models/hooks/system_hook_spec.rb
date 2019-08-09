@@ -16,7 +16,7 @@ describe SystemHook do
     end
   end
 
-  describe "execute" do
+  describe "execute", :sidekiq_inline_tech_debt do
     let(:system_hook) { create(:system_hook) }
     let(:user)        { create(:user) }
     let(:project)     { create(:project, namespace: user.namespace) }

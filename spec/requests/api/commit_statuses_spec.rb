@@ -248,7 +248,7 @@ describe API::CommitStatuses do
             }
           end
 
-          it 'update the correct pipeline' do
+          it 'update the correct pipeline', :sidekiq_inline_tech_debt do
             subject
 
             expect(first_pipeline.reload.status).to eq('created')
@@ -272,7 +272,7 @@ describe API::CommitStatuses do
           expect(json_response['status']).to eq('success')
         end
 
-        it 'retries a commit status' do
+        it 'retries a commit status', :sidekiq_inline_tech_debt do
           expect(CommitStatus.count).to eq 2
           expect(CommitStatus.first).to be_retried
           expect(CommitStatus.last.pipeline).to be_success

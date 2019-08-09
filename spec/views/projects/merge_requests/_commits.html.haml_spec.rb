@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'projects/merge_requests/_commits.html.haml' do
+describe 'projects/merge_requests/_commits.html.haml', :sidekiq_inline_tech_debt do
   include Devise::Test::ControllerHelpers
   include ProjectForksHelper
 

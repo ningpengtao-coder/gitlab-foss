@@ -726,7 +726,7 @@ describe SystemNoteService do
         described_class.cross_reference(noteable, commit0, author2)
       end
 
-      it 'is true when a fork mentions an external issue' do
+      it 'is true when a fork mentions an external issue', :sidekiq_inline_tech_debt do
         expect(described_class.cross_reference_exists?(noteable, commit2))
             .to be true
       end
@@ -737,7 +737,7 @@ describe SystemNoteService do
           system_note.update(note: system_note.note.capitalize)
         end
 
-        it 'is true when a fork mentions an external issue' do
+        it 'is true when a fork mentions an external issue', :sidekiq_inline_tech_debt do
           expect(described_class.cross_reference_exists?(noteable, commit2))
               .to be true
         end

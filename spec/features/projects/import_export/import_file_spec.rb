@@ -28,7 +28,7 @@ describe 'Import/Export - project import integration test', :js do
     let(:project_path) { 'test-project-name' + randomHex }
 
     context 'prefilled the path' do
-      it 'user imports an exported project successfully' do
+      it 'user imports an exported project successfully', :sidekiq_inline_tech_debt do
         visit new_project_path
 
         select2(namespace.id, from: '#project_namespace_id')
@@ -55,7 +55,7 @@ describe 'Import/Export - project import integration test', :js do
     end
 
     context 'path is not prefilled' do
-      it 'user imports an exported project successfully' do
+      it 'user imports an exported project successfully', :sidekiq_inline_tech_debt do
         visit new_project_path
         click_import_project_tab
         click_link 'GitLab export'

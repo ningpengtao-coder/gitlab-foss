@@ -47,7 +47,7 @@ describe 'forked project import' do
     end
   end
 
-  it 'can access the MR' do
+  it 'can access the MR', :sidekiq_inline_tech_debt do
     project.merge_requests.first.fetch_ref!
 
     expect(project.repository.ref_exists?('refs/merge-requests/1/head')).to be_truthy

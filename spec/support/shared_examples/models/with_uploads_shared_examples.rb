@@ -18,7 +18,7 @@ shared_examples_for 'model with uploads' do |supports_fileuploads|
       end
     end
 
-    context 'with not mounted uploads', :sidekiq, skip: !supports_fileuploads do
+    context 'with not mounted uploads', :sidekiq_inline_tech_debt, skip: !supports_fileuploads do
       context 'with local files' do
         let!(:uploads) { create_list(:upload, 2, uploader: FileUploader, model: model_object) }
 

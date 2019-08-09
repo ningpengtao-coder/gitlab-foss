@@ -142,7 +142,7 @@ describe 'Merge request > User merges when pipeline succeeds', :js do
         refresh
       end
 
-      it 'merges merge request' do
+      it 'merges merge request', :sidekiq_inline_tech_debt do
         expect(page).to have_content 'The changes were merged'
         expect(merge_request.reload).to be_merged
       end

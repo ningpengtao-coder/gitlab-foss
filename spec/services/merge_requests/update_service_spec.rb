@@ -97,7 +97,7 @@ describe MergeRequests::UpdateService, :mailer do
           )
       end
 
-      it 'sends email to user2 about assign of new merge request and email to user3 about merge request unassignment' do
+      it 'sends email to user2 about assign of new merge request and email to user3 about merge request unassignment', :sidekiq_inline_tech_debt do
         deliveries = ActionMailer::Base.deliveries
         email = deliveries.last
         recipients = deliveries.last(2).flat_map(&:to)
@@ -180,7 +180,7 @@ describe MergeRequests::UpdateService, :mailer do
           end
         end
 
-        it 'merges the MR' do
+        it 'merges the MR', :sidekiq_inline_tech_debt do
           expect(@merge_request).to be_valid
           expect(@merge_request.state).to eq('merged')
           expect(@merge_request.merge_error).to be_nil
@@ -201,7 +201,7 @@ describe MergeRequests::UpdateService, :mailer do
           end
         end
 
-        it 'merges the MR' do
+        it 'merges the MR', :sidekiq_inline_tech_debt do
           expect(@merge_request).to be_valid
           expect(@merge_request.state).to eq('merged')
         end
@@ -331,7 +331,7 @@ describe MergeRequests::UpdateService, :mailer do
 
         it_behaves_like 'system notes for milestones'
 
-        it 'sends notifications for subscribers of changed milestone' do
+        it 'sends notifications for subscribers of changed milestone', :sidekiq_inline_tech_debt do
           merge_request.milestone = create(:milestone, project: project)
 
           merge_request.save
@@ -363,7 +363,7 @@ describe MergeRequests::UpdateService, :mailer do
 
         it_behaves_like 'system notes for milestones'
 
-        it 'sends notifications for subscribers of changed milestone' do
+        it 'sends notifications for subscribers of changed milestone', :sidekiq_inline_tech_debt do
           perform_enqueued_jobs do
             update_merge_request(milestone: create(:milestone, project: project))
           end
@@ -430,7 +430,7 @@ describe MergeRequests::UpdateService, :mailer do
         project.add_developer(subscriber)
       end
 
-      it 'sends notifications for subscribers of newly added labels' do
+      it 'sends notifications for subscribers of newly added labels', :sidekiq_inline_tech_debt do
         opts = { label_ids: [label.id] }
 
         perform_enqueued_jobs do

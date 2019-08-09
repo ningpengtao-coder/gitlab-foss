@@ -1174,7 +1174,7 @@ describe Projects::IssuesController do
           stub_feature_flags(create_confidential_merge_request: true)
         end
 
-        it 'creates a new merge request' do
+        it 'creates a new merge request', :sidekiq_inline_tech_debt do
           expect { create_merge_request }.to change(target_project.merge_requests, :count).by(1)
         end
       end

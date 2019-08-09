@@ -189,7 +189,7 @@ describe RemoteMirror, :mailer do
         remote_mirror.project.add_maintainer(user)
       end
 
-      it 'notifies the project maintainers' do
+      it 'notifies the project maintainers', :sidekiq_inline_tech_debt do
         perform_enqueued_jobs { subject }
 
         should_email(user)

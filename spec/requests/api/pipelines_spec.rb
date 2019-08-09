@@ -625,7 +625,7 @@ describe API::Pipelines do
     let!(:build) { create(:ci_build, :running, pipeline: pipeline) }
 
     context 'authorized user' do
-      it 'retries failed builds' do
+      it 'retries failed builds', :sidekiq_inline_tech_debt do
         post api("/projects/#{project.id}/pipelines/#{pipeline.id}/cancel", user)
 
         expect(response).to have_gitlab_http_status(200)

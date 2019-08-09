@@ -20,7 +20,7 @@ describe ObjectStorage::BackgroundMoveWorker do
         stub_lfs_object_storage(background_upload: true)
       end
 
-      it 'uploads object to storage' do
+      it 'uploads object to storage', :sidekiq_inline_tech_debt do
         expect { perform }.to change { lfs_object.reload.file_store }.from(local).to(remote)
       end
 
@@ -63,7 +63,7 @@ describe ObjectStorage::BackgroundMoveWorker do
           stub_artifacts_object_storage(background_upload: true)
         end
 
-        it "migrates file to remote storage" do
+        it "migrates file to remote storage", :sidekiq_inline_tech_debt do
           perform
 
           expect(artifact.reload.file_store).to eq(remote)
@@ -89,7 +89,7 @@ describe ObjectStorage::BackgroundMoveWorker do
           let(:subject_class) { project.class }
           let(:subject_id) { project.id }
 
-          it "migrates file to remote storage" do
+          it "migrates file to remote storage", :sidekiq_inline_tech_debt do
             perform
             project.reload
             BatchLoader::Executor.clear_current
@@ -102,7 +102,7 @@ describe ObjectStorage::BackgroundMoveWorker do
           let(:subject_class) { Upload }
           let(:subject_id) { project.avatar.upload.id }
 
-          it "migrates file to remote storage" do
+          it "migrates file to remote storage", :sidekiq_inline_tech_debt do
             perform
 
             expect(project.reload.avatar).not_to be_file_storage

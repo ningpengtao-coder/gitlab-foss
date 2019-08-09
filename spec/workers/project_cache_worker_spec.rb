@@ -105,7 +105,7 @@ describe ProjectCacheWorker do
     end
 
     context 'when a lease could be obtained' do
-      it 'updates the project statistics twice' do
+      it 'updates the project statistics twice', :sidekiq_inline_tech_debt do
         stub_exclusive_lease(lease_key, timeout: lease_timeout)
 
         expect(Projects::UpdateStatisticsService).to receive(:new)
