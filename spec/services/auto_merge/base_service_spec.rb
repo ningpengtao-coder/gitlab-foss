@@ -58,6 +58,7 @@ describe AutoMerge::BaseService do
 
     context 'when strategy is merge when pipeline succeeds' do
       let(:service) { AutoMerge::MergeWhenPipelineSucceedsService.new(project, user) }
+      let(:project) { merge_request.project }
 
       before do
         pipeline = build(:ci_pipeline)
