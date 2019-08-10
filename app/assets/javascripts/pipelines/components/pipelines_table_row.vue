@@ -285,6 +285,18 @@ export default {
       <div class="table-mobile-header" role="rowheader">{{ s__('Pipeline|Commit') }}</div>
       <div class="table-mobile-content">
         <commit-component
+          class="d-none d-md-inline d-xl-none"
+          :tag="commitTag"
+          :commit-ref="commitRef"
+          :commit-url="commitUrl"
+          :merge-request-ref="pipeline.merge_request"
+          :short-sha="commitShortSha"
+          :show-title="false"
+          :author="commitAuthor"
+          :show-ref-info="!isChildView"
+        />
+        <commit-component
+          class="d-md-none d-xl-inline"
           :tag="commitTag"
           :commit-ref="commitRef"
           :commit-url="commitUrl"
