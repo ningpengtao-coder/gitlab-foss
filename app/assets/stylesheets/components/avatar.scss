@@ -183,6 +183,18 @@ $identicon-backgrounds: $identicon-red, $identicon-purple, $identicon-indigo, $i
     min-width: 64px;
     min-height: 64px;
   }
+
+  .fork-thumbnail & {
+    $all-sizes: [];
+    @each $size, $_ in $avatar-sizes {
+      $all-sizes: append($all-sizes, unquote('&.s#{$size}'));
+    }
+
+    #{join([], $all-sizes, $separator: comma)} {
+      // When inside the fork button, avatars should have auto right margins
+      margin-right: auto;
+    }
+  }
 }
 
 .rect-avatar {
