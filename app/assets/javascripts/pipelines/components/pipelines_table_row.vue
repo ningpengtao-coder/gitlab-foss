@@ -309,7 +309,7 @@ export default {
       </div>
     </div>
 
-    <div class="table-section section-wrap section-15 stage-cell">
+    <div class="table-section section-wrap section-20 stage-cell">
       <div class="table-mobile-header" role="rowheader">{{ s__('Pipeline|Stages') }}</div>
       <div class="table-mobile-content">
         <template v-if="pipeline.details.stages.length > 0">
