@@ -1,9 +1,7 @@
 .package-and-qa-base:
   image: ruby:2.6-alpine
   stage: review  # So even if review-deploy failed we can still run this
-  before_script: []
   dependencies: []
-  cache: {}
   variables:
     GIT_DEPTH: "1"
   retry: 0
@@ -16,10 +14,10 @@
     - branches@gitlab-org/gitlab-ee
 
 package-and-qa:
-  extends: .package-and-qa-base
+  extends:
+    - .package-and-qa-base
+    - .no-qa
   when: manual
-  except:
-    - /(^qa[\/-].*|.*-qa$)/
 
 package-and-qa-always:
   extends: .package-and-qa-base

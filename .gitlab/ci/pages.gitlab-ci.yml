@@ -1,6 +1,13 @@
 pages:
-  extends: .dedicated-no-docs-no-db-pull-cache-job
-  before_script: []
+  extends:
+    - .default-tags
+    - .default-retry
+    - .default-cache
+    - .no-docs
+  only:
+    refs:
+      - master@gitlab-org/gitlab-ce
+      - master@gitlab-org/gitlab-ee
   stage: pages
   dependencies:
     - coverage
@@ -21,6 +28,3 @@ pages:
   artifacts:
     paths:
       - public
-  only:
-    - master@gitlab-org/gitlab-ce
-    - master@gitlab-org/gitlab-ee
