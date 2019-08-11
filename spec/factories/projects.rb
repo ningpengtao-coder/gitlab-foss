@@ -36,6 +36,8 @@ FactoryBot.define do
       group_runners_enabled nil
       import_status nil
       import_jid nil
+
+      forked_from nil
     end
 
     after(:create) do |project, evaluator|
@@ -67,6 +69,14 @@ FactoryBot.define do
       end
 
       project.group&.refresh_members_authorized_projects
+
+      # establish fork relation if forked_from is informed
+      if evaluator.forked_from
+        evaluator.forked_from.build_root_of_fork_network.save
+
+        project.build_fork_network_member(forked_from_project: evaluator.forked_from,
+          fork_network: evaluator.forked_from.reload.fork_network).save
+      end
 
       # assign the delegated `#ci_cd_settings` attributes after create
       project.reload.group_runners_enabled = evaluator.group_runners_enabled unless evaluator.group_runners_enabled.nil?

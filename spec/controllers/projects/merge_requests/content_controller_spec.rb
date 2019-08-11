@@ -47,6 +47,20 @@ describe Projects::MergeRequests::ContentController do
 
         expect { do_request }.to change { merge_request.reload.open? }.from(true).to(false)
       end
+
+      context 'source project exists but repository is removed from disk' do
+        let(:forked) { create(:project, :missing_repo, forked_from: project) }
+        let(:merge_request) do
+          create(:merge_request, :with_merge_request_pipeline,
+                 target_project: project.reload, source_project: forked.reload)
+        end
+
+        it 'renders 500 error' do
+          do_request
+
+          expect(response).to have_http_status(:internal_server_error)
+        end
+      end
     end
 
     context 'user does not have access to the project' do
