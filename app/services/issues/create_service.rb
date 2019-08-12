@@ -29,6 +29,7 @@ module Issues
       todo_service.new_issue(issuable, current_user)
       user_agent_detail_service.create
       resolve_discussions_with_issue(issuable)
+      update_links(issuable)
 
       super
     end
@@ -46,6 +47,10 @@ module Issues
 
     def user_agent_detail_service
       UserAgentDetailService.new(@issue, @request)
+    end
+
+    # override if needed
+    def update_links(issuable)
     end
   end
 end
