@@ -2689,9 +2689,9 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
 
   create_table "project_pages_metadata", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.boolean "deployed", default: false, null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.boolean "deployed", default: false, null: false
     t.index ["deployed"], name: "index_project_pages_metadata_on_deployed"
     t.index ["project_id"], name: "index_project_pages_metadata_on_project_id", unique: true
   end
