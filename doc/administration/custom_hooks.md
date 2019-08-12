@@ -102,6 +102,13 @@ first script exiting with a non-zero value.
 
 > [Introduced][5073] in GitLab 8.10.
 
+NOTE: **Note:**
+Error messages were not shown in the GitLab UI from version 10.8 to 11.10
+due to security concerns with the original implementation. See the discussion in 
+[merge request 18646](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/18646)
+for more information. The feature was reintroduced in 11.10 in 
+[merge request 25625](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/25625).
+
 To have custom error messages appear in GitLab's UI when the commit is
 declined or an error occurs during the Git hook, your script should:
 
