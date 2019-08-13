@@ -26,7 +26,9 @@ module SortingHelper
       sort_value_priority          => sort_title_priority,
       sort_value_upvotes           => sort_title_upvotes,
       sort_value_contacted_date    => sort_title_contacted_date,
-      sort_value_relative_position => sort_title_relative_position
+      sort_value_relative_position => sort_title_relative_position,
+      sort_value_size              => sort_title_size,
+      sort_value_expire_date       => sort_title_expire_date
     }
   end
 
@@ -388,6 +390,14 @@ module SortingHelper
     s_('SortOptions|Most stars')
   end
 
+  def sort_title_size
+    s_('SortOptions|Largest size')
+  end
+
+  def sort_title_expire_date
+    s_('SortOptions|Oldest expired')
+  end
+
   def sort_title_stars
     s_('SortOptions|Stars')
   end
@@ -539,6 +549,14 @@ module SortingHelper
 
   def sort_value_stars_desc
     'stars_desc'
+  end
+
+  def sort_value_size
+    'size_desc'
+  end
+
+  def sort_value_expire_date
+    'expired_asc'
   end
 
   def sort_value_stars_asc
