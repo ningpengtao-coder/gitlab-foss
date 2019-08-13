@@ -11,7 +11,7 @@
         = snippet.file_name
 
     %ul.controls
-      - if can?(current_user, :update_personal_snippet, snippet)
+      - if can?(current_user, :update_personal_snippet, snippet) || can?(current_user:update_project_snippet, snippet)
         %li
           = link_to edit_snippet_path(snippet) do
             = icon('pencil')
