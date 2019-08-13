@@ -62,7 +62,6 @@ dast:
   artifacts:
     reports:
       dependency_scanning: gl-dast-report.json
-  dependencies: []
   only:
     refs:
       - branches
