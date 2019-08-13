@@ -12,6 +12,9 @@
 
     %ul.controls
       %li
+        - if can?(current_user, :update_personal_snippet, @snippet)
+          = link_to edit_snippet_path(@snippet), icon('pencil')
+      %li
         - note_count = snippet.notes.user.count
         = link_to reliable_snippet_path(snippet, anchor: 'notes'), class: ('no-comments' if note_count.zero?) do
           = icon('comments')
