@@ -47,7 +47,7 @@ dast:
         "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION" /analyze
   artifacts:
     reports:
-      dependency_scanning: gl-dast-report.json
+      dast: gl-dast-report.json
   only:
     refs:
       - branches
