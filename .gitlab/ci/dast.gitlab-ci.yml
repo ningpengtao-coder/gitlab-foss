@@ -21,8 +21,7 @@ dast:
   services:
     - docker:stable-dind
   before_script:
-    - echo "ASDF"
-    - cat review_app_url.txt
+    - export DAST_WEBSITE="$(cat review_app_url.txt)"
   script:
     - export DAST_VERSION=${SP_VERSION:-$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')}
     - |
@@ -43,22 +42,9 @@ dast:
       docker run \
         $(propagate_env_vars \
           DAST_WEBSITE \
-          DS_ANALYZER_IMAGES \
-          DS_ANALYZER_IMAGE_PREFIX \
-          DS_ANALYZER_IMAGE_TAG \
-          DS_DEFAULT_ANALYZERS \
-          DS_EXCLUDED_PATHS \
-          DEP_SCAN_DISABLE_REMOTE_CHECKS \
-          DS_DOCKER_CLIENT_NEGOTIATION_TIMEOUT \
-          DS_PULL_ANALYZER_IMAGE_TIMEOUT \
-          DS_RUN_ANALYZER_TIMEOUT \
-          DS_PYTHON_VERSION \
-          DS_PIP_DEPENDENCY_PATH \
-          PIP_INDEX_URL \
-          PIP_EXTRA_INDEX_URL \
         ) \
         --volume /var/run/docker.sock:/var/run/docker.sock \
-        "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION" /analyze -t $DAST_WEBSITE
+        "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION" /analyze
   artifacts:
     reports:
       dependency_scanning: gl-dast-report.json
