@@ -94,9 +94,53 @@ If you want to whitelist some specific vulnerabilities, you can do so by definin
 them in a YAML file named `clair-whitelist.yml`. Read more in the
 [Clair documentation](https://github.com/arminc/clair-scanner/blob/master/README.md#example-whitelist-yaml-file).
 
+### Customizing the Container Scanning settings
+
+The Container Scanning settings can be changed through [environment variables](#available-variables) by using the
+[`variables`](../../../ci/yaml/README.md#variables) parameter in `.gitlab-ci.yml`.
+
+For example:
+
+```yaml
+include:
+  template: Container-Scanning.gitlab-ci.yml
+
+variables:
+  CLAIR_SCAN_LOCAL_VERSION: "2.0.5"
+```
+
+Because template is [evaluated before](../../../ci/yaml/README.md#include) the pipeline
+configuration, the last mention of the variable will take precedence.
+
+### Overriding the Container Scanning template
+
+If you want to override the job definition (for example, change properties like
+`variables` or `dependencies`), you need to declare a `Container_scanning` job
+after the template inclusion and specify any additional keys under it. For example:
+
+```yaml
+include:
+  template: Container-Scanning.gitlab-ci.yml
+
+container_scanning:
+  variables:
+    CLAIR_SCAN_LOCAL_VERSION: "2.0.5"
+```
+
+### Available variables
+
+Container Scanning can be [configured](#customizing-the-container-scanning-settings)
+using environment variables.
+
+| Environment variable            | Function |
+|-------------------------------- |----------|
+| `CLAIR_SCAN_LOCAL_VERSION`      | Select a custom version (actually, a Docker tag) of [clair-local-scan](https://github.com/arminc/clair-local-scan) to use. |
+| `CLAIR_EXECUTABLE_VERSION`      | Select a custom version of [clair-scanner](https://github.com/arminc/clair-scanner) binary to use. |
+
 ## Example
 
-The following is a sample `.gitlab-ci.yml` that will build your Docker Image, push it to the container registry and run Container Scanning. 
+The following is a sample `.gitlab-ci.yml` that will build your Docker image,
+push it to the Container Registry and run Container Scanning:
 
 ```yaml
 variables:
