@@ -209,6 +209,7 @@ Gitlab.ee do
   Settings.gitlab['mirror_max_delay'] ||= 300
   Settings.gitlab['mirror_max_capacity'] ||= 30
   Settings.gitlab['mirror_capacity_threshold'] ||= 15
+  Settings.gitlab['pendo_api_key'] ||= ENV['GITLAB_PENDO_API_KEY']
 end
 
 #

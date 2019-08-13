@@ -145,6 +145,12 @@ RSpec.configure do |config|
       .with(:force_autodevops_on_by_default, anything)
       .and_return(false)
 
+    # Disable Pendo tracking features by default as we do not want tests to send
+    # data to Pendo.
+    # Once we move away from Feature flag use for Pendo into using our built in
+    # feature flag setup, we can remove this.
+    stub_feature_flags(pendo_tracking: false)
+
     Gitlab::ThreadMemoryCache.cache_backend.clear
   end
 
