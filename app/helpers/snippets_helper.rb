@@ -19,6 +19,17 @@ module SnippetsHelper
     end
   end
 
+  # Return the path to edit a snippet for a user or for a project
+  #
+  # @returns String, path to edit snippet
+  def reliable_snippet_edit_path(snippet)
+    if snippet.project_id
+      edit_project_snippet_path(snippet.project, snippet)
+    else
+      edit_snippet_path(snippet)
+    end
+  end
+
   def download_snippet_path(snippet)
     if snippet.project_id
       raw_project_snippet_path(@project, snippet, inline: false)
