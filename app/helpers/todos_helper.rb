@@ -26,7 +26,7 @@ module TodosHelper
   end
 
   def todo_target_link(todo)
-    text = raw("#{todo.target_type.titleize.downcase} ") +
+    text = raw("#{todo_target_type_name(todo)} ") +
       if todo.for_commit?
         content_tag(:span, todo.target_reference, class: 'commit-sha')
       else
@@ -36,21 +36,26 @@ module TodosHelper
     link_to text, todo_target_path(todo), class: 'has-tooltip', title: todo.target.title
   end
 
+  def todo_target_type_name(todo)
+    todo.target_type.titleize.downcase
+  end
+
   def todo_target_path(todo)
     return unless todo.target.present?
 
-    anchor = dom_id(todo.note) if todo.note.present?
-
     if todo.for_commit?
-      project_commit_path(todo.project,
-                                    todo.target, anchor: anchor)
+      project_commit_path(todo.project, todo.target, anchor: todo_target_path_anchor(todo))
     else
       path = [todo.parent, todo.target]
 
       path.unshift(:pipelines) if todo.build_failed?
 
-      polymorphic_path(path, anchor: anchor)
+      polymorphic_path(path, anchor: todo_target_path_anchor(todo))
     end
+  end
+
+  def todo_target_path_anchor(todo)
+    dom_id(todo.note) if todo.note.present?
   end
 
   def todo_target_state_pill(todo)
@@ -177,3 +182,7 @@ module TodosHelper
     groups.unshift({ id: '', text: 'Any Group' }).to_json
   end
 end
+
+# For some reason the wrong module was prepended here.
+TodosHelper.prepend_if_ee('EE::NotesHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
+TodosHelper.prepend_if_ee('EE::TodosHelper')
