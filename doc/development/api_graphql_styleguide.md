@@ -322,6 +322,7 @@ mutation.
 
 ### Errors
 
+NOTE: For official guidance on handling errors, see: [the GraphQL manual][graphql_docs_errs]
 
 There are three states a mutation response should be in:
 
@@ -353,7 +354,7 @@ There are three states a mutation response should be in:
 * An error occurred which was caught during the mutation, and returned as part
   of the result. We will refer to these as _mutation errors_. In this case there
   is no `thing`:
-  
+
 ```javascript
 {
     data: {
@@ -368,28 +369,28 @@ These two error handling mechanisms differ in their *semantics*:
 
 - Top level errors are *non-recoverable* (think `HTTP 500`)
 
-    These probably our fault as developers (e.g. a GraphQL syntax error) , or
-    they not really anyone's fault (e.g. a git storage exception), and the user
-    should not be able in the course of normal usage to cause them. This
-    category of errors should be treated as an internal error, and not shown
-    to the user.
-    
-    We need to inform the user when the mutation fails, but we do not need to
-    tell them why.
+  These are probably our fault as developers (e.g. a GraphQL syntax error), or
+  they not really anyone's fault (e.g. a git storage exception), and the user
+  should not be able in the course of normal usage to cause them. This
+  category of errors should be treated as an internal error, and not shown
+  to the user.
+
+  We need to inform the user when the mutation fails, but we do not need to
+  tell them why.
 
 * Mutation errors are *recoverable* (think `HTTP 4xx`)
 
-    In the second case the errors are relevant to the user. They are things they
-    need to know about, and may be able to change. Examples of this are things like
-    model validation errors, permission errors, etc. Ideally we would like to
-    prevent the user from getting as far as making the request, but if they do, they
-    need to be told what is wrong.
-    
-    The user needs to be shown the error, and possibly be given an opportunity
-    to fix the situation (log in, change the inputs, etc.).
+  In the second case the errors are relevant to the user. They are things they
+  need to know about, and may be able to change. Examples of this are things like
+  model validation errors, permission errors, etc. Ideally we would like to
+  prevent the user from getting as far as making the request, but if they do, they
+  need to be told what is wrong.
+
+  The user needs to be shown the error, and possibly be given an opportunity
+  to fix the situation (log in, change the inputs, etc.).
 
 A mutation response is thus a three-valued sum-type, a bit like the
-type `Either Errors (Either Errors Value)`{.haskell}
+type `Either Errors (Either Errors Value)`{:.haskell}
 
 #### Back-End considerations
 
@@ -615,3 +616,5 @@ it 'returns a successful response' do
    expect(graphql_mutation_response(:merge_request_set_wip)['errors']).to be_empty
 end
 ```
+
+[graphql_docs_errs]: https://graphql.github.io/graphql-spec/June2018/#sec-Errors
