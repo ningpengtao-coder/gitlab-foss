@@ -23,7 +23,7 @@ class BackgroundMigrationWorker
     should_perform, ttl = perform_and_ttl(class_name)
 
     if should_perform
-      Gitlab::BackgroundMigration.perform(class_name, arguments)
+      do_perform(class_name, arguments)
     else
       # If the lease could not be obtained this means either another process is
       # running a migration of this class or we ran one recently. In this case
@@ -84,5 +84,11 @@ class BackgroundMigrationWorker
       :background_migration_database_health_reschedules,
       'The number of times a background migration is rescheduled because the database is unhealthy.'
     )
+  end
+
+  private
+
+  def do_perform(class_name, arguments)
+    Gitlab::BackgroundMigration.perform(class_name, arguments)
   end
 end
