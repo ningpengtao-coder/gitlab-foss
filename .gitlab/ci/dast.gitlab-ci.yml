@@ -43,6 +43,7 @@ dast:
         $(propagate_env_vars \
           DAST_WEBSITE \
         ) \
+        --volume ${PWD}:/output
         --volume /var/run/docker.sock:/var/run/docker.sock \
         "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION" /analyze
   artifacts:
