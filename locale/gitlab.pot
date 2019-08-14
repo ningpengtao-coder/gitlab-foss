@@ -625,6 +625,9 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
+msgid "Add"
+msgstr ""
+
 msgid "Add %d issue"
 msgid_plural "Add %d issues"
 msgstr[0] ""
@@ -1234,6 +1237,18 @@ msgid "Applying multiple commands"
 msgstr ""
 
 msgid "Applying suggestion"
+msgstr ""
+
+msgid "ApprovalRule|Members"
+msgstr ""
+
+msgid "ApprovalRule|No. approvals required"
+msgstr ""
+
+msgid "ApprovalRule|Rule name"
+msgstr ""
+
+msgid "ApprovalRule|e.g. QA, Security, etc."
 msgstr ""
 
 msgid "Apr"
@@ -8200,10 +8215,22 @@ msgstr ""
 msgid "Please create a username with only alphanumeric characters."
 msgstr ""
 
+msgid "Please enter a non-negative number"
+msgstr ""
+
+msgid "Please enter a number greater than %{number} (from the project settings)"
+msgstr ""
+
+msgid "Please enter a valid number"
+msgstr ""
+
 msgid "Please fill in a descriptive name for your group."
 msgstr ""
 
 msgid "Please note that this application is not provided by GitLab and you should verify its authenticity before allowing access."
+msgstr ""
+
+msgid "Please provide a name"
 msgstr ""
 
 msgid "Please provide a valid email address."
@@ -8216,6 +8243,9 @@ msgid "Please select a file"
 msgstr ""
 
 msgid "Please select a group."
+msgstr ""
+
+msgid "Please select and add a member"
 msgstr ""
 
 msgid "Please select at least one filter to see results"
