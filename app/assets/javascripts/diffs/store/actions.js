@@ -136,6 +136,10 @@ export const startRenderDiffsQueue = ({ state, commit }) => {
           (file.viewer && (!file.viewer.collapsed || !file.viewer.name === diffViewerModes.text)),
       );
 
+      if (gon.features && gon.features.fileByFile && state.currentDiffFileId === '') {
+        commit(types.UPDATE_CURRENT_DIFF_FILE_ID, state.diffFiles[0].file_hash);
+      }
+
       if (nextFile) {
         requestAnimationFrame(() => {
           commit(types.RENDER_FILE, nextFile);
@@ -312,7 +316,7 @@ export const toggleTreeOpen = ({ commit }, path) => {
 
 export const scrollToFile = ({ state, commit }, path) => {
   const { fileHash } = state.treeEntries[path];
-  document.location.hash = fileHash;
+  if (gon.features && !gon.features.fileByFile) document.location.hash = fileHash;
 
   commit(types.UPDATE_CURRENT_DIFF_FILE_ID, fileHash);
 };

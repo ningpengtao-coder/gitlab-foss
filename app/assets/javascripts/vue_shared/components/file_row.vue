@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import FileHeader from '~/vue_shared/components/file_row_header.vue';
 import FileIcon from '~/vue_shared/components/file_icon.vue';
@@ -43,6 +44,14 @@ export default {
     };
   },
   computed: {
+    ...mapState('diffs', ['currentDiffFileId']),
+    isSelected() {
+      return (
+        gon.features &&
+        gon.features.fileByFile &&
+        this.currentDiffFileId === this.file.fileHash
+      );
+    },
     isTree() {
       return this.file.type === 'tree';
     },
@@ -60,6 +69,7 @@ export default {
         'is-active': this.isBlob && this.file.active,
         folder: this.isTree,
         'is-open': this.file.opened,
+        selected: this.isSelected,
       };
     },
     childFilesLevel() {
@@ -195,7 +205,8 @@ export default {
 }
 
 .file-row:hover,
-.file-row:focus {
+.file-row:focus,
+.file-row.selected {
   background: #f2f2f2;
 }
 

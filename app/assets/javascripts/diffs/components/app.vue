@@ -273,6 +273,9 @@ export default {
         this.toggleShowTreeList(false);
       }
     },
+    showFile(idx) {
+      return (gon.features && !gon.features.fileByFile) || idx === this.currentDiffIndex;
+    },
   },
   minTreeWidth: MIN_TREE_WIDTH,
   maxTreeWidth: MAX_TREE_WIDTH,
@@ -325,13 +328,14 @@ export default {
         >
           <commit-widget v-if="commit" :commit="commit" />
           <template v-if="renderDiffFiles">
-            <diff-file
-              v-for="file in diffFiles"
-              :key="file.newPath"
-              :file="file"
-              :help-page-path="helpPagePath"
-              :can-current-user-fork="canCurrentUserFork"
-            />
+            <div v-for="(file, idx) in diffFiles" :key="file.newPath">
+              <diff-file
+                v-if="showFile(idx)"
+                :file="file"
+                :help-page-path="helpPagePath"
+                :can-current-user-fork="canCurrentUserFork"
+              />
+            </div>
           </template>
           <no-changes v-else :changes-empty-state-illustration="changesEmptyStateIllustration" />
         </div>

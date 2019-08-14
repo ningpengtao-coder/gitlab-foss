@@ -68,6 +68,9 @@ export default {
     baseVersionPath() {
       return this.mergeRequestDiff.base_version_path;
     },
+    showToggle() {
+      return gon.features && !gon.features.fileByFile;
+    },
   },
   created() {
     this.CENTERED_LIMITED_CONTAINER_CLASSES = CENTERED_LIMITED_CONTAINER_CLASSES;
@@ -95,6 +98,7 @@ export default {
       }"
     >
       <button
+        v-if="showToggle"
         v-gl-tooltip.hover
         type="button"
         class="btn btn-default append-right-8 js-toggle-tree-list"
