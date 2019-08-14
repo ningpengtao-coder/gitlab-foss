@@ -1,5 +1,72 @@
 ---
 comments: false
+redirect_from:
+  - /update/7.8-ce-to-ee.md
+  - /update/6.2-ce-to-ee.md
+  - /update/8.6-ce-to-ee.md
+  - /update/11.4-ce-to-ee.md
+  - /update/8.0-ce-to-ee.md
+  - /update/7.1-ce-to-ee.md
+  - /update/8.13-ce-to-ee.md
+  - /update/11.0-ce-to-ee.md
+  - /update/9.0-ce-to-ee.md
+  - /update/8.2-ce-to-ee.md
+  - /update/8.16-ce-to-ee.md
+  - /update/8.17-ce-to-ee.md
+  - /update/10.6-ce-to-ee.md
+  - /update/8.4-ce-to-ee.md
+  - /update/9.4-ce-to-ee.md
+  - /update/6.5-ce-to-ee.md
+  - /update/9.5-ce-to-ee.md
+  - /update/9.1-ce-to-ee.md
+  - /update/11.7-ce-to-ee.md
+  - /update/6.8-ce-to-ee.md
+  - /update/8.7-ce-to-ee.md
+  - /update/7.9-ce-to-ee.md
+  - /update/7.7-ce-to-ee.md
+  - /update/11.5-ce-to-ee.md
+  - /update/11.2-ce-to-ee.md
+  - /update/6.3-ce-to-ee.md
+  - /update/8.1-ce-to-ee.md
+  - /update/8.14-ce-to-ee.md
+  - /update/6.1-ce-to-ee.md
+  - /update/10.8-ce-to-ee.md
+  - /update/8.12-ce-to-ee.md
+  - /update/8.11-ce-to-ee.md
+  - /update/10.7-ce-to-ee.md
+  - /update/11.6-ce-to-ee.md
+  - /update/8.9-ce-to-ee.md
+  - /update/9.2-ce-to-ee.md
+  - /update/6.4-ce-to-ee.md
+  - /update/8.3-ce-to-ee.md
+  - /update/7.13-ce-to-ee.md
+  - /update/7.0-ce-to-ee.md
+  - /update/10.5-ce-to-ee.md
+  - /update/9.3-ce-to-ee.md
+  - /update/6.0-ce-to-ee.md
+  - /update/7.6-ce-to-ee.md
+  - /update/7.14-ce-to-ee.md
+  - /update/8.5-ce-to-ee.md
+  - /update/7.4-ce-to-ee.md
+  - /update/10.1-ce-to-ee.md
+  - /update/8.10-ce-to-ee.md
+  - /update/7.12-ce-to-ee.md
+  - /update/10.2-ce-to-ee.md
+  - /update/7.10-ce-to-ee.md
+  - /update/10.0-ce-to-ee.md
+  - /update/11.8-ce-to-ee.md
+  - /update/6.7-ce-to-ee.md
+  - /update/7.11-ce-to-ee.md
+  - /update/10.3-ce-to-ee.md
+  - /update/10.4-ce-to-ee.md
+  - /update/6.9-ce-to-ee.md
+  - /update/11.1-ce-to-ee.md
+  - /update/7.5-ce-to-ee.md
+  - /update/11.3-ce-to-ee.md
+  - /update/8.8-ce-to-ee.md
+  - /update/8.15-ce-to-ee.md
+  - /update/6.6-ce-to-ee.md
+  - /update/7.3-ce-to-ee.md
 ---
 
 # Upgrading from Community Edition to Enterprise Edition from source
