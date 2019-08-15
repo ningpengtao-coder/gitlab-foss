@@ -361,9 +361,9 @@ Prometheus server.
 
 It is possible to display metrics charts within [GitLab Flavored Markdown](../../markdown.md#gitlab-flavored-markdown-gfm).
 
-To display a metric chart, include a link of the form `https://<root_url>/<project>/environments/<environment_id>/metrics`.
+To display the default metric charts (CPU & Memory), include a link of the form `https://<root_url>/<project>/environments/<environment_id>/metrics`.
 
-The following requirements must be met for the metric to unfurl:
+The following requirements must be met for the metrics to unfurl:
 
 - The `<environment_id>` must correspond to a real environment.
 - Prometheus must be monitoring the environment.
@@ -371,9 +371,21 @@ The following requirements must be met for the metric to unfurl:
 - The user must be allowed access to the monitoring dashboard for the environment ([Reporter or higher](../../permissions.md)).
 - The dashboard must have data within the last 8 hours.
 
- If all of the above are true, then the metric will unfurl as seen below:
+If all of the above are true, then the metrics will unfurl as seen below:
 
 ![Embedded Metrics](img/embed_metrics.png)
+
+To embed a specific chart, the following parameters should be included in the url:
+
+- `dashboard` - Filepath for the dashboard. Optional. Defaults to the system dashboard.
+- `group` - The title of the group in which the chart is located. Required.
+- `title` - Chart title. Required.
+- `y_label` - Y-Axis label of the chart. Required.
+
+For example, the following url would unfurl only the CPU chart from the system dashboard:
+```
+https://<root_url>/<project>/environments/<environment_id>/metrics?dashboard=config%20prometheus%2Fcommon_metrics.yml&group=System%20metrics%20(Kubernetes)&title=Core%20Usage%20(Total)&y_label=Cores%20per%20Pod
+```
 
 ## Troubleshooting
 
