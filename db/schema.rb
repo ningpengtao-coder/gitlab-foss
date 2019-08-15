@@ -883,6 +883,7 @@ ActiveRecord::Schema.define(version: 2019_08_06_071559) do
     t.string "domain"
     t.boolean "managed", default: true, null: false
     t.boolean "namespace_per_environment", default: false, null: false
+    t.boolean "cloud_run", default: false, null: false
     t.index ["enabled"], name: "index_clusters_on_enabled"
     t.index ["user_id"], name: "index_clusters_on_user_id"
   end
