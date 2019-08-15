@@ -363,13 +363,16 @@ to this group.
 
 Some domains cannot be restricted. These are the most popular public email domains, such as:
 
-- `*@gmail.com`
-- `*@yahoo.com`
-- `*@hotmail.com`
-- `*@aol.com`
-- `*@msn.com`
-- `*@hotmail.co.uk`
-- `*@hotmail.fr`
+- `gmail.com`
+- `yahoo.com`
+- `hotmail.com`
+- `aol.com`
+- `msn.com`
+- `hotmail.co.uk`
+- `hotmail.fr`
+- `live.com`
+- `outlook.com`
+- `icloud.com`
 
 To enable this feature:
 
