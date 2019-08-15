@@ -1,14 +1,15 @@
 import Vue from 'vue';
-import store from '~/ide/stores';
+import { createStore } from '~/ide/stores';
 import commitActions from '~/ide/components/commit_sidebar/actions.vue';
 import consts from '~/ide/stores/modules/commit/constants';
 import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { resetStore } from 'spec/ide/helpers';
 import { projectData, branches } from 'spec/ide/mock_data';
 
+const ACTION_UPDATE_COMMIT_ACTION = 'commit/updateCommitAction';
+
 describe('IDE commit sidebar actions', () => {
+  let store;
   let vm;
-  let updateCommitActionSpy;
 
   const createComponent = ({ hasMR = false, currentBranchId = 'master' } = {}) => {
     const Component = Vue.extend(commitActions);
@@ -35,10 +36,14 @@ describe('IDE commit sidebar actions', () => {
     return vm;
   };
 
+  beforeEach(() => {
+    store = createStore();
+    spyOn(store, 'dispatch');
+  });
+
   afterEach(() => {
     vm.$destroy();
-
-    resetStore(vm.$store);
+    vm = null;
   });
 
   it('renders 2 groups', () => {
@@ -75,10 +80,27 @@ describe('IDE commit sidebar actions', () => {
 
   describe('updateSelectedCommitAction', () => {
     it('does not return anything if currentBranch does not exist', () => {
-      updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
-      vm.updateSelectedCommitAction();
+      createComponent({ currentBranchId: null });
 
-      expect(updateCommitActionSpy).not.toHaveBeenCalled();
+      expect(vm.$store.dispatch).not.toHaveBeenCalled();
+    });
+
+    it('calls again after staged changes', done => {
+      createComponent({ currentBranchId: null });
+
+      vm.$store.state.currentBranchId = 'master';
+      vm.$store.state.changedFiles.push({});
+      vm.$store.state.stagedFiles.push({});
+
+      vm.$nextTick()
+        .then(() => {
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            jasmine.anything(),
+          );
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     describe('default branch', () => {
@@ -86,11 +108,12 @@ describe('IDE commit sidebar actions', () => {
         createComponent({
           currentBranchId: 'master',
         });
-        updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-        vm.updateSelectedCommitAction();
-
-        expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_NEW_BRANCH);
+        expect(vm.$store.dispatch).toHaveBeenCalledTimes(1);
+        expect(vm.$store.dispatch).toHaveBeenCalledWith(
+          ACTION_UPDATE_COMMIT_ACTION,
+          consts.COMMIT_TO_NEW_BRANCH,
+        );
       });
     });
 
@@ -101,11 +124,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: true,
             currentBranchId: 'protected/access',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_CURRENT_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_CURRENT_BRANCH,
+          );
         });
 
         it('dispatches correct action when MR does not exists', () => {
@@ -113,11 +136,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: false,
             currentBranchId: 'protected/access',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_CURRENT_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_CURRENT_BRANCH,
+          );
         });
       });
 
@@ -127,11 +150,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: true,
             currentBranchId: 'protected/no-access',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_NEW_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_NEW_BRANCH,
+          );
         });
 
         it('dispatches correct action when MR does not exists', () => {
@@ -139,11 +162,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: false,
             currentBranchId: 'protected/no-access',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_NEW_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_NEW_BRANCH,
+          );
         });
       });
     });
@@ -155,11 +178,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: true,
             currentBranchId: 'regular',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_CURRENT_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_CURRENT_BRANCH,
+          );
         });
 
         it('dispatches correct action when MR does not exists', () => {
@@ -167,11 +190,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: false,
             currentBranchId: 'regular',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_CURRENT_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_CURRENT_BRANCH,
+          );
         });
       });
 
@@ -181,11 +204,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: true,
             currentBranchId: 'regular/no-access',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_NEW_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_NEW_BRANCH,
+          );
         });
 
         it('dispatches correct action when MR does not exists', () => {
@@ -193,11 +216,11 @@ describe('IDE commit sidebar actions', () => {
             hasMR: false,
             currentBranchId: 'regular/no-access',
           });
-          updateCommitActionSpy = spyOn(vm, 'updateCommitAction');
 
-          vm.updateSelectedCommitAction();
-
-          expect(updateCommitActionSpy).toHaveBeenCalledWith(consts.COMMIT_TO_NEW_BRANCH);
+          expect(vm.$store.dispatch).toHaveBeenCalledWith(
+            ACTION_UPDATE_COMMIT_ACTION,
+            consts.COMMIT_TO_NEW_BRANCH,
+          );
         });
       });
     });
