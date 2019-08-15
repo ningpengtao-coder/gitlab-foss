@@ -13,7 +13,9 @@ describe Gitlab::Prometheus::Queries::KnativeInvocationQuery do
 
   context 'verify queries' do
     before do
-      allow(PrometheusMetric).to receive(:find_by_identifier).and_return(create(:prometheus_metric, query: prometheus_istio_query('test-name', 'test-ns')))
+      allow_any_instance_of(PrometheusMetricsFinder)
+        .to receive(:execute)
+        .and_return(create(:prometheus_metric, query: prometheus_istio_query('test-name', 'test-ns')))
       allow(client).to receive(:query_range)
     end
 
