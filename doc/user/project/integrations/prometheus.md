@@ -375,7 +375,7 @@ If all of the above are true, then the metrics will unfurl as seen below:
 
 ![Embedded Metrics](img/embed_metrics.png)
 
-To embed a specific chart, the following parameters should be included in the url:
+To embed a specific chart, the following parameters should be included in the URL:
 
 - `dashboard` - Filepath for the dashboard. Optional. Defaults to the system dashboard.
 - `group` - The title of the group in which the chart is located. Required.
