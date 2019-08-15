@@ -2,6 +2,7 @@
 
 require 'google/apis/compute_v1'
 require 'google/apis/container_v1'
+require 'google/apis/container_v1beta1'
 require 'google/apis/cloudbilling_v1'
 require 'google/apis/cloudresourcemanager_v1'
 
@@ -53,30 +54,40 @@ module GoogleApi
         service.get_zone_cluster(project_id, zone, cluster_id, options: user_agent_header)
       end
 
-      def projects_zones_clusters_create(project_id, zone, cluster_name, cluster_size, machine_type:, legacy_abac:)
-        service = Google::Apis::ContainerV1::ContainerService.new
+      def projects_zones_clusters_create(project_id, zone, cluster_name, cluster_size, machine_type:, legacy_abac:, enable_addons: [])
+        service = Google::Apis::ContainerV1beta1::ContainerService.new
         service.authorization = access_token
 
-        request_body = Google::Apis::ContainerV1::CreateClusterRequest.new(
-          {
-            "cluster": {
-              "name": cluster_name,
-              "initial_node_count": cluster_size,
-              "node_config": {
-                "machine_type": machine_type
-              },
-              "master_auth": {
-                "username": CLUSTER_MASTER_AUTH_USERNAME,
-                "client_certificate_config": {
-                  issue_client_certificate: true
-                }
-              },
-              "legacy_abac": {
-                "enabled": legacy_abac
+        cluster_options = {
+          cluster: {
+            name: cluster_name,
+            initial_node_count: cluster_size,
+            node_config: {
+              machine_type: machine_type
+            },
+            master_auth: {
+              username: CLUSTER_MASTER_AUTH_USERNAME,
+              client_certificate_config: {
+                issue_client_certificate: true
               }
+            },
+            legacy_abac: {
+              enabled: legacy_abac
             }
           }
-        )
+        }
+
+        enable_addons.each do |addon|
+          cluster_options[:cluster].tap do |cluster|
+            (cluster[:addons_config] ||= {}).tap do |addons_config|
+              (addons_config[addon] ||= {}).tap do |addon_config|
+                addon_config[:disabled] = false
+              end
+            end
+          end
+        end
+
+        request_body = Google::Apis::ContainerV1beta1::CreateClusterRequest.new(cluster_options)
 
         service.create_cluster(project_id, zone, request_body, options: user_agent_header)
       end

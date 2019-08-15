@@ -22,13 +22,20 @@ module Clusters
       private
 
       def get_operation_id
+        enable_addons = []
+
+        if provider.cluster.cloud_run
+          enable_addons.concat([:http_load_balancing, :istio_config, :cloud_run_config])
+        end
+
         operation = provider.api_client.projects_zones_clusters_create(
           provider.gcp_project_id,
           provider.zone,
           provider.cluster.name,
           provider.num_nodes,
           machine_type: provider.machine_type,
-          legacy_abac: provider.legacy_abac
+          legacy_abac: provider.legacy_abac,
+          enable_addons: enable_addons
         )
 
         unless operation.status == 'PENDING' || operation.status == 'RUNNING'
