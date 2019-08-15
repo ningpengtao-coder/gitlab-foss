@@ -382,7 +382,8 @@ To embed a specific chart, the following parameters should be included in the ur
 - `title` - Chart title. Required.
 - `y_label` - Y-Axis label of the chart. Required.
 
-For example, the following url would unfurl only the CPU chart from the system dashboard:
+For example, the following URL would unfurl only the CPU chart from the system dashboard:
+
 ```
 https://<root_url>/<project>/environments/<environment_id>/metrics?dashboard=config%20prometheus%2Fcommon_metrics.yml&group=System%20metrics%20(Kubernetes)&title=Core%20Usage%20(Total)&y_label=Cores%20per%20Pod
 ```
