@@ -79,17 +79,21 @@ describe Projects::TransferService do
       let(:project) { create(:project, group: group2) }
       let(:group_milestone) { create(:milestone, group: group2) }
       let(:project_milestone) { create(:milestone, project: project) }
-      let!(:issue) { create(:issue, project: project, milestone: group_milestone)}
-      let!(:merge_request) { create(:merge_request, source_project: project, milestone: project_milestone)}
+      let!(:issue1) { create(:issue, project: project, milestone: group_milestone)}
+      let!(:issue2) { create(:issue, project: project, milestone: project_milestone)}
+      let!(:merge_request1) { create(:merge_request, source_project: project, source_branch: 'branch-1', milestone: group_milestone)}
+      let!(:merge_request2) { create(:merge_request, source_project: project, source_branch: 'branch-2', milestone: project_milestone)}
 
       before do
         group2.add_owner(user)
       end
 
-      it 'removes invalid milestones' do
+      it 'removes issuables invalid group milestones' do
         expect { transfer_project(project, user, group) }
-          .to change { issue.reload.milestone }.from(group_milestone).to(nil)
-          .and not_change { merge_request.reload.milestone }
+          .to change { issue1.reload.milestone }.from(group_milestone).to(nil)
+          .and change { merge_request1.reload.milestone }.from(group_milestone).to(nil)
+          .and not_change { issue2.reload.milestone }
+          .and not_change { merge_request2.reload.milestone }
       end
     end
   end

@@ -70,7 +70,7 @@ module Projects
         move_project_folders(project)
 
         # Remove missing group milestones
-        filter_issuable_milestones(project)
+        remove_issuables_group_milestones(project)
 
         # Move missing group labels to project
         Labels::TransferService.new(current_user, @old_group, project).execute
@@ -167,20 +167,29 @@ module Projects
       )
     end
 
-    def filter_issuable_milestones(project)
-      %i[issues merge_requests].each do |type|
-        remove_group_milestones(project.try(type))
-      end
+    # rubocop: disable CodeReuse/ActiveRecord
+    def update_merge_requests_milestone(project)
+      MergeRequest.joins(:milestone)
+        .where(
+          merge_requests: { target_project_id: project.id },
+          milestones: { group_id: @old_group&.id }
+        ).update_all(milestone_id: nil)
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
-    def remove_group_milestones(issuables)
-      return unless issuables.any?
+    # rubocop: disable CodeReuse/ActiveRecord
+    def update_issues_milestone(project)
+      Issue.joins(:milestone)
+        .where(
+          issues: { project_id: project.id },
+          milestones: { group_id: @old_group&.id }
+        ).update_all(milestone_id: nil)
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
 
-      issuables.each do |issuable|
-        next unless issuable.milestone&.group_milestone?
-
-        issuable.update(milestone: nil)
-      end
+    def remove_issuables_group_milestones(project)
+      update_merge_requests_milestone(project)
+      update_issues_milestone(project)
     end
   end
 end
