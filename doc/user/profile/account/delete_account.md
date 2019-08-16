@@ -59,7 +59,6 @@ A deactivated user:
 Personal projects, group and user history of the deactivated user will be left intact.
 
 NOTE: **Note:**
-
 A deactivated user does not consume a [seat](../../../subscriptions/index.md#managing-subscriptions).
 
 To do this:
