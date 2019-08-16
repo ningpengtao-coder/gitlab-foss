@@ -612,12 +612,12 @@ class Project < ApplicationRecord
         .to_sql
 
       select_from = project_pages_metadata_not_migrated
-        .select("projects.id, COALESCE((#{successful_pages_deploy}), FALSE), NOW(), NOW()")
+        .select("projects.id, COALESCE((#{successful_pages_deploy}), FALSE)")
         .to_sql
 
       connection_pool.with_connection do |connection|
         connection.execute <<~INSERT_SQL
-          INSERT INTO project_pages_metadata (project_id, deployed, created_at, updated_at)
+          INSERT INTO project_pages_metadata (project_id, deployed)
           #{select_from}
         INSERT_SQL
       end
@@ -2375,10 +2375,10 @@ class Project < ApplicationRecord
     flag = flag ? 'TRUE' : 'FALSE'
 
     upsert = <<~SQL
-      INSERT INTO project_pages_metadata (project_id, deployed, created_at, updated_at)
-      VALUES (#{id}, #{flag}, NOW(), NOW())
+      INSERT INTO project_pages_metadata (project_id, deployed)
+      VALUES (#{id}, #{flag})
       ON CONFLICT (project_id) DO UPDATE
-      SET deployed = EXCLUDED.deployed, updated_at = NOW()
+      SET deployed = EXCLUDED.deployed
     SQL
 
     self.class.connection_pool.with_connection do |connection|
