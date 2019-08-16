@@ -538,4 +538,32 @@ describe PagesDomain do
       )
     end
   end
+
+  describe '#pages_virtual_domain' do
+    let(:project) { create(:project) }
+    let(:pages_domain) { create(:pages_domain, project: project) }
+
+    context 'when there are no pages deployed for the project' do
+      it 'returns nil when there are no pages deployed for the project' do
+        expect(pages_domain.pages_virtual_domain).to be_nil
+      end
+    end
+
+    context 'when there are pages deployed for the project' do
+      before do
+        generic_commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
+        generic_commit_status.update!(project: project)
+      end
+
+      it 'returns the virual domain' do
+        expect(pages_domain.pages_virtual_domain).to be_an_instance_of(Pages::VirtualDomain)
+      end
+
+      it 'migrates project pages metadata' do
+        expect { pages_domain.pages_virtual_domain }.to change {
+          project.project_pages_metadatum&.deployed
+        }.from(nil).to(true)
+      end
+    end
+  end
 end

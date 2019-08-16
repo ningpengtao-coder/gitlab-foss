@@ -27,7 +27,10 @@ module API
             host = Namespace.find_by_pages_host(params[:host]) || PagesDomain.find_by_domain(params[:host])
             not_found! unless host
 
-            present host.pages_virtual_domain, with: Entities::Internal::Pages::VirtualDomain
+            virtual_domain = host.pages_virtual_domain
+            no_content! unless virtual_domain
+
+            present virtual_domain, with: Entities::Internal::Pages::VirtualDomain
           end
         end
       end

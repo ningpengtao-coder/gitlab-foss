@@ -43,6 +43,11 @@ describe API::Internal::Pages do
           super(host, headers)
         end
 
+        def deploy_pages(project)
+          generic_commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
+          generic_commit_status.update!(project: project)
+        end
+
         context 'not existing host' do
           it 'responds with 404 Not Found' do
             query_host('pages.gitlab.io')
@@ -52,32 +57,39 @@ describe API::Internal::Pages do
         end
 
         context 'custom domain' do
-          it 'responds with the correct domain configuration' do
-            namespace = create(:namespace, name: 'gitlab-org')
-            project = create(:project, namespace: namespace, name: 'gitlab-ce')
-            pages_domain = create(:pages_domain, domain: 'pages.gitlab.io', project: project)
+          let(:namespace) { create(:namespace, name: 'gitlab-org') }
+          let(:project) { create(:project, namespace: namespace, name: 'gitlab-ce') }
+          let!(:pages_domain) { create(:pages_domain, domain: 'pages.gitlab.io', project: project) }
 
-            query_host('pages.gitlab.io')
+          context 'when there are no pages deployed for the related project' do
+            it 'responds with 204 No Content' do
+              query_host('pages.gitlab.io')
 
-            expect(response).to have_gitlab_http_status(200)
-            expect(response).to match_response_schema('internal/pages/virtual_domain')
+              expect(response).to have_gitlab_http_status(204)
+            end
+          end
 
-            expect(json_response['certificate']).to eq(pages_domain.certificate)
-            expect(json_response['key']).to eq(pages_domain.key)
+          context 'when there are  pages deployed for the related project' do
+            it 'responds with the correct domain configuration' do
+              deploy_pages(project)
 
-            lookup_path = json_response['lookup_paths'][0]
-            expect(lookup_path['prefix']).to eq('/')
-            expect(lookup_path['source']['path']).to eq('gitlab-org/gitlab-ce/public/')
+              query_host('pages.gitlab.io')
+
+              expect(response).to have_gitlab_http_status(200)
+              expect(response).to match_response_schema('internal/pages/virtual_domain')
+
+              expect(json_response['certificate']).to eq(pages_domain.certificate)
+              expect(json_response['key']).to eq(pages_domain.key)
+
+              lookup_path = json_response['lookup_paths'][0]
+              expect(lookup_path['prefix']).to eq('/')
+              expect(lookup_path['source']['path']).to eq('gitlab-org/gitlab-ce/public/')
+            end
           end
         end
 
         context 'namespaced domain' do
           let(:group) { create(:group, name: 'mygroup') }
-
-          def deploy_pages(project)
-            generic_commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
-            generic_commit_status.update!(project: project)
-          end
 
           before do
             allow(Settings.pages).to receive(:host).and_return('gitlab-pages.io')

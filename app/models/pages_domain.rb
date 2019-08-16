@@ -186,10 +186,20 @@ class PagesDomain < ApplicationRecord
   end
 
   def pages_virtual_domain
+    return unless pages_deployed?
+
     Pages::VirtualDomain.new([project], domain: self)
   end
 
   private
+
+  def pages_deployed?
+    return true if project.project_pages_metadatum&.deployed?
+
+    Project.where(id: project_id).migrate_project_pages_metadata
+
+    project.reset.project_pages_metadatum&.deployed?
+  end
 
   def set_verification_code
     return if self.verification_code.present?
