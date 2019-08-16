@@ -10,6 +10,7 @@ license_management:
     entrypoint: [""]
   variables:
     SETUP_CMD: $LICENSE_MANAGEMENT_SETUP_CMD
+    LM_PYTHON_VERSION: 3 # Default to Python 3 starting with GitLab 12.2. https://about.gitlab.com/2019/07/19/python-3-defailt-for-license-compliance/
   allow_failure: true
   script:
     - /run.sh analyze .
