@@ -424,11 +424,11 @@ class Project < ApplicationRecord
   end
 
   scope :project_pages_metadata_not_migrated, -> do
-    where('NOT EXISTS (SELECT 1 FROM project_pages_metadata WHERE projects.id=project_pages_metadata.project_id)')
+    where('NOT EXISTS (?)', ProjectPagesMetadatum.project_scoped.select(1))
   end
 
   scope :with_pages_deployed, -> do
-    where('EXISTS (SELECT 1 FROM project_pages_metadata WHERE projects.id=project_pages_metadata.project_id AND deployed = TRUE)')
+    where('EXISTS (?)', ProjectPagesMetadatum.project_scoped.where(deployed: true).select(1))
   end
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
