@@ -26,7 +26,6 @@ export const updateCommitAction = ({ commit }, commitAction) => {
 
 export const toggleShouldCreateMR = ({ commit }) => {
   commit(types.TOGGLE_SHOULD_CREATE_MR);
-  commit(types.INTERACT_WITH_NEW_MR);
 };
 
 export const updateBranchName = ({ commit }, branchName) => {

@@ -541,10 +541,7 @@ describe('IDE commit module actions', () => {
         actions.toggleShouldCreateMR,
         {},
         store.state,
-        [
-          { type: mutationTypes.TOGGLE_SHOULD_CREATE_MR },
-          { type: mutationTypes.INTERACT_WITH_NEW_MR },
-        ],
+        [{ type: mutationTypes.TOGGLE_SHOULD_CREATE_MR }],
         [],
         done,
       );
