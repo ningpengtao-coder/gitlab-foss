@@ -86,7 +86,6 @@ To do this:
 1. Under the **Account** tab, click **Activate user**.
 
 TIP: **Tip:**
-
 A deactivated user can also activate their account by themselves by simply logging back via the UI.
 
 ## Associated Records
