@@ -72,7 +72,7 @@ and they will assist you with any issues you are having.
   This is the principle of Kubernetes, read [Twelve-factor app](https://12factor.net/)
   for details.
 
-## Gitlab-specific kubernetes information
+## GitLab-specific kubernetes information
 
 - Minimal config that can be used to test a Kubernetes helm chart can be found
   [here](https://gitlab.com/charts/gitlab/issues/620).
