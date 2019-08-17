@@ -5,12 +5,12 @@
 Two different storage layouts can be used
 to store the repositories on disk and their characteristics.
 
-GitLab can be configured to use one or multiple repository shard locations
-that can be:
+GitLab can be configured to use one or multiple repository storage paths/shard
+locations that can be:
 
 - Mounted to the local disk
 - Exposed as an NFS shared volume
-- Acessed via [gitaly] on its own machine.
+- Acessed via [Gitaly] on its own machine
 
 In GitLab, this is configured in `/etc/gitlab/gitlab.rb` by the `git_data_dirs({})`
 configuration hash. The storage layouts discussed here will apply to any shard
@@ -34,8 +34,8 @@ easy for Administrators to find where the repository is stored.
 On the other hand this has some drawbacks:
 
 Storage location will concentrate huge amount of top-level namespaces. The
-impact can be reduced by the introduction of [multiple storage
-paths][storage-paths].
+impact can be reduced by the introduction of multiple storage
+paths.
 
 Because backups are a snapshot of the same URL mapping, if you try to recover a
 very old backup, you need to verify whether any project has taken the place of
@@ -199,5 +199,4 @@ They are also S3 compatible since **10.0** (GitLab Premium), and available in Gi
 [ce-2821]: https://gitlab.com/gitlab-com/infrastructure/issues/2821
 [ce-28283]: https://gitlab.com/gitlab-org/gitlab-ce/issues/28283
 [rake/migrate-to-hashed]: raketasks/storage.md#migrate-existing-projects-to-hashed-storage
-[storage-paths]: repository_storage_types.md
-[gitaly]: gitaly/index.md
+[Gitaly]: gitaly/index.md
