@@ -2,21 +2,41 @@ FROM ruby:2.6-stretch
 LABEL maintainer "Grzegorz Bizon <grzegorz@gitlab.com>"
 ENV DEBIAN_FRONTEND noninteractive
 
-##
-# Add support for stretch-backports
-#
-RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
+ARG GIT_VERSION
+ENV GIT_VERSION 2.23.0
 
 ##
 # Update APT sources and install some dependencies
 #
 RUN sed -i "s/httpredir.debian.org/ftp.us.debian.org/" /etc/apt/sources.list
-RUN apt-get update && apt-get install -y wget unzip xvfb
+RUN apt-get update && apt-get install -y wget unzip xvfb gettext
 
 ##
-# Install some packages from backports
+# Install latest git
 #
-RUN apt-get -y -t stretch-backports install git git-lfs
+RUN mkdir /tmp/git-${GIT_VERSION} && \
+  cd /tmp/git-${GIT_VERSION} && \
+  wget -q https://github.com/git/git/archive/v${GIT_VERSION}.zip && \
+  unzip -q v${GIT_VERSION}.zip && \
+  cd git-${GIT_VERSION} && \
+  make prefix=/usr/local all install && \
+  cd /tmp && \
+  rm -rf /tmp/git-${GIT_VERSION}
+
+ARG GIT_LFS_VERSION
+ENV GIT_LFS_VERSION 2.8.0
+
+##
+# Install latest git-lfs
+#
+RUN mkdir /tmp/git-lfs-${GIT_LFS_VERSION} && \
+  cd /tmp/git-lfs-${GIT_LFS_VERSION} && \
+  wget -q https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-arm64-v${GIT_LFS_VERSION}.tar.gz && \
+  tar xzf git-lfs-linux-arm64-v${GIT_LFS_VERSION}.tar.gz && \
+  mv git-lfs /usr/local/bin && \
+  chmod 755 /usr/local/bin/git-lfs && \
+  cd /tmp && \
+  rm -rf /tmp/git-lfs-${GIT_LFS_VERSION}
 
 ##
 # Install Docker
