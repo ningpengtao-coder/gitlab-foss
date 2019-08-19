@@ -57,6 +57,44 @@ describe('IDE commit module actions', () => {
         .then(done)
         .catch(done.fail);
     });
+
+    it('sets shouldCreateMR to true if "Create new MR" option is visible', done => {
+      store.state.shouldHideNewMrOption = false;
+
+      testAction(
+        actions.updateCommitAction,
+        {},
+        store.state,
+        [
+          {
+            type: mutationTypes.UPDATE_COMMIT_ACTION,
+            payload: { commitAction: jasmine.anything() },
+          },
+          { type: mutationTypes.TOGGLE_SHOULD_CREATE_MR, payload: true },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it('sets shouldCreateMR to false if "Create new MR" option is hidden', done => {
+      store.state.shouldHideNewMrOption = true;
+
+      testAction(
+        actions.updateCommitAction,
+        {},
+        store.state,
+        [
+          {
+            type: mutationTypes.UPDATE_COMMIT_ACTION,
+            payload: { commitAction: jasmine.anything() },
+          },
+          { type: mutationTypes.TOGGLE_SHOULD_CREATE_MR, payload: false },
+        ],
+        [],
+        done,
+      );
+    });
   });
 
   describe('updateBranchName', () => {

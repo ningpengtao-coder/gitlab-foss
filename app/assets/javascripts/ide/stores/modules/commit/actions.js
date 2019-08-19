@@ -18,10 +18,11 @@ export const discardDraft = ({ commit }) => {
   commit(types.UPDATE_COMMIT_MESSAGE, '');
 };
 
-export const updateCommitAction = ({ commit }, commitAction) => {
+export const updateCommitAction = ({ commit, getters }, commitAction) => {
   commit(types.UPDATE_COMMIT_ACTION, {
     commitAction,
   });
+  commit(types.TOGGLE_SHOULD_CREATE_MR, !getters.shouldHideNewMrOption);
 };
 
 export const toggleShouldCreateMR = ({ commit }) => {
