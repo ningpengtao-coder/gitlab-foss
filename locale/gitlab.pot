@@ -11649,6 +11649,9 @@ msgstr ""
 msgid "This pipeline makes use of a predefined CI/CD configuration enabled by <b>Auto DevOps.</b>"
 msgstr ""
 
+msgid "This pipeline was skipped because this project is not compatible with Auto DevOps. To run Auto DevOps pipelines, ensure your project has a <a href=\"https://docs.gitlab.com/ee/topics/autodevops/#auto-build-using-a-dockerfile\">Dockerfile</a> or <a href=\"https://docs.gitlab.com/ee/topics/autodevops/#auto-build-using-heroku-buildpacks\">matching buildpack</a>."
+msgstr ""
+
 msgid "This project"
 msgstr ""
 

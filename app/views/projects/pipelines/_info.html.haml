@@ -5,6 +5,12 @@
     %pre.commit-description<
       = preserve(markdown(commit.description, pipeline: :single_line))
 
+- if @pipeline.auto_devops_unsupported?
+  .flash-container
+    .flash-warning
+      .flash-text
+        = s_('This pipeline was skipped because this project is not compatible with Auto DevOps. To run Auto DevOps pipelines, ensure your project has a <a href="https://docs.gitlab.com/ee/topics/autodevops/#auto-build-using-a-dockerfile">Dockerfile</a> or <a href="https://docs.gitlab.com/ee/topics/autodevops/#auto-build-using-heroku-buildpacks">matching buildpack</a>.').html_safe
+
 .info-well
   .well-segment.pipeline-info
     .icon-container

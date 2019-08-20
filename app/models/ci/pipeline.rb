@@ -810,6 +810,10 @@ module Ci
       errors ? errors.full_messages.to_sentence : ""
     end
 
+    def auto_devops_unsupported?
+      !auto_devops_buildable.nil? && !auto_devops_buildable?
+    end
+
     private
 
     def ci_yaml_from_repo

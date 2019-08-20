@@ -3082,4 +3082,38 @@ describe Ci::Pipeline, :mailer do
       end
     end
   end
+
+  describe '#auto_devops_unsupported?' do
+    subject { pipeline }
+
+    context 'buildable' do
+      before do
+        pipeline.auto_devops_buildable = true
+      end
+
+      it 'is supported' do
+        is_expected.not_to be_auto_devops_unsupported
+      end
+    end
+
+    context 'not buildable' do
+      before do
+        pipeline.auto_devops_buildable = false
+      end
+
+      it 'is unsupported' do
+        is_expected.to be_auto_devops_unsupported
+      end
+    end
+
+    context 'unknown buildable' do
+      before do
+        pipeline.auto_devops_buildable = nil
+      end
+
+      it 'is supported' do
+        is_expected.not_to be_auto_devops_unsupported
+      end
+    end
+  end
 end
