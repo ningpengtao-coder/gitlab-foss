@@ -39,7 +39,7 @@ describe Gitlab::SidekiqMiddleware::MemoryKiller do
       expect(subject).to receive(:sleep).with(15 * 60).ordered
       expect(Process).to receive(:kill).with('SIGTSTP', pid).ordered
 
-      expect(subject).to receive(:sleep).with(30).ordered
+      expect(subject).to receive(:sleep).with(360).ordered
       expect(Process).to receive(:kill).with('SIGTERM', pid).ordered
 
       expect(subject).to receive(:sleep).with(10).ordered

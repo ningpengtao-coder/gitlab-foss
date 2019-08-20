@@ -1,0 +1,5 @@
+---
+title: Adjust Sidekiq Memory killer shutdown wait time
+merge_request: 32008
+author:
+type: changed

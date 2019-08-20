@@ -8,7 +8,7 @@ module Gitlab
       # Give Sidekiq 15 minutes of grace time after exceeding the RSS limit
       GRACE_TIME = (ENV['SIDEKIQ_MEMORY_KILLER_GRACE_TIME'] || 15 * 60).to_s.to_i
       # Wait 30 seconds for running jobs to finish during graceful shutdown
-      SHUTDOWN_WAIT = (ENV['SIDEKIQ_MEMORY_KILLER_SHUTDOWN_WAIT'] || 30).to_s.to_i
+      SHUTDOWN_WAIT = (ENV['SIDEKIQ_MEMORY_KILLER_SHUTDOWN_WAIT'] || 360).to_s.to_i
 
       # Create a mutex used to ensure there will be only one thread waiting to
       # shut Sidekiq down
