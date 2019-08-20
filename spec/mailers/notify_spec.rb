@@ -3,7 +3,6 @@ require 'email_spec'
 
 describe Notify do
   include EmailSpec::Helpers
-  include EmailSpec::Matchers
   include EmailHelpers
   include RepoHelpers
 
@@ -55,7 +54,7 @@ describe Notify do
         aggregate_failures do
           expect(sender.display_name).to eq(current_user.name)
           expect(sender.address).to eq(gitlab_sender)
-          expect(subject).to deliver_to(recipient.notification_email)
+          expect(subject).to deliver_mail_to(recipient.notification_email)
         end
       end
     end
@@ -76,12 +75,12 @@ describe Notify do
         it 'has the correct subject and body' do
           aggregate_failures do
             is_expected.to have_referable_subject(issue)
-            is_expected.to have_body_text(project_issue_path(project, issue))
+            is_expected.to have_mail_body(project_issue_path(project, issue))
           end
         end
 
         it 'contains the description' do
-          is_expected.to have_body_text issue.description
+          is_expected.to have_mail_body(issue.description)
         end
 
         it 'does not add a reason header' do
