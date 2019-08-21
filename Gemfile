@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+# TEST: just a random gem to check metric reports
+gem 'crack' # in Gemfile
+
 gem 'rails', '5.2.3'
 
 gem 'bootsnap', '~> 1.4'
