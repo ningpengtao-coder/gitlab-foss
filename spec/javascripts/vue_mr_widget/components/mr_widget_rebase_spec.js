@@ -97,10 +97,6 @@ describe('Merge request widget rebase component', () => {
 
       const elem = vm.$el.querySelector('.rebase-state-find-class-convention span');
 
-      expect(elem.textContent.trim()).toContain(
-        `Fast-forward merge is not possible. Rebase the source branch onto ${targetBranch} to allow this merge request to be merged.`,
-      );
-
       expect(elem.innerHTML).toContain(
         `Fast-forward merge is not possible. Rebase the source branch onto <span class="label-branch">${targetBranch}</span> to allow this merge request to be merged.`,
       );
