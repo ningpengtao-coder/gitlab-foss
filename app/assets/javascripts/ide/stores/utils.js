@@ -213,3 +213,5 @@ export const mergeTrees = (fromTree, toTree) => {
 
   return toTree;
 };
+
+export const escapeFileUrl = fileUrl => encodeURIComponent(fileUrl).replace(/%2F/g, '/');

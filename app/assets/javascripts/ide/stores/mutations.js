@@ -5,7 +5,7 @@ import mergeRequestMutation from './mutations/merge_request';
 import fileMutations from './mutations/file';
 import treeMutations from './mutations/tree';
 import branchMutations from './mutations/branch';
-import { sortTree } from './utils';
+import { sortTree, escapeFileUrl } from './utils';
 
 export default {
   [types.SET_INITIAL_DATA](state, data) {
@@ -234,7 +234,7 @@ export default {
       name: entryPath ? oldEntry.name : name,
       tempFile: true,
       prevPath: oldEntry.tempFile ? null : oldEntry.path,
-      url: oldEntry.url.replace(new RegExp(`${oldEntry.path}/?$`), newPath),
+      url: oldEntry.url.replace(new RegExp(`${escapeFileUrl(oldEntry.path)}/?$`), newPath),
       tree: [],
       raw: '',
       opened: false,
