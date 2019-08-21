@@ -612,13 +612,14 @@ class Project < ApplicationRecord
         .to_sql
 
       select_from = project_pages_metadata_not_migrated
-        .select("projects.id, COALESCE((#{successful_pages_deploy}), FALSE)")
+        .select("projects.id", "COALESCE((#{successful_pages_deploy}), FALSE)")
         .to_sql
 
       connection_pool.with_connection do |connection|
         connection.execute <<~INSERT_SQL
           INSERT INTO project_pages_metadata (project_id, deployed)
           #{select_from}
+          ON CONFLICT (project_id) DO NOTHING
         INSERT_SQL
       end
     end
