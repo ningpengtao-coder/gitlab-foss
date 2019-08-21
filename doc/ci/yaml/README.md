@@ -518,9 +518,23 @@ Four keys are available:
 - `changes`
 - `kubernetes`
 
-If you use multiple keys under `only` or `except`, they act as an AND. The logic is:
+If you use multiple keys under `only` or `except`, the keys will be evaluated as a
+single conjoined expression. That is:
+
+- `only:` means "include this job if all of the conditions match".
+- `except:` means "exclude this job if any of the conditions match".
+
+The the individual keys are logically joined by an AND:
 
 > (any of refs) AND (any of variables) AND (any of changes) AND (if kubernetes is active)
+
+`except` is implemented as a negation of this complete expression:
+
+> NOT((any of refs) AND (any of variables) AND (any of changes) AND (if kubernetes is active))
+
+This, more intuitively, means the keys join by an OR. A functionally equivalent expression:
+
+> (any of refs) OR (any of variables) OR (any of changes) OR (if kubernetes is active)
 
 #### `only:refs`/`except:refs`
 
@@ -1721,7 +1735,7 @@ This example creates three paths of execution:
 1. If `needs:` is set to point to a job that is not instantiated
    because of `only/except` rules or otherwise does not exist, the
    job will fail.
-1. Note that one day one of the launch, we are temporarily limiting the 
+1. Note that on day one of the launch, we are temporarily limiting the 
    maximum number of jobs that a single job can need in the `needs:` array. Track
    our [infrastructure issue](https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues/7541)
    for details on the current limit.
@@ -1734,8 +1748,8 @@ This example creates three paths of execution:
    in the first stage (see [gitlab-ce#65504](https://gitlab.com/gitlab-org/gitlab-ce/issues/65504)).
 1. If `needs:` refers to a job that is marked as `parallel:`.
    the current job will depend on all parallel jobs created.
-1. `needs:` is similar to `dependencies:` in that needs to use jobs from
-   prior stages, this means that it is impossible to create circular
+1. `needs:` is similar to `dependencies:` in that it needs to use jobs from
+   prior stages, meaning it is impossible to create circular
    dependencies or depend on jobs in the current stage (see [gitlab-ce#65505](https://gitlab.com/gitlab-org/gitlab-ce/issues/65505)).
 1. Related to the above, stages must be explicitly defined for all jobs
    that have the keyword `needs:` or are referred to by one.

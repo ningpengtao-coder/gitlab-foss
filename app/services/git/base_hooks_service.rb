@@ -8,8 +8,6 @@ module Git
     PROCESS_COMMIT_LIMIT = 100
 
     def execute
-      project.repository.after_create if project.empty_repo?
-
       create_events
       create_pipelines
       execute_project_hooks
@@ -58,7 +56,7 @@ module Git
       return unless params.fetch(:create_pipelines, true)
 
       Ci::CreatePipelineService
-        .new(project, current_user, base_params)
+        .new(project, current_user, pipeline_params)
         .execute(:push, pipeline_options)
     end
 
@@ -70,31 +68,36 @@ module Git
     end
 
     def enqueue_invalidate_cache
-      ProjectCacheWorker.perform_async(
-        project.id,
-        invalidated_file_types,
-        [:commit_count, :repository_size]
-      )
+      file_types = invalidated_file_types
+
+      return unless file_types.present?
+
+      ProjectCacheWorker.perform_async(project.id, file_types, [], false)
     end
 
-    def base_params
+    def pipeline_params
       {
-        oldrev: params[:oldrev],
-        newrev: params[:newrev],
+        before: params[:oldrev],
+        after: params[:newrev],
         ref: params[:ref],
-        push_options: params[:push_options] || {}
+        push_options: params[:push_options] || {},
+        checkout_sha: Gitlab::DataBuilder::Push.checkout_sha(
+          project.repository, params[:newrev], params[:ref])
       }
     end
 
     def push_data_params(commits:, with_changed_files: true)
-      base_params.merge(
+      {
+        oldrev: params[:oldrev],
+        newrev: params[:newrev],
+        ref: params[:ref],
         project: project,
         user: current_user,
         commits: commits,
         message: event_message,
         commits_count: commits_count,
         with_changed_files: with_changed_files
-      )
+      }
     end
 
     def event_push_data

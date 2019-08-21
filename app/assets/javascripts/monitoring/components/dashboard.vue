@@ -10,13 +10,13 @@ import {
 } from '@gitlab/ui';
 import _ from 'underscore';
 import { mapActions, mapState } from 'vuex';
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
-import { getParameterValues } from '~/lib/utils/url_utility';
+import { getParameterValues, mergeUrlParams } from '~/lib/utils/url_utility';
 import invalidUrl from '~/lib/utils/invalid_url';
+import PanelType from 'ee_else_ce/monitoring/components/panel_type.vue';
 import MonitorAreaChart from './charts/area.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
-import PanelType from './panel_type.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import { sidebarAnimationDuration, timeWindows } from '../constants';
@@ -141,6 +141,16 @@ export default {
       required: false,
       default: false,
     },
+    alertsEndpoint: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    prometheusAlertsAvailable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -168,8 +178,11 @@ export default {
       'multipleDashboardsEnabled',
       'additionalPanelTypesEnabled',
     ]),
+    firstDashboard() {
+      return this.allDashboards[0] || {};
+    },
     selectedDashboardText() {
-      return this.currentDashboard || (this.allDashboards[0] && this.allDashboards[0].display_name);
+      return this.currentDashboard || this.firstDashboard.display_name;
     },
     addingMetricsAvailable() {
       return IS_EE && this.canAddMetrics && !this.showEmptyState;
@@ -258,7 +271,15 @@ export default {
     getGraphAlertValues(queries) {
       return Object.values(this.getGraphAlerts(queries));
     },
+    showToast() {
+      this.$toast.show(__('Link copied to clipboard'));
+    },
     // TODO: END
+    generateLink(group, title, yLabel) {
+      const dashboard = this.currentDashboard || this.firstDashboard.path;
+      const params = _.pick({ dashboard, group, title, y_label: yLabel }, value => value != null);
+      return mergeUrlParams(params, window.location.href);
+    },
     hideAddMetricModal() {
       this.$refs.addMetricModal.hide();
     },
@@ -435,8 +456,11 @@ export default {
           <panel-type
             v-for="(graphData, graphIndex) in groupData.metrics"
             :key="`panel-type-${graphIndex}`"
+            :clipboard-text="generateLink(groupData.group, graphData.title, graphData.y_label)"
             :graph-data="graphData"
             :dashboard-width="elWidth"
+            :alerts-endpoint="alertsEndpoint"
+            :prometheus-alerts-available="prometheusAlertsAvailable"
             :index="`${index}-${graphIndex}`"
           />
         </template>
@@ -473,6 +497,15 @@ export default {
                 </template>
                 <gl-dropdown-item :href="downloadCsv(graphData)" download="chart_metrics.csv">
                   {{ __('Download CSV') }}
+                </gl-dropdown-item>
+                <gl-dropdown-item
+                  class="js-chart-link"
+                  :data-clipboard-text="
+                    generateLink(groupData.group, graphData.title, graphData.y_label)
+                  "
+                  @click="showToast"
+                >
+                  {{ __('Generate link to chart') }}
                 </gl-dropdown-item>
                 <gl-dropdown-item
                   v-if="alertWidgetAvailable"

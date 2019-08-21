@@ -275,7 +275,6 @@ gem 'font-awesome-rails', '~> 4.7'
 gem 'gemojione', '~> 3.3'
 gem 'gon', '~> 6.2'
 gem 'request_store', '~> 1.3'
-gem 'virtus', '~> 1.0.1'
 gem 'base32', '~> 0.3.0'
 
 # Sentry integration
@@ -374,8 +373,6 @@ group :development, :test do
 
   gem 'license_finder', '~> 5.4', require: false
   gem 'knapsack', '~> 1.17'
-
-  gem 'activerecord_sane_schema_dumper', '1.0'
 
   gem 'stackprof', '~> 0.2.10', require: false
 

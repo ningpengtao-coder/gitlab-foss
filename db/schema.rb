@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_12_070645) do
+ActiveRecord::Schema.define(version: 2019_08_15_093949) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -24,6 +24,14 @@ ActiveRecord::Schema.define(version: 2019_08_12_070645) do
     t.datetime "updated_at"
     t.text "message_html"
     t.integer "cached_markdown_version"
+  end
+
+  create_table "allowed_email_domains", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "group_id", null: false
+    t.string "domain", limit: 255, null: false
+    t.index ["group_id"], name: "index_allowed_email_domains_on_group_id"
   end
 
   create_table "analytics_cycle_analytics_group_stages", force: :cascade do |t|
@@ -2279,7 +2287,7 @@ ActiveRecord::Schema.define(version: 2019_08_12_070645) do
     t.index ["line_code"], name: "index_notes_on_line_code"
     t.index ["note"], name: "index_notes_on_note_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["noteable_id", "noteable_type"], name: "index_notes_on_noteable_id_and_noteable_type"
-    t.index ["noteable_type"], name: "index_notes_on_noteable_type"
+    t.index ["project_id", "id"], name: "index_notes_on_project_id_and_id_and_system_false", where: "(NOT system)"
     t.index ["project_id", "noteable_type"], name: "index_notes_on_project_id_and_noteable_type"
     t.index ["review_id"], name: "index_notes_on_review_id"
   end
@@ -3670,6 +3678,7 @@ ActiveRecord::Schema.define(version: 2019_08_12_070645) do
     t.index ["type"], name: "index_web_hooks_on_type"
   end
 
+  add_foreign_key "allowed_email_domains", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "analytics_cycle_analytics_group_stages", "labels", column: "end_event_label_id", on_delete: :cascade
   add_foreign_key "analytics_cycle_analytics_group_stages", "labels", column: "start_event_label_id", on_delete: :cascade
   add_foreign_key "analytics_cycle_analytics_group_stages", "namespaces", column: "group_id", on_delete: :cascade

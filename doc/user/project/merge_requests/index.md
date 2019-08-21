@@ -488,15 +488,6 @@ without having to check the entire job log.
 
 [Read more about JUnit test reports](../../../ci/junit_test_reports.md).
 
-## Live preview with Review Apps
-
-If you configured [Review Apps](https://about.gitlab.com/features/review-apps/) for your project,
-you can preview the changes submitted to a feature-branch through a merge request
-in a per-branch basis. No need to checkout the branch, install and preview locally;
-all your changes will be available to preview by anyone with the Review Apps link.
-
-[Read more about Review Apps.](../../../ci/review_apps/index.md)
-
 ## Merge request diff file navigation
 
 When reviewing changes in the **Changes** tab the diff can be navigated using
@@ -505,6 +496,15 @@ changes, you can quickly jump to any changed file using the file tree or file
 list.
 
 ![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
+
+### Incrementally expand merge request diffs
+
+By default, the diff shows only the parts of a file which are changed.
+To view more unchanged lines above or below a change click on the
+**Expand up** or **Expand down** icons. You can also click on **Show all lines**
+to expand the entire file.
+
+![Incrementally expand merge request diffs](img/incrementally_expand_merge_request_diffs_v12_2.png)
 
 ## Ignore whitespace changes in Merge Request diff view
 

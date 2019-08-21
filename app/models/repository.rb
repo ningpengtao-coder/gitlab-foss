@@ -239,13 +239,13 @@ class Repository
   def branch_exists?(branch_name)
     return false unless raw_repository
 
-    branch_names.include?(branch_name)
+    branch_names_include?(branch_name)
   end
 
   def tag_exists?(tag_name)
     return false unless raw_repository
 
-    tag_names.include?(tag_name)
+    tag_names_include?(tag_name)
   end
 
   def ref_exists?(ref)
@@ -389,11 +389,15 @@ class Repository
     expire_statistics_caches
   end
 
-  # Runs code after a repository has been created.
-  def after_create
+  def expire_status_cache
     expire_exists_cache
     expire_root_ref_cache
     expire_emptiness_caches
+  end
+
+  # Runs code after a repository has been created.
+  def after_create
+    expire_status_cache
 
     repository_event(:create_repository)
   end
@@ -561,10 +565,10 @@ class Repository
   end
 
   delegate :branch_names, to: :raw_repository
-  cache_method :branch_names, fallback: []
+  cache_method_as_redis_set :branch_names, fallback: []
 
   delegate :tag_names, to: :raw_repository
-  cache_method :tag_names, fallback: []
+  cache_method_as_redis_set :tag_names, fallback: []
 
   delegate :branch_count, :tag_count, :has_visible_content?, to: :raw_repository
   cache_method :branch_count, fallback: 0
@@ -1124,6 +1128,10 @@ class Repository
 
   def cache
     @cache ||= Gitlab::RepositoryCache.new(self)
+  end
+
+  def redis_set_cache
+    @redis_set_cache ||= Gitlab::RepositorySetCache.new(self)
   end
 
   def request_store_cache

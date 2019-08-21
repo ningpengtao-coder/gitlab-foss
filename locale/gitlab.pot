@@ -469,6 +469,9 @@ msgstr ""
 msgid "A Jekyll site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
 msgstr ""
 
+msgid "A Let's Encrypt SSL certificate can not be obtained until your domain is verified."
+msgstr ""
+
 msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
 msgstr ""
 
@@ -3943,6 +3946,9 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
+msgid "Disable email notifications"
+msgstr ""
+
 msgid "Disable for this project"
 msgstr ""
 
@@ -4139,6 +4145,9 @@ msgid "Edit merge request"
 msgstr ""
 
 msgid "Edit public deploy key"
+msgstr ""
+
+msgid "Edit stage"
 msgstr ""
 
 msgid "Edit wiki page"
@@ -5181,6 +5190,9 @@ msgstr ""
 msgid "Generate a default set of labels"
 msgstr ""
 
+msgid "Generate link to chart"
+msgstr ""
+
 msgid "Generate new export"
 msgstr ""
 
@@ -5236,6 +5248,9 @@ msgid "GitLab Shared Runners execute code of different projects on the same Runn
 msgstr ""
 
 msgid "GitLab User"
+msgstr ""
+
+msgid "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later."
 msgstr ""
 
 msgid "GitLab member or Email address"
@@ -5478,6 +5493,9 @@ msgstr ""
 msgid "GroupSettings|Default to Auto DevOps pipeline for all projects within this group"
 msgstr ""
 
+msgid "GroupSettings|Disable email notifications"
+msgstr ""
+
 msgid "GroupSettings|Learn more about badges."
 msgstr ""
 
@@ -5503,6 +5521,9 @@ msgid "GroupSettings|This setting is applied on %{ancestor_group}. You can overr
 msgstr ""
 
 msgid "GroupSettings|This setting will be applied to all subgroups unless overridden by a group owner. Groups that already have access to the project will continue to have access unless removed manually."
+msgstr ""
+
+msgid "GroupSettings|This setting will override user notification preferences for all members of the group, subgroups, and projects."
 msgstr ""
 
 msgid "GroupSettings|cannot be disabled when the parent group \"Share with group lock\" is enabled, except by the owner of the parent group"
@@ -5644,6 +5665,9 @@ msgid "Hide payload"
 msgstr ""
 
 msgid "Hide shared projects"
+msgstr ""
+
+msgid "Hide stage"
 msgstr ""
 
 msgid "Hide value"
@@ -6533,6 +6557,9 @@ msgid "Limited to showing %d event at most"
 msgid_plural "Limited to showing %d events at most"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Link copied to clipboard"
+msgstr ""
 
 msgid "Linked emails (%{email_count})"
 msgstr ""
@@ -7586,6 +7613,9 @@ msgstr ""
 msgid "Notifications"
 msgstr ""
 
+msgid "Notifications have been disabled by the project or group owner"
+msgstr ""
+
 msgid "Notifications off"
 msgstr ""
 
@@ -7990,6 +8020,9 @@ msgstr ""
 msgid "Pipelines for last year"
 msgstr ""
 
+msgid "Pipelines for merge requests are configured. A detached pipeline runs in the context of the merge request, and not against the merged result. Learn more on the documentation for Pipelines for Merged Results."
+msgstr ""
+
 msgid "Pipelines settings for '%{project_name}' were successfully updated."
 msgstr ""
 
@@ -8144,6 +8177,9 @@ msgid "Please accept the Terms of Service before continuing."
 msgstr ""
 
 msgid "Please add a list to your board first"
+msgstr ""
+
+msgid "Please check your email (%{email}) to verify that you own this address. Didn't receive it? %{resend_link}. Wrong email address? %{update_link}."
 msgstr ""
 
 msgid "Please choose a group URL with no special characters."
@@ -9336,6 +9372,9 @@ msgstr ""
 msgid "Remove spent time"
 msgstr ""
 
+msgid "Remove stage"
+msgstr ""
+
 msgid "Remove time estimate"
 msgstr ""
 
@@ -9526,6 +9565,9 @@ msgid "Resend confirmation email"
 msgstr ""
 
 msgid "Resend invite"
+msgstr ""
+
+msgid "Resend it"
 msgstr ""
 
 msgid "Reset health check access token"
@@ -11121,9 +11163,6 @@ msgstr ""
 msgid "The character highlighter helps you keep the subject line to %{titleLength} characters and wrap the body at %{bodyLength} so they are readable in git."
 msgstr ""
 
-msgid "The code of a detached pipeline is tested against the source branch instead of merged results"
-msgstr ""
-
 msgid "The coding stage shows the time from the first commit to creating the merge request. The data will automatically be added here once you create your first merge request."
 msgstr ""
 
@@ -11647,6 +11686,9 @@ msgid "This runner will only run on pipelines triggered on protected branches"
 msgstr ""
 
 msgid "This setting can be overridden in each project."
+msgstr ""
+
+msgid "This setting will override user notification preferences for all project members."
 msgstr ""
 
 msgid "This setting will update the hostname that is used to generate private commit emails. %{learn_more}"
@@ -12304,6 +12346,9 @@ msgstr ""
 msgid "Update failed"
 msgstr ""
 
+msgid "Update it"
+msgstr ""
+
 msgid "Update now"
 msgstr ""
 
@@ -12843,13 +12888,7 @@ msgstr ""
 msgid "WikiMarkdownTip|To link to a (new) page, simply type %{link_example}"
 msgstr ""
 
-msgid "WikiNewPagePlaceholder|how-to-setup"
-msgstr ""
-
 msgid "WikiNewPageTip|Tip: You can specify the full path for the new file. We will automatically create any missing directories."
-msgstr ""
-
-msgid "WikiNewPageTitle|New Wiki Page"
 msgstr ""
 
 msgid "WikiPageConfirmDelete|Are you sure you want to delete this page?"
@@ -12867,19 +12906,16 @@ msgstr ""
 msgid "WikiPageConflictMessage|the page"
 msgstr ""
 
-msgid "WikiPageCreate|Create %{page_title}"
+msgid "WikiPageCreate|Create %{pageTitle}"
 msgstr ""
 
-msgid "WikiPageEdit|Update %{page_title}"
-msgstr ""
-
-msgid "WikiPage|Page slug"
+msgid "WikiPageEdit|Update %{pageTitle}"
 msgstr ""
 
 msgid "WikiPage|Write your content or drag files here…"
 msgstr ""
 
-msgid "Wiki|Create Page"
+msgid "Wiki|Create New Page"
 msgstr ""
 
 msgid "Wiki|Create page"
@@ -12898,6 +12934,9 @@ msgid "Wiki|New page"
 msgstr ""
 
 msgid "Wiki|Page history"
+msgstr ""
+
+msgid "Wiki|Page title"
 msgstr ""
 
 msgid "Wiki|Page version"
@@ -13356,16 +13395,13 @@ msgstr ""
 msgid "Your request for access has been queued for review."
 msgstr ""
 
-msgid "a Zoom call was added to this issue"
-msgstr ""
-
-msgid "a Zoom call was removed from this issue"
-msgstr ""
-
 msgid "a deleted user"
 msgstr ""
 
 msgid "added %{created_at_timeago}"
+msgstr ""
+
+msgid "added a Zoom call to this issue"
 msgstr ""
 
 msgid "ago"
@@ -13902,6 +13938,9 @@ msgid "remove"
 msgstr ""
 
 msgid "remove due date"
+msgstr ""
+
+msgid "removed a Zoom call from this issue"
 msgstr ""
 
 msgid "rendered diff"

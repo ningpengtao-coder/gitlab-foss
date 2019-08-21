@@ -100,9 +100,7 @@ module Gitlab
           .merge(services_usage)
           .merge(approximate_counts)
         }.tap do |data|
-          if Feature.enabled?(:group_overview_security_dashboard)
-            data[:counts][:user_preferences] = user_preferences_usage
-          end
+          data[:counts][:user_preferences] = user_preferences_usage
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -190,8 +188,8 @@ module Gitlab
         {} # augmented in EE
       end
 
-      def count(relation, fallback: -1)
-        relation.count
+      def count(relation, count_by: nil, fallback: -1)
+        count_by ? relation.count(count_by) : relation.count
       rescue ActiveRecord::StatementInvalid
         fallback
       end
