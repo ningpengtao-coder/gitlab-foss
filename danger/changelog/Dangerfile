@@ -1,19 +1,21 @@
+# frozen_string_literal: true
 # rubocop:disable Style/SignalException
 
 require 'yaml'
 
-NO_CHANGELOG_LABELS = %w[backstage ci-build Documentation meta QA test].freeze
-SEE_DOC = "See [the documentation](https://docs.gitlab.com/ce/development/changelog.html).".freeze
-CREATE_CHANGELOG_MESSAGE = <<~MSG.freeze
-You can create one with:
+NO_CHANGELOG_LABELS = %w[backstage ci-build meta].freeze
+SEE_DOC = "See [the documentation](https://docs.gitlab.com/ce/development/changelog.html)."
+CREATE_CHANGELOG_MESSAGE = <<~MSG
+If you don't think your merge request [warrants a CHANGELOG entry](https://docs.gitlab.com/ee/development/changelog.html#what-warrants-a-changelog-entry)
+(or if you already added one in another merge request), free to ignore this warning.
+
+Otherwise, you can create one with:
 
 ```
 bin/changelog -m %<mr_iid>s "%<mr_title>s"
 ```
 
-If your merge request doesn't warrant a CHANGELOG entry,
-consider adding any of the %<labels>s labels.
-#{SEE_DOC}
+For your information, the following labels disable the CHANGELOG entry requirement check: %<labels>s.
 MSG
 
 def ee_changelog?(changelog_path)
