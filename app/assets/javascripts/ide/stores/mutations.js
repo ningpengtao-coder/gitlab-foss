@@ -5,7 +5,7 @@ import mergeRequestMutation from './mutations/merge_request';
 import fileMutations from './mutations/file';
 import treeMutations from './mutations/tree';
 import branchMutations from './mutations/branch';
-import { sortTree, escapeFileUrl } from './utils';
+import { sortTree, escapeFileUrl, swapInStateArray } from './utils';
 
 export default {
   [types.SET_INITIAL_DATA](state, data) {
@@ -157,9 +157,14 @@ export default {
       changed: Boolean(changedFile),
       staged: false,
       replaces: false,
-      prevPath: '',
       moved: false,
       lastCommitSha: lastCommit.commit.id,
+      key: file.key.replace('renamed-', ''),
+
+      prevId: undefined,
+      prevPath: undefined,
+      prevName: undefined,
+      prevUrl: undefined,
     });
 
     if (prevPath) {
@@ -222,47 +227,47 @@ export default {
   [types.RENAME_ENTRY](state, { path, name, entryPath = null, parentPath }) {
     const oldEntry = state.entries[entryPath || path];
     const slashedParentPath = parentPath ? `${parentPath}/` : '';
+    const newName = entryPath ? oldEntry.name : name;
     const newPath = entryPath
       ? `${slashedParentPath}${oldEntry.name}`
       : `${slashedParentPath}${name}`;
+    const newUrl = oldEntry.url.replace(
+      new RegExp(`${escapeFileUrl(oldEntry.path)}/?$`),
+      encodeURI(newPath),
+    );
 
     Vue.set(state.entries, newPath, {
       ...oldEntry,
       id: newPath,
-      key: `${newPath}-${oldEntry.type}-${oldEntry.path}`,
       path: newPath,
-      name: entryPath ? oldEntry.name : name,
-      tempFile: true,
-      prevPath: oldEntry.tempFile ? null : oldEntry.path,
-      url: oldEntry.url.replace(new RegExp(`${escapeFileUrl(oldEntry.path)}/?$`), newPath),
-      tree: [],
-      raw: '',
-      opened: false,
-      parentPath,
+      name: newName,
+      url: newUrl,
+      parentPath: parentPath || oldEntry.parentPath,
+
+      key: `renamed-${oldEntry.key}`,
+      prevId: oldEntry.id,
+      prevPath: oldEntry.path,
+      prevName: oldEntry.name,
+      prevUrl: oldEntry.url,
     });
 
-    oldEntry.moved = true;
-    oldEntry.movedPath = newPath;
+    Vue.delete(state.entries, oldEntry.path);
+
+    if (oldEntry.type === 'blob') {
+      if (oldEntry.opened) {
+        swapInStateArray(state, 'openFiles', oldEntry.key, newPath);
+      }
+      swapInStateArray(state, 'changedFiles', oldEntry.key, newPath);
+    }
 
     const parent = parentPath
       ? state.entries[parentPath]
       : state.trees[`${state.currentProjectId}/${state.currentBranchId}`];
-    const newEntry = state.entries[newPath];
 
-    parent.tree = sortTree(parent.tree.concat(newEntry));
+    if (parent) {
+      const tree = parent.tree.filter(entry => entry.key !== oldEntry.key);
 
-    if (newEntry.type === 'blob') {
-      state.changedFiles = state.changedFiles.concat(newEntry);
-    }
-
-    if (oldEntry.tempFile) {
-      const filterMethod = f => f.path !== oldEntry.path;
-
-      state.openFiles = state.openFiles.filter(filterMethod);
-      state.changedFiles = state.changedFiles.filter(filterMethod);
-      parent.tree = parent.tree.filter(filterMethod);
-
-      Vue.delete(state.entries, oldEntry.path);
+      parent.tree = sortTree(tree.concat(state.entries[newPath]));
     }
   },
 

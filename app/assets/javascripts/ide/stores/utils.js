@@ -150,7 +150,7 @@ export const createCommitPayload = ({
     action: commitActionForFile(f),
     file_path: f.moved ? f.movedPath : f.path,
     previous_path: f.prevPath === '' ? undefined : f.prevPath,
-    content: f.prevPath ? null : f.content || undefined,
+    content: f.prevPath && !f.changed ? null : f.content || undefined,
     encoding: f.base64 ? 'base64' : 'text',
     last_commit_id:
       newBranch || f.deleted || f.prevPath || f.replaces ? undefined : f.lastCommitSha,
@@ -215,3 +215,8 @@ export const mergeTrees = (fromTree, toTree) => {
 };
 
 export const escapeFileUrl = fileUrl => encodeURIComponent(fileUrl).replace(/%2F/g, '/');
+
+export const swapInStateArray = (state, arr, key, newPath) =>
+  Object.assign(state, {
+    [arr]: state[arr].filter(f => f.key !== key).concat(state.entries[newPath]),
+  });

@@ -230,20 +230,24 @@ export const renameEntry = (
 
     state.entries[entryPath || path].tree.forEach(f => {
       dispatch('renameEntry', {
-        path,
-        name,
+        path: f.path,
+        name: f.name,
         entryPath: f.path,
         parentPath: newParentPath,
       });
     });
   } else {
     const newPath = parentPath ? `${parentPath}/${name}` : name;
+
     const newEntry = state.entries[newPath];
-    commit(types.TOGGLE_FILE_CHANGED, { file: newEntry, changed: true });
+    if (!newEntry.changed) {
+      commit(types.TOGGLE_FILE_CHANGED, { file: newEntry, changed: true });
+    }
 
     if (entry.opened) {
-      router.push(`/project${newEntry.url}`);
       commit(types.TOGGLE_FILE_OPEN, entry.path);
+      commit(types.TOGGLE_FILE_OPEN, newEntry.path);
+      router.push(`/project${newEntry.url}`);
     }
   }
 

@@ -430,4 +430,48 @@ describe('Multi-file store utils', () => {
       expect(utils.escapeFileUrl('foo/bar/file.md')).toBe('foo/bar/file.md');
     });
   });
+
+  describe('swapInStateArray', () => {
+    let localState;
+
+    beforeEach(() => {
+      localState = [];
+    });
+
+    it('swaps existing entry with a new one', () => {
+      const file1 = {
+        ...file('old'),
+        key: 'foo',
+      };
+      const file2 = file('new');
+      const arr = [file1];
+
+      Object.assign(localState, {
+        dummyArray: arr,
+        entries: {
+          new: file2,
+        },
+      });
+
+      utils.swapInStateArray(localState, 'dummyArray', 'foo', 'new');
+
+      expect(localState.dummyArray.length).toBe(1);
+      expect(localState.dummyArray[0]).toBe(file2);
+    });
+
+    it('adds an item if it does not exist yet in array', () => {
+      const file1 = file('file');
+      Object.assign(localState, {
+        dummyArray: [],
+        entries: {
+          file: file1,
+        },
+      });
+
+      utils.swapInStateArray(localState, 'dummyArray', 'foo', 'file');
+
+      expect(localState.dummyArray.length).toBe(1);
+      expect(localState.dummyArray[0]).toBe(file1);
+    });
+  });
 });

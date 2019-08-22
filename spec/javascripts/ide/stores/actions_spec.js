@@ -13,12 +13,14 @@ import actions, {
   createTempEntry,
 } from '~/ide/stores/actions';
 import axios from '~/lib/utils/axios_utils';
-import store from '~/ide/stores';
+import { createStore } from '~/ide/stores';
 import * as types from '~/ide/stores/mutation_types';
 import router from '~/ide/ide_router';
 import { resetStore, file } from '../helpers';
 import testAction from '../../helpers/vuex_action_helper';
 import MockAdapter from 'axios-mock-adapter';
+
+const store = createStore();
 
 describe('Multi-file store actions', () => {
   beforeEach(() => {
@@ -543,79 +545,169 @@ describe('Multi-file store actions', () => {
   });
 
   describe('renameEntry', () => {
-    it('renames entry', done => {
-      store.state.entries.test = {
-        tree: [],
-      };
+    describe('single entry', () => {
+      let spy;
 
-      testAction(
-        renameEntry,
-        { path: 'test', name: 'new-name', entryPath: null, parentPath: 'parent-path' },
-        store.state,
-        [
-          {
-            type: types.RENAME_ENTRY,
-            payload: { path: 'test', name: 'new-name', entryPath: null, parentPath: 'parent-path' },
+      beforeEach(() => {
+        spy = jasmine.createSpy('new-name');
+        Object.assign(store.state.entries, {
+          test: {
+            ...file('test', 'test', 'blob'),
           },
-          {
-            type: types.TOGGLE_FILE_CHANGED,
-            payload: {
-              file: store.state.entries['parent-path/new-name'],
-              changed: true,
+          'new-name': spy,
+        });
+      });
+
+      afterEach(() => {
+        resetStore(store);
+      });
+
+      it('by default renames an entry and marks it as changed', done => {
+        testAction(
+          renameEntry,
+          { path: 'test', name: 'new-name' },
+          store.state,
+          [
+            {
+              type: types.RENAME_ENTRY,
+              payload: jasmine.objectContaining({
+                path: 'test',
+                name: 'new-name',
+              }),
             },
+            {
+              type: types.TOGGLE_FILE_CHANGED,
+              payload: {
+                file: store.state.entries['new-name'],
+                changed: true,
+              },
+            },
+          ],
+          [{ type: 'triggerFilesChange' }],
+          done,
+        );
+      });
+
+      it('does not mark the file as changed if it is already changed', done => {
+        spy.changed = true;
+        testAction(
+          renameEntry,
+          { path: 'test', name: 'new-name' },
+          store.state,
+          [jasmine.objectContaining({ type: types.RENAME_ENTRY })],
+          [{ type: 'triggerFilesChange' }],
+          done,
+        );
+      });
+
+      it('routes to the renamed file if the original file has been opened', done => {
+        Object.assign(store.state.entries.test, {
+          opened: true,
+          url: '/foo-bar.md',
+        });
+
+        store
+          .dispatch('renameEntry', {
+            path: 'test',
+            name: 'new-name',
+          })
+          .then(() => {
+            expect(router.push.calls.count()).toBe(1);
+            expect(router.push).toHaveBeenCalledWith(`/project/foo-bar.md`);
+          })
+          .catch(() => {
+            done.fail();
+          });
+
+        store.state.entries['new-name'].opened = false;
+
+        store
+          .dispatch('renameEntry', {
+            path: 'new-name',
+            name: 'test',
+          })
+          .then(() => {
+            expect(router.push.calls.count()).toBe(1);
+          })
+          .then(done)
+          .catch(() => {
+            done.fail();
+          });
+      });
+
+      it('renames entries with spaces correctly', done => {
+        spy = jasmine.createSpy('new name');
+        Object.assign(store.state, {
+          entries: {
+            'old entry': {
+              ...file('old entry', 'old entry', 'blob'),
+            },
+            'new name': spy,
           },
-        ],
-        [{ type: 'triggerFilesChange' }],
-        done,
-      );
+        });
+
+        testAction(
+          renameEntry,
+          { path: 'old entry', name: 'new name' },
+          store.state,
+          [
+            {
+              type: types.RENAME_ENTRY,
+              payload: jasmine.objectContaining({
+                path: 'old entry',
+                name: 'new name',
+              }),
+            },
+            {
+              type: types.TOGGLE_FILE_CHANGED,
+              payload: {
+                file: store.state.entries['new name'],
+                changed: true,
+              },
+            },
+          ],
+          [{ type: 'triggerFilesChange' }],
+          done,
+        );
+      });
     });
 
-    it('renames all entries in tree', done => {
-      store.state.entries.test = {
-        type: 'tree',
-        tree: [
-          {
-            path: 'tree-1',
-          },
-          {
-            path: 'tree-2',
-          },
-        ],
-      };
+    describe('folder', () => {
+      let folder;
+      let file1;
+      let file2;
 
-      testAction(
-        renameEntry,
-        { path: 'test', name: 'new-name', parentPath: 'parent-path' },
-        store.state,
-        [
-          {
-            type: types.RENAME_ENTRY,
-            payload: { path: 'test', name: 'new-name', entryPath: null, parentPath: 'parent-path' },
-          },
-        ],
-        [
-          {
-            type: 'renameEntry',
-            payload: {
-              path: 'test',
-              name: 'new-name',
-              entryPath: 'tree-1',
-              parentPath: 'parent-path/new-name',
-            },
-          },
-          {
-            type: 'renameEntry',
-            payload: {
-              path: 'test',
-              name: 'new-name',
-              entryPath: 'tree-2',
-              parentPath: 'parent-path/new-name',
-            },
-          },
-          { type: 'triggerFilesChange' },
-        ],
-        done,
-      );
+      beforeEach(() => {
+        folder = file('folder', 'folder', 'tree');
+        file1 = file('file-1', 'file-1', 'blob', folder);
+        file2 = file('file-2', 'file-2', 'blob', folder);
+
+        folder.tree = [file1, file2];
+
+        Object.assign(store.state.entries, {
+          [folder.path]: folder,
+          [file1.path]: file1,
+          [file2.path]: file2,
+        });
+      });
+
+      it('updates entries in a folder correctly, when folder is renamed', done => {
+        store
+          .dispatch('renameEntry', {
+            path: 'folder',
+            name: 'new-folder',
+          })
+          .then(() => {
+            const keys = Object.keys(store.state.entries);
+
+            expect(keys.length).toBe(3);
+            expect(keys.indexOf('new-folder')).toBe(0);
+            expect(keys.indexOf('new-folder/file-1')).toBe(1);
+            expect(keys.indexOf('new-folder/file-2')).toBe(2);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 
