@@ -33,6 +33,27 @@ describe('Multi-file editor commit sidebar list item', () => {
     expect(vm.$el.querySelector('.multi-file-commit-list-path').textContent).toContain(f.path);
   });
 
+  it('correctly renders renamed entries', done => {
+    Vue.set(vm.file, 'prevName', 'Old name');
+
+    vm.$nextTick(() => {
+      const text = vm.$el.querySelector('.multi-file-commit-list-path').textContent;
+
+      expect(text).toEqual(jasmine.stringMatching('Old name'));
+      expect(text).toEqual(jasmine.stringMatching(f.name));
+      done();
+    });
+  });
+
+  it('correctly renders entry, the name of which did not change after rename (as within a folder)', done => {
+    Vue.set(vm.file, 'prevName', f.name);
+
+    vm.$nextTick(() => {
+      expect(vm.$el.querySelector('.multi-file-commit-list-path').textContent.trim()).toEqual(f.name);
+      done();
+    });
+  });
+
   it('opens a closed file in the editor when clicking the file path', done => {
     spyOn(vm, 'openPendingTab').and.callThrough();
     spyOn(router, 'push');
