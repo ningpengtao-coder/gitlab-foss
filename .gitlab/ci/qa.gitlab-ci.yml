@@ -16,7 +16,9 @@
     - branches@gitlab-org/gitlab-ee
 
 package-and-qa:
-  extends: .package-and-qa-base
+  extends:
+    - .package-and-qa-base
+    - .no-docs
   when: manual
   except:
     - /(^qa[\/-].*|.*-qa$)/
