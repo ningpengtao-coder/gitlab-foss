@@ -27,7 +27,7 @@ describe('create new MR checkbox', () => {
     vm.$store.state.currentBranchId = currentBranchId;
     vm.$store.state.currentProjectId = 'abcproject';
 
-    const proj = Object.assign({}, { ...projectData });
+    const proj = JSON.parse(JSON.stringify(projectData));
     proj.branches[currentBranchId] = branches.find(branch => branch.name === currentBranchId);
 
     Vue.set(vm.$store.state.projects, 'abcproject', proj);
