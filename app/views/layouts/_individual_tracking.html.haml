@@ -1,0 +1,8 @@
+- return unless Gitlab.com?
+- return unless Feature.enabled?(:individual_tracking_consent, default_enabled: false)
+- return unless current_user&.tracking_consent?
+
+:javascript
+  if (window.gon && window.gon.current_user_id) {
+    window.snowplow('setUserId', window.gon.current_user_id);
+  }

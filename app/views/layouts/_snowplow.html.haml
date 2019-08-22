@@ -21,6 +21,8 @@
     window.snowplow('enableActivityTracking', 30, 30);
     window.snowplow('trackPageView');
 
+= render 'layouts/individual_tracking'
+
 - return unless Feature.enabled?(:additional_snowplow_tracking, @group)
 
 = javascript_tag nonce: true do

@@ -87,7 +87,11 @@ class ProfilesController < Profiles::ApplicationController
   end
 
   def user_params
-    @user_params ||= params.require(:user).permit(
+    @user_params ||= params.require(:user).permit(user_params_attributes)
+  end
+
+  def user_params_attributes
+    [
       :avatar,
       :bio,
       :email,
@@ -108,6 +112,8 @@ class ProfilesController < Profiles::ApplicationController
       :include_private_contributions,
       :timezone,
       status: [:emoji, :message]
-    )
+    ]
   end
 end
+
+ProfilesController.prepend_if_ee('EE::ProfilesController')
