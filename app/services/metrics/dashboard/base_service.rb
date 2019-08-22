@@ -32,7 +32,7 @@ module Metrics
       # dashboards at all.
       def allowed?
         if params[:cluster]
-          Ability.allowed?(current_user, :read_cluster, params[:cluster])
+          true # Authorization handled at controller level
         else
           Ability.allowed?(current_user, :read_environment, project)
         end
