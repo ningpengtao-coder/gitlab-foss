@@ -24,6 +24,12 @@ describe Gitlab::Metrics::Dashboard::ServiceSelector do
       end
     end
 
+    context 'when cluster is provided' do
+      let(:arguments) { { cluster: "some cluster" } }
+
+      it { is_expected.to be Metrics::Dashboard::ClusterDashboardService }
+    end
+
     context 'when the embedded flag is provided' do
       let(:arguments) { { embedded: true } }
 

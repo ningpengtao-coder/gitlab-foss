@@ -32,7 +32,7 @@ module Gitlab
         def process(insert_project_metrics:)
           @dashboard.deep_symbolize_keys.tap do |dashboard|
             sequence(insert_project_metrics).each do |stage|
-              stage.new(@project, @environment, dashboard).transform!
+              stage.new(@project, dashboard, environment: @environment).transform!
             end
           end
         end
