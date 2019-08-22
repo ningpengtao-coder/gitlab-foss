@@ -18,10 +18,8 @@
 package-and-qa:
   extends:
     - .package-and-qa-base
-    - .no-docs
+    - .no-docs-and-no-qa
   when: manual
-  except:
-    - /(^qa[\/-].*|.*-qa$)/
 
 package-and-qa-always:
   extends: .package-and-qa-base
