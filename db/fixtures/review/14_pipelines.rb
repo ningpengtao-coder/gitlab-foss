@@ -1,4 +1,4 @@
-# require './spec/support/sidekiq'
+# frozen_string_literal: true
 
 class Gitlab::Seeder::Pipelines
   STAGES = %w[build test deploy notify]
