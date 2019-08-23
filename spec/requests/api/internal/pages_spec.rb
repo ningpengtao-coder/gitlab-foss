@@ -46,6 +46,7 @@ describe API::Internal::Pages do
         def deploy_pages(project)
           generic_commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
           generic_commit_status.update!(project: project)
+          project.mark_pages_as_deployed
         end
 
         context 'not existing host' do

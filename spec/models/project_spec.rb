@@ -131,6 +131,13 @@ describe Project do
         expect(project.ci_cd_settings).to be_an_instance_of(ProjectCiCdSetting)
         expect(project.ci_cd_settings).to be_persisted
       end
+
+      it 'automatically creates a Pages metadata row' do
+        project = create(:project)
+
+        expect(project.project_pages_metadatum).to be_an_instance_of(ProjectPagesMetadatum)
+        expect(project.project_pages_metadatum).to be_persisted
+      end
     end
 
     context 'updating cd_cd_settings' do
@@ -3488,8 +3495,8 @@ describe Project do
   end
 
   describe '#remove_pages' do
-    let(:project) { create(:project) }
-    let(:project_pages_metadatum) { create(:project_pages_metadatum, project: project, deployed: true) }
+    let(:project) { create(:project).tap { |project| project.mark_pages_as_deployed } }
+    let(:project_pages_metadatum) { project.project_pages_metadatum }
     let(:namespace) { project.namespace }
     let(:pages_path) { project.pages_path }
 
@@ -4979,19 +4986,21 @@ describe Project do
 
   describe '.migrate_project_pages_metadata' do
     it 'marks projects with successful pages deployment' do
-      not_migrated_with_pages = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy').project
-      not_migrated_no_pages = create(:project)
-      migrated = create(:project_pages_metadatum, deployed: true).project
-      other_project = create(:project)
+      commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
+      not_migrated_with_pages = commit_status.project.tap { |project| project.project_pages_metadatum.destroy! }
+
+      not_migrated_no_pages = create(:project).tap { |project| project.project_pages_metadatum.destroy! }
+      migrated = create(:project).tap { |project| project.mark_pages_as_deployed }
+      other_project = create(:project).tap { |project| project.project_pages_metadatum.destroy! }
 
       projects = described_class.where(id: [not_migrated_with_pages, not_migrated_no_pages, migrated])
 
       expect { projects.migrate_project_pages_metadata }.not_to raise_error
 
-      expect(not_migrated_with_pages.project_pages_metadatum.deployed).to eq(true)
-      expect(not_migrated_no_pages.project_pages_metadatum.deployed).to eq(false)
-      expect(migrated.project_pages_metadatum.deployed).to eq(true)
-      expect(other_project.project_pages_metadatum).to be_nil
+      expect(not_migrated_with_pages.reload.project_pages_metadatum.deployed).to eq(true)
+      expect(not_migrated_no_pages.reload.project_pages_metadatum.deployed).to eq(false)
+      expect(migrated.reload.project_pages_metadatum.deployed).to eq(true)
+      expect(other_project.reload.project_pages_metadatum).to be_nil
     end
   end
 
@@ -5001,17 +5010,19 @@ describe Project do
       'mark_pages_as_not_deployed' => false
     }.each do |method, flag|
       describe "##{method}" do
+        let(:project) { create(:project) }
+
         it "creates new record and sets deployed to #{flag} if none exists yet" do
-          project = create(:project)
+          project.project_pages_metadatum.destroy!
 
           project.send(method)
 
-          expect(project.project_pages_metadatum.deployed).to eq(flag)
+          expect(project.reload.project_pages_metadatum.deployed).to eq(flag)
         end
 
         it "updates the existing record and sets deployed to #{flag}" do
-          project_pages_metadatum = create(:project_pages_metadatum, deployed: !flag)
-          project = project_pages_metadatum.project
+          project_pages_metadatum = project.project_pages_metadatum
+          project_pages_metadatum.update!(deployed: !flag)
 
           expect { project.send(method) }.to change {
             project_pages_metadatum.reload.deployed

@@ -553,6 +553,7 @@ describe PagesDomain do
       before do
         generic_commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
         generic_commit_status.update!(project: project)
+        project.project_pages_metadatum.destroy!
       end
 
       it 'returns the virual domain' do
@@ -561,7 +562,7 @@ describe PagesDomain do
 
       it 'migrates project pages metadata' do
         expect { pages_domain.pages_virtual_domain }.to change {
-          project.project_pages_metadatum&.deployed
+          project.reload.project_pages_metadatum&.deployed
         }.from(nil).to(true)
       end
     end

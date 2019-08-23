@@ -103,6 +103,10 @@ class Project < ApplicationRecord
     unless: :ci_cd_settings,
     if: proc { ProjectCiCdSetting.available? }
 
+  after_create :create_project_pages_metadatum,
+    unless: :project_pages_metadatum,
+    if: proc { ProjectPagesMetadatum.available? }
+
   after_create :set_timestamps_for_create
   after_update :update_forks_visibility_level
 

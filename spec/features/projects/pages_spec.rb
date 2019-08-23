@@ -311,7 +311,7 @@ shared_examples 'pages settings editing' do
         result = Projects::UpdatePagesService.new(project, ci_build).execute
         expect(result[:status]).to eq(:success)
         expect(project).to be_pages_deployed
-        expect(project.project_pages_metadatum.deployed).to eq(true)
+        expect(project.project_pages_metadatum.reload.deployed).to eq(true)
       end
 
       it 'removes the pages' do
