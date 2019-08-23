@@ -67,7 +67,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
 
     shared_examples_for 'errors with message' do |expected_message|
       it 'raises a DashboardLayoutError' do
-        error_class = Gitlab::Metrics::Dashboard::Stages::BaseStage::DashboardProcessingError
+        error_class = Gitlab::Metrics::Dashboard::Errors::DashboardProcessingError
 
         expect { dashboard }.to raise_error(error_class, expected_message)
       end
