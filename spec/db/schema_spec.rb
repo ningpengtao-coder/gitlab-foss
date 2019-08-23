@@ -24,6 +24,7 @@ describe 'Database schema' do
     ci_pipelines: %w[user_id],
     ci_runner_projects: %w[runner_id],
     ci_trigger_requests: %w[commit_id],
+    cluster_providers_aws: %w[aws_account_id access_key_id],
     cluster_providers_gcp: %w[gcp_project_id operation_id],
     deploy_keys_projects: %w[deploy_key_id],
     deployments: %w[deployable_id environment_id user_id],

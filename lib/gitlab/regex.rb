@@ -115,5 +115,14 @@ module Gitlab
     def jira_transition_id_regex
       @jira_transition_id_regex ||= /\d+/
     end
+
+    # https://docs.aws.amazon.com/general/latest/gr/acct-identifiers.html
+    def aws_account_id_regex
+      /\A\d+\z/
+    end
+
+    def aws_account_id_regex_message
+      "can contain only digits, optionally separated by '-'"
+    end
   end
 end

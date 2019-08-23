@@ -34,6 +34,7 @@ module Clusters
 
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
+    has_one :provider_aws, class_name: 'Clusters::Providers::Aws', autosave: true
 
     has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', inverse_of: :cluster, autosave: true
 
@@ -89,14 +90,20 @@ module Clusters
 
     enum provider_type: {
       user: 0,
-      gcp: 1
+      gcp: 1,
+      aws: 2
     }
 
     scope :enabled, -> { where(enabled: true) }
     scope :disabled, -> { where(enabled: false) }
-    scope :user_provided, -> { where(provider_type: ::Clusters::Cluster.provider_types[:user]) }
-    scope :gcp_provided, -> { where(provider_type: ::Clusters::Cluster.provider_types[:gcp]) }
-    scope :gcp_installed, -> { gcp_provided.includes(:provider_gcp).where(cluster_providers_gcp: { status: ::Clusters::Providers::Gcp.state_machines[:status].states[:created].value }) }
+
+    scope :user_provided, -> { where(provider_type: provider_types[:user]) }
+    scope :gcp_provided, -> { where(provider_type: provider_types[:gcp]) }
+    scope :aws_provided, -> { where(provider_type: provider_types[:aws]) }
+
+    scope :gcp_installed, -> { gcp_provided.joins(:provider_gcp).merge(Clusters::Providers::Gcp.created) }
+    scope :aws_installed, -> { aws_provided.joins(:provider_aws).merge(Clusters::Providers::Aws.created) }
+
     scope :managed, -> { where(managed: true) }
 
     scope :default_environment, -> { where(environment_scope: DEFAULT_ENVIRONMENT) }
@@ -139,7 +146,11 @@ module Clusters
     end
 
     def provider
-      return provider_gcp if gcp?
+      if gcp?
+        provider_gcp
+      elsif aws?
+        provider_aws
+      end
     end
 
     def platform

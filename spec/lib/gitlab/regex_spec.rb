@@ -65,4 +65,13 @@ describe Gitlab::Regex do
     it { is_expected.not_to match('.my/image') }
     it { is_expected.not_to match('my/image.') }
   end
+
+  describe '.aws_account_id_regex' do
+    subject { described_class.aws_account_id_regex }
+
+    it { is_expected.to match('12345') }
+    it { is_expected.to match('123456789012') }
+    it { is_expected.not_to match('abcdefg') }
+    it { is_expected.not_to match('1234-5678-9012') }
+  end
 end

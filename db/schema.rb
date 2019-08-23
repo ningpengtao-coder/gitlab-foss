@@ -905,6 +905,23 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.index ["project_id"], name: "index_cluster_projects_on_project_id"
   end
 
+  create_table "cluster_providers_aws", force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.integer "status", null: false
+    t.text "status_reason"
+    t.string "aws_account_id", null: false
+    t.string "region", null: false
+    t.integer "num_nodes", null: false
+    t.string "machine_type", null: false
+    t.string "access_key_id"
+    t.text "encrypted_secret_access_key"
+    t.string "encrypted_secret_access_key_iv"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["cluster_id", "status"], name: "index_cluster_providers_aws_on_cluster_id_and_status"
+    t.index ["cluster_id"], name: "index_cluster_providers_aws_on_cluster_id", unique: true
+  end
+
   create_table "cluster_providers_gcp", id: :serial, force: :cascade do |t|
     t.integer "cluster_id", null: false
     t.integer "status"
@@ -3790,6 +3807,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
   add_foreign_key "cluster_platforms_kubernetes", "clusters", on_delete: :cascade
   add_foreign_key "cluster_projects", "clusters", on_delete: :cascade
   add_foreign_key "cluster_projects", "projects", on_delete: :cascade
+  add_foreign_key "cluster_providers_aws", "clusters", on_delete: :cascade
   add_foreign_key "cluster_providers_gcp", "clusters", on_delete: :cascade
   add_foreign_key "clusters", "users", on_delete: :nullify
   add_foreign_key "clusters_applications_cert_managers", "clusters", on_delete: :cascade
