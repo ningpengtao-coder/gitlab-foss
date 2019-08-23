@@ -18,5 +18,3 @@ class Groups::ClustersController < Clusters::ClustersController
     @group ||= find_routable!(Group, params[:group_id] || params[:id])
   end
 end
-
-Groups::ClustersController.prepend_if_ee('EE::Groups::ClustersController')

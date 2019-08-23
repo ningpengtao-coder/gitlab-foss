@@ -8,7 +8,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
 
   describe 'process' do
-    let(:process_params) { [project, environment, dashboard_yml] }
+    let(:process_params) { [project, dashboard_yml, { environment: environment }] }
     let(:dashboard) { described_class.new(*process_params).process(insert_project_metrics: true) }
 
     it 'includes a path for the prometheus endpoint with each metric' do

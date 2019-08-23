@@ -12,4 +12,3 @@ class Admin::ClustersController < Clusters::ClustersController
   end
 end
 
-Admin::ClustersController.prepend_if_ee('EE::Admin::ClustersController')
