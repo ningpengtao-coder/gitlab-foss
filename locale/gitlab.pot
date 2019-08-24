@@ -12364,7 +12364,50 @@ msgstr ""
 msgid "Protected Tag"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Protected branches"
+=======
+msgid "ProtectedBranch|%{wildcards_link_start}Wildcards%{wildcards_link_end} such as %{code_tag_start}*-stable%{code_tag_end} or %{code_tag_start}production/*%{code_tag_end} are supported"
+msgstr ""
+
+msgid "ProtectedBranch|Allowed to merge"
+msgstr ""
+
+msgid "ProtectedBranch|Allowed to merge:"
+msgstr ""
+
+msgid "ProtectedBranch|Allowed to push"
+msgstr ""
+
+msgid "ProtectedBranch|Allowed to push:"
+msgstr ""
+
+msgid "ProtectedBranch|Code owner approval"
+msgstr ""
+
+msgid "ProtectedBranch|Last commit"
+msgstr ""
+
+msgid "ProtectedBranch|Protect"
+msgstr ""
+
+msgid "ProtectedBranch|Protect a branch"
+msgstr ""
+
+msgid "ProtectedBranch|Protected branch (%{protected_branches_count})"
+msgstr ""
+
+msgid "ProtectedBranch|Pushes that change filenames matched by the CODEOWNERS file will be rejected"
+msgstr ""
+
+msgid "ProtectedBranch|Require approval from code owners:"
+msgstr ""
+
+msgid "ProtectedBranch|There are currently no protected branches, protect a branch with the form above."
+msgstr ""
+
+msgid "ProtectedBranch|Toggle code owner approval"
+>>>>>>> cd182ca57e5... Add views of code owner approval
 msgstr ""
 
 msgid "ProtectedEnvironment|%{environment_name} will be writable for developers. Are you sure?"
