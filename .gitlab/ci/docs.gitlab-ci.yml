@@ -67,7 +67,8 @@ docs lint:
     # Lint Markdown
     - bundle exec mdl content/$DOCS_GITLAB_REPO_SUFFIX -c $CI_PROJECT_DIR/.mdlrc
     # Build HTML from Markdown
-    - bundle exec nanoc
+    - bundle exec nanoc check external_links
+    - bundle exec nanoc check 
     # Check the internal links
     - bundle exec nanoc check internal_links
     # Check the internal anchor links

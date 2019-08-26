@@ -13,6 +13,8 @@ description: 'Learn how to use and administer GitLab, the most scalable Git-base
 
 Welcome to [GitLab](https://about.gitlab.com/) Documentation.
 
+This is [a test link to a moved MR](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/386).
+
 Here you can access the complete documentation for GitLab, the single application for the
 [entire DevOps lifecycle](#the-entire-devops-lifecycle).
 
