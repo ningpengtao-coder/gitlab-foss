@@ -1,30 +1,30 @@
-const DETAILS_OPEN = '<details open>';
-const DETAILS_EL_REGEXP = new RegExp(/<details>/, 'g');
-const DETAILS_TAG = '<details>';
-
 /**
  * Function that replaces the open attribute for the <details> element.
  *
- * @param {String} description - The html string passed back from the server as a result of polling
+ * @param {String} descriptionHtml - The html string passed back from the server as a result of polling
  * @param {Array} details - All detail nodes inside of the issue description.
  */
 
-const updateDetailsState = (description = '', details = []) => {
-  let index = 0;
+const updateDetailsState = (descriptionHtml = '', details = []) => {
+  const placeholder = document.createElement('div');
+  placeholder.innerHTML = descriptionHtml;
 
-  return description.replace(DETAILS_EL_REGEXP, () => {
-    const shouldReplace = details[index] && details[index].open;
-    let str = DETAILS_TAG;
-    // increment count every time we find a match.
-    index += 1;
+  const newDescription = placeholder.querySelectorAll('details')
 
-    if(shouldReplace) {
-      str =  DETAILS_OPEN;
-    }
-    
+  if(newDescription.length !== details.length) {
+    return descriptionHtml;
+  };
 
-    return str;
+  newDescription.forEach((el, i) => {
+    /*
+      * <details> has an open attribute that can have a value, "", "true", "false"
+      * and will show the dropdown, which is why we are setting the attribute
+      * explicitly to true.
+    */
+    if(details[i].open) el.setAttribute('open', true)
   });
+
+  return placeholder.innerHTML;
 }
 
 export { updateDetailsState };
