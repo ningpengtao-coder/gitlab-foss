@@ -15,6 +15,8 @@ Welcome to [GitLab](https://about.gitlab.com/) Documentation.
 
 This is [a test link to a moved MR](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/386).
 
+This is [a test link to a moved issue](https://gitlab.com/gitlab-com/gitlab-docs/issues/394)
+
 Here you can access the complete documentation for GitLab, the single application for the
 [entire DevOps lifecycle](#the-entire-devops-lifecycle).
 
