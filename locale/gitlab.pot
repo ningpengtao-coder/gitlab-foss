@@ -2977,6 +2977,9 @@ msgstr ""
 msgid "Commands applied"
 msgstr ""
 
+msgid "Commands did not apply"
+msgstr ""
+
 msgid "Comment"
 msgstr ""
 
@@ -3353,6 +3356,12 @@ msgstr ""
 msgid "Copy token to clipboard"
 msgstr ""
 
+msgid "Could not add admins as members"
+msgstr ""
+
+msgid "Could not add admins as members to self-monitoring project. Errors: %{errors}"
+msgstr ""
+
 msgid "Could not add prometheus URL to whitelist"
 msgstr ""
 
@@ -3369,6 +3378,9 @@ msgid "Could not connect to FogBugz, check your URL"
 msgstr ""
 
 msgid "Could not create Wiki Repository at this time. Please try again later."
+msgstr ""
+
+msgid "Could not create group"
 msgstr ""
 
 msgid "Could not create instance administration project. Errors: %{errors}"
@@ -3396,6 +3408,12 @@ msgid "Could not save instance administration project ID, errors: %{errors}"
 msgstr ""
 
 msgid "Could not save project ID"
+msgstr ""
+
+msgid "Could not save prometheus manual configuration"
+msgstr ""
+
+msgid "Could not save prometheus manual configuration for self-monitoring project. Errors: %{errors}"
 msgstr ""
 
 msgid "Coverage"
@@ -3600,6 +3618,30 @@ msgid "Cycle Analytics"
 msgstr ""
 
 msgid "Cycle Analytics gives an overview of how much time it takes to go from idea to production in your project."
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue created"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue first associated with a milestone or issue first added to a board"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Issue first mentioned in a commit"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request created"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request first deployed to production"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request last build finish time"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request last build start time"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|Merge request merged"
 msgstr ""
 
 msgid "CycleAnalyticsStage|Code"
@@ -7376,7 +7418,13 @@ msgstr ""
 msgid "No Tag"
 msgstr ""
 
+msgid "No active admin user found"
+msgstr ""
+
 msgid "No activities found"
+msgstr ""
+
+msgid "No application_settings found"
 msgstr ""
 
 msgid "No available namespaces to fork the project."
@@ -8002,7 +8050,7 @@ msgstr ""
 msgid "PipelineSheduleIntervalPattern|Custom"
 msgstr ""
 
-msgid "PipelineStatusTooltip|Commit: %{ci_status}"
+msgid "PipelineStatusTooltip|Pipeline: %{ciStatus}"
 msgstr ""
 
 msgid "PipelineStatusTooltip|Pipeline: %{ci_status}"
@@ -8720,6 +8768,9 @@ msgid "Project URL"
 msgstr ""
 
 msgid "Project access must be granted explicitly to each user."
+msgstr ""
+
+msgid "Project already created"
 msgstr ""
 
 msgid "Project and wiki repositories"
@@ -13919,6 +13970,9 @@ msgstr ""
 msgid "pending comment"
 msgstr ""
 
+msgid "pipeline"
+msgstr ""
+
 msgid "private"
 msgstr ""
 
@@ -13932,6 +13986,12 @@ msgid "project"
 msgstr ""
 
 msgid "project avatar"
+msgstr ""
+
+msgid "prometheus.enable is not present in gitlab.yml"
+msgstr ""
+
+msgid "prometheus.listen_address is not present in gitlab.yml"
 msgstr ""
 
 msgid "quick actions"
