@@ -37,3 +37,6 @@ dast:
   before_script:
     - export DAST_WEBSITE="$(cat review_app_url.txt)"
   cache: {}
+  artifacts:
+    paths:
+      - gl-dast-report.json
