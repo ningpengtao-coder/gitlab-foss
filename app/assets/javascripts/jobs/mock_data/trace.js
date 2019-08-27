@@ -33,12 +33,10 @@ export default {
     {
       content: [{ text: 'Starting service postgres:9.6.14 ...' }],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [{ text: 'Pulling docker image postgres:9.6.14 ...' }],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [
@@ -48,17 +46,14 @@ export default {
         },
       ],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [{ text: 'Starting service redis:alpine ...' }],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [{ text: 'Pulling docker image redis:alpine ...' }],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [
@@ -68,12 +63,10 @@ export default {
         },
       ],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [{ text: 'Waiting for services to be up and running...' }],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [
@@ -84,7 +77,6 @@ export default {
         },
       ],
       sections: ['prepare-executor'],
-      section_header: true,
     },
     {
       content: [
@@ -95,10 +87,12 @@ export default {
         },
       ],
       sections: ['prepare-executor'],
-      section_header: true,
     },
-    //line 36 of log.html
-
+    {
+      content: [],
+      sections: ['prepare-executor'],
+      section_footer: true,
+    },
     {
       content: [
         {
@@ -119,14 +113,17 @@ export default {
       section_header: true,
       section_timestamp: 1566571800,
     },
-
     {
       content: [
-        // lines 59 to 63 - double check due to the <br>
         {
           text: `Reinitialized existing Git repository in /builds/gitlab-org/gitlab-ce/.git/<br />From
       https://gitlab.com/gitlab-org/gitlab-ce`,
         },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      content: [
         {
           text: ' * [new branch] 66454-create-feature-flag -&gt; origin/66454-create-feature-flag',
         },
@@ -138,7 +135,7 @@ export default {
       content: [
         {
           text: 'Checking out 061606b4 as 66454-create-feature-flag...',
-          class: 'term-fg-l-green term-bold'
+          class: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['get-sources'],
@@ -147,15 +144,228 @@ export default {
     {
       content: [
         {
-          text: `Removing .gitlab_shell_secret<br />Removing .gitlab_workhorse_secret<br />Removing
-          config/database.yml`,
+          text: 'Removing .gitlab_shell_secret',
         },
-        {
-          text: '' // line 65
-
-        }
       ],
       sections: ['get-sources'],
+    },
+    {
+      content: [
+        {
+          text: 'Removing .gitlab_workhorse_secret',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+
+    {
+      content: [
+        {
+          text: 'Removing config/database.yml',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      content: [
+        {
+          text: 'Removing config/database_geo.yml',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      content: [
+        {
+          text: 'Removing config/gitlab.yml',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      content: [
+        {
+          text: 'Removing config/redis.cache.yml',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      content: [
+        {
+          text: 'Skipping Git submodules setup',
+          class: 'term-fg-l-green term-bold',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      content: [],
+      sections: ['get-sources'],
+    },
+    {
+      content: [],
+      sections: ['get-sources'],
+      section_footer: true,
+    },
+    {
+      content: [
+        {
+          text: 'Checking cache for debian-stretch-ruby-2.6.3-node-12.x-3...',
+          class: 'term-fg-l-green term-bold',
+        },
+      ],
+      sections: ['restore-cache'],
+      section_header: true,
+      section_timestamp: 1566571811,
+    },
+    {
+      content: [],
+      sections: ['restore-cache'],
+    },
+    {
+      content: [
+        {
+          text:
+            'Downloading cache.zip from https://storage.googleapis.com/gitlab-com-runners-cache/project/13083/debian-stretch-ruby-2.6.3-node-12.x-3',
+        },
+      ],
+      sections: ['restore-cache'],
+    },
+    {
+      content: [],
+      sections: ['restore-cache'],
+    },
+    {
+      content: [
+        {
+          text: 'Successfully extracted cache',
+          class: 'term-fg-l-green term-bold ',
+        },
+      ],
+      sections: ['restore-cache'],
+    },
+    {
+      content: [],
+      sections: ['restore-cache'],
+      section_footer: true,
+    },
+
+    {
+      content: [
+        {
+          text: 'Downloading artifacts for compile-assets pull-cache (278912482)...',
+          class: 'term-fg-l-green term-bold',
+        },
+      ],
+      sections: ['download-artifacts'],
+      section_header: true,
+      section_timestamp: 1566571839,
+    },
+
+    {
+      content: [],
+      sections: ['download-artifacts'],
+    },
+
+    {
+      content: [
+        {
+          text: 'Downloading artifacts from coordinator... ok ',
+          class: 'term-fg-l-green term-bold',
+        },
+        {
+          text: ' id',
+        },
+        {
+          text: '=278912482 responseStatus',
+        },
+        {
+          text: '=200 OK token',
+        },
+        {
+          text: '=DUNW1asp',
+        },
+      ],
+      sections: ['download-artifacts'],
+    },
+
+    {
+      content: [
+        {
+          text: 'Downloading artifacts for setup-test-env (278912484)...',
+          class: 'term-fg-l-green term-bold',
+        },
+      ],
+      sections: ['download-artifacts'],
+    },
+
+    {
+      content: [
+        {
+          text: 'Downloading artifacts from coordinator... ok ',
+        },
+        {
+          text: ' id',
+        },
+        {
+          text: '=278912484 responseStatus',
+        },
+        {
+          text: '=200 OK token',
+        },
+        {
+          text: '=gdMnE5zT',
+        },
+      ],
+      sections: ['download-artifacts'],
+    },
+
+    {
+      content: [
+        {
+          text: `WARNING: tmp/tests/gitlab-shell/.gitlab_shell_secret: chmod
+          tmp/tests/gitlab-shell/.gitlab_shell_secret: no such file or directory (suppressing
+          repeats)`,
+          class: 'term-fg-yellow',
+        },
+      ],
+      sections: ['download-artifacts'],
+    },
+    {
+      content: [
+        {
+          text: 'Downloading artifacts for retrieve-tests-metadata (278912485)...',
+          class: 'term-fg-l-green term-bold',
+        },
+      ],
+      sections: ['download-artifacts'],
+    },
+
+    {
+      content: [
+        {
+          text: 'Downloading artifacts from coordinator... ok ',
+        },
+        {
+          text: ' id',
+        },
+        {
+          text: '=278912485 responseStatus',
+        },
+        {
+          text: '=200 OK token',
+        },
+        {
+          text: '=rCtxUhsy',
+        },
+      ],
+      sections: ['download-artifacts'],
+    },
+    {
+      content: [],
+      sections: ['download-artifacts'],
+      section_footer: true,
     },
   ],
 };
