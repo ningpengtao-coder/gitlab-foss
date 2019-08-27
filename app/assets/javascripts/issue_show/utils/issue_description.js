@@ -9,13 +9,13 @@ const updateDetailsState = (descriptionHtml = '', details = []) => {
   const placeholder = document.createElement('div');
   placeholder.innerHTML = descriptionHtml;
 
-  const newDescription = placeholder.querySelectorAll('details')
+  const newDescription = placeholder.getElementsByTagName('details');
 
   if(newDescription.length !== details.length) {
     return descriptionHtml;
   };
 
-  newDescription.forEach((el, i) => {
+  [...newDescription].forEach((el, i) => {
     /*
       * <details> has an open attribute that can have a value, "", "true", "false"
       * and will show the dropdown, which is why we are setting the attribute
