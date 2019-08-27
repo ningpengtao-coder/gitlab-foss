@@ -330,19 +330,7 @@ export default {
       offset: 1037,
       content: [
         {
-          text: 'Downloading artifacts from coordinator... ok ',
-        },
-        {
-          text: ' id',
-        },
-        {
-          text: '=278912484 responseStatus',
-        },
-        {
-          text: '=200 OK token',
-        },
-        {
-          text: '=gdMnE5zT',
+          text: 'Downloading artifacts from coordinator... ok  id=278912484 responseStatus=200 OK token=gdMnE5zT',
         },
       ],
       sections: ['download-artifacts'],
@@ -373,19 +361,7 @@ export default {
       offset: 1040,
       content: [
         {
-          text: 'Downloading artifacts from coordinator... ok ',
-        },
-        {
-          text: ' id',
-        },
-        {
-          text: '=278912485 responseStatus',
-        },
-        {
-          text: '=200 OK token',
-        },
-        {
-          text: '=rCtxUhsy',
+          text: 'Downloading artifacts from coordinator... ok id=278912485 responseStatus=200 OK token=rCtxUhsy',
         },
       ],
       sections: ['download-artifacts'],
@@ -396,6 +372,22 @@ export default {
       sections: ['download-artifacts'],
       section_footer: true,
       section_duration: '01:00:58'
+    },
+    {
+      offset: 1037,
+      content: [
+        {
+          text: 'Downloading artifacts from coordinator... ok ',
+        },
+        {
+          text: ' id',
+          class: 'term-fg-l-green term-bold',
+        },
+        {
+          text: '=278912484 responseStatus=200 OK token=gdMnE5zT',
+        },
+      ],
+      sections: ['download-artifacts'],
     },
   ],
 };
