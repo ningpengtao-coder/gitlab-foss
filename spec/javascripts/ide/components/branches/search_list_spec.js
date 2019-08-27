@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { GlLoadingIcon } from '@gitlab/ui';
 import store from '~/ide/stores';
 import * as types from '~/ide/stores/modules/branches/mutation_types';
 import List from '~/ide/components/branches/search_list.vue';
@@ -25,6 +26,7 @@ describe('IDE branches search list', () => {
   });
 
   it('calls fetch on mounted', () => {
+    throw new Error('test');
     expect(vm.fetchBranches).toHaveBeenCalledWith({
       search: '',
     });
@@ -35,7 +37,7 @@ describe('IDE branches search list', () => {
 
     vm.$nextTick()
       .then(() => {
-        expect(vm.$el).toContainElement('.loading-container');
+        expect(vm.find(GlLoadingIcon).exists()).toBe(true);
       })
       .then(done)
       .catch(done.fail);
