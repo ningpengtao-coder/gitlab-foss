@@ -74,7 +74,7 @@ Please note that for the deactivation option to be visible to an admin, the user
 
 ### Activating a user
 
-[Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.3.
 
 A deactivated user can be activated from the Admin area. Activating a user sets their account to active state.
 
