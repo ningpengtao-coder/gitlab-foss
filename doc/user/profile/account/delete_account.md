@@ -44,7 +44,7 @@ a user can be blocked directly from the Admin area. To do this:
 
 ### Deactivating a user
 
-[Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.3.
 
 A user can be deactivated from the Admin area. Deactivating a user is functionally identical to blocking a user, with the following differences:
 
