@@ -14,12 +14,15 @@ export default {
 
   lines: [
     {
+      offset: 1000,
       content: [{ text: 'Running with gitlab-runner 12.1.0 (de7731dd)' }],
     },
     {
+      offset: 1001,
       content: [{ text: ' on docker-auto-scale-com 8a6210b8' }],
     },
     {
+      offset: 1002,
       content: [
         {
           text:
@@ -31,14 +34,17 @@ export default {
       section_timestamp: 1566571786,
     },
     {
+      offset: 1003,
       content: [{ text: 'Starting service postgres:9.6.14 ...' }],
       sections: ['prepare-executor'],
     },
     {
+      offset: 1004,
       content: [{ text: 'Pulling docker image postgres:9.6.14 ...' }],
       sections: ['prepare-executor'],
     },
     {
+      offset: 1005,
       content: [
         {
           text: `Using docker image sha256:ac400042d32f8e146477ae5b3528f1e4232fc8e83b2fd9fe0cbe08900e45bae1 for
@@ -48,14 +54,17 @@ export default {
       sections: ['prepare-executor'],
     },
     {
+      offset: 1006,
       content: [{ text: 'Starting service redis:alpine ...' }],
       sections: ['prepare-executor'],
     },
     {
+      offset: 1007,
       content: [{ text: 'Pulling docker image redis:alpine ...' }],
       sections: ['prepare-executor'],
     },
     {
+      offset: 1008,
       content: [
         {
           text: `Using docker image sha256:ed7d2ff5a6232b43bdc89a2220ed989f532c3794422aa2a86823b8bc62e71447 for
@@ -65,10 +74,12 @@ export default {
       sections: ['prepare-executor'],
     },
     {
+      offset: 1009,
       content: [{ text: 'Waiting for services to be up and running...' }],
       sections: ['prepare-executor'],
     },
     {
+      offset: 1010,
       content: [
         {
           text: `Pulling docker image
@@ -79,6 +90,7 @@ export default {
       sections: ['prepare-executor'],
     },
     {
+      offset: 1011,
       content: [
         {
           text: `Using docker image sha256:f5b71ccc7a53408ea88959433baf23f7d716bb431d0475a4f3d9ba213d7841c1 for
@@ -89,11 +101,13 @@ export default {
       sections: ['prepare-executor'],
     },
     {
+      offset: 1012,
       content: [],
       sections: ['prepare-executor'],
       section_footer: true,
     },
     {
+      offset: 1013,
       content: [
         {
           text: `Running on runner-8a6210b8-project-13083-concurrent-0 via
@@ -106,6 +120,7 @@ export default {
     },
 
     {
+      offset: 1014,
       content: [
         { text: 'Fetching changes with git depth set to 20..', class: 'term-fg-l-green term-bold' },
       ],
@@ -114,6 +129,7 @@ export default {
       section_timestamp: 1566571800,
     },
     {
+      offset: 1015,
       content: [
         {
           text: `Reinitialized existing Git repository in /builds/gitlab-org/gitlab-ce/.git/<br />From
@@ -123,6 +139,7 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1016,
       content: [
         {
           text: ' * [new branch] 66454-create-feature-flag -&gt; origin/66454-create-feature-flag',
@@ -130,8 +147,8 @@ export default {
       ],
       sections: ['get-sources'],
     },
-
     {
+      offset: 1017,
       content: [
         {
           text: 'Checking out 061606b4 as 66454-create-feature-flag...',
@@ -140,8 +157,8 @@ export default {
       ],
       sections: ['get-sources'],
     },
-
     {
+      offset: 1018,
       content: [
         {
           text: 'Removing .gitlab_shell_secret',
@@ -150,6 +167,7 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1019,
       content: [
         {
           text: 'Removing .gitlab_workhorse_secret',
@@ -157,8 +175,8 @@ export default {
       ],
       sections: ['get-sources'],
     },
-
     {
+      offset: 1020,
       content: [
         {
           text: 'Removing config/database.yml',
@@ -167,6 +185,7 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1021,
       content: [
         {
           text: 'Removing config/database_geo.yml',
@@ -175,6 +194,7 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1022,
       content: [
         {
           text: 'Removing config/gitlab.yml',
@@ -183,6 +203,7 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1023,
       content: [
         {
           text: 'Removing config/redis.cache.yml',
@@ -191,6 +212,7 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1024,
       content: [
         {
           text: 'Skipping Git submodules setup',
@@ -200,15 +222,18 @@ export default {
       sections: ['get-sources'],
     },
     {
+      offset: 1025,
       content: [],
       sections: ['get-sources'],
     },
     {
+      offset: 1026,
       content: [],
       sections: ['get-sources'],
       section_footer: true,
     },
     {
+      offset: 1027,
       content: [
         {
           text: 'Checking cache for debian-stretch-ruby-2.6.3-node-12.x-3...',
@@ -220,10 +245,12 @@ export default {
       section_timestamp: 1566571811,
     },
     {
+      offset: 1028,
       content: [],
       sections: ['restore-cache'],
     },
     {
+      offset: 1029,
       content: [
         {
           text:
@@ -233,10 +260,12 @@ export default {
       sections: ['restore-cache'],
     },
     {
+      offset: 1030,
       content: [],
       sections: ['restore-cache'],
     },
     {
+      offset: 1031,
       content: [
         {
           text: 'Successfully extracted cache',
@@ -246,12 +275,13 @@ export default {
       sections: ['restore-cache'],
     },
     {
+      offset: 1032,
       content: [],
       sections: ['restore-cache'],
       section_footer: true,
     },
-
     {
+      offset: 1033,
       content: [
         {
           text: 'Downloading artifacts for compile-assets pull-cache (278912482)...',
@@ -262,13 +292,13 @@ export default {
       section_header: true,
       section_timestamp: 1566571839,
     },
-
     {
+      offset: 1034,
       content: [],
       sections: ['download-artifacts'],
     },
-
     {
+      offset: 1035,
       content: [
         {
           text: 'Downloading artifacts from coordinator... ok ',
@@ -289,8 +319,8 @@ export default {
       ],
       sections: ['download-artifacts'],
     },
-
     {
+      offset: 1036,
       content: [
         {
           text: 'Downloading artifacts for setup-test-env (278912484)...',
@@ -299,8 +329,8 @@ export default {
       ],
       sections: ['download-artifacts'],
     },
-
     {
+      offset: 1037,
       content: [
         {
           text: 'Downloading artifacts from coordinator... ok ',
@@ -320,8 +350,8 @@ export default {
       ],
       sections: ['download-artifacts'],
     },
-
     {
+      offset: 1038,
       content: [
         {
           text: `WARNING: tmp/tests/gitlab-shell/.gitlab_shell_secret: chmod
@@ -333,6 +363,7 @@ export default {
       sections: ['download-artifacts'],
     },
     {
+      offset: 1039,
       content: [
         {
           text: 'Downloading artifacts for retrieve-tests-metadata (278912485)...',
@@ -341,8 +372,8 @@ export default {
       ],
       sections: ['download-artifacts'],
     },
-
     {
+      offset: 1040,
       content: [
         {
           text: 'Downloading artifacts from coordinator... ok ',
@@ -363,6 +394,7 @@ export default {
       sections: ['download-artifacts'],
     },
     {
+      offset: 1041,
       content: [],
       sections: ['download-artifacts'],
       section_footer: true,
