@@ -1223,36 +1223,66 @@ describe Repository do
   end
 
   describe '#branch_exists?' do
-    it 'uses branch_names' do
-      allow(repository).to receive(:branch_names).and_return(['foobar'])
+    let(:branch) { repository.root_ref }
 
-      expect(repository.branch_exists?('foobar')).to eq(true)
-      expect(repository.branch_exists?('master')).to eq(false)
+    subject { repository.branch_exists?(branch) }
+
+    it 'delegates to branch_names when the cache is empty' do
+      repository.expire_branches_cache
+
+      expect(repository).to receive(:branch_names).and_call_original
+      is_expected.to eq(true)
+    end
+
+    it 'uses redis set caching when the cache is filled' do
+      repository.branch_names # ensure the branch name cache is filled
+
+      expect(repository)
+        .to receive(:branch_names_include?)
+        .with(branch)
+        .and_call_original
+
+      is_expected.to eq(true)
     end
   end
 
   describe '#tag_exists?' do
-    it 'uses tag_names' do
-      allow(repository).to receive(:tag_names).and_return(['foobar'])
+    let(:tag) { repository.tags.first.name }
 
-      expect(repository.tag_exists?('foobar')).to eq(true)
-      expect(repository.tag_exists?('master')).to eq(false)
+    subject { repository.tag_exists?(tag) }
+
+    it 'delegates to tag_names when the cache is empty' do
+      repository.expire_tags_cache
+
+      expect(repository).to receive(:tag_names).and_call_original
+      is_expected.to eq(true)
+    end
+
+    it 'uses redis set caching when the cache is filled' do
+      repository.tag_names # ensure the tag name cache is filled
+
+      expect(repository)
+        .to receive(:tag_names_include?)
+        .with(tag)
+        .and_call_original
+
+      is_expected.to eq(true)
     end
   end
 
-  describe '#branch_names', :use_clean_rails_memory_store_caching do
+  describe '#branch_names', :clean_gitlab_redis_cache do
     let(:fake_branch_names) { ['foobar'] }
 
     it 'gets cached across Repository instances' do
       allow(repository.raw_repository).to receive(:branch_names).once.and_return(fake_branch_names)
 
-      expect(repository.branch_names).to eq(fake_branch_names)
+      expect(repository.branch_names).to match_array(fake_branch_names)
 
       fresh_repository = Project.find(project.id).repository
       expect(fresh_repository.object_id).not_to eq(repository.object_id)
 
       expect(fresh_repository.raw_repository).not_to receive(:branch_names)
-      expect(fresh_repository.branch_names).to eq(fake_branch_names)
+      expect(fresh_repository.branch_names).to match_array(fake_branch_names)
     end
   end
 
@@ -1420,12 +1450,13 @@ describe Repository do
                              source_project: project)
     end
 
-    it 'writes merge of source and target to MR merge_ref_path' do
+    it 'writes merge of source SHA and first parent ref to MR merge_ref_path' do
       merge_commit_id = repository.merge_to_ref(user,
                                                 merge_request.diff_head_sha,
                                                 merge_request,
                                                 merge_request.merge_ref_path,
-                                                'Custom message')
+                                                'Custom message',
+                                                merge_request.target_branch_ref)
 
       merge_commit = repository.commit(merge_commit_id)
 
@@ -1743,11 +1774,22 @@ describe Repository do
     end
   end
 
-  describe '#before_push_tag' do
+  describe '#expires_caches_for_tags' do
     it 'flushes the cache' do
       expect(repository).to receive(:expire_statistics_caches)
       expect(repository).to receive(:expire_emptiness_caches)
       expect(repository).to receive(:expire_tags_cache)
+
+      repository.expire_caches_for_tags
+    end
+  end
+
+  describe '#before_push_tag' do
+    it 'logs an event' do
+      expect(repository).not_to receive(:expire_statistics_caches)
+      expect(repository).not_to receive(:expire_emptiness_caches)
+      expect(repository).not_to receive(:expire_tags_cache)
+      expect(repository).to receive(:repository_event).with(:push_tag)
 
       repository.before_push_tag
     end
@@ -1780,6 +1822,12 @@ describe Repository do
 
       repository.after_create_branch
     end
+
+    it 'does not expire the branch caches when specified' do
+      expect(repository).not_to receive(:expire_branches_cache)
+
+      repository.after_create_branch(expire_cache: false)
+    end
   end
 
   describe '#after_remove_branch' do
@@ -1788,25 +1836,45 @@ describe Repository do
 
       repository.after_remove_branch
     end
+
+    it 'does not expire the branch caches when specified' do
+      expect(repository).not_to receive(:expire_branches_cache)
+
+      repository.after_remove_branch(expire_cache: false)
+    end
   end
 
   describe '#after_create' do
+    it 'calls expire_status_cache' do
+      expect(repository).to receive(:expire_status_cache)
+
+      repository.after_create
+    end
+
+    it 'logs an event' do
+      expect(repository).to receive(:repository_event).with(:create_repository)
+
+      repository.after_create
+    end
+  end
+
+  describe '#expire_status_cache' do
     it 'flushes the exists cache' do
       expect(repository).to receive(:expire_exists_cache)
 
-      repository.after_create
+      repository.expire_status_cache
     end
 
     it 'flushes the root ref cache' do
       expect(repository).to receive(:expire_root_ref_cache)
 
-      repository.after_create
+      repository.expire_status_cache
     end
 
     it 'flushes the emptiness caches' do
       expect(repository).to receive(:expire_emptiness_caches)
 
-      repository.after_create
+      repository.expire_status_cache
     end
   end
 
@@ -2298,48 +2366,6 @@ describe Repository do
     end
   end
 
-  describe '#diverging_commit_counts' do
-    let(:diverged_branch) { repository.find_branch('fix') }
-    let(:root_ref_sha) { repository.raw_repository.commit(repository.root_ref).id }
-    let(:diverged_branch_sha) { diverged_branch.dereferenced_target.sha }
-
-    it 'returns the commit counts behind and ahead of default branch' do
-      result = repository.diverging_commit_counts(diverged_branch)
-
-      expect(result).to eq(behind: 29, ahead: 2)
-    end
-
-    context 'when gitaly_count_diverging_commits_no_max is enabled' do
-      before do
-        stub_feature_flags(gitaly_count_diverging_commits_no_max: true)
-      end
-
-      it 'calls diverging_commit_count without max count' do
-        expect(repository.raw_repository)
-          .to receive(:diverging_commit_count)
-          .with(root_ref_sha, diverged_branch_sha)
-          .and_return([29, 2])
-
-        repository.diverging_commit_counts(diverged_branch)
-      end
-    end
-
-    context 'when gitaly_count_diverging_commits_no_max is disabled' do
-      before do
-        stub_feature_flags(gitaly_count_diverging_commits_no_max: false)
-      end
-
-      it 'calls diverging_commit_count with max count' do
-        expect(repository.raw_repository)
-          .to receive(:diverging_commit_count)
-          .with(root_ref_sha, diverged_branch_sha, max_count: Repository::MAX_DIVERGING_COUNT)
-          .and_return([29, 2])
-
-        repository.diverging_commit_counts(diverged_branch)
-      end
-    end
-  end
-
   describe '#refresh_method_caches' do
     it 'refreshes the caches of the given types' do
       expect(repository).to receive(:expire_method_caches)
@@ -2467,16 +2493,15 @@ describe Repository do
       # Gets the commit oid, and warms the cache
       oid = project.commit.id
 
-      expect(Gitlab::Git::Commit).not_to receive(:find).once
+      expect(Gitlab::Git::Commit).to receive(:find).once
 
-      project.commit_by(oid: oid)
+      2.times { project.commit_by(oid: oid) }
     end
 
     it 'caches nil values' do
       expect(Gitlab::Git::Commit).to receive(:find).once
 
-      project.commit_by(oid: '1' * 40)
-      project.commit_by(oid: '1' * 40)
+      2.times { project.commit_by(oid: '1' * 40) }
     end
   end
 

@@ -1,4 +1,4 @@
-# Instance Review **[CORE ONLY]**
+# Instance Review **(CORE ONLY)**
 
 > [Introduced][6995] in [GitLab Core][ee] 11.3.
 
@@ -14,4 +14,3 @@ Additionally you will be contacted by our team for further review which should h
 
 [6995]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6995
 [ee]: https://about.gitlab.com/pricing/
-

@@ -7,7 +7,6 @@ class MergeRequest < ApplicationRecord
   include Noteable
   include Referable
   include Presentable
-  include IgnorableColumn
   include TimeTrackable
   include ManualInverseAssociation
   include EachBatch
@@ -23,10 +22,6 @@ class MergeRequest < ApplicationRecord
   self.reactive_cache_lifetime = 10.minutes
 
   SORTING_PREFERENCE_FIELD = :merge_requests_sort
-
-  ignore_column :locked_at,
-                :ref_fetched,
-                :deleted_at
 
   belongs_to :target_project, class_name: "Project"
   belongs_to :source_project, class_name: "Project"
@@ -78,6 +73,7 @@ class MergeRequest < ApplicationRecord
   after_update :clear_memoized_shas
   after_update :reload_diff_if_branch_changed
   after_save :ensure_metrics
+  after_commit :expire_etag_cache
 
   # When this attribute is true some MR validation is ignored
   # It allows us to close or modify broken merge requests
@@ -197,6 +193,7 @@ class MergeRequest < ApplicationRecord
   alias_attribute :project, :target_project
   alias_attribute :project_id, :target_project_id
   alias_attribute :auto_merge_enabled, :merge_when_pipeline_succeeds
+  alias_method :issuing_parent, :target_project
 
   def self.reference_prefix
     '!'
@@ -223,12 +220,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def rebase_in_progress?
-    strong_memoize(:rebase_in_progress) do
-      # The source project can be deleted
-      next false unless source_project
-
-      source_project.repository.rebase_in_progress?(id)
-    end
+    rebase_jid.present? && Gitlab::SidekiqStatus.running?(rebase_jid)
   end
 
   # Use this method whenever you need to make sure the head_pipeline is synced with the
@@ -387,6 +379,34 @@ class MergeRequest < ApplicationRecord
   def merge_async(user_id, params)
     jid = MergeWorker.perform_async(id, user_id, params.to_h)
     update_column(:merge_jid, jid)
+
+    # merge_ongoing? depends on merge_jid
+    # expire etag cache since the attribute is changed without triggering callbacks
+    expire_etag_cache
+  end
+
+  # Set off a rebase asynchronously, atomically updating the `rebase_jid` of
+  # the MR so that the status of the operation can be tracked.
+  def rebase_async(user_id)
+    transaction do
+      lock!
+
+      raise ActiveRecord::StaleObjectError if !open? || rebase_in_progress?
+
+      # Although there is a race between setting rebase_jid here and clearing it
+      # in the RebaseWorker, it can't do any harm since we check both that the
+      # attribute is set *and* that the sidekiq job is still running. So a JID
+      # for a completed RebaseWorker is equivalent to a nil JID.
+      jid = Sidekiq::Worker.skipping_transaction_check do
+        RebaseWorker.perform_async(id, user_id)
+      end
+
+      update_column(:rebase_jid, jid)
+    end
+
+    # rebase_in_progress? depends on rebase_jid
+    # expire etag cache since the attribute is changed without triggering callbacks
+    expire_etag_cache
   end
 
   def merge_participants
@@ -562,7 +582,11 @@ class MergeRequest < ApplicationRecord
   end
 
   def diff_refs
-    persisted? ? merge_request_diff.diff_refs : repository_diff_refs
+    if importing? || persisted?
+      merge_request_diff.diff_refs
+    else
+      repository_diff_refs
+    end
   end
 
   # Instead trying to fetch the
@@ -727,7 +751,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def check_mergeability
-    MergeRequests::MergeabilityCheckService.new(self).execute
+    MergeRequests::MergeabilityCheckService.new(self).execute(retry_lease: false)
   end
   # rubocop: enable CodeReuse/ServiceClass
 
@@ -1101,6 +1125,19 @@ class MergeRequest < ApplicationRecord
     "refs/#{Repository::REF_MERGE_REQUEST}/#{iid}/merge"
   end
 
+  def train_ref_path
+    "refs/#{Repository::REF_MERGE_REQUEST}/#{iid}/train"
+  end
+
+  def cleanup_refs(only: :all)
+    target_refs = []
+    target_refs << ref_path       if %i[all head].include?(only)
+    target_refs << merge_ref_path if %i[all merge].include?(only)
+    target_refs << train_ref_path if %i[all train].include?(only)
+
+    project.repository.delete_refs(*target_refs)
+  end
+
   def self.merge_request_ref?(ref)
     ref.start_with?("refs/#{Repository::REF_MERGE_REQUEST}/")
   end
@@ -1211,15 +1248,8 @@ class MergeRequest < ApplicationRecord
   end
 
   def all_commits
-    # MySQL doesn't support LIMIT in a subquery.
-    diffs_relation = if Gitlab::Database.postgresql?
-                       merge_request_diffs.recent
-                     else
-                       merge_request_diffs
-                     end
-
     MergeRequestDiffCommit
-      .where(merge_request_diff: diffs_relation)
+      .where(merge_request_diff: merge_request_diffs.recent)
       .limit(10_000)
   end
 
@@ -1353,6 +1383,7 @@ class MergeRequest < ApplicationRecord
   end
 
   # TODO: remove once production database rename completes
+  # https://gitlab.com/gitlab-org/gitlab-ce/issues/47592
   alias_attribute :allow_collaboration, :allow_maintainer_to_push
 
   def allow_collaboration
@@ -1395,5 +1426,12 @@ class MergeRequest < ApplicationRecord
       variables.append(key: 'CI_MERGE_REQUEST_SOURCE_PROJECT_URL', value: source_project.web_url)
       variables.append(key: 'CI_MERGE_REQUEST_SOURCE_BRANCH_NAME', value: source_branch.to_s)
     end
+  end
+
+  def expire_etag_cache
+    return unless project.namespace
+
+    key = Gitlab::Routing.url_helpers.cached_widget_project_json_merge_request_path(project, self, format: :json)
+    Gitlab::EtagCaching::Store.new.touch(key)
   end
 end

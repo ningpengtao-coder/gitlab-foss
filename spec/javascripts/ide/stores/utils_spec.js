@@ -92,6 +92,16 @@ describe('Multi-file store utils', () => {
             path: 'deletedFile',
             deleted: true,
           },
+          {
+            ...file('renamedFile'),
+            path: 'renamedFile',
+            prevPath: 'prevPath',
+          },
+          {
+            ...file('replacingFile'),
+            path: 'replacingFile',
+            replaces: true,
+          },
         ],
         currentBranchId: 'master',
       };
@@ -126,6 +136,22 @@ describe('Multi-file store utils', () => {
           {
             action: commitActionTypes.delete,
             file_path: 'deletedFile',
+            content: undefined,
+            encoding: 'text',
+            last_commit_id: undefined,
+            previous_path: undefined,
+          },
+          {
+            action: commitActionTypes.move,
+            file_path: 'renamedFile',
+            content: null,
+            encoding: 'text',
+            last_commit_id: undefined,
+            previous_path: 'prevPath',
+          },
+          {
+            action: commitActionTypes.update,
+            file_path: 'replacingFile',
             content: undefined,
             encoding: 'text',
             last_commit_id: undefined,
@@ -230,6 +256,41 @@ describe('Multi-file store utils', () => {
       expect(flattendFiles).toEqual([
         {
           path: 'a',
+          type: 'blob',
+          deleted: true,
+        },
+      ]);
+    });
+
+    it('filters out folders from the list', () => {
+      const files = [
+        {
+          path: 'a',
+          type: 'blob',
+          deleted: true,
+        },
+        {
+          path: 'c',
+          type: 'tree',
+          deleted: true,
+        },
+        {
+          path: 'c/d',
+          type: 'blob',
+          deleted: true,
+        },
+      ];
+
+      const flattendFiles = utils.getCommitFiles(files);
+
+      expect(flattendFiles).toEqual([
+        {
+          path: 'a',
+          type: 'blob',
+          deleted: true,
+        },
+        {
+          path: 'c/d',
           type: 'blob',
           deleted: true,
         },

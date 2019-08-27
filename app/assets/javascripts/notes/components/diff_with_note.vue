@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { mapState, mapActions } from 'vuex';
 import DiffFileHeader from '~/diffs/components/diff_file_header.vue';
 import DiffViewer from '~/vue_shared/components/diff_viewer/diff_viewer.vue';
@@ -100,7 +101,7 @@ export default {
               class="btn-link btn-link-retry btn-no-padding js-toggle-lazy-diff-retry-button"
               @click="fetchDiff"
             >
-              Try again
+              {{ __('Try again') }}
             </button>
           </td>
           <td v-else class="line_content js-success-lazy-load">

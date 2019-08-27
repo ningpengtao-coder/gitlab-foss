@@ -723,7 +723,7 @@ describe API::MergeRequests do
 
     it_behaves_like 'merge requests list'
 
-    context 'when have subgroups', :nested_groups do
+    context 'when have subgroups' do
       let!(:group) { create(:group, :public) }
       let!(:subgroup) { create(:group, parent: group) }
       let!(:project) { create(:project, :public, :repository, creator: user, namespace: subgroup, only_allow_merge_if_pipeline_succeeds: false) }
@@ -831,6 +831,31 @@ describe API::MergeRequests do
         expect(Time.parse json_response['latest_build_started_at']).to be_like_time(merge_request.metrics.latest_build_started_at)
         expect(Time.parse json_response['latest_build_finished_at']).to be_like_time(merge_request.metrics.latest_build_finished_at)
         expect(Time.parse json_response['first_deployed_to_production_at']).to be_like_time(merge_request.metrics.first_deployed_to_production_at)
+      end
+    end
+
+    context 'head_pipeline' do
+      before do
+        merge_request.update(head_pipeline: create(:ci_pipeline))
+        merge_request.project.project_feature.update(builds_access_level: 10)
+      end
+
+      context 'when user can read the pipeline' do
+        it 'exposes pipeline information' do
+          get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user)
+
+          expect(json_response).to include('head_pipeline')
+        end
+      end
+
+      context 'when user can not read the pipeline' do
+        let(:guest) { create(:user) }
+
+        it 'does not expose pipeline information' do
+          get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", guest)
+
+          expect(json_response).not_to include('head_pipeline')
+        end
       end
     end
 
@@ -1546,7 +1571,7 @@ describe API::MergeRequests do
     end
   end
 
-  describe "GET /projects/:id/merge_requests/:merge_request_iid/merge_ref" do
+  describe "GET /projects/:id/merge_requests/:merge_request_iid/merge_ref", :clean_gitlab_redis_shared_state do
     before do
       merge_request.mark_as_unchecked!
     end
@@ -2008,6 +2033,9 @@ describe API::MergeRequests do
 
       expect(response).to have_gitlab_http_status(202)
       expect(RebaseWorker.jobs.size).to eq(1)
+
+      expect(merge_request.reload).to be_rebase_in_progress
+      expect(json_response['rebase_in_progress']).to be(true)
     end
 
     it 'returns 403 if the user cannot push to the branch' do
@@ -2017,6 +2045,16 @@ describe API::MergeRequests do
       put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/rebase", guest)
 
       expect(response).to have_gitlab_http_status(403)
+    end
+
+    it 'returns 409 if a rebase is already in progress' do
+      Sidekiq::Testing.fake! do
+        merge_request.rebase_async(user.id)
+
+        put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/rebase", user)
+      end
+
+      expect(response).to have_gitlab_http_status(409)
     end
   end
 

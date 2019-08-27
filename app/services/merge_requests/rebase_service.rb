@@ -15,7 +15,8 @@ module MergeRequests
     end
 
     def rebase
-      if merge_request.rebase_in_progress?
+      # Ensure Gitaly isn't already running a rebase
+      if source_project.repository.rebase_in_progress?(merge_request.id)
         log_error('Rebase task canceled: Another rebase is already in progress', save_message_on_model: true)
         return false
       end
@@ -27,6 +28,8 @@ module MergeRequests
       log_error(REBASE_ERROR, save_message_on_model: true)
       log_error(e.message)
       false
+    ensure
+      merge_request.update_column(:rebase_jid, nil)
     end
   end
 end

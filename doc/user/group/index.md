@@ -78,6 +78,10 @@ Issues and merge requests are part of projects. For a given group, you can view 
 [issues](../project/issues/index.md#issues-list) and [merge requests](../project/merge_requests/index.md#merge-requests-per-group) across all projects in that group,
 together in a single list view.
 
+### Bulk editing issues and merge requests
+
+For details, see [bulk editing issues and merge requests](../group/bulk_editing/index.md).
+
 ## Create a new group
 
 > For a list of words that are not allowed to be used as group names see the
@@ -87,11 +91,11 @@ To create a new Group, either:
 
 - In the top menu, click **Groups** and then **Your Groups**, and click the green button **New group**.
 
-    ![new group from groups page](img/new_group_from_groups.png)
+  ![new group from groups page](img/new_group_from_groups.png)
 
 - Or, in the top menu, expand the `plus` sign and choose **New group**.
 
-    ![new group from elsewhere](img/new_group_from_other_pages.png)
+  ![new group from elsewhere](img/new_group_from_other_pages.png)
 
 Add the following information:
 
@@ -100,15 +104,15 @@ Add the following information:
 1. The **Group name** will automatically populate the URL. Optionally, you can change it.
    This is the name that displays in group views.
    The name can contain only:
-     - Alphanumeric characters
-     - Underscores
-     - Dashes and dots
-     - Spaces
+   - Alphanumeric characters
+   - Underscores
+   - Dashes and dots
+   - Spaces
 1. The **Group URL** is the namespace under which your projects will be hosted.
    The URL can contain only:
-     - Alphanumeric characters
-     - Underscores
-     - Dashes and dots (it cannot start with dashes or end in a dot)
+   - Alphanumeric characters
+   - Underscores
+   - Dashes and dots (it cannot start with dashes or end in a dot)
 1. Optionally, you can add a brief description to tell others
    what this group is about.
 1. Optionally, choose an avatar for your group.
@@ -162,12 +166,12 @@ There are two different ways to add a new project to a group:
 
 - Select a group, and then click **New project**. You can then continue [creating your project](../../gitlab-basics/create-project.md).
 
-    ![New project](img/create_new_project_from_group.png)
+  ![New project](img/create_new_project_from_group.png)
 
 - While you are creating a project, select a group namespace
   you've already created from the dropdown menu.
 
-    ![Select group](img/select_group_dropdown.png)
+  ![Select group](img/select_group_dropdown.png)
 
 ### Default project-creation level
 
@@ -200,7 +204,7 @@ Alternatively, you can [lock the sharing with group feature](#share-with-group-l
 In GitLab Enterprise Edition, it is possible to manage GitLab group memberships using LDAP groups.
 See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for more information.
 
-## Epics **[ULTIMATE]**
+## Epics **(ULTIMATE)**
 
 > Introduced in [GitLab Ultimate][ee] 10.2.
 
@@ -210,13 +214,15 @@ milestones.
 
 [Learn more about Epics.](epics/index.md)
 
-## Group Security Dashboard **[ULTIMATE]**
+## Group Security Dashboard **(ULTIMATE)**
 
 Get an overview of the vulnerabilities of all the projects in a group and its subgroups.
 
 [Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
-## Insights **[ULTIMATE]**
+## Insights **(ULTIMATE)**
+
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/725) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
 
 Configure the Insights that matter for your groups or projects, allowing users
 to explore data such as:
@@ -305,7 +311,7 @@ To enable this feature, navigate to the group settings page. Select
 
 ![Checkbox for share with group lock](img/share_with_group_lock.png)
 
-#### Member Lock **[STARTER]**
+#### Member Lock **(STARTER)**
 
 Member lock lets a group owner prevent any new project membership to all of the
 projects within a group, allowing tighter control over project membership.
@@ -325,7 +331,7 @@ This will disable the option for all users who previously had permissions to
 operate project memberships, so no new users can be added. Furthermore, any
 request to add a new user to a project through API will not be possible.
 
-#### IP access restriction **[ULTIMATE]**
+#### IP access restriction **(ULTIMATE ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1985) in
 [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
@@ -336,7 +342,7 @@ underlying projects, issues, etc, by IP address. This can help ensure that
 particular content doesn't leave the premises, while not blocking off access to
 the entire instance.
 
-Add whitelisted IP subnet using CIDR notation to the group settings and anyone
+Add one or more whitelisted IP subnets using CIDR notation in comma separated format to the group settings and anyone
 coming from a different IP address won't be able to access the restricted
 content.
 
@@ -344,7 +350,39 @@ Restriction currently applies to UI, API access is not restricted.
 To avoid accidental lock-out, admins and group owners are are able to access
 the group regardless of the IP restriction.
 
-#### Group file templates **[PREMIUM]**
+#### Allowed domain restriction **(PREMIUM ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7297) in
+[GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
+
+You can restrict access to groups and their underlying projects by
+allowing only users with email addresses in particular domains to be added to the group.
+
+Add email domains you want to whitelist and users with emails from different 
+domains won't be allowed to be added to this group.
+
+Some domains cannot be restricted. These are the most popular public email domains, such as:
+
+- `gmail.com`
+- `yahoo.com`
+- `hotmail.com`
+- `aol.com`
+- `msn.com`
+- `hotmail.co.uk`
+- `hotmail.fr`
+- `live.com`
+- `outlook.com`
+- `icloud.com`
+
+To enable this feature:
+
+1. Navigate to the group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section, and enter domain name into **Restrict membership by email** field.
+1. Click **Save changes**.
+
+This will enable the domain-checking for all new users added to the group from this moment on.
+
+#### Group file templates **(PREMIUM)**
 
 Group file templates allow you to share a set of templates for common file
 types with every project in a group. It is analogous to the
@@ -368,10 +406,21 @@ To enable this feature, navigate to the group settings page, expand the
 
 ![Group file template settings](img/group_file_template_settings.png)
 
-#### Group-level project templates **[PREMIUM]**
+#### Group-level project templates **(PREMIUM)**
 
 Define project templates at a group level by setting a group as the template source.
 [Learn more about group-level project templates](custom_project_templates.md).
+
+#### Disabling email notifications
+
+You can disable all email notifications related to the group, which also includes
+it's subgroups and projects.
+
+To enable this feature:
+ 
+1. Navigate to the group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section, and select **Disable email notifications**.
+1. Click **Save changes**.
 
 ### Advanced settings
 
@@ -380,10 +429,10 @@ Define project templates at a group level by setting a group as the template sou
 - **Webhooks**: Configure [webhooks](../project/integrations/webhooks.md) for your group.
 - **Kubernetes cluster integration**: Connect your GitLab group with [Kubernetes clusters](clusters/index.md).
 - **Audit Events**: View [Audit Events](../../administration/audit_events.md)
-  for the group. **[STARTER ONLY]**
+  for the group. **(STARTER ONLY)**
 - **Pipelines quota**: Keep track of the [pipeline quota](../admin_area/settings/continuous_integration.md) for the group.
 
-#### Storage usage quota **[STARTER]**
+#### Storage usage quota **(STARTER)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/13294) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.0.
 
@@ -391,17 +440,17 @@ A group owner can check the aggregated storage usage for all the project in a gr
 
 ![Group storage usage quota](img/group_storage_usage_quota.png)
 
-## User contribution analysis **[STARTER]**
+## User contribution analysis **(STARTER)**
 
 With [GitLab Contribution Analytics](contribution_analytics/index.md),
 you have an overview of the contributions (pushes, merge requests,
 and issues) performed by your group members.
 
-## Issues analytics **[PREMIUM]**
+## Issues analytics **(PREMIUM)**
 
 With [GitLab Issues Analytics](issues_analytics/index.md), you can see a bar chart of the number of issues created each month in your groups.
 
-## Dependency Proxy **[PREMIUM]**
+## Dependency Proxy **(PREMIUM)**
 
 Use GitLab as a [dependency proxy](dependency_proxy/index.md) for upstream Docker images.
 

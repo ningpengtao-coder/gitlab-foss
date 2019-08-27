@@ -69,7 +69,7 @@ module ApplicationSettingsHelper
   # toggle button effect.
   def import_sources_checkboxes(help_block_id, options = {})
     Gitlab::ImportSources.options.map do |name, source|
-      checked = Gitlab::CurrentSettings.import_sources.include?(source)
+      checked = @application_setting.import_sources.include?(source)
       css_class = checked ? 'active' : ''
       checkbox_name = 'application_setting[import_sources][]'
 
@@ -85,7 +85,7 @@ module ApplicationSettingsHelper
 
   def oauth_providers_checkboxes
     button_based_providers.map do |source|
-      disabled = Gitlab::CurrentSettings.disabled_oauth_sign_in_sources.include?(source.to_s)
+      disabled = @application_setting.disabled_oauth_sign_in_sources.include?(source.to_s)
       css_class = ['btn']
       css_class << 'active' unless disabled
       checkbox_name = 'application_setting[enabled_oauth_sign_in_sources][]'
@@ -160,6 +160,8 @@ module ApplicationSettingsHelper
       :akismet_api_key,
       :akismet_enabled,
       :allow_local_requests_from_hooks_and_services,
+      :allow_local_requests_from_web_hooks_and_services,
+      :allow_local_requests_from_system_hooks,
       :dns_rebinding_protection_enabled,
       :archive_builds_in_human_readable,
       :authorized_keys_enabled,
@@ -177,6 +179,7 @@ module ApplicationSettingsHelper
       :domain_blacklist_enabled,
       :domain_blacklist_raw,
       :domain_whitelist_raw,
+      :outbound_local_requests_whitelist_raw,
       :dsa_key_restriction,
       :ecdsa_key_restriction,
       :ed25519_key_restriction,
@@ -187,6 +190,8 @@ module ApplicationSettingsHelper
       :gitaly_timeout_default,
       :gitaly_timeout_medium,
       :gitaly_timeout_fast,
+      :grafana_enabled,
+      :grafana_url,
       :gravatar_enabled,
       :hashed_storage_enabled,
       :help_page_hide_commercial_content,
@@ -265,7 +270,11 @@ module ApplicationSettingsHelper
       :diff_max_patch_bytes,
       :commit_email_hostname,
       :protected_ci_variables,
-      :local_markdown_version
+      :local_markdown_version,
+      :snowplow_collector_hostname,
+      :snowplow_cookie_domain,
+      :snowplow_enabled,
+      :snowplow_site_id
     ]
   end
 

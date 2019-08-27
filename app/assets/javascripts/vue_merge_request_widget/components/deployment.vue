@@ -14,6 +14,8 @@ import ReviewAppLink from './review_app_link.vue';
 import MRWidgetService from '../services/mr_widget_service';
 
 export default {
+  // name: 'Deployment' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   name: 'Deployment',
   components: {
     LoadingButton,
@@ -125,7 +127,9 @@ export default {
             this.isStopping = false;
           })
           .catch(() => {
-            createFlash('Something went wrong while stopping this environment. Please try again.');
+            createFlash(
+              __('Something went wrong while stopping this environment. Please try again.'),
+            );
             this.isStopping = false;
           });
       }

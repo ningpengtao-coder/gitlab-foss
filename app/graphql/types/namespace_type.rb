@@ -4,6 +4,8 @@ module Types
   class NamespaceType < BaseObject
     graphql_name 'Namespace'
 
+    authorize :read_namespace
+
     field :id, GraphQL::ID_TYPE, null: false
 
     field :name, GraphQL::STRING_TYPE, null: false
@@ -16,6 +18,11 @@ module Types
     field :visibility, GraphQL::STRING_TYPE, null: true
     field :lfs_enabled, GraphQL::BOOLEAN_TYPE, null: true, method: :lfs_enabled?
     field :request_access_enabled, GraphQL::BOOLEAN_TYPE, null: true
+
+    field :root_storage_statistics, Types::RootStorageStatisticsType,
+          null: true,
+          description: 'The aggregated storage statistics. Only available for root namespaces',
+          resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchRootStorageStatisticsLoader.new(obj.id).find }
 
     field :projects,
           Types::ProjectType.connection_type,

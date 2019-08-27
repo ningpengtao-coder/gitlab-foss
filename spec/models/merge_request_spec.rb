@@ -7,6 +7,8 @@ describe MergeRequest do
   include ProjectForksHelper
   include ReactiveCachingHelpers
 
+  using RSpec::Parameterized::TableSyntax
+
   subject { create(:merge_request) }
 
   describe 'associations' do
@@ -1986,6 +1988,7 @@ describe MergeRequest do
       params = {}
       merge_jid = 'hash-123'
 
+      expect(merge_request).to receive(:expire_etag_cache)
       expect(MergeWorker).to receive(:perform_async).with(merge_request.id, user_id, params) do
         merge_jid
       end
@@ -1993,6 +1996,48 @@ describe MergeRequest do
       merge_request.merge_async(user_id, params)
 
       expect(merge_request.reload.merge_jid).to eq(merge_jid)
+    end
+  end
+
+  describe '#rebase_async' do
+    let(:merge_request) { create(:merge_request) }
+    let(:user_id) { double(:user_id) }
+    let(:rebase_jid) { 'rebase-jid' }
+
+    subject(:execute) { merge_request.rebase_async(user_id) }
+
+    it 'atomically enqueues a RebaseWorker job and updates rebase_jid' do
+      expect(RebaseWorker)
+        .to receive(:perform_async)
+        .with(merge_request.id, user_id)
+        .and_return(rebase_jid)
+
+      expect(merge_request).to receive(:expire_etag_cache)
+      expect(merge_request).to receive(:lock!).and_call_original
+
+      execute
+
+      expect(merge_request.rebase_jid).to eq(rebase_jid)
+    end
+
+    it 'refuses to enqueue a job if a rebase is in progress' do
+      merge_request.update_column(:rebase_jid, rebase_jid)
+
+      expect(RebaseWorker).not_to receive(:perform_async)
+      expect(Gitlab::SidekiqStatus)
+        .to receive(:running?)
+        .with(rebase_jid)
+        .and_return(true)
+
+      expect { execute }.to raise_error(ActiveRecord::StaleObjectError)
+    end
+
+    it 'refuses to enqueue a job if the MR is not open' do
+      merge_request.update_column(:state, 'foo')
+
+      expect(RebaseWorker).not_to receive(:perform_async)
+
+      expect { execute }.to raise_error(ActiveRecord::StaleObjectError)
     end
   end
 
@@ -2411,6 +2456,13 @@ describe MergeRequest do
   describe "#diff_refs" do
     context "with diffs" do
       subject { create(:merge_request, :with_diffs) }
+      let(:expected_diff_refs) do
+        Gitlab::Diff::DiffRefs.new(
+          base_sha:  subject.merge_request_diff.base_commit_sha,
+          start_sha: subject.merge_request_diff.start_commit_sha,
+          head_sha:  subject.merge_request_diff.head_commit_sha
+        )
+      end
 
       it "does not touch the repository" do
         subject # Instantiate the object
@@ -2421,13 +2473,17 @@ describe MergeRequest do
       end
 
       it "returns expected diff_refs" do
-        expected_diff_refs = Gitlab::Diff::DiffRefs.new(
-          base_sha:  subject.merge_request_diff.base_commit_sha,
-          start_sha: subject.merge_request_diff.start_commit_sha,
-          head_sha:  subject.merge_request_diff.head_commit_sha
-        )
-
         expect(subject.diff_refs).to eq(expected_diff_refs)
+      end
+
+      context 'when importing' do
+        before do
+          subject.importing = true
+        end
+
+        it "returns MR diff_refs" do
+          expect(subject.diff_refs).to eq(expected_diff_refs)
+        end
       end
     end
   end
@@ -2946,39 +3002,24 @@ describe MergeRequest do
   end
 
   describe '#rebase_in_progress?' do
-    shared_examples 'checking whether a rebase is in progress' do
-      let(:repo_path) do
-        Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-          subject.source_project.repository.path
-        end
-      end
-      let(:rebase_path) { File.join(repo_path, "gitlab-worktree", "rebase-#{subject.id}") }
+    where(:rebase_jid, :jid_valid, :result) do
+      'foo' | true  | true
+      'foo' | false | false
+      ''    | true  | false
+      nil   | true  | false
+    end
 
-      before do
-        system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} worktree add --detach #{rebase_path} master))
-      end
+    with_them do
+      let(:merge_request) { create(:merge_request) }
 
-      it 'returns true when there is a current rebase directory' do
-        expect(subject.rebase_in_progress?).to be_truthy
-      end
+      subject { merge_request.rebase_in_progress? }
 
-      it 'returns false when there is no rebase directory' do
-        FileUtils.rm_rf(rebase_path)
+      it do
+        allow(Gitlab::SidekiqStatus).to receive(:running?).with(rebase_jid) { jid_valid }
 
-        expect(subject.rebase_in_progress?).to be_falsey
-      end
+        merge_request.rebase_jid = rebase_jid
 
-      it 'returns false when the rebase directory has expired' do
-        time = 20.minutes.ago.to_time
-        File.utime(time, time, rebase_path)
-
-        expect(subject.rebase_in_progress?).to be_falsey
-      end
-
-      it 'returns false when the source project has been removed' do
-        allow(subject).to receive(:source_project).and_return(nil)
-
-        expect(subject.rebase_in_progress?).to be_falsey
+        is_expected.to eq(result)
       end
     end
   end
@@ -3151,6 +3192,36 @@ describe MergeRequest do
       let(:ref) { 'refs/merge-requests/1/merge' }
 
       it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#cleanup_refs' do
+    subject { merge_request.cleanup_refs(only: only) }
+
+    let(:merge_request) { build(:merge_request) }
+
+    context 'when removing all refs' do
+      let(:only) { :all }
+
+      it 'deletes all refs from the target project' do
+        expect(merge_request.target_project.repository)
+          .to receive(:delete_refs)
+          .with(merge_request.ref_path, merge_request.merge_ref_path, merge_request.train_ref_path)
+
+        subject
+      end
+    end
+
+    context 'when removing only train ref' do
+      let(:only) { :train }
+
+      it 'deletes train ref from the target project' do
+        expect(merge_request.target_project.repository)
+          .to receive(:delete_refs)
+          .with(merge_request.train_ref_path)
+
+        subject
+      end
     end
   end
 end

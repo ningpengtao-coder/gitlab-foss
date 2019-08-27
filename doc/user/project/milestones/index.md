@@ -1,3 +1,7 @@
+---
+type: index, reference
+---
+
 # Milestones
 
 ## Overview
@@ -14,12 +18,12 @@ the start and end of your Agile sprint.
 Set the milestone title to the name of your Agile sprint,
 such as `November 2018 sprint`.
 Add an issue to your Agile sprint by associating
-the milestone to the issue.  
+the milestone to the issue.
 
 ## Milestones as releases
 
 Milestones can be used as releases.
-Set the milestone due date to represent the release date of your release. 
+Set the milestone due date to represent the release date of your release.
 (And leave the milestone start date blank.)
 Set the milestone title to the version of your release,
 such as `Version 9.4`.
@@ -84,9 +88,9 @@ From the project issue/merge request list pages and the group issue/merge reques
 ### Filtering in issue boards
 
 - From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [search and filter bar](../../search/index.md#issue-boards).
-- From [group issue boards](../issue_board.md#group-issue-boards-premium), you can filter by only group milestones in the [search and filter bar](../../search/index.md#issue-boards). **[PREMIUM]**
-- From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [issue board configuration](../issue_board.md#configurable-issue-boards-starter). **[STARTER]**
-- From [group issue boards](../issue_board.md#group-issue-boards-premium) you can filter by only group milestones in the [issue board configuration](../issue_board.md#configurable-issue-boards-starter). **[STARTER]**
+- From [group issue boards](../issue_board.md#group-issue-boards-premium), you can filter by only group milestones in the [search and filter bar](../../search/index.md#issue-boards). **(PREMIUM)**
+- From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [issue board configuration](../issue_board.md#configurable-issue-boards-starter). **(STARTER)**
+- From [group issue boards](../issue_board.md#group-issue-boards-premium) you can filter by only group milestones in the [issue board configuration](../issue_board.md#configurable-issue-boards-starter). **(STARTER)**
 
 ### Special milestone filters
 
@@ -124,13 +128,13 @@ These features are only available for project milestones and not group milestone
 - Participants and labels that are used in issues and merge requests that have the milestone assigned are displayed.
 - [Burndown chart](#project-burndown-charts-starter).
 
-### Project Burndown Charts **[STARTER]**
+### Project Burndown Charts **(STARTER)**
 
 For project milestones in [GitLab Starter](https://about.gitlab.com/pricing), a [burndown chart](burndown_charts.md) is in the milestone view, showing the progress of completing a milestone.
 
 ![burndown chart](img/burndown_chart.png)
 
-### Group Burndown Charts **[PREMIUM]**
+### Group Burndown Charts **(PREMIUM)**
 
 For group milestones in [GitLab Premium](https://about.gitlab.com/pricing), a [burndown chart](burndown_charts.md) is in the milestone view, showing the progress of completing a milestone.
 
@@ -145,3 +149,15 @@ The milestone sidebar on the milestone view shows the following:
 For project milestones only, the milestone sidebar shows the total issue weight of all issues that have the milestone assigned.
 
 ![Project milestone page](img/milestones_project_milestone_page.png)
+
+<!-- ## Troubleshooting
+
+Include any troubleshooting steps that you can foresee. If you know beforehand what issues
+one might have when setting this up, or when something is changed, or on upgrading, it's
+important to describe those, too. Think of things that may go wrong and include them here.
+This is important to minimize requests for support, and to avoid doc comments with
+questions that you know someone might ask.
+
+Each scenario can be a third-level heading, e.g. `### Getting error message X`.
+If you have none to add when creating a doc, leave this section in place
+but commented out to help encourage others to add to it in the future. -->

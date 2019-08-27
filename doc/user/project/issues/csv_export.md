@@ -1,4 +1,4 @@
-# Export Issues to CSV **[STARTER]**
+# Export Issues to CSV **(STARTER)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1126) in [GitLab Starter 9.0](https://about.gitlab.com/2017/03/22/gitlab-9-0-released/#export-issues-ees-eep).
 
@@ -48,7 +48,6 @@ Exported issues are always sorted by `Issue ID`.
 
 Data will be encoded with a comma as the column delimiter, with `"` used to quote fields if needed, and newlines to separate rows. The first row will be the headers, which are listed in the following table along with a description of the values:
 
-
 | Column  | Description |
 |---------|-------------|
 | Issue ID | Issue `iid` |
@@ -71,7 +70,6 @@ Data will be encoded with a comma as the column delimiter, with `"` used to quot
 | Time Estimate | [Time estimate](../../../workflow/time_tracking.md#estimates) in seconds |
 | Time Spent | [Time spent](../../../workflow/time_tracking.md#time-spent) in seconds |
 
-
 ## Limitations
 
-As the issues will be sent as an email attachment, there is a limit on how much data can be exported. Currently this limit is 20MB to ensure successful delivery across a range of email providers. If this limit is reached we suggest narrowing the search before export, perhaps by exporting open and closed issues separately.
+As the issues will be sent as an email attachment, there is a limit on how much data can be exported. Currently this limit is 15MB to ensure successful delivery across a range of email providers. If this limit is reached we suggest narrowing the search before export, perhaps by exporting open and closed issues separately.

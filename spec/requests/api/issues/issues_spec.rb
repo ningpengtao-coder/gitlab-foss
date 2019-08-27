@@ -4,8 +4,9 @@ require 'spec_helper'
 
 describe API::Issues do
   set(:user) { create(:user) }
-  set(:project) do
-    create(:project, :public, creator_id: user.id, namespace: user.namespace)
+  set(:project) { create(:project, :public, :repository, creator_id: user.id, namespace: user.namespace) }
+  set(:private_mrs_project) do
+    create(:project, :public, :repository, creator_id: user.id, namespace: user.namespace, merge_requests_access_level: ProjectFeature::PRIVATE)
   end
 
   let(:user2)       { create(:user) }
@@ -63,6 +64,8 @@ describe API::Issues do
   before(:all) do
     project.add_reporter(user)
     project.add_guest(guest)
+    private_mrs_project.add_reporter(user)
+    private_mrs_project.add_guest(guest)
   end
 
   before do
@@ -213,6 +216,10 @@ describe API::Issues do
         expect_paginated_array_response([issue.id, closed_issue.id])
         expect(json_response.first['title']).to eq(issue.title)
         expect(json_response.last).to have_key('web_url')
+        # Calculating the value of subscribed field triggers Markdown
+        # processing. We can't do that for multiple issues / merge
+        # requests in a single API request.
+        expect(json_response.last).not_to have_key('subscribed')
       end
 
       it 'returns an array of closed issues' do
@@ -600,6 +607,22 @@ describe API::Issues do
         expect_paginated_array_response([closed_issue.id, issue.id])
       end
 
+      context 'with issues list sort options' do
+        it 'accepts only predefined order by params' do
+          API::Helpers::IssuesHelpers.sort_options.each do |sort_opt|
+            get api('/issues', user), params: { order_by: sort_opt, sort: 'asc' }
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+
+        it 'fails to sort with non predefined options' do
+          %w(milestone title abracadabra).each do |sort_opt|
+            get api('/issues', user), params: { order_by: sort_opt, sort: 'asc' }
+            expect(response).to have_gitlab_http_status(400)
+          end
+        end
+      end
+
       it 'matches V4 response schema' do
         get api('/issues', user)
 
@@ -723,6 +746,30 @@ describe API::Issues do
           expect(response).to have_gitlab_http_status(400)
           expect(json_response["error"]).to include("mutually exclusive")
         end
+      end
+    end
+
+    context "when returns issue merge_requests_count for different access levels" do
+      let!(:merge_request1) do
+        create(:merge_request,
+               :simple,
+               author: user,
+               source_project: private_mrs_project,
+               target_project: private_mrs_project,
+               description: "closes #{issue.to_reference(private_mrs_project)}")
+      end
+      let!(:merge_request2) do
+        create(:merge_request,
+               :simple,
+               author: user,
+               source_project: project,
+               target_project: project,
+               description: "closes #{issue.to_reference}")
+      end
+
+      it_behaves_like 'accessible merge requests count' do
+        let(:api_url) { "/issues" }
+        let(:target_issue) { issue }
       end
     end
   end

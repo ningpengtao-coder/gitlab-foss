@@ -320,7 +320,6 @@ class IssuableFinder
   def use_cte_for_search?
     strong_memoize(:use_cte_for_search) do
       next false unless search
-      next false unless Gitlab::Database.postgresql?
       # Only simple unsorted & simple sorts can use CTE
       next false if params[:sort].present? && !params[:sort].in?(klass.simple_sorts.keys)
 
@@ -429,7 +428,7 @@ class IssuableFinder
       items = klass.with(cte.to_arel).from(klass.table_name)
     end
 
-    items.full_search(search, matched_columns: params[:in])
+    items.full_search(search, matched_columns: params[:in], use_minimum_char_limit: !use_cte_for_search?)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

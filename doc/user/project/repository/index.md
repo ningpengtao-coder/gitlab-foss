@@ -1,3 +1,7 @@
+---
+type: concepts, howto
+---
+
 # Repository
 
 A [repository](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
@@ -111,33 +115,7 @@ GitLab.
 
 ## Branches
 
-When you submit changes in a new [branch](branches/index.md), you create a new version
-of that project's file tree. Your branch contains all the changes
-you are presenting, which are detected by Git line by line.
-
-To continue your workflow, once you pushed your changes to a new branch,
-you can create a [merge request](../merge_requests/index.md), perform
-inline code review, and [discuss](../../discussions/index.md)
-your implementation with your team.
-You can live preview changes submitted to a new branch with
-[Review Apps](../../../ci/review_apps/index.md).
-
-With [GitLab Starter](https://about.gitlab.com/pricing/), you can also request
-[approval](../merge_requests/merge_request_approvals.md) from your managers.
-
-To create, delete, and view [branches](branches/index.md) via GitLab's UI:
-
-- [Default branches](branches/index.md#default-branch)
-- [Create a branch](web_editor.md#create-a-new-branch)
-- [Protected branches](../protected_branches.md#protected-branches)
-- [Delete merged branches](branches/index.md#delete-merged-branches)
-- [Branch filter search box](branches/index.md#branch-filter-search-box)
-
-Alternatively, you can use the
-[command line](../../../gitlab-basics/start-using-git.md#create-a-branch).
-
-To learn more about branching strategies read through the
-[GitLab Flow](../../../university/training/gitlab_flow.md) documentation.
+For details, see [Branches](branches/index.md).
 
 ## Commits
 
@@ -171,17 +149,14 @@ Via command line, you can commit multiple times before pushing.
 - **Sign a commit:**
   Use GPG to [sign your commits](gpg_signed_commits/index.md).
 
-## Repository size
+## Project and repository size
 
-A project's repository size is reported on the project's **Details** page. The reported size is
-updated every 15 minutes at most, so may not reflect recent activity.
+A project's size is reported on the project's **Details** page. The reported size is
+updated every 15 minutes at most, so may not reflect recent activity. The displayed files size includes repository files, artifacts, and LFS.
 
-The repository size for:
+The project size may differ slightly from one instance to another due to compression, housekeeping, and other factors.
 
-- GitLab.com [is set by GitLab](../../gitlab_com/index.md#repository-size-limit).
-- Self-managed instances is set by your GitLab administrators.
-
-You can [reduce a repository's size using Git](reducing_the_repo_size_using_git.md).
+[Repository size limit](../../admin_area/settings/account_and_limit_settings.md) may be set by admins. GitLab.com's repository size limit [is set by GitLab](../../gitlab_com/index.md#repository-size-limit).
 
 ## Contributors
 
@@ -207,7 +182,7 @@ were used and display this on the projects pages. If this information is missing
 be added after updating the default branch on the project. This process can take up to 5
 minutes.
 
-![Repository Languages bar](img/repository_languages.png)
+![Repository Languages bar](img/repository_languages_v12_2.gif)
 
 Not all files are detected, among others; documentation,
 vendored code, and most markup languages are excluded. This behaviour can be
@@ -216,15 +191,7 @@ detected, add the following to `.gitattributes` in the root of your repository.
 
 > *.proto linguist-detectable=true
 
-## Compare
-
-Select branches to compare using the [branch filter search box](branches/index.md#branch-filter-search-box), then click the **Compare** button to view the changes inline:
-
-![compare branches](img/compare_branches.png)
-
-Find it under your project's **Repository > Compare**.
-
-## Locked files **[PREMIUM]**
+## Locked files **(PREMIUM)**
 
 Use [File Locking](../file_lock.md) to
 lock your files to prevent any conflicting changes.
@@ -259,3 +226,15 @@ By clicking the download icon, a dropdown will open with links to download the f
   `tar`, `tar.gz`, and `tar.bz2`.
 - **Artifacts:**
   allows users to download the artifacts of the latest CI build.
+
+<!-- ## Troubleshooting
+
+Include any troubleshooting steps that you can foresee. If you know beforehand what issues
+one might have when setting this up, or when something is changed, or on upgrading, it's
+important to describe those, too. Think of things that may go wrong and include them here.
+This is important to minimize requests for support, and to avoid doc comments with
+questions that you know someone might ask.
+
+Each scenario can be a third-level heading, e.g. `### Getting error message X`.
+If you have none to add when creating a doc, leave this section in place
+but commented out to help encourage others to add to it in the future. -->

@@ -23,7 +23,11 @@ describe API::Issues do
 
   describe 'GET /groups/:id/issues' do
     let!(:group)            { create(:group) }
-    let!(:group_project)    { create(:project, :public, creator_id: user.id, namespace: group) }
+    let!(:group_project)    { create(:project, :public, :repository, creator_id: user.id, namespace: group) }
+    let!(:private_mrs_project) do
+      create(:project, :public, :repository, creator_id: user.id, namespace: group, merge_requests_access_level: ProjectFeature::PRIVATE)
+    end
+
     let!(:group_closed_issue) do
       create :closed_issue,
         author: user,
@@ -78,7 +82,7 @@ describe API::Issues do
       end
     end
 
-    context 'when group has subgroups', :nested_groups do
+    context 'when group has subgroups' do
       let(:subgroup_1) { create(:group, parent: group) }
       let(:subgroup_2) { create(:group, parent: subgroup_1) }
 
@@ -234,6 +238,30 @@ describe API::Issues do
             it_behaves_like 'group issues statistics'
           end
         end
+
+        context "when returns issue merge_requests_count for different access levels" do
+          let!(:merge_request1) do
+            create(:merge_request,
+                   :simple,
+                   author: user,
+                   source_project: private_mrs_project,
+                   target_project: private_mrs_project,
+                   description: "closes #{group_issue.to_reference(private_mrs_project)}")
+          end
+          let!(:merge_request2) do
+            create(:merge_request,
+                   :simple,
+                   author: user,
+                   source_project: group_project,
+                   target_project: group_project,
+                   description: "closes #{group_issue.to_reference}")
+          end
+
+          it_behaves_like 'accessible merge requests count' do
+            let(:api_url) { base_url }
+            let(:target_issue) { group_issue }
+          end
+        end
       end
     end
 
@@ -312,6 +340,14 @@ describe API::Issues do
     context 'when user is a group member' do
       before do
         group_project.add_reporter(user)
+      end
+
+      it 'exposes known attributes' do
+        get api(base_url, admin)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response.last.keys).to include(*%w(id iid project_id title description))
+        expect(json_response.last).not_to have_key('subscribed')
       end
 
       it 'returns all group issues (including opened and closed)' do

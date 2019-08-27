@@ -129,7 +129,7 @@ below.
 }
 ```
 
-## Interactive Web Terminals for the Web IDE **[ULTIMATE ONLY]**
+## Interactive Web Terminals for the Web IDE **(ULTIMATE ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5426) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.6.
 
@@ -151,7 +151,7 @@ to work:
 - The Runner needs to have
   [`[session_server]` configured properly](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-session_server-section).
 - If you are using a reverse proxy with your GitLab instance, web terminals need to be
-  [enabled](../../../administration/integration/terminal.md#enabling-and-disabling-terminal-support). **[ULTIMATE ONLY]**
+  [enabled](../../../administration/integration/terminal.md#enabling-and-disabling-terminal-support). **(ULTIMATE ONLY)**
 
 If you have the terminal open and the job has finished with its tasks, the
 terminal will block the job from finishing for the duration configured in
@@ -294,7 +294,6 @@ active terminal at a time.
 - If the terminal displays **Connection Failure**, then the terminal could not
   connect to the runner. Please try to stop and restart the terminal. If the
   problem persists, double check your runner configuration.
-
 
 [ce]: https://about.gitlab.com/pricing/
 [ee]: https://about.gitlab.com/pricing/

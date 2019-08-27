@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Dashboard shortcuts', :js do
@@ -22,7 +24,7 @@ describe 'Dashboard shortcuts', :js do
 
       find('body').send_keys([:shift, 'T'])
 
-      check_page_title('Todos')
+      check_page_title('To-Do List')
 
       find('body').send_keys([:shift, 'P'])
 
@@ -49,7 +51,7 @@ describe 'Dashboard shortcuts', :js do
       find('body').send_keys([:shift, 'P'])
 
       find('.nothing-here-block')
-      expect(page).to have_content('This user doesn\'t have any personal projects')
+      expect(page).to have_content('Explore public groups to find projects to contribute to.')
     end
   end
 

@@ -40,21 +40,26 @@ export default {
 
 <template>
   <div class="discussion-with-resolve-btn clearfix">
-    <reply-placeholder class="qa-discussion-reply" @onClick="$emit('showReplyForm')" />
+    <reply-placeholder
+      data-qa-selector="discussion_reply_tab"
+      :button-text="s__('MergeRequests|Reply...')"
+      @onClick="$emit('showReplyForm')"
+    />
 
     <div class="btn-group discussion-actions" role="group">
-      <resolve-discussion-button
-        v-if="discussion.resolvable"
-        :is-resolving="isResolving"
-        :button-title="resolveButtonTitle"
-        @onClick="$emit('resolve')"
-      />
+      <div class="btn-group">
+        <resolve-discussion-button
+          v-if="discussion.resolvable"
+          :is-resolving="isResolving"
+          :button-title="resolveButtonTitle"
+          @onClick="$emit('resolve')"
+        />
+      </div>
       <resolve-with-issue-button
         v-if="discussion.resolvable && resolveWithIssuePath"
         :url="resolveWithIssuePath"
       />
     </div>
-
     <div
       v-if="discussion.resolvable && shouldShowJumpToNextDiscussion"
       class="btn-group discussion-actions ml-sm-2"

@@ -372,7 +372,7 @@ describe('diff_file_header', () => {
       });
 
       it('displays old and new path if the file was renamed', () => {
-        props.diffFile.viewer.name = diffViewerModes.renamed;
+        props.diffFile.renamed_file = true;
 
         vm = mountComponentWithStore(Component, { props, store });
 
@@ -521,7 +521,7 @@ describe('diff_file_header', () => {
       });
 
       describe('with discussions', () => {
-        it('dispatches toggleFileDiscussions when user clicks on toggle discussions button', () => {
+        it('dispatches toggleFileDiscussionWrappers when user clicks on toggle discussions button', () => {
           const propsCopy = Object.assign({}, props);
           propsCopy.diffFile.submodule = false;
           propsCopy.diffFile.blob = {
@@ -552,11 +552,11 @@ describe('diff_file_header', () => {
             }),
           });
 
-          spyOn(vm, 'toggleFileDiscussions');
+          spyOn(vm, 'toggleFileDiscussionWrappers');
 
           vm.$el.querySelector('.js-btn-vue-toggle-comments').click();
 
-          expect(vm.toggleFileDiscussions).toHaveBeenCalled();
+          expect(vm.toggleFileDiscussionWrappers).toHaveBeenCalled();
         });
       });
     });

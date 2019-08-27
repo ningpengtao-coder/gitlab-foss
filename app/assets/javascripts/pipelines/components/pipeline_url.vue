@@ -67,7 +67,7 @@ export default {
       <span
         v-if="pipeline.flags.latest"
         v-gl-tooltip
-        :title="__('Latest pipeline for this branch')"
+        :title="__('Latest pipeline for the most recent commit on this branch')"
         class="js-pipeline-url-latest badge badge-success"
       >
         {{ __('latest') }}
@@ -94,16 +94,19 @@ export default {
         tabindex="0"
         class="js-pipeline-url-autodevops badge badge-info autodevops-badge"
         role="button"
+        >{{ __('Auto DevOps') }}</gl-link
       >
-        Auto DevOps
-      </gl-link>
       <span v-if="pipeline.flags.stuck" class="js-pipeline-url-stuck badge badge-warning">
         {{ __('stuck') }}
       </span>
       <span
         v-if="pipeline.flags.detached_merge_request_pipeline"
         v-gl-tooltip
-        :title="__('This pipeline is run on the source branch')"
+        :title="
+          __(
+            'Pipelines for merge requests are configured. A detached pipeline runs in the context of the merge request, and not against the merged result. Learn more on the documentation for Pipelines for Merged Results.',
+          )
+        "
         class="js-pipeline-url-detached badge badge-info"
       >
         {{ __('detached') }}

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'OAuth Login', :js, :allow_forgery_protection do
@@ -16,16 +18,8 @@ describe 'OAuth Login', :js, :allow_forgery_protection do
   providers = [:github, :twitter, :bitbucket, :gitlab, :google_oauth2,
                :facebook, :cas3, :auth0, :authentiq, :salesforce]
 
-  before(:all) do
-    # The OmniAuth `full_host` parameter doesn't get set correctly (it gets set to something like `http://localhost`
-    # here), and causes integration tests to fail with 404s. We set the `full_host` by removing the request path (and
-    # anything after it) from the request URI.
-    @omniauth_config_full_host = OmniAuth.config.full_host
-    OmniAuth.config.full_host = ->(request) { request['REQUEST_URI'].sub(/#{request['REQUEST_PATH']}.*/, '') }
-  end
-
-  after(:all) do
-    OmniAuth.config.full_host = @omniauth_config_full_host
+  around(:all) do |example|
+    with_omniauth_full_host { example.run }
   end
 
   def login_with_provider(provider, enter_two_factor: false)
@@ -42,6 +36,7 @@ describe 'OAuth Login', :js, :allow_forgery_protection do
 
       before do
         stub_omniauth_config(provider)
+        expect(ActiveSession).to receive(:cleanup).with(user).at_least(:once).and_call_original
       end
 
       context 'when two-factor authentication is disabled' do
@@ -58,6 +53,18 @@ describe 'OAuth Login', :js, :allow_forgery_protection do
         it 'logs the user in' do
           login_with_provider(provider, enter_two_factor: true)
 
+          expect(current_path).to eq root_path
+        end
+
+        it 'when bypass-two-factor is enabled' do
+          allow(Gitlab.config.omniauth).to receive_messages(allow_bypass_two_factor: true)
+          login_via(provider.to_s, user, uid, remember_me: false)
+          expect(current_path).to eq root_path
+        end
+
+        it 'when bypass-two-factor is disabled' do
+          allow(Gitlab.config.omniauth).to receive_messages(allow_bypass_two_factor: false)
+          login_with_provider(provider, enter_two_factor: true)
           expect(current_path).to eq root_path
         end
       end

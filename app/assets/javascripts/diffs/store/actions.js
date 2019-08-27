@@ -12,6 +12,7 @@ import {
   getNoteFormData,
   convertExpandLines,
   idleCallback,
+  allDiscussionWrappersExpanded,
 } from './utils';
 import * as types from './mutation_types';
 import {
@@ -79,6 +80,7 @@ export const assignDiscussionsToDiff = (
   discussions = rootState.notes.discussions,
 ) => {
   const diffPositionByLineCode = getDiffPositionByLineCode(state.diffFiles);
+  const hash = getLocationHash();
 
   discussions
     .filter(discussion => discussion.diff_discussion)
@@ -86,6 +88,7 @@ export const assignDiscussionsToDiff = (
       commit(types.SET_LINE_DISCUSSIONS_FOR_FILE, {
         discussion,
         diffPositionByLineCode,
+        hash,
       });
     });
 
@@ -99,10 +102,14 @@ export const removeDiscussionsFromDiff = ({ commit }, removeDiscussion) => {
   commit(types.REMOVE_LINE_DISCUSSIONS_FOR_FILE, { fileHash: file_hash, lineCode: line_code, id });
 };
 
+export const toggleLineDiscussions = ({ commit }, options) => {
+  commit(types.TOGGLE_LINE_DISCUSSIONS, options);
+};
+
 export const renderFileForDiscussionId = ({ commit, rootState, state }, discussionId) => {
   const discussion = rootState.notes.discussions.find(d => d.id === discussionId);
 
-  if (discussion) {
+  if (discussion && discussion.diff_file) {
     const file = state.diffFiles.find(f => f.file_hash === discussion.diff_file.file_hash);
 
     if (file) {
@@ -176,7 +183,7 @@ export const cancelCommentForm = ({ commit }, { lineCode, fileHash }) => {
 };
 
 export const loadMoreLines = ({ commit }, options) => {
-  const { endpoint, params, lineNumbers, fileHash } = options;
+  const { endpoint, params, lineNumbers, fileHash, isExpandDown, nextLineNumbers } = options;
 
   params.from_merge_request = true;
 
@@ -188,6 +195,8 @@ export const loadMoreLines = ({ commit }, options) => {
       contextLines,
       params,
       fileHash,
+      isExpandDown,
+      nextLineNumbers,
     });
   });
 };
@@ -257,6 +266,31 @@ export const toggleFileDiscussions = ({ getters, dispatch }, diff) => {
   });
 };
 
+export const toggleFileDiscussionWrappers = ({ commit }, diff) => {
+  const discussionWrappersExpanded = allDiscussionWrappersExpanded(diff);
+  let linesWithDiscussions;
+  if (diff.highlighted_diff_lines) {
+    linesWithDiscussions = diff.highlighted_diff_lines.filter(line => line.discussions.length);
+  }
+  if (diff.parallel_diff_lines) {
+    linesWithDiscussions = diff.parallel_diff_lines.filter(
+      line =>
+        (line.left && line.left.discussions.length) ||
+        (line.right && line.right.discussions.length),
+    );
+  }
+
+  if (linesWithDiscussions.length) {
+    linesWithDiscussions.forEach(line => {
+      commit(types.TOGGLE_LINE_DISCUSSIONS, {
+        fileHash: diff.file_hash,
+        lineCode: line.line_code,
+        expanded: !discussionWrappersExpanded,
+      });
+    });
+  }
+};
+
 export const saveDiffDiscussion = ({ state, dispatch }, { note, formData }) => {
   const postData = getNoteFormData({
     commit: state.commit,
@@ -267,7 +301,7 @@ export const saveDiffDiscussion = ({ state, dispatch }, { note, formData }) => {
   return dispatch('saveNote', postData, { root: true })
     .then(result => dispatch('updateDiscussion', result.discussion, { root: true }))
     .then(discussion => dispatch('assignDiscussionsToDiff', [discussion]))
-    .then(() => dispatch('updateResolvableDiscussonsCounts', null, { root: true }))
+    .then(() => dispatch('updateResolvableDiscussionsCounts', null, { root: true }))
     .then(() => dispatch('closeDiffFileCommentForm', formData.diffFile.file_hash))
     .catch(() => createFlash(s__('MergeRequests|Saving the comment failed')));
 };

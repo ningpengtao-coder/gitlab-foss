@@ -1,4 +1,4 @@
-# Related issues **[STARTER]**
+# Related issues **(STARTER)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1797) in [GitLab Starter](https://about.gitlab.com/pricing/) 9.4.
 
@@ -19,7 +19,7 @@ Issues from a different project require additional information like the
 group and the project name. For example:
 
 - same project: `#44`
-- same group: `project#44 `
+- same group: `project#44`
 - different group: `group/project#44`
 
 Valid references will be added to a temporary list that you can review.

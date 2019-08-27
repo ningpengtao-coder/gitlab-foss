@@ -17,8 +17,8 @@ module Issues
       super
     end
 
-    def before_update(issue)
-      spam_check(issue, current_user)
+    def before_update(issue, skip_spam_check: false)
+      spam_check(issue, current_user) unless skip_spam_check
     end
 
     def handle_changes(issue, options)
@@ -61,6 +61,8 @@ module Issues
       if added_mentions.present?
         notification_service.async.new_mentions_in_issue(issue, added_mentions, current_user)
       end
+
+      ZoomNotesService.new(issue, project, current_user, old_description: old_associations[:description]).execute
     end
 
     def handle_task_changes(issuable)

@@ -27,7 +27,6 @@ export default {
     return {
       width: 0,
       height: 0,
-      isLoaded: false,
     };
   },
   computed: {
@@ -63,8 +62,6 @@ export default {
         this.height = contentImg.naturalHeight;
 
         this.$nextTick(() => {
-          this.isLoaded = true;
-
           this.$emit('imgLoaded', {
             width: this.width,
             height: this.height,
@@ -91,7 +88,9 @@ export default {
         |
       </template>
       <template v-if="hasDimensions">
-        <strong>W</strong>: {{ width }} | <strong>H</strong>: {{ height }}
+        <strong>{{ s__('ImageViewerDimensions|W') }}</strong
+        >: {{ width }} | <strong>{{ s__('ImageViewerDimensions|H') }}</strong
+        >: {{ height }}
       </template>
     </p>
   </div>

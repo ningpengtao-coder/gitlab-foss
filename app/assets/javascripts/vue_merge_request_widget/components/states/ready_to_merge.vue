@@ -6,6 +6,7 @@ import simplePoll from '~/lib/utils/simple_poll';
 import { __ } from '~/locale';
 import readyToMergeMixin from 'ee_else_ce/vue_merge_request_widget/mixins/ready_to_merge';
 import MergeRequest from '../../../merge_request';
+import { refreshUserMergeRequestCounts } from '~/commons/nav/user_merge_requests';
 import Flash from '../../../flash';
 import statusIcon from '../mr_widget_status_icon.vue';
 import eventHub from '../../event_hub';
@@ -93,9 +94,6 @@ export default {
 
       return __('Merge');
     },
-    shouldShowMergeOptionsDropdown() {
-      return this.isAutoMergeAvailable && !this.mr.onlyAllowMergeIfPipelineSucceeds;
-    },
     isRemoveSourceBranchButtonDisabled() {
       return this.isMergeButtonDisabled;
     },
@@ -174,6 +172,8 @@ export default {
             MergeRequest.decreaseCounter();
             stopPolling();
 
+            refreshUserMergeRequestCounts();
+
             // If user checked remove source branch and we didn't remove the branch yet
             // we should start another polling for source branch remove process
             if (this.removeSourceBranch && data.source_branch_exists) {
@@ -243,17 +243,17 @@ export default {
               {{ mergeButtonText }}
             </button>
             <button
-              v-if="isAutoMergeAvailable"
+              v-if="shouldShowMergeImmediatelyDropdown"
               :disabled="isMergeButtonDisabled"
               type="button"
               class="btn btn-sm btn-info dropdown-toggle js-merge-moment"
               data-toggle="dropdown"
-              aria-label="Select merge moment"
+              :aria-label="__('Select merge moment')"
             >
               <i class="fa fa-chevron-down qa-merge-moment-dropdown" aria-hidden="true"></i>
             </button>
             <ul
-              v-if="shouldShowMergeOptionsDropdown"
+              v-if="shouldShowMergeImmediatelyDropdown"
               class="dropdown-menu dropdown-menu-right"
               role="menu"
             >

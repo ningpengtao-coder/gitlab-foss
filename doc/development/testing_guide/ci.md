@@ -1,6 +1,6 @@
 # GitLab tests in the Continuous Integration (CI) context
 
-### Test suite parallelization on the CI
+## Test suite parallelization on the CI
 
 Our current CI parallelization setup is as follows:
 
@@ -26,7 +26,7 @@ Our current CI parallelization setup is as follows:
 After that, the next pipeline will use the up-to-date
 `knapsack/${CI_PROJECT_NAME}/rspec_report-master.json` file.
 
-### Monitoring
+## Monitoring
 
 The GitLab test suite is [monitored] for the `master` branch, and any branch
 that includes `rspec-profile` in their name.
@@ -39,7 +39,6 @@ slowest test files and try to improve them.
 
 ## CI setup
 
-- On CE and EE, the test suite runs both PostgreSQL and MySQL.
 - Rails logging to `log/test.log` is disabled by default in CI [for
   performance reasons][logging]. To override this setting, provide the
   `RAILS_ENABLE_TEST_LOG` environment variable.

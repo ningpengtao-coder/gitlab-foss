@@ -182,7 +182,7 @@ class IssuableBaseService < BaseService
     # To be overridden by subclasses
   end
 
-  def before_update(issuable)
+  def before_update(issuable, skip_spam_check: false)
     # To be overridden by subclasses
   end
 
@@ -257,7 +257,7 @@ class IssuableBaseService < BaseService
                                               last_edited_at: Time.now,
                                               last_edited_by: current_user))
 
-      before_update(issuable)
+      before_update(issuable, skip_spam_check: true)
 
       if issuable.with_transaction_returning_status { issuable.save }
         # We do not touch as it will affect a update on updated_at field
@@ -344,10 +344,7 @@ class IssuableBaseService < BaseService
 
   def toggle_award(issuable)
     award = params.delete(:emoji_award)
-    if award
-      todo_service.new_award_emoji(issuable, current_user)
-      issuable.toggle_award_emoji(award, current_user)
-    end
+    AwardEmojis::ToggleService.new(issuable, award, current_user).execute if award
   end
 
   def associations_before_update(issuable)
@@ -358,6 +355,7 @@ class IssuableBaseService < BaseService
         assignees: issuable.assignees.to_a
       }
     associations[:total_time_spent] = issuable.total_time_spent if issuable.respond_to?(:total_time_spent)
+    associations[:description] = issuable.description
 
     associations
   end

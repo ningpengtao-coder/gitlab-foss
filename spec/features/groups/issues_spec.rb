@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Group issues page' do
@@ -50,7 +52,7 @@ describe 'Group issues page' do
     end
   end
 
-  context 'issues list', :nested_groups do
+  context 'issues list' do
     let(:subgroup) { create(:group, parent: group) }
     let(:subgroup_project) { create(:project, :public, group: subgroup)}
     let(:user_in_group) { create(:group_member, :maintainer, user: create(:user), group: group ).user }
@@ -148,6 +150,25 @@ describe 'Group issues page' do
       visit issues_group_path(group, sort: 'relative_position')
 
       check_issue_order
+    end
+
+    it 'issues should not be draggable when user is not logged in', :js do
+      sign_out(user_in_group)
+
+      visit issues_group_path(group, sort: 'relative_position')
+
+      drag_to(selector: '.manual-ordering',
+        from_index: 0,
+        to_index: 2)
+
+      wait_for_requests
+
+      # Issue order should remain the same
+      page.within('.manual-ordering') do
+        expect(find('.issue:nth-child(1) .title')).to have_content('Issue #1')
+        expect(find('.issue:nth-child(2) .title')).to have_content('Issue #2')
+        expect(find('.issue:nth-child(3) .title')).to have_content('Issue #3')
+      end
     end
 
     def check_issue_order

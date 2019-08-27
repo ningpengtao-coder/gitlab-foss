@@ -36,17 +36,17 @@ For the Troubleshooting sections, people in GitLab Support can merge additions t
 
 Include any media types/sources if the content is relevant to readers. You can freely include or link presentations, diagrams, videos, etc.; no matter who it was originally composed for, if it is helpful to any of our audiences, we can include it.
 
-   - If you use an image that has a separate source file (for example, a vector or diagram format), link the image to the source file so that it may be reused or updated by anyone.
-   - Do not copy and paste content from other sources unless it is a limited quotation with the source cited. Typically it is better to either rephrase relevant information in your own words or link out to the other source.
+- If you use an image that has a separate source file (for example, a vector or diagram format), link the image to the source file so that it may be reused or updated by anyone.
+- Do not copy and paste content from other sources unless it is a limited quotation with the source cited. Typically it is better to either rephrase relevant information in your own words or link out to the other source.
 
 ### No special types
 
-In the software industry, it is a best practice to organize documentatioin in different types. For example, [Divio recommends](https://www.divio.com/blog/documentation/):
+In the software industry, it is a best practice to organize documentation in different types. For example, [Divio recommends](https://www.divio.com/blog/documentation/):
 
 1. Tutorials
-2. How-to guides
-3. Explanation
-4. Reference (for example, a glossary)
+1. How-to guides
+1. Explanation
+1. Reference (for example, a glossary)
 
 At GitLab, we have so many product changes in our monthly releases that we can't afford to continually update multiple types of information.
 If we have multiple types, the information will become outdated. Therefore, we have a [single template](structure.md) for documentation.
@@ -76,8 +76,8 @@ and cross-link between any related content.
 
 We employ a **docs-first methodology** to help ensure that the docs remain a complete and trusted resource, and to make communicating about the use of GitLab more efficient.
 
-* If the answer to a question exists in documentation, share the link to the docs instead of rephrasing the information.
-* When you encounter new information not available in GitLab’s documentation (for example, when working on a support case or testing a feature), your first step should be to create a merge request to add this information to the docs. You can then share the MR in order to communicate this information.
+- If the answer to a question exists in documentation, share the link to the docs instead of rephrasing the information.
+- When you encounter new information not available in GitLab’s documentation (for example, when working on a support case or testing a feature), your first step should be to create a merge request to add this information to the docs. You can then share the MR in order to communicate this information.
 
 New information that would be useful toward the future usage or troubleshooting of GitLab should not be written directly in a forum or other messaging system, but added to a docs MR and then referenced, as described above. Note that among any other doc changes, you can always add a Troubleshooting section to a doc if none exists, or un-comment and use the placeholder Troubleshooting section included as part of our [doc template](structure.md#template-for-new-docs), if present.
 
@@ -106,6 +106,22 @@ Hard-coded HTML is valid, although it's discouraged to be used while we have `/h
 - Advanced tables are necessary.
 - Special styling is required.
 - Reviewed and approved by a technical writer.
+
+### Markdown Rules
+
+GitLab ensures that the Markdown used across all documentation is consistent, as
+well as easy to review and maintain, by testing documentation changes with
+[Markdownlint (mdl)](https://github.com/markdownlint/markdownlint). This lint test
+checks many common problems with Markdown, and fails when any document has an issue
+with Markdown formatting that may cause the page to render incorrectly within GitLab.
+It will also fail when a document is using non-standard Markdown (which may render
+correctly, but is not the current standard in GitLab documentation).
+
+Each formatting issue that mdl checks has an associated [rule](https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md),
+and the rules that are currently enabled for GitLab documentation are listed in the
+[`.mdlrc.style`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.mdlrc.style) file.
+Configuration options are set in the [`.mdlrc`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.mdlrc.style)
+file.
 
 ## Structure
 
@@ -142,16 +158,16 @@ The table below shows what kind of documentation goes where.
 ### Working with directories and files
 
 1. When you create a new directory, always start with an `index.md` file.
-  Do not use another file name and **do not** create `README.md` files.
+   Do not use another file name and **do not** create `README.md` files.
 1. **Do not** use special characters and spaces, or capital letters in file names,
-  directory names, branch names, and anything that generates a path.
+   directory names, branch names, and anything that generates a path.
 1. When creating a new document and it has more than one word in its name,
    make sure to use underscores instead of spaces or dashes (`-`). For example,
    a proper naming would be `import_projects_from_github.md`. The same rule
    applies to images.
 1. For image files, do not exceed 100KB.
 1. Do not upload video files to the product repositories.
-[Link or embed videos](#videos) instead.
+   [Link or embed videos](#videos) instead.
 1. There are four main directories, `user`, `administration`, `api` and `development`.
 1. The `doc/user/` directory has five main subdirectories: `project/`, `group/`,
    `profile/`, `dashboard/` and `admin_area/`.
@@ -179,7 +195,7 @@ The table below shows what kind of documentation goes where.
 If you are unsure where a document or a content addition should live, this should
 not stop you from authoring and contributing. You can use your best judgment and
 then ask the reviewer of your MR to confirm your decision, and/or ask a technical writer
-at any stage in the process. The techncial writing team will review all documentation
+at any stage in the process. The technical writing team will review all documentation
 changes, regardless, and can move content if there is a better place for it.
 
 ### Avoid duplication
@@ -221,14 +237,14 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
 - Use sentence case for titles, headings, labels, menu items, and buttons.
 - Insert an empty line between different markups (e.g., after every paragraph, header, list, etc). Example:
 
-    ```md
-    ## Header
+  ```md
+  ## Header
 
-    Paragraph.
+  Paragraph.
 
-    - List item 1
-    - List item 2
-    ```
+  - List item 1
+  - List item 2
+  ```
 
 ### Tables overlapping the TOC
 
@@ -267,32 +283,52 @@ Check specific punctuation rules for [list items](#list-items) below.
 
 ## List items
 
-- Always start list items with a capital letter.
+- Always start list items with a capital letter, unless they are parameters or commands
+  that are in backticks, or similar.
 - Always leave a blank line before and after a list.
-- Begin a line with spaces (not tabs) to denote a subitem.
-- To nest subitems, indent them with two spaces.
-- To nest code blocks, indent them with four spaces.
-- Only use ordered lists when their items describe a sequence of steps to follow.
+- Begin a line with spaces (not tabs) to denote a [nested subitem](#nesting-inside-a-list-item).
+- Only use ordered lists when their items describe a sequence of steps to follow:
+
+  Do:
+
+  These are the steps to do something:
+
+  1. First, do step 1
+  1. Then, do step 2
+  1. Finally, do step 3
+
+  Don't:
+
+  This is a list of different features:
+
+  1. Feature 1
+  1. Feature 2
+  1. Feature 3
 
 **Markup:**
 
 - Use dashes (`-`) for unordered lists instead of asterisks (`*`).
-- Use the number one (`1`) for each item in an ordered list.
-  When rendered, the list items will appear with sequential numbering.
+- Prefix `1.` to each item in an ordered list.
+  When rendered, the list items will appear with sequential numbering automatically.
 
 **Punctuation:**
 
-- Do not add commas (`,`) or semicolons (`;`) to the end of a list item.
-- Only add periods to the end of a list item if the item consists of a complete sentence. The [definition of full sentence](https://www2.le.ac.uk/offices/ld/resources/writing/grammar/grammar-guides/sentence) is: _"a complete sentence always contains a verb, expresses a complete idea, and makes sense standing alone"_.
-- Be consistent throughout the list: if the majority of the items do not end in a period, do not end any of the items in a period, even if they consist of a complete sentence. The opposite is also valid: if the majority of the items end with a period, end all with a period.
+- Do not add commas (`,`) or semicolons (`;`) to the end of list items.
+- Only add periods to the end of a list item if the item consists of a complete sentence.
+  The [definition of full sentence](https://www2.le.ac.uk/offices/ld/resources/writing/grammar/grammar-guides/sentence)
+  is: _"a complete sentence always contains a verb, expresses a complete idea, and makes sense standing alone"_.
+- Be consistent throughout the list: if the majority of the items do not end in a period,
+  do not end any of the items in a period, even if they consist of a complete sentence.
+  The opposite is also valid: if the majority of the items end with a period, end
+  all with a period.
 - Separate list items from explanatory text with a colon (`:`). For example:
 
-    ```md
-    The list is as follows:
+  ```md
+  The list is as follows:
 
-    - First item: this explains the first item.
-    - Second item: this explains the second item.
-    ```
+  - First item: this explains the first item.
+  - Second item: this explains the second item.
+  ```
 
 **Examples:**
 
@@ -314,11 +350,85 @@ Do:
 - Let's say this is also a complete sentence.
 - Not a complete sentence.
 
-Don't:
+Don't (third item should have a `.` to match the first and second items):
 
 - Let's say this is a complete sentence.
 - Let's say this is also a complete sentence.
 - Not a complete sentence
+
+### Nesting inside a list item
+
+It is possible to nest items under a list item, so that they render with the same indentation
+as the list item. This can be done with:
+
+- [Code blocks](#code-blocks)
+- [Blockquotes](#blockquotes)
+- [Alert boxes](#alert-boxes)
+- [Images](#images)
+
+Items nested in lists should always align with the first character of the list item.
+In unordered lists (using `-`), this means two spaces for each level of indentation:
+
+~~~md
+- Unordered list item 1
+
+  A line nested using 2 spaces to align with the `U` above.
+
+- Unordered list item 2
+
+  > A quote block that will nest
+  > inside list item 2.
+
+- Unordered list item 3
+
+  ```text
+  a codeblock that will next inside list item 3
+  ```
+
+- Unordered list item 4
+
+  ![an image that will nest inside list item 4](image.png)
+~~~
+
+For ordered lists, use three spaces for each level of indentation:
+
+~~~md
+1. Ordered list item 1
+
+   A line nested using 3 spaces to align with the `O` above.
+
+1. Ordered list item 2
+
+   > A quote block that will nest
+   > inside list item 2.
+
+1. Ordered list item 3
+
+   ```text
+   a codeblock that will next inside list item 3
+   ```
+
+1. Ordered list item 4
+
+   ![an image that will nest inside list item 4](image.png)
+~~~
+
+You can nest full lists inside other lists using the same rules as above. If you wish
+to mix types, that is also possible, as long as you don't mix items at the same level:
+
+```
+1. Ordered list item one.
+1. Ordered list item two.
+   - Nested unordered list item one.
+   - Nested unordered list item two.
+1. Ordered list item three.
+
+- Unordered list item one.
+- Unordered list item two.
+  1. Nested ordered list item one.
+  1. Nested ordered list item two.
+- Unordered list item three.
+```
 
 ## Quotes
 
@@ -340,7 +450,7 @@ For other punctuation rules, please refer to the
   links shift too, which eventually leads to dead links. If you think it is
   compelling to add numbers in headings, make sure to at least discuss it with
   someone in the Merge Request.
-- [Avoid using symbols and special chars](https://gitlab.com/gitlab-com/gitlab-docs/issues/84)
+- [Avoid using symbols and special chars](https://gitlab.com/gitlab-org/gitlab-docs/issues/84)
   in headers. Whenever possible, they should be plain and short text.
 - Avoid adding things that show ephemeral statuses. For example, if a feature is
   considered beta or experimental, put this info in a note, not in the heading.
@@ -393,7 +503,7 @@ Instead:
 Example:
 
 ```md
-For more information, see the [confidential issue](https://docs.gitlab.com/ee/user/project/issues/confidential_issues.html) `https://gitlab.com/gitlab-org/gitlab-ce/issues/<issue_number>`.
+For more information, see the [confidential issue](../../user/project/issues/confidential_issues.md) `https://gitlab.com/gitlab-org/gitlab-ce/issues/<issue_number>`.
 ```
 
 ### Unlinking emails
@@ -476,7 +586,7 @@ Do not upload videos to the product repositories. [Link](#link-to-video) or [emb
 
 ### Link to video
 
-To link out to a video, include a YouTube icon so that readers can 
+To link out to a video, include a YouTube icon so that readers can
 quickly and easily scan the page for videos before reading:
 
 ```md
@@ -488,7 +598,7 @@ You can link any up-to-date video that is useful to the GitLab user.
 
 ### Embed videos
 
-> [Introduced](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/472) in GitLab 12.1.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/472) in GitLab 12.1.
 
 GitLab docs (docs.gitlab.com) support embedded videos.
 
@@ -504,21 +614,21 @@ To embed a video, follow the instructions below and make sure
 you have your MR reviewed and approved by a technical writer.
 
 1. Copy the code below and paste it into your markdown file.
-  Leave a blank line above and below it. Do NOT edit the code
-  (don't remove or add any spaces, etc).
+   Leave a blank line above and below it. Do NOT edit the code
+   (don't remove or add any spaces, etc).
 1. On YouTube, visit the video URL you want to display. Copy
-  the regular URL from your browser (`https://www.youtube.com/watch?v=VIDEO-ID`)
-  and replace the video title and link in the line under `<div class="video-fallback">`.
+   the regular URL from your browser (`https://www.youtube.com/watch?v=VIDEO-ID`)
+   and replace the video title and link in the line under `<div class="video-fallback">`.
 1. On YouTube, click **Share**, then **Embed**.
 1. Copy the `<iframe>` source (`src`) **URL only**
-  (`https://www.youtube.com/embed/VIDEO-ID`),
-  and paste it, replacing the content of the `src` field in the
-  `iframe` tag.
+   (`https://www.youtube.com/embed/VIDEO-ID`),
+   and paste it, replacing the content of the `src` field in the
+   `iframe` tag.
 
 ```html
 leave a blank line here
 <div class="video-fallback">
-  See the video: [Video title](https://www.youtube.com/watch?v=MqL6BMOySIQ).
+  See the video: <a href="https://www.youtube.com/watch?v=MqL6BMOySIQ">Video title</a>.
 </div>
 <figure class="video-container">
   <iframe src="https://www.youtube.com/embed/MqL6BMOySIQ" frameborder="0" allowfullscreen="true"> </iframe>
@@ -529,7 +639,7 @@ leave a blank line here
 This is how it renders on docs.gitlab.com:
 
 <div class="video-fallback">
-  See the video: [What is GitLab](https://www.youtube.com/watch?v=enMumwvLAug).
+  See the video: <a href="https://www.youtube.com/watch?v=enMumwvLAug">What is GitLab</a>.
 </div>
 <figure class="video-container">
   <iframe src="https://www.youtube.com/embed/MqL6BMOySIQ" frameborder="0" allowfullscreen="true"> </iframe>
@@ -545,15 +655,16 @@ nicely on different mobile devices.
 
 ## Code blocks
 
-- Always wrap code added to a sentence in inline code blocks (``` ` ```).
+- Always wrap code added to a sentence in inline code blocks (`` ` ``).
   E.g., `.gitlab-ci.yml`, `git add .`, `CODEOWNERS`, `only: master`.
   File names, commands, entries, and anything that refers to code should be added to code blocks.
   To make things easier for the user, always add a full code block for things that can be
   useful to copy and paste, as they can easily do it with the button on code blocks.
+- Add a blank line above and below code blocks.
 - For regular code blocks, always use a highlighting class corresponding to the
   language for better readability. Examples:
 
-  ````md
+  ~~~md
   ```ruby
   Ruby code
   ```
@@ -563,27 +674,45 @@ nicely on different mobile devices.
   ```
 
   ```md
-  Markdown code
+  [Markdown code example](example.md)
   ```
 
   ```text
-  Code for which no specific highlighting class is available.
+  Code or text for which no specific highlighting class is available.
   ```
-  ````
+  ~~~
 
-- To display raw markdown instead of rendered markdown, use four backticks on their own lines around the
-  markdown to display. See [example](https://gitlab.com/gitlab-org/gitlab-ce/blob/8c1991b9bb7e3b8d606481fdea316d633cfa5eb7/doc/development/documentation/styleguide.md#L275-287).
+- To display raw markdown instead of rendered markdown, you can use triple backticks
+  with `md`, like the `Markdown code` example above, unless you want to include triple
+  backticks in the code block as well. In that case, use triple tildes (`~~~`) instead.
 - For a complete reference on code blocks, check the [Kramdown guide](https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/#code-blocks).
 
 ## Alert boxes
 
-Whenever you want to call the attention to a particular sentence,
+Whenever you need to call special attention to particular sentences,
 use the following markup for highlighting.
 
 _Note that the alert boxes only work for one paragraph only. Multiple paragraphs,
 lists, headers, etc will not render correctly. For multiple lines, use blockquotes instead._
 
 ### Note
+
+Notes catch the eye of most readers, and therefore should be used very sparingly.
+In most cases, content considered for a note should be included:
+
+- As just another sentence in the previous paragraph or the most-relevant paragraph.
+- As its own standalone paragraph.
+- As content under a new subheading that introduces the topic, making it more visible/findable.
+
+#### When to use
+
+Use a note when there is a reason that most or all readers who browse the
+section should see the content. That is, if missed, it’s likely to cause
+major trouble for a minority of users or significant trouble for a majority
+of users.
+
+Weigh the costs of distracting users to whom the content is not relevant against
+the cost of users missing the content if it were not expressed as a note.
 
 ```md
 NOTE: **Note:**
@@ -714,24 +843,24 @@ a helpful link back to how the feature was developed.
 - For features that need to declare the GitLab version that the feature was introduced. Text similar
   to the following should be added immediately below the heading as a blockquote:
 
-    ```md
-    > Introduced in GitLab 11.3.
-    ```
+  ```md
+  > Introduced in GitLab 11.3.
+  ```
 
 - Whenever possible, version text should have a link to the issue, merge request, or epic that introduced the feature.
   An issue is preferred over a merge request, and a merge request is preferred over an epic. For example:
 
-    ```md
-    > [Introduced](<link-to-issue>) in GitLab 11.3.
-    ```
+  ```md
+  > [Introduced](<link-to-issue>) in GitLab 11.3.
+  ```
 
 - If the feature is only available in GitLab Enterprise Edition, mention
   the [paid tier](https://about.gitlab.com/handbook/marketing/product-marketing/#tiers)
   the feature is available in:
 
-    ```md
-    > [Introduced](<link-to-issue>) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.3.
-    ```
+  ```md
+  > [Introduced](<link-to-issue>) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.3.
+  ```
 
 ### Removing version text
 
@@ -750,24 +879,25 @@ Other text includes deprecation notices and version-specific how-to information.
 When a feature is available in EE-only tiers, add the corresponding tier according to the
 feature availability:
 
-- For GitLab Starter and GitLab.com Bronze: `**[STARTER]**`.
-- For GitLab Premium and GitLab.com Silver: `**[PREMIUM]**`.
-- For GitLab Ultimate and GitLab.com Gold: `**[ULTIMATE]**`.
-- For GitLab Core and GitLab.com Free: `**[CORE]**`.
+- For GitLab Core and GitLab.com Free: `**(CORE)**`.
+- For GitLab Starter and GitLab.com Bronze: `**(STARTER)**`.
+- For GitLab Premium and GitLab.com Silver: `**(PREMIUM)**`.
+- For GitLab Ultimate and GitLab.com Gold: `**(ULTIMATE)**`.
 
 To exclude GitLab.com tiers (when the feature is not available in GitLab.com), add the
 keyword "only":
 
-- For GitLab Core: `**[CORE ONLY]**`.
-- For GitLab Starter: `**[STARTER ONLY]**`.
-- For GitLab Premium: `**[PREMIUM ONLY]**`.
-- For GitLab Ultimate: `**[ULTIMATE ONLY]**`.
+- For GitLab Core: `**(CORE ONLY)**`.
+- For GitLab Starter: `**(STARTER ONLY)**`.
+- For GitLab Premium: `**(PREMIUM ONLY)**`.
+- For GitLab Ultimate: `**(ULTIMATE ONLY)**`.
 
 For GitLab.com only tiers (when the feature is not available for self-hosted instances):
 
-- For GitLab Bronze and higher tiers: `**[BRONZE ONLY]**`.
-- For GitLab Silver and higher tiers: `**[SILVER ONLY]**`.
-- For GitLab Gold: `**[GOLD ONLY]**`.
+- For GitLab Free and higher tiers: `**(FREE ONLY)**`.
+- For GitLab Bronze and higher tiers: `**(BRONZE ONLY)**`.
+- For GitLab Silver and higher tiers: `**(SILVER ONLY)**`.
+- For GitLab Gold: `**(GOLD ONLY)**`.
 
 The tier should be ideally added to headers, so that the full badge will be displayed.
 However, it can be also mentioned from paragraphs, list items, and table cells. For these cases,
@@ -775,17 +905,17 @@ the tier mention will be represented by an orange question mark that will show t
 
 For example:
 
-- `**[STARTER]**` renders as **[STARTER]**
-- `**[STARTER ONLY]**` renders as **[STARTER ONLY]**
-- `**[SILVER ONLY]**` renders as **[SILVER ONLY]**
+- `**(STARTER)**` renders as **(STARTER)**
+- `**(STARTER ONLY)**` renders as **(STARTER ONLY)**
+- `**(SILVER ONLY)**` renders as **(SILVER ONLY)**
 
 The absence of tiers' mentions mean that the feature is available in GitLab Core,
 GitLab.com Free, and all higher tiers.
 
 ### How it works
 
-Introduced by [!244](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/244),
-the special markup `**[STARTER]**` will generate a `span` element to trigger the
+Introduced by [!244](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/244),
+the special markup `**(STARTER)**` will generate a `span` element to trigger the
 badges and tooltips (`<span class="badge-trigger starter">`). When the keyword
 "only" is added, the corresponding GitLab.com badge will not be displayed.
 
@@ -838,14 +968,14 @@ When there is a list of steps to perform, usually that entails editing the
 configuration file and reconfiguring/restarting GitLab. In such case, follow
 the style below as a guide:
 
-```md
+````md
 **For Omnibus installations**
 
 1. Edit `/etc/gitlab/gitlab.rb`:
 
-    ```ruby
-    external_url "https://gitlab.example.com"
-    ```
+   ```ruby
+   external_url "https://gitlab.example.com"
+   ```
 
 1. Save the file and [reconfigure] GitLab for the changes to take effect.
 
@@ -855,17 +985,16 @@ the style below as a guide:
 
 1. Edit `config/gitlab.yml`:
 
-    ```yaml
-    gitlab:
-      host: "gitlab.example.com"
-    ```
+   ```yaml
+   gitlab:
+     host: "gitlab.example.com"
+   ```
 
 1. Save the file and [restart] GitLab for the changes to take effect.
 
-
 [reconfigure]: path/to/administration/restart_gitlab.md#omnibus-gitlab-reconfigure
 [restart]: path/to/administration/restart_gitlab.md#installations-from-source
-```
+````
 
 In this case:
 
@@ -884,9 +1013,9 @@ on this document. Further explanation is given below.
 
 - Every method must have the REST API request. For example:
 
-    ```
-    GET /projects/:id/repository/branches
-    ```
+  ```
+  GET /projects/:id/repository/branches
+  ```
 
 - Every method must have a detailed
   [description of the parameters](#method-description).
@@ -897,7 +1026,7 @@ on this document. Further explanation is given below.
 
 The following can be used as a template to get started:
 
-````md
+~~~md
 ## Descriptive title
 
 One or two sentence description of what endpoint does.
@@ -925,7 +1054,7 @@ Example response:
   }
 ]
 ```
-````
+~~~
 
 ### Fake tokens
 
@@ -938,7 +1067,7 @@ You can use the following fake tokens as examples.
 
 | Token type            | Token value                                                        |
 |:----------------------|:-------------------------------------------------------------------|
-| Private user token    | `<your_access_token>`                                             |
+| Private user token    | `<your_access_token>`                                              |
 | Personal access token | `n671WNGecHugsdEDPsyo`                                             |
 | Application ID        | `2fcb195768c39e9a94cec2c2e32c59c0aad7a3365c10892e8116b5d83d4096b6` |
 | Application secret    | `04f294d1eaca42b8692017b426d53bbc8fe75f827734f0260710b83a556082df` |
@@ -953,7 +1082,7 @@ You can use the following fake tokens as examples.
 ### Method description
 
 Use the following table headers to describe the methods. Attributes should
-always be in code blocks using backticks (``` ` ```).
+always be in code blocks using backticks (`` ` ``).
 
 ```md
 | Attribute | Type | Required | Description |
@@ -1059,6 +1188,6 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" --data "domain_
 
 [cURL]: http://curl.haxx.se/ "cURL website"
 [single spaces]: http://www.slate.com/articles/technology/technology/2011/01/space_invaders.html
-[gfm]: https://docs.gitlab.com/ce/user/markdown.html#newlines "GitLab flavored markdown documentation"
+[gfm]: ../../user/markdown.md#newlines "GitLab flavored markdown documentation"
 [ce-1242]: https://gitlab.com/gitlab-org/gitlab-ce/issues/1242
 [doc-restart]: ../../administration/restart_gitlab.md "GitLab restart documentation"

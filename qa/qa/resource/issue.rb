@@ -3,7 +3,7 @@
 module QA
   module Resource
     class Issue < Base
-      attr_writer :description
+      attr_writer :description, :milestone
 
       attribute :project do
         Project.fabricate! do |resource|
@@ -15,6 +15,10 @@ module QA
       attribute :id
       attribute :labels
       attribute :title
+
+      def initialize
+        @labels = []
+      end
 
       def fabricate!
         project.visit!
@@ -38,9 +42,11 @@ module QA
 
       def api_post_body
         {
-          labels: [labels],
+          labels: labels,
           title: title
-        }
+        }.tap do |hash|
+          hash[:milestone_id] = @milestone.id if @milestone
+        end
       end
     end
   end

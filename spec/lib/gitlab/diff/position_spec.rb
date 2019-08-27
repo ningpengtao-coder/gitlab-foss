@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Diff::Position do
@@ -608,6 +610,19 @@ describe Gitlab::Diff::Position do
       let(:args) { args_for_img }
 
       it_behaves_like "diff position json"
+    end
+  end
+
+  describe "#file_hash" do
+    subject do
+      described_class.new(
+        old_path: "image.jpg",
+        new_path: "image.jpg"
+      )
+    end
+
+    it "returns SHA1 representation of the file_path" do
+      expect(subject.file_hash).to eq(Digest::SHA1.hexdigest(subject.file_path))
     end
   end
 end

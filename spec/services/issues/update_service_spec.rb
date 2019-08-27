@@ -116,7 +116,7 @@ describe Issues::UpdateService, :mailer do
         expect(issue.relative_position).to be_between(issue1.relative_position, issue2.relative_position)
       end
 
-      context 'when moving issue between issues from different projects', :nested_groups do
+      context 'when moving issue between issues from different projects' do
         let(:group) { create(:group) }
         let(:subgroup) { create(:group, parent: group) }
 
@@ -179,7 +179,7 @@ describe Issues::UpdateService, :mailer do
         it 'sends email to user2 about assign of new issue and email to user3 about issue unassignment' do
           deliveries = ActionMailer::Base.deliveries
           email = deliveries.last
-          recipients = deliveries.last(2).map(&:to).flatten
+          recipients = deliveries.last(2).flat_map(&:to)
           expect(recipients).to include(user2.email, user3.email)
           expect(email.subject).to include(issue.title)
         end
@@ -224,6 +224,15 @@ describe Issues::UpdateService, :mailer do
         expect(note).not_to be_nil
         expect(note.note).to eq('changed the description')
       end
+    end
+
+    it 'creates zoom_link_added system note when a zoom link is added to the description' do
+      update_issue(description: 'Changed description https://zoom.us/j/5873603787')
+
+      note = find_note('added a Zoom call')
+
+      expect(note).not_to be_nil
+      expect(note.note).to eq('added a Zoom call to this issue')
     end
 
     context 'when issue turns confidential' do
@@ -480,6 +489,22 @@ describe Issues::UpdateService, :mailer do
           update_issue(description: "- [x] Task 1\n- [X] Task 2")
         end
 
+        it 'does not check for spam on task status change' do
+          params = {
+            update_task: {
+              index: 1,
+              checked: false,
+              line_source: '- [x] Task 1',
+              line_number: 1
+            }
+          }
+          service = described_class.new(project, user, params)
+
+          expect(service).not_to receive(:spam_check)
+
+          service.execute(issue)
+        end
+
         it 'creates system note about task status change' do
           note1 = find_note('marked the task **Task 1** as completed')
           note2 = find_note('marked the task **Task 2** as completed')
@@ -687,7 +712,7 @@ describe Issues::UpdateService, :mailer do
       end
     end
 
-    context 'when moving an issue ', :nested_groups do
+    context 'when moving an issue ' do
       it 'raises an error for invalid move ids within a project' do
         opts = { move_between_ids: [9000, 9999] }
 

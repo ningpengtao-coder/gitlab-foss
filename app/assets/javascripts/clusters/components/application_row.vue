@@ -1,5 +1,6 @@
 <script>
 /* eslint-disable vue/require-default-prop */
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { GlLink, GlModalDirective } from '@gitlab/ui';
 import TimeagoTooltip from '../../vue_shared/components/time_ago_tooltip.vue';
 import { s__, __, sprintf } from '~/locale';
@@ -207,7 +208,7 @@ export default {
         return __('Updating');
       }
 
-      return __('Updated');
+      return this.updateSuccessful ? __('Updated to') : __('Updated');
     },
     updateFailureDescription() {
       return s__('ClusterIntegration|Update failed. Please check the logs and try again.');
@@ -331,8 +332,6 @@ export default {
             class="form-text text-muted label p-0 js-cluster-application-update-details"
           >
             {{ versionLabel }}
-            <span v-if="updateSuccessful">to</span>
-
             <gl-link
               v-if="updateSuccessful"
               :href="chartRepo"

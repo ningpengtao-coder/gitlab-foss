@@ -1,21 +1,24 @@
 # Workflow labels
 
 To allow for asynchronous issue handling, we use [milestones][milestones-page]
-and [labels][labels-page]. Leads and product managers handle most of the
+and [labels](https://gitlab.com/gitlab-org/gitlab-ce/-/labels). Leads and product managers handle most of the
 scheduling into milestones. Labelling is a task for everyone.
 
 Most issues will have labels for at least one of the following:
 
-- Type: ~feature, ~bug, ~customer, etc.
-- Subject: ~wiki, ~"Container Registry", ~ldap, ~api, ~frontend, etc.
-- Team: ~Plan, ~Manage, ~Quality, etc.
-- Stage: ~"devops:plan", ~"devops:create", etc.
+- Type: ~feature, ~bug, ~backstage, etc.
+- Subject: ~wiki, ~"Container Registry", ~ldap, ~api, etc.
+- Team: ~Documentation, ~Delivery, etc.
+- Stage: ~"devops::plan", ~"devops::create", etc.
+- Group: ~"group::source code" ~"group::knowledge" ~"group::editor", etc.
+- Department: ~UX, ~Quality
+- Specialization: ~frontend, ~backend
 - Release Scoping: ~Deliverable, ~Stretch, ~"Next Patch Release"
 - Priority: ~P1, ~P2, ~P3, ~P4
 - Severity: ~S1, ~S2, ~S3, ~S4
 
 All labels, their meaning and priority are defined on the
-[labels page][labels-page].
+[labels page](https://gitlab.com/gitlab-org/gitlab-ce/-/labels).
 
 If you come across an issue that has none of these, and you're allowed to set
 labels, you can _always_ add the team and type, and often also the subject.
@@ -27,8 +30,7 @@ labels, you can _always_ add the team and type, and often also the subject.
 Type labels are very important. They define what kind of issue this is. Every
 issue should have one or more.
 
-Examples of type labels are ~feature, ~bug, ~customer, ~security,
-and ~direction.
+Examples of type labels are ~feature, ~bug, ~backstage and ~security
 
 A number of type labels have a priority assigned to them, which automatically
 makes them float to the top, depending on their importance.
@@ -36,7 +38,7 @@ makes them float to the top, depending on their importance.
 Type labels are always lowercase, and can have any color, besides blue (which is
 already reserved for subject labels).
 
-The descriptions on the [labels page][labels-page] explain what falls under each type label.
+The descriptions on the [labels page](https://gitlab.com/gitlab-org/gitlab-ce/-/labels) explain what falls under each type label.
 
 ## Subject labels
 
@@ -58,36 +60,18 @@ Subject labels are always all-lowercase.
 
 ## Team labels
 
+**Important**: Most of the historical team labels (e.g. Manage, Plan etc.) are
+now deprecated in favor of [Group labels](#group-labels) and [Stage labels](#stage-labels).
+
 Team labels specify what team is responsible for this issue.
 Assigning a team label makes sure issues get the attention of the appropriate
 people.
 
 The current team labels are:
 
-- ~Configure
-- ~Create
-- ~Defend
-- ~Distribution
+- ~Delivery
 - ~Documentation
-- ~Ecosystem
-- ~Geo
-- ~Gitaly
-- ~Growth
-- ~Manage
-- ~Memory
-- ~Monitor
-- ~Plan
 - ~Quality
-- ~Release
-- ~Secure
-- ~UX
-- ~Verify
-
-The descriptions on the [labels page][labels-page] explain what falls under the
-responsibility of each team.
-
-Within those team labels, we also have the ~backend and ~frontend labels to
-indicate if an issue needs backend work, frontend work, or both.
 
 Team labels are always capitalized so that they show up as the first label for
 any issue.
@@ -96,32 +80,10 @@ any issue.
 
 Stage labels specify which [DevOps stage][devops-stages] the issue belongs to.
 
-The current stage labels are:
-
-- ~"devops::manage"
-- ~"devops::plan"
-- ~"devops::create"
-- ~"devops::verify"
-- ~"devops::package"
-- ~"devops::release"
-- ~"devops::configure"
-- ~"devops::monitor"
-- ~"devops::secure"
-- ~"devops::defend"
-- ~"devops::growth"
-- ~"devops::enablement"
+The current stage labels can be found by [searching the labels list for `devops::`](https://gitlab.com/groups/gitlab-org/-/labels?search=devops%3A%3A).
 
 These labels are [scoped labels](../../user/project/labels.md#scoped-labels-premium)
 and thus are mutually exclusive.
-
-They differ from the [Team labels](#team-labels) because teams may work on
-issues outside their stage.
-
-Normally there is a 1:1 relationship between Stage labels and Team labels, but
-any issue can be picked up by any team, depending on current priorities.
-So, an issue labeled ~"devops:create" may be scheduled by the ~Plan team, for
-example. In such cases, it's usual to include both team labels so each team can
-be aware of the progress.
 
 The Stage labels are used to generate the [direction pages][direction-pages] automatically.
 
@@ -132,20 +94,38 @@ The Stage labels are used to generate the [direction pages][direction-pages] aut
 
 Group labels specify which [groups][structure-groups] the issue belongs to.
 
-Examples include:
-
-- ~"group::control"
-- ~"group::editor"
+The current group labels can be found by [searching the labels list for `group::`](https://gitlab.com/groups/gitlab-org/-/labels?search=group%3A%3A).
 
 These labels are [scoped labels](../../user/project/labels.md#scoped-labels-premium)
 and thus are mutually exclusive.
 
-Groups are nested beneath a particular stage, so only one stage label and one group label
-can be applied to a single issue. You can find the groups listed in the
-[Product Categories pages][product-categories].
+You can find the groups listed in the [Product Stages, Groups, and Categories][product-categories] page.
+
+We use the term group to map down product requirements from our product stages.
+As a team needs some way to collect the work their members are planning to be assigned to, we use the `~group::` labels to do so.
+
+Normally there is a 1:1 relationship between Stage labels and Group labels. In the spirit of "Everyone can contribute",
+any issue can be picked up by any group, depending on current priorities. For example, an issue labeled ~"devops::create" may be picked up by the ~"group::access" group.
+
+We also use stage and group labels to help quantify our [throughput](https://about.gitlab.com/handbook/engineering/management/throughput).
+Please read [Stage and Group labels in Throughtput](https://about.gitlab.com/handbook/engineering/management/throughput/#stage-and-group-labels-in-throughput) for more information on how the labels are used in this context.
 
 [structure-groups]: https://about.gitlab.com/company/team/structure/#groups
 [product-categories]: https://about.gitlab.com/handbook/product/categories/
+
+## Department labels
+
+The current department labels are:
+
+- ~UX
+- ~Quality
+
+## Specialization labels
+
+These labels narrow the [specialization](https://about.gitlab.com/company/team/structure/#specialist) on a unit of work.
+
+- ~frontend
+- ~backend
 
 ## Release Scoping labels
 
@@ -192,21 +172,21 @@ There can be multiple facets of the impact. The below is a guideline.
 
 If a bug seems to fall between two severity labels, assign it to the higher-severity label.
 
-* Example(s) of ~S1
-  * Data corruption/loss. 
-  * Security breach.
-  * Unable to create an issue or merge request. 
-  * Unable to add a comment or discussion to the issue or merge request.
-* Example(s) of ~S2
-  * Cannot submit changes through the web IDE but the commandline works.
-  * A status widget on the merge request page is not working but information can be seen in the test pipeline page.
-* Example(s) of ~S3
-  * Can create merge requests only from the Merge Requests list view, not from an Issue page.
-  * Status is not updated in real time and needs a page refresh.
-* Example(s) of ~S4
-  * Label colors are incorrect.
-  * UI elements are not fully aligned.
-  
+- Example(s) of ~S1
+  - Data corruption/loss.
+  - Security breach.
+  - Unable to create an issue or merge request.
+  - Unable to add a comment or thread to the issue or merge request.
+- Example(s) of ~S2
+  - Cannot submit changes through the web IDE but the commandline works.
+  - A status widget on the merge request page is not working but information can be seen in the test pipeline page.
+- Example(s) of ~S3
+  - Can create merge requests only from the Merge Requests list view, not from an Issue page.
+  - Status is not updated in real time and needs a page refresh.
+- Example(s) of ~S4
+  - Label colors are incorrect.
+  - UI elements are not fully aligned.
+
 ## Label for community contributors
 
 Issues that are beneficial to our users, 'nice to haves', that we currently do
@@ -241,7 +221,7 @@ know how difficult the issue is. Additionally:
   as suitable for people that have never contributed to GitLab before on the
   [Up For Grabs campaign](http://up-for-grabs.net)
 - We encourage people that have never contributed to any open source project to
-  look for [`Accepting merge requests` issues with a weight of 1][firt-timers]
+  look for [`Accepting merge requests` issues with a weight of 1][first-timers]
 
 If you've decided that you would like to work on an issue, please @-mention
 the [appropriate product manager](https://about.gitlab.com/handbook/product/#who-to-talk-to-for-what)
@@ -254,8 +234,8 @@ GitLab team members who apply the ~"Accepting merge requests" label to an issue
 should update the issue description with a responsible product manager, inviting
 any potential community contributor to @-mention per above.
 
-[up-for-grabs]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=0&sort=weight
-[firt-timers]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=0&sort=weight&weight=1
+[up-for-grabs]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=None&sort=weight
+[first-timers]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=None&sort=weight&weight=1
 
 ## Issue triaging
 
@@ -290,7 +270,7 @@ For feature proposals for EE, open an issue on the
 
 In order to help track the feature proposals, we have created a
 [`feature`][fl] label. For the time being, users that are not members
-of the project cannot add labels. You can instead ask one of the [core team]
+of the project cannot add labels. You can instead ask one of the [core team](https://about.gitlab.com/community/core-team/)
 members to add the label ~feature to the issue or add the following
 code snippet right after your description in a new line: `~feature`.
 
@@ -301,7 +281,7 @@ Please submit Feature Proposals using the ['Feature Proposal' issue template](ht
 
 For changes in the interface, it is helpful to include a mockup. Issues that add to, or change, the interface should
 be given the ~"UX" label. This will allow the UX team to provide input and guidance. You may
-need to ask one of the [core team] members to add the label, if you do not have permissions to do it by yourself.
+need to ask one of the [core team](https://about.gitlab.com/community/core-team/) members to add the label, if you do not have permissions to do it by yourself.
 
 If you want to create something yourself, consider opening an issue first to
 discuss whether it is interesting to include this in GitLab.
@@ -445,7 +425,6 @@ A recent example of this was the issue for
 
 [Return to Contributing documentation](index.md)
 
-[labels-page]: https://gitlab.com/gitlab-org/gitlab-ce/labels
 [ce-tracker]: https://gitlab.com/gitlab-org/gitlab-ce/issues
 [ee-tracker]: https://gitlab.com/gitlab-org/gitlab-ee/issues
 [inferred-labels]: https://gitlab.com/gitlab-org/quality/triage-ops/merge_requests/155

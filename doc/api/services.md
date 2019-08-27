@@ -291,7 +291,6 @@ Parameters:
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 | `tag_push_events` | boolean | false | Enable notifications for tag push events |
 
-
 ### Delete Drone CI service
 
 Delete Drone CI service for a project.
@@ -584,7 +583,7 @@ Parameters:
 | `username`      | string | yes  | The username of the user created to be used with GitLab/Jira. |
 | `password`      | string | yes  | The password of the user created to be used with GitLab/Jira. |
 | `active`        | boolean | no  | Activates or deactivates the service. Defaults to false (deactivated). |
-| `jira_issue_transition_id` | string | no | The ID of a transition that moves issues to a closed state. You can find this number under the Jira workflow administration (**Administration > Issues > Workflows**) by selecting **View** under **Operations** of the desired workflow of your project. The ID of each state can be found inside the parenthesis of each transition name under the **Transitions (id)** column ([see screenshot][trans]). By default, this ID is set to `2`. |
+| `jira_issue_transition_id` | string | no | The ID of a transition that moves issues to a closed state. You can find this number under the Jira workflow administration (**Administration > Issues > Workflows**) by selecting **View** under **Operations** of the desired workflow of your project. The ID of each state can be found inside the parenthesis of each transition name under the **Transitions (id)** column. By default, this ID is set to `2`. |
 | `commit_events` | boolean | false | Enable notifications for commit events |
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 
@@ -594,44 +593,6 @@ Remove all previously Jira settings from a project.
 
 ```
 DELETE /projects/:id/services/jira
-```
-
-## Kubernetes
-
-Kubernetes / OpenShift integration
-
-CAUTION: **Warning:**
-Kubernetes service integration has been deprecated in GitLab 10.3. API service endpoints will continue to work as long as the Kubernetes service is active, however if the service is inactive API endpoints will automatically return a `400 Bad Request`. Read [GitLab 10.3 release post](https://about.gitlab.com/2017/12/22/gitlab-10-3-released/#kubernetes-integration-service) for more information.
-
-### Create/Edit Kubernetes service
-
-Set Kubernetes service for a project.
-
-```
-PUT /projects/:id/services/kubernetes
-```
-
-Parameters:
-
-- `namespace` (**required**) - The Kubernetes namespace to use
-- `api_url` (**required**) - The URL to the Kubernetes cluster API. For example, `https://kubernetes.example.com`
-- `token` (**required**) - The service token to authenticate against the Kubernetes cluster with
-- `ca_pem` (optional) - A custom certificate authority bundle to verify the Kubernetes cluster with (PEM format)
-
-### Delete Kubernetes service
-
-Delete Kubernetes service for a project.
-
-```
-DELETE /projects/:id/services/kubernetes
-```
-
-### Get Kubernetes service settings
-
-Get Kubernetes service settings for a project.
-
-```
-GET /projects/:id/services/kubernetes
 ```
 
 ## Slack slash commands
@@ -744,7 +705,7 @@ Parameters:
 | --------- | ---- | -------- | ----------- |
 | `username` | string | yes | The username of a Packagist account |
 | `token` | string | yes | API token to the Packagist server |
-| `server` | boolean | no | URL of the Packagist server. Leave blank for default: https://packagist.org |
+| `server` | boolean | no | URL of the Packagist server. Leave blank for default: <https://packagist.org> |
 | `push_events` | boolean | false | Enable notifications for push events |
 | `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 | `tag_push_events` | boolean | false | Enable notifications for tag push events |
@@ -973,22 +934,28 @@ Parameters:
 | `channel` | string | false | Default channel to use if others are not configured |
 | `notify_only_broken_pipelines` | boolean | false | Send notifications for broken pipelines |
 | `notify_only_default_branch` | boolean | false | Send notifications only for the default branch |
-| `push_events` | boolean | false | Enable notifications for push events |
-| `issues_events` | boolean | false | Enable notifications for issue events |
-| `confidential_issues_events` | boolean | false | Enable notifications for confidential issue events |
-| `merge_requests_events` | boolean | false | Enable notifications for merge request events |
-| `tag_push_events` | boolean | false | Enable notifications for tag push events |
-| `note_events` | boolean | false | Enable notifications for note events |
-| `pipeline_events` | boolean | false | Enable notifications for pipeline events |
-| `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
-| `push_channel` | string | false | The name of the channel to receive push events notifications |
-| `issue_channel` | string | false | The name of the channel to receive issues events notifications |
+| `commit_events` | boolean | false | Enable notifications for commit events |
 | `confidential_issue_channel` | string | false | The name of the channel to receive confidential issues events notifications |
+| `confidential_issues_events` | boolean | false | Enable notifications for confidential issue events |
+| `confidential_note_channel` | string | false | The name of the channel to receive confidential note events notifications |
+| `confidential_note_events` | boolean | false | Enable notifications for confidential note events |
+| `deployment_channel` | string | false | The name of the channel to receive deployment events notifications |
+| `deployment_events` | boolean | false | Enable notifications for deployment events |
+| `issue_channel` | string | false | The name of the channel to receive issues events notifications |
+| `issues_events` | boolean | false | Enable notifications for issue events |
+| `job_events` | boolean | false | Enable notifications for job events |
 | `merge_request_channel` | string | false | The name of the channel to receive merge request events notifications |
+| `merge_requests_events` | boolean | false | Enable notifications for merge request events |
 | `note_channel` | string | false | The name of the channel to receive note events notifications |
-| `tag_push_channel` | string | false | The name of the channel to receive tag push events notifications |
+| `note_events` | boolean | false | Enable notifications for note events |
 | `pipeline_channel` | string | false | The name of the channel to receive pipeline events notifications |
+| `pipeline_events` | boolean | false | Enable notifications for pipeline events |
+| `push_channel` | string | false | The name of the channel to receive push events notifications |
+| `push_events` | boolean | false | Enable notifications for push events |
+| `tag_push_channel` | string | false | The name of the channel to receive tag push events notifications |
+| `tag_push_events` | boolean | false | Enable notifications for tag push events |
 | `wiki_page_channel` | string | false | The name of the channel to receive wiki page events notifications |
+| `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
 
 ### Delete Slack service
 
@@ -1147,7 +1114,7 @@ Get JetBrains TeamCity CI service settings for a project.
 GET /projects/:id/services/teamcity
 ```
 
-## Jenkins CI **[STARTER]**
+## Jenkins CI **(STARTER)**
 
 A continuous integration and build server
 
@@ -1161,7 +1128,7 @@ PUT /projects/:id/services/jenkins
 
 Parameters:
 
-- `jenkins_url` (**required**) - Jenkins URL like http://jenkins.example.com
+- `jenkins_url` (**required**) - Jenkins URL like `http://jenkins.example.com`
 - `project_name` (**required**) - The URL-friendly project name. Example: my_project_name
 - `username` (optional) - A user with access to the Jenkins server, if applicable
 - `password` (optional) - The password of the user
@@ -1196,7 +1163,7 @@ PUT /projects/:id/services/jenkins-deprecated
 
 Parameters:
 
-- `project_url` (**required**) - Jenkins project URL like http://jenkins.example.com/job/my-project/
+- `project_url` (**required**) - Jenkins project URL like `http://jenkins.example.com/job/my-project/`
 - `multiproject_enabled` (optional) - Multi-project mode is configured in Jenkins GitLab Hook plugin
 - `pass_unstable` (optional) - Unstable builds will be treated as passing
 

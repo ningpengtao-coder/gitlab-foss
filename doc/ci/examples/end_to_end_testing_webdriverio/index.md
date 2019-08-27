@@ -32,7 +32,7 @@ through the process of setting up GitLab CI/CD for end-to-end testing Javascript
 with WebdriverIO, but the general strategy should carry over to other languages.
 We assume you are familiar with GitLab, [GitLab CI/CD](../../README.md), [Review Apps](../../review_apps/index.md), and running your app locally, e.g., on `localhost:8000`.
 
-### What to test
+## What to test
 
 In the widely-used [testing pyramid strategy](https://martinfowler.com/bliki/TestPyramid.html), end-to-end tests act more like a
 safeguard: [most of your code should be covered by
@@ -40,9 +40,9 @@ unit tests](https://vincenttunru.com/100-percent-coverage/) that allow you to ea
 will likely want to
 [limit the number of end-to-end tests](https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html)
 to just enough to give you the confidence that the deployment went as intended, that your
-infrastructure is up and running, and that your units of code work well together. 
+infrastructure is up and running, and that your units of code work well together.
 
-### Selenium and WebdriverIO
+## Selenium and WebdriverIO
 
 [Selenium](http://www.seleniumhq.org/) is a piece of software that can control web browsers, e.g., to make them
 visit a specific URL or interact with elements on the page. It can be programmatically controlled
@@ -65,7 +65,7 @@ describe('A visitor without account', function(){
         expect(browser.getUrl()).toMatch('page-that-does-not-exist');
 
         browser.element('.content a[href="/"]').click();
-        
+
         expect(browser.getUrl()).not.toMatch('page-that-does-not-exist');
     });
 });
@@ -143,7 +143,7 @@ Which brings us to the exciting part: how do we run this in GitLab CI/CD? There 
 need to do for this:
 
 1. Set up [CI/CD jobs](../../yaml/README.md#introduction) that actually have a browser available.
-2. Update our WebdriverIO configuration to use those browsers to visit the review apps.
+1. Update our WebdriverIO configuration to use those browsers to visit the review apps.
 
 For the scope of this article, we've defined an additional [CI/CD stage](../../yaml/README.md#stages)
 `confidence-check` that is executed _after_ the stage that deploys the review app. It uses the `node:latest` [Docker

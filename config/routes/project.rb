@@ -170,7 +170,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :recent
           end
         end
+
         resources :releases, only: [:index]
+        resources :starrers, only: [:index]
         resources :forks, only: [:index, :new, :create]
         resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
@@ -182,7 +184,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       #
       # Templates
       #
-      get '/templates/:template_type/:key' => 'templates#show', as: :template, constraints: { key: %r{[^/]+} }
+      get '/templates/:template_type/:key' => 'templates#show',
+          as: :template,
+          defaults: { format: 'json' },
+          constraints: { key: %r{[^/]+}, template_type: %r{issue|merge_request}, format: 'json' }
 
       resources :commit, only: [:show], constraints: { id: /\h{7,40}/ } do
         member do
@@ -262,6 +267,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :pipelines
             get :diffs, to: 'merge_requests/diffs#show'
             get :widget, to: 'merge_requests/content#widget'
+            get :cached_widget, to: 'merge_requests/content#cached_widget'
           end
 
           get :diff_for_path, controller: 'merge_requests/diffs'
@@ -336,11 +342,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :variables, only: [:show, :update]
 
-      resources :triggers, only: [:index, :create, :edit, :update, :destroy] do
-        member do
-          post :take_ownership
-        end
-      end
+      resources :triggers, only: [:index, :create, :edit, :update, :destroy]
 
       resource :mirror, only: [:show, :update] do
         member do
@@ -357,6 +359,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         collection do
           resource :pipelines_settings, path: 'settings', only: [:show, :update]
           get :charts
+          scope '(*ref)', constraints: { ref: Gitlab::PathRegex.git_reference_regex } do
+            get :latest, action: :show, defaults: { latest: true }
+          end
         end
 
         member do
@@ -475,7 +480,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           # in JSON format, or a request for tag named `latest.json`.
           scope format: false do
             resources :tags, only: [:index, :destroy],
-                             constraints: { id: Gitlab::Regex.container_registry_tag_regex }
+                             constraints: { id: Gitlab::Regex.container_registry_tag_regex } do
+              collection do
+                delete :bulk_destroy
+              end
+            end
           end
         end
       end
@@ -501,6 +510,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :realtime_changes
           post :create_merge_request
           get :discussions, format: :json
+
+          Gitlab.ee do
+            get 'designs(/*vueroute)', to: 'issues#show', as: :designs, format: false
+          end
         end
 
         collection do

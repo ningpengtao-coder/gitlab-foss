@@ -18,34 +18,15 @@ export const discardDraft = ({ commit }) => {
   commit(types.UPDATE_COMMIT_MESSAGE, '');
 };
 
-export const updateCommitAction = ({ commit, dispatch }, commitAction) => {
+export const updateCommitAction = ({ commit, getters }, commitAction) => {
   commit(types.UPDATE_COMMIT_ACTION, {
     commitAction,
   });
-  dispatch('setShouldCreateMR');
+  commit(types.TOGGLE_SHOULD_CREATE_MR, !getters.shouldHideNewMrOption);
 };
 
 export const toggleShouldCreateMR = ({ commit }) => {
   commit(types.TOGGLE_SHOULD_CREATE_MR);
-  commit(types.INTERACT_WITH_NEW_MR);
-};
-
-export const setShouldCreateMR = ({
-  commit,
-  getters,
-  rootGetters,
-  state: { interactedWithNewMR },
-}) => {
-  const committingToExistingMR =
-    getters.isCommittingToCurrentBranch &&
-    rootGetters.hasMergeRequest &&
-    !rootGetters.isOnDefaultBranch;
-
-  if ((getters.isCommittingToDefaultBranch && !interactedWithNewMR) || committingToExistingMR) {
-    commit(types.TOGGLE_SHOULD_CREATE_MR, false);
-  } else if (!interactedWithNewMR) {
-    commit(types.TOGGLE_SHOULD_CREATE_MR, true);
-  }
 };
 
 export const updateBranchName = ({ commit }, branchName) => {
@@ -185,6 +166,8 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
           }
 
           commit(rootTypes.CLEAR_STAGED_CHANGES, null, { root: true });
+
+          commit(rootTypes.CLEAR_REPLACED_FILES, null, { root: true });
 
           setTimeout(() => {
             commit(rootTypes.SET_LAST_COMMIT_MSG, '', { root: true });

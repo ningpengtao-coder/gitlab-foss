@@ -188,28 +188,27 @@ when running our Phoenix in our `localhost`.
 - Open `hello_gitlab_ci/config/test.exs` on your favorite code editor
 - Go to **Configure your database** session and edit the block to include `System.get_env`:
 
-    ```elixir
-    # Configure your database
-    config :hello_gitlab_ci, HelloGitlabCi.Repo,
-      adapter: Ecto.Adapters.Postgres,
-      username: System.get_env("POSTGRES_USER") || "postgres",
-      password: System.get_env("POSTGRES_PASSWORD") || "postgres",
-      database: System.get_env("POSTGRES_DB") || "hello_gitlab_ci_test",
-      hostname: System.get_env("POSTGRES_HOST") || "localhost",
-      pool: Ecto.Adapters.SQL.Sandbox
-    ```
+  ```elixir
+  # Configure your database
+  config :hello_gitlab_ci, HelloGitlabCi.Repo,
+    adapter: Ecto.Adapters.Postgres,
+    username: System.get_env("POSTGRES_USER") || "postgres",
+    password: System.get_env("POSTGRES_PASSWORD") || "postgres",
+    database: System.get_env("POSTGRES_DB") || "hello_gitlab_ci_test",
+    hostname: System.get_env("POSTGRES_HOST") || "localhost",
+    pool: Ecto.Adapters.SQL.Sandbox
+  ```
 
-    We'll need these system variables later on.
+  We'll need these system variables later on.
 
 - Create an empty file named `.gitkeep` into `hello_gitlab_ci/priv/repo/migrations`
 
-    As our project is still fresh, we don't have any data on our database, so, the `migrations`
-directory will be empty.
-    Without `.gitkeep`, git will not upload this empty directory and we'll got an error when running our
-test on GitLab.
+  As our project is still fresh, we don't have any data on our database, so, the `migrations`
+  directory will be empty.
+  Without `.gitkeep`, git will not upload this empty directory and we'll got an error when running our
+  test on GitLab.
 
-    > **Note:**
-    If we add a folder via the GitLab UI, GitLab itself will add the `.gitkeep` to that new dir.
+  > **Note:** If we add a folder via the GitLab UI, GitLab itself will add the `.gitkeep` to that new dir.
 
 Now, let's run a local test and see if everything we did didn't break anything.
 
@@ -248,64 +247,64 @@ project.
 
 - The fastest and easiest way to do this, is to click on **Set up CI** on project's main page:
 
-    ![Set up CI](img/setup-ci.png)
+  ![Set up CI](img/setup-ci.png)
 
 - On next screen, we can select a template ready to go. Click on **Apply a GitLab CI/CD Yaml
   template** and select **Elixir**:
 
-    ![Select template](img/select-template.png)
+  ![Select template](img/select-template.png)
 
-    This template file tells GitLab CI/CD about what we wish to do every time a new commit is made.
-    However, we have to adapt it to run a Phoenix app.
+  This template file tells GitLab CI/CD about what we wish to do every time a new commit is made.
+  However, we have to adapt it to run a Phoenix app.
 
 - The first line tells GitLab what Docker image will be used.
 
-    Remember when we learn about Runners, the isolated virtual machine where GitLab CI/CD build and test
-    our application? This virtual machine must have all dependencies to run our application. This is
-    where a Docker image is needed. The correct image will provide the entire system for us.
+  Remember when we learn about Runners, the isolated virtual machine where GitLab CI/CD build and test
+  our application? This virtual machine must have all dependencies to run our application. This is
+  where a Docker image is needed. The correct image will provide the entire system for us.
 
-    As a suggestion, you can use [trenpixster's elixir image][docker-image], which already has all
-    dependencies for Phoenix installed, such as Elixir, Erlang, NodeJS and PostgreSQL:
+  As a suggestion, you can use [trenpixster's elixir image][docker-image], which already has all
+  dependencies for Phoenix installed, such as Elixir, Erlang, NodeJS and PostgreSQL:
 
-    ```yml
-    image: trenpixster/elixir:latest
-    ```
+  ```yml
+  image: trenpixster/elixir:latest
+  ```
 
 - At `services` session, we'll only use `postgres`, so we'll delete `mysql` and `redis` lines:
 
-    ```yml
-    services:
-      - postgres:latest
-    ```
+  ```yml
+  services:
+    - postgres:latest
+  ```
 
 - Now, we'll create a new entry called `variables`, before `before_script` session:
 
-    ```yml
-    variables:
-      POSTGRES_DB: hello_gitlab_ci_test
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "postgres"
-      MIX_ENV: "test"
-    ```
+  ```yml
+  variables:
+    POSTGRES_DB: hello_gitlab_ci_test
+    POSTGRES_HOST: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: "postgres"
+    MIX_ENV: "test"
+  ```
 
-    Here, we are setting up the values for GitLab CI/CD authenticate into PostgreSQL, as we did on
-    `config/test.exs` earlier.
+  Here, we are setting up the values for GitLab CI/CD authenticate into PostgreSQL, as we did on
+  `config/test.exs` earlier.
 
 - In `before_script` session, we'll add some commands to prepare everything to the test:
 
-    ```yml
-    before_script:
-      - apt-get update && apt-get -y install postgresql-client
-      - mix local.hex --force
-      - mix deps.get --only test
-      - mix ecto.create
-      - mix ecto.migrate
-    ```
+  ```yml
+  before_script:
+    - apt-get update && apt-get -y install postgresql-client
+    - mix local.hex --force
+    - mix deps.get --only test
+    - mix ecto.create
+    - mix ecto.migrate
+   ```
 
-    It's important to install `postgresql-client` to let GitLab CI/CD access PostgreSQL and create our
-    database with the login information provided earlier. More important is to respect the indentation,
-    to avoid syntax errors when running the build.
+  It's important to install `postgresql-client` to let GitLab CI/CD access PostgreSQL and create our
+  database with the login information provided earlier. More important is to respect the indentation,
+  to avoid syntax errors when running the build.
 
 - And finally, we'll let `mix` session intact.
 
@@ -404,14 +403,14 @@ other reasons][ci-reasons] to keep using GitLab CI/CD. The benefits to our teams
 [phoenix-learning-guide]: https://hexdocs.pm/phoenix/learning.html "Phoenix Learning Guide"
 [phoenix-install]: https://hexdocs.pm/phoenix/installation.html "Phoenix Installation"
 [phoenix-mysql]: https://hexdocs.pm/phoenix/ecto.html#using-mysql "Phoenix with MySQL"
-[elixir-site]: http://elixir-lang.org/ "Elixir"
-[elixir-mix]: http://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html "Introduction to mix"
-[elixir-docs]: http://elixir-lang.org/getting-started/introduction.html "Elixir Documentation"
+[elixir-site]: https://elixir-lang.org/ "Elixir"
+[elixir-mix]: https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html "Introduction to mix"
+[elixir-docs]: https://elixir-lang.org/getting-started/introduction.html "Elixir Documentation"
 [elixir-install]: https://elixir-lang.org/install.html "Elixir Installation"
-[ecto]: http://hexdocs.pm/ecto "Ecto"
+[ecto]: https://hexdocs.pm/ecto/Ecto.html "Ecto"
 [ecto-repo]: https://hexdocs.pm/ecto/Ecto.html#module-repositories "Ecto Repositories"
 [mix-ecto]: https://hexdocs.pm/ecto/Mix.Tasks.Ecto.Create.html "mix and Ecto"
-[iex]: http://elixir-lang.org/getting-started/introduction.html#interactive-mode "Interactive Mode"
+[iex]: https://elixir-lang.org/getting-started/introduction.html#interactive-mode "Interactive Mode"
 [ci-lint]: https://gitlab.com/ci/lint "CI Lint Tool"
 [ci-reasons]: https://about.gitlab.com/2015/02/03/7-reasons-why-you-should-be-using-ci/ "7 Reasons Why You Should Be Using CI"
 [ci-guide]: https://about.gitlab.com/2015/12/14/getting-started-with-gitlab-and-gitlab-ci/ "Getting Started With GitLab And GitLab CI/CD"

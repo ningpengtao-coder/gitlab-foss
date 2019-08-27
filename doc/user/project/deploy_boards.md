@@ -1,4 +1,4 @@
-# Deploy Boards **[PREMIUM]**
+# Deploy Boards **(PREMIUM)**
 
 > [Introduced][ee-1589] in [GitLab Premium][ee] 9.0.
 
@@ -63,12 +63,12 @@ To display the Deploy Boards for a specific [environment] you should:
 
 1. Have a Kubernetes cluster up and running.
 
-    NOTE: **Running on OpenShift:**
-    If you are using OpenShift, ensure that you're using the `Deployment` resource
-    instead of `DeploymentConfiguration`, otherwise the Deploy Boards won't render
-    correctly. For more information, read the
-    [OpenShift docs](https://docs.openshift.com/container-platform/3.7/dev_guide/deployments/kubernetes_deployments.html#kubernetes-deployments-vs-deployment-configurations)
-    and [GitLab issue #4584](https://gitlab.com/gitlab-org/gitlab-ee/issues/4584).
+   NOTE: **Running on OpenShift:**
+   If you are using OpenShift, ensure that you're using the `Deployment` resource
+   instead of `DeploymentConfiguration`, otherwise the Deploy Boards won't render
+   correctly. For more information, read the
+   [OpenShift docs](https://docs.openshift.com/container-platform/3.7/dev_guide/deployments/kubernetes_deployments.html#kubernetes-deployments-vs-deployment-configurations)
+   and [GitLab issue #4584](https://gitlab.com/gitlab-org/gitlab-ee/issues/4584).
 
 1. [Configure GitLab Runner][runners] with the [Docker][docker-exec] or
    [Kubernetes][kube-exec] executor.
@@ -93,7 +93,7 @@ To display the Deploy Boards for a specific [environment] you should:
    To migrate, please apply the required annotations (see above) and
    re-deploy your application.
 
-    ![Deploy Boards Kubernetes Label](img/deploy_boards_kubernetes_label.png)
+   ![Deploy Boards Kubernetes Label](img/deploy_boards_kubernetes_label.png)
 
 Once all of the above are set up and the pipeline has run at least once,
 navigate to the environments page under **Operations > Environments**.
@@ -125,6 +125,6 @@ version of your application.
 [kube-service]: integrations/kubernetes.md "Kubernetes project service"
 [review apps]: ../../ci/review_apps/index.md "Review Apps documentation"
 [variables]: ../../ci/variables/README.md "GitLab CI variables"
-[autodeploy]: ../../ci/autodeploy/index.md "GitLab Autodeploy"
+[autodeploy]: ../../topics/autodevops/index.md#auto-deploy "GitLab Autodeploy"
 [kube-image]: https://gitlab.com/gitlab-examples/kubernetes-deploy/container_registry "Kubernetes deploy Container Registry"
 [runners]: ../../ci/runners/README.md

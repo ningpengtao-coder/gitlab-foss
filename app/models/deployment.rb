@@ -7,6 +7,7 @@ class Deployment < ApplicationRecord
 
   belongs_to :project, required: true
   belongs_to :environment, required: true
+  belongs_to :cluster, class_name: 'Clusters::Cluster', optional: true
   belongs_to :user
   belongs_to :deployable, polymorphic: true # rubocop:disable Cop/PolymorphicAssociations
 
@@ -84,11 +85,6 @@ class Deployment < ApplicationRecord
     Commit.truncate_sha(sha)
   end
 
-  # Deprecated - will be replaced by a persisted cluster_id
-  def deployment_platform_cluster
-    environment.deployment_platform&.cluster
-  end
-
   def execute_hooks
     deployment_data = Gitlab::DataBuilder::Deployment.build(self)
     project.execute_services(deployment_data, :deployment_hooks)
@@ -132,17 +128,8 @@ class Deployment < ApplicationRecord
       merge_requests = merge_requests.where("merge_request_metrics.merged_at >= ?", previous_deployment.finished_at)
     end
 
-    # Need to use `map` instead of `select` because MySQL doesn't allow `SELECT`ing from the same table
-    # that we're updating.
-    merge_request_ids =
-      if Gitlab::Database.postgresql?
-        merge_requests.select(:id)
-      elsif Gitlab::Database.mysql?
-        merge_requests.map(&:id)
-      end
-
     MergeRequest::Metrics
-      .where(merge_request_id: merge_request_ids, first_deployed_to_production_at: nil)
+      .where(merge_request_id: merge_requests.select(:id), first_deployed_to_production_at: nil)
       .update_all(first_deployed_to_production_at: finished_at)
   end
 
@@ -175,29 +162,15 @@ class Deployment < ApplicationRecord
     deployed_at&.to_time&.in_time_zone&.to_s(:medium)
   end
 
-  def has_metrics?
-    success? && prometheus_adapter&.can_query?
-  end
-
-  def metrics
-    return {} unless has_metrics?
-
-    metrics = prometheus_adapter.query(:deployment, self)
-    metrics&.merge(deployment_time: finished_at.to_i) || {}
-  end
-
-  def additional_metrics
-    return {} unless has_metrics?
-
-    metrics = prometheus_adapter.query(:additional_metrics_deployment, self)
-    metrics&.merge(deployment_time: finished_at.to_i) || {}
+  def deployed_by
+    # We use deployable's user if available because Ci::PlayBuildService
+    # does not update the deployment's user, just the one for the deployable.
+    # TODO: use deployment's user once https://gitlab.com/gitlab-org/gitlab-ce/issues/66442
+    # is completed.
+    deployable&.user || user
   end
 
   private
-
-  def prometheus_adapter
-    environment.prometheus_adapter
-  end
 
   def ref_path
     File.join(environment.ref_path, 'deployments', iid.to_s)

@@ -11,7 +11,6 @@ class GraphqlController < ApplicationController
   # around in GraphiQL.
   protect_from_forgery with: :null_session, only: :execute
 
-  before_action :check_graphql_feature_flag!
   before_action :authorize_access_api!
   before_action(only: [:execute]) { authenticate_sessionless_user!(:api) }
 
@@ -28,6 +27,10 @@ class GraphqlController < ApplicationController
   end
 
   rescue_from Gitlab::Graphql::Variables::Invalid do |exception|
+    render_error(exception.message, status: :unprocessable_entity)
+  end
+
+  rescue_from Gitlab::Graphql::Errors::ArgumentError do |exception|
     render_error(exception.message, status: :unprocessable_entity)
   end
 
@@ -85,9 +88,5 @@ class GraphqlController < ApplicationController
     error = { errors: [message: message] }
 
     render json: error, status: status
-  end
-
-  def check_graphql_feature_flag!
-    render_404 unless Gitlab::Graphql.enabled?
   end
 end

@@ -4,6 +4,9 @@ $: << File.expand_path(File.dirname(__FILE__))
 
 Encoding.default_external = 'UTF-8'
 
+require_relative '../lib/gitlab'
+require_relative '../config/initializers/0_inject_enterprise_edition_module'
+
 module QA
   ##
   # GitLab QA runtime classes, mostly singletons.
@@ -162,9 +165,12 @@ module QA
     module File
       autoload :Form, 'qa/page/file/form'
       autoload :Show, 'qa/page/file/show'
+      autoload :Edit, 'qa/page/file/edit'
 
       module Shared
         autoload :CommitMessage, 'qa/page/file/shared/commit_message'
+        autoload :CommitButton, 'qa/page/file/shared/commit_button'
+        autoload :Editor, 'qa/page/file/shared/editor'
       end
     end
 
@@ -218,6 +224,7 @@ module QA
         autoload :Operations, 'qa/page/project/sub_menus/operations'
         autoload :Repository, 'qa/page/project/sub_menus/repository'
         autoload :Settings, 'qa/page/project/sub_menus/settings'
+        autoload :Project, 'qa/page/project/sub_menus/project'
       end
 
       module Issue
@@ -310,6 +317,10 @@ module QA
       autoload :Login, 'qa/page/mattermost/login'
     end
 
+    module Search
+      autoload :Results, 'qa/page/search/results'
+    end
+
     ##
     # Classes describing components that are used by several pages.
     #
@@ -323,6 +334,7 @@ module QA
       autoload :DropdownFilter, 'qa/page/component/dropdown_filter'
       autoload :UsersSelect, 'qa/page/component/users_select'
       autoload :Note, 'qa/page/component/note'
+      autoload :ConfirmModal, 'qa/page/component/confirm_modal'
 
       module Issuable
         autoload :Common, 'qa/page/component/issuable/common'
@@ -347,6 +359,13 @@ module QA
     autoload :KubernetesCluster, 'qa/service/kubernetes_cluster'
     autoload :Omnibus, 'qa/service/omnibus'
     autoload :Runner, 'qa/service/runner'
+
+    module ClusterProvider
+      autoload :Base, 'qa/service/cluster_provider/base'
+      autoload :Gcloud, 'qa/service/cluster_provider/gcloud'
+      autoload :Minikube, 'qa/service/cluster_provider/minikube'
+      autoload :K3d, 'qa/service/cluster_provider/k3d'
+    end
   end
 
   ##
@@ -355,6 +374,7 @@ module QA
   module Specs
     autoload :Config, 'qa/specs/config'
     autoload :Runner, 'qa/specs/runner'
+    autoload :ParallelRunner, 'qa/specs/parallel_runner'
 
     module Helpers
       autoload :Quarantine, 'qa/specs/helpers/quarantine'

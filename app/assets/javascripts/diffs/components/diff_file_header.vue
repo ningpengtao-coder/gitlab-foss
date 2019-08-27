@@ -130,7 +130,7 @@ export default {
       return `\`${this.diffFile.file_path}\``;
     },
     isFileRenamed() {
-      return this.diffFile.viewer.name === diffViewerModes.renamed;
+      return this.diffFile.renamed_file;
     },
     isModeChanged() {
       return this.diffFile.viewer.name === diffViewerModes.mode_changed;
@@ -151,7 +151,11 @@ export default {
     stickyMonitor(this.$refs.header, contentTop() - fileHeaderHeight - 1, false);
   },
   methods: {
-    ...mapActions('diffs', ['toggleFileDiscussions', 'toggleFullDiff']),
+    ...mapActions('diffs', [
+      'toggleFileDiscussions',
+      'toggleFileDiscussionWrappers',
+      'toggleFullDiff',
+    ]),
     handleToggleFile(e, checkTarget) {
       if (
         !checkTarget ||
@@ -165,7 +169,7 @@ export default {
       this.$emit('showForkMessage');
     },
     handleToggleDiscussions() {
-      this.toggleFileDiscussions(this.diffFile);
+      this.toggleFileDiscussionWrappers(this.diffFile);
     },
     handleFileNameClick(e) {
       const isLinkToOtherPage =
@@ -259,6 +263,7 @@ export default {
               :disabled="!diffHasDiscussions(diffFile)"
               :class="{ active: hasExpandedDiscussions }"
               class="js-btn-vue-toggle-comments btn"
+              data-qa-selector="toggle_comments_button"
               type="button"
               @click="handleToggleDiscussions"
             >

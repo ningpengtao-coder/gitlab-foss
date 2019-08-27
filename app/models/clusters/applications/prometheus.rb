@@ -49,14 +49,6 @@ module Clusters
         )
       end
 
-      def uninstall_command
-        Gitlab::Kubernetes::Helm::DeleteCommand.new(
-          name: name,
-          rbac: cluster.platform_kubernetes_rbac?,
-          files: files
-        )
-      end
-
       def upgrade_command(values)
         ::Gitlab::Kubernetes::Helm::InstallCommand.new(
           name: name,
@@ -64,6 +56,15 @@ module Clusters
           rbac: cluster.platform_kubernetes_rbac?,
           chart: chart,
           files: files_with_replaced_values(values)
+        )
+      end
+
+      def uninstall_command
+        Gitlab::Kubernetes::Helm::DeleteCommand.new(
+          name: name,
+          rbac: cluster.platform_kubernetes_rbac?,
+          files: files,
+          predelete: delete_knative_istio_metrics
         )
       end
 
@@ -82,7 +83,7 @@ module Clusters
 
         # ensures headers containing auth data are appended to original k8s client options
         options = kube_client.rest_client.options.merge(headers: kube_client.headers)
-        RestClient::Resource.new(proxy_url, options)
+        Gitlab::PrometheusClient.new(proxy_url, options)
       rescue Kubeclient::HttpError
         # If users have mistakenly set parameters or removed the depended clusters,
         # `proxy_url` could raise an exception because gitlab can not communicate with the cluster.
@@ -103,7 +104,15 @@ module Clusters
       end
 
       def install_knative_metrics
-        ["kubectl apply -f #{Clusters::Applications::Knative::METRICS_CONFIG}"] if cluster.application_knative_available?
+        return [] unless cluster.application_knative_available?
+
+        [Gitlab::Kubernetes::KubectlCmd.apply_file(Clusters::Applications::Knative::METRICS_CONFIG)]
+      end
+
+      def delete_knative_istio_metrics
+        return [] unless cluster.application_knative_available?
+
+        [Gitlab::Kubernetes::KubectlCmd.delete("-f", Clusters::Applications::Knative::METRICS_CONFIG)]
       end
     end
   end

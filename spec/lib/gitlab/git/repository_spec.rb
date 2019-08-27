@@ -186,6 +186,12 @@ describe Gitlab::Git::Repository, :seed_helper do
     it { is_expected.to be < 2 }
   end
 
+  describe '#to_s' do
+    subject { repository.to_s }
+
+    it { is_expected.to eq("<Gitlab::Git::Repository: group/project>") }
+  end
+
   describe '#object_directory_size' do
     before do
       allow(repository.gitaly_repository_client)
@@ -253,6 +259,22 @@ describe Gitlab::Git::Repository, :seed_helper do
       let(:ref) { '6d39438' }
 
       it { expect(submodule_url('six')).to eq(nil) }
+    end
+  end
+
+  describe '#submodule_urls_for' do
+    let(:ref) { 'master' }
+
+    it 'returns url mappings for submodules' do
+      urls = repository.submodule_urls_for(ref)
+
+      expect(urls).to eq({
+        "deeper/nested/six" => "git://github.com/randx/six.git",
+               "gitlab-grack" => "https://gitlab.com/gitlab-org/gitlab-grack.git",
+       "gitlab-shell" => "https://github.com/gitlabhq/gitlab-shell.git",
+        "nested/six" => "git://github.com/randx/six.git",
+        "six" => "git://github.com/randx/six.git"
+      })
     end
   end
 
@@ -1694,14 +1716,15 @@ describe Gitlab::Git::Repository, :seed_helper do
     let(:branch_head) { '6d394385cf567f80a8fd85055db1ab4c5295806f' }
     let(:left_sha) { 'cfe32cf61b73a0d5e9f13e774abde7ff789b1660' }
     let(:right_branch) { 'test-master' }
+    let(:first_parent_ref) { 'refs/heads/test-master' }
     let(:target_ref) { 'refs/merge-requests/999/merge' }
 
     before do
-      repository.create_branch(right_branch, branch_head) unless repository.branch_exists?(right_branch)
+      repository.create_branch(right_branch, branch_head) unless repository.ref_exists?(first_parent_ref)
     end
 
     def merge_to_ref
-      repository.merge_to_ref(user, left_sha, right_branch, target_ref, 'Merge message')
+      repository.merge_to_ref(user, left_sha, right_branch, target_ref, 'Merge message', first_parent_ref)
     end
 
     it 'generates a commit in the target_ref' do
@@ -1716,7 +1739,7 @@ describe Gitlab::Git::Repository, :seed_helper do
     end
 
     it 'does not change the right branch HEAD' do
-      expect { merge_to_ref }.not_to change { repository.find_branch(right_branch).target }
+      expect { merge_to_ref }.not_to change { repository.commit(first_parent_ref).sha }
     end
   end
 

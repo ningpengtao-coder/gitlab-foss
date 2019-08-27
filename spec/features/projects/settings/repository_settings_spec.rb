@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Projects > Settings > Repository settings' do
@@ -112,11 +114,17 @@ describe 'Projects > Settings > Repository settings' do
       it 'add a new deploy token' do
         fill_in 'deploy_token_name', with: 'new_deploy_key'
         fill_in 'deploy_token_expires_at', with: (Date.today + 1.month).to_s
+        fill_in 'deploy_token_username', with: 'deployer'
         check 'deploy_token_read_repository'
         check 'deploy_token_read_registry'
         click_button 'Create deploy token'
 
         expect(page).to have_content('Your new project deploy token has been created')
+
+        within('.created-deploy-token-container') do
+          expect(page).to have_selector("input[name='deploy-token-user'][value='deployer']")
+          expect(page).to have_selector("input[name='deploy-token'][readonly='readonly']")
+        end
       end
     end
 
@@ -242,11 +250,11 @@ describe 'Projects > Settings > Repository settings' do
 
       visit project_settings_repository_path(project)
 
-      mirror = find('.qa-mirrored-repository-row')
+      mirror = find('.rspec-mirrored-repository-row')
 
-      expect(mirror).to have_selector('.qa-delete-mirror')
-      expect(mirror).to have_selector('.qa-disabled-mirror-badge')
-      expect(mirror).not_to have_selector('.qa-update-now-button')
+      expect(mirror).to have_selector('.rspec-delete-mirror')
+      expect(mirror).to have_selector('.rspec-disabled-mirror-badge')
+      expect(mirror).not_to have_selector('.rspec-update-now-button')
     end
   end
 end

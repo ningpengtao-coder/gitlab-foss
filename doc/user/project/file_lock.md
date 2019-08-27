@@ -1,4 +1,4 @@
-# File Locking **[PREMIUM]**
+# File Locking **(PREMIUM)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/440) in [GitLab Premium](https://about.gitlab.com/pricing/) 8.9.
 
@@ -40,7 +40,7 @@ To lock a file:
 1. Pick the file you want to lock.
 1. Click the "Lock" button.
 
-    ![Locking file](img/file_lock.png)
+   ![Locking file](img/file_lock.png)
 
 To lock an entire directory, look for the "Lock" link next to "History".
 

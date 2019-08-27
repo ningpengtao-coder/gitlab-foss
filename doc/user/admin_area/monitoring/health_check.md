@@ -2,7 +2,7 @@
 type: concepts, howto
 ---
 
-# Health Check
+# Health Check **(CORE ONLY)**
 
 > - Liveness and readiness probes were [introduced][ce-10416] in GitLab 9.1.
 > - The `health_check` endpoint was [introduced][ce-3888] in GitLab 8.8 and was
@@ -21,70 +21,127 @@ traffic until the system is ready or restart the container as needed.
 To access monitoring resources, the requesting client IP needs to be included in a whitelist.
 For details, see [how to add IPs to a whitelist for the monitoring endpoints](../../../administration/monitoring/ip_whitelist.md).
 
-## Using the endpoints
+## Using the endpoints locally
 
 With default whitelist settings, the probes can be accessed from localhost using the following URLs:
 
-- `http://localhost/-/health`
-- `http://localhost/-/readiness`
-- `http://localhost/-/liveness`
+```text
+GET http://localhost/-/health
+```
 
-The first endpoint, `health`, only checks whether the application server is running. It does not verify the database or other services are running. A successful response will return a 200 status code with the following message:
+```text
+GET http://localhost/-/readiness
+```
+
+```text
+GET http://localhost/-/liveness
+```
+
+## Health
+
+Checks whether the application server is running. It does not verify the database or other services are running.
+
+```text
+GET /-/health
+```
+
+Example request:
+
+```sh
+curl 'https://gitlab.example.com/-/health'
+```
+
+Example response:
 
 ```text
 GitLab OK
 ```
 
-The readiness and liveness probes will provide a report of system health in JSON format.
+## Readiness
 
-`readiness` probe example output:
+The readiness probe checks whether the Gitlab instance is ready to use. It checks the dependent services (Database, Redis, Gitaly etc.) and gives a status for each.
+
+```text
+GET /-/readiness
+```
+
+Example request:
+
+```sh
+curl 'https://gitlab.example.com/-/readiness'
+```
+
+Example response:
 
 ```json
 {
-   "queues_check" : {
-      "status" : "ok"
+   "db_check":{
+      "status":"failed",
+      "message": "unexpected Db check result: 0"
    },
-   "redis_check" : {
-      "status" : "ok"
+   "redis_check":{
+      "status":"ok"
    },
-   "shared_state_check" : {
-      "status" : "ok"
+   "cache_check":{
+      "status":"ok"
    },
-   "db_check" : {
-      "status" : "ok"
+   "queues_check":{
+      "status":"ok"
    },
-   "cache_check" : {
-      "status" : "ok"
+   "shared_state_check":{
+      "status":"ok"
+   },
+   "gitaly_check":{
+      "status":"ok",
+      "labels":{
+         "shard":"default"
+         }
+      }
+   }
+```
+
+## Liveness
+
+The liveness probe checks whether the application server is alive. Unlike the [`health`](#health) check, this check hits the database.
+
+```text
+GET /-/liveness
+```
+
+Example request:
+
+```sh
+curl 'https://gitlab.example.com/-/liveness'
+```
+
+Example response:
+
+On success, the endpoint will return a valid successful HTTP status code, and a response like below.
+
+```json
+{
+   "db_check":{
+      "status":"ok"
+   },
+   "redis_check":{
+      "status":"ok"
+   },
+   "cache_check":{
+      "status":"ok"
+   },
+   "queues_check":{
+      "status":"ok"
+   },
+   "shared_state_check":{
+      "status":"ok"
+   },
+   "gitaly_check":{
+      "status":"ok"
    }
 }
 ```
 
-`liveness` probe example output:
-
-```json
-{
-   "cache_check" : {
-      "status" : "ok"
-   },
-   "db_check" : {
-      "status" : "ok"
-   },
-   "redis_check" : {
-      "status" : "ok"
-   },
-   "queues_check" : {
-      "status" : "ok"
-   },
-   "shared_state_check" : {
-      "status" : "ok"
-   }
-}
-```
-
-## Status
-
-On failure, the endpoint will return a `500` HTTP status code. On success, the endpoint
-will return a valid successful HTTP status code, and a `success` message.
+On failure, the endpoint will return a `500` HTTP status code.
 
 ## Access token (Deprecated)
 

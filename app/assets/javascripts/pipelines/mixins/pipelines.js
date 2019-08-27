@@ -60,12 +60,14 @@ export default {
     eventHub.$on('postAction', this.postAction);
     eventHub.$on('retryPipeline', this.postAction);
     eventHub.$on('clickedDropdown', this.updateTable);
+    eventHub.$on('updateTable', this.updateTable);
     eventHub.$on('refreshPipelinesTable', this.fetchPipelines);
   },
   beforeDestroy() {
     eventHub.$off('postAction', this.postAction);
     eventHub.$off('retryPipeline', this.postAction);
     eventHub.$off('clickedDropdown', this.updateTable);
+    eventHub.$off('updateTable', this.updateTable);
     eventHub.$off('refreshPipelinesTable', this.fetchPipelines);
   },
   destroyed() {
@@ -107,8 +109,8 @@ export default {
       }
       // Stop polling
       this.poll.stop();
-      // Update the table
-      return this.getPipelines().then(() => this.poll.restart());
+      // Restarting the poll also makes an initial request
+      this.poll.restart();
     },
     fetchPipelines() {
       if (!this.isMakingRequest) {
@@ -153,7 +155,7 @@ export default {
     postAction(endpoint) {
       this.service
         .postAction(endpoint)
-        .then(() => this.fetchPipelines())
+        .then(() => this.updateTable())
         .catch(() => Flash(__('An error occurred while making the request.')));
     },
   },

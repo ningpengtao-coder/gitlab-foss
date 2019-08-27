@@ -17,7 +17,7 @@ class JiraService < IssueTrackerService
   # Jira Cloud version is deprecating authentication via username and password.
   # We should use username/password for Jira Server and email/api_token for Jira Cloud,
   # for more information check: https://gitlab.com/gitlab-org/gitlab-ce/issues/49936.
-  prop_accessor :username, :password, :url, :api_url, :jira_issue_transition_id, :title, :description
+  prop_accessor :username, :password, :url, :api_url, :jira_issue_transition_id
 
   before_update :reset_password
 
@@ -31,13 +31,12 @@ class JiraService < IssueTrackerService
 
   # {PROJECT-KEY}-{NUMBER} Examples: JIRA-1, PROJECT-1
   def self.reference_pattern(only_long: true)
-    @reference_pattern ||= /(?<issue>\b([A-Z][A-Z0-9_]+-)\d+)/
+    @reference_pattern ||= /(?<issue>\b#{Gitlab::Regex.jira_issue_key_regex})/
   end
 
   def initialize_properties
     super do
       self.properties = {
-        title: issues_tracker['title'],
         url: issues_tracker['url'],
         api_url: issues_tracker['api_url']
       }
@@ -55,7 +54,7 @@ class JiraService < IssueTrackerService
       username: self.username,
       password: self.password,
       site: URI.join(url, '/').to_s, # Intended to find the root
-      context_path: url.path.chomp('/'),
+      context_path: url.path,
       auth_type: :basic,
       read_timeout: 120,
       use_cookies: true,
@@ -74,20 +73,12 @@ class JiraService < IssueTrackerService
     [Jira service documentation](#{help_page_url('user/project/integrations/jira')})."
   end
 
-  def title
-    if self.properties && self.properties['title'].present?
-      self.properties['title']
-    else
-      'Jira'
-    end
+  def default_title
+    'Jira'
   end
 
-  def description
-    if self.properties && self.properties['description'].present?
-      self.properties['description']
-    else
-      s_('JiraService|Jira issue tracker')
-    end
+  def default_description
+    s_('JiraService|Jira issue tracker')
   end
 
   def self.to_param
@@ -110,6 +101,12 @@ class JiraService < IssueTrackerService
 
   def new_issue_url
     "#{url}/secure/CreateIssue.jspa"
+  end
+
+  alias_method :original_url, :url
+
+  def url
+    original_url&.chomp('/')
   end
 
   def execute(push)
@@ -259,7 +256,7 @@ class JiraService < IssueTrackerService
       end
 
       log_info("Successfully posted", client_url: client_url)
-      "SUCCESS: Successfully posted to http://jira.example.net."
+      "SUCCESS: Successfully posted to #{client_url}."
     end
   end
 

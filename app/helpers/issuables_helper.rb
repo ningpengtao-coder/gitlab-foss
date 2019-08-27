@@ -280,7 +280,11 @@ module IssuablesHelper
       initialTaskStatus: issuable.task_status
     }
 
-    data[:hasClosingMergeRequest] = issuable.merge_requests_count != 0 if issuable.is_a?(Issue)
+    data[:hasClosingMergeRequest] = issuable.merge_requests_count(current_user) != 0 if issuable.is_a?(Issue)
+
+    zoom_links = Gitlab::ZoomLinkExtractor.new(issuable.description).links
+
+    data[:zoomMeetingUrl] = zoom_links.last if zoom_links.any?
 
     if parent.is_a?(Group)
       data[:groupPath] = parent.path
@@ -390,8 +394,8 @@ module IssuablesHelper
 
   def issuable_todo_button_data(issuable, is_collapsed)
     {
-      todo_text: _('Add todo'),
-      mark_text: _('Mark todo as done'),
+      todo_text: _('Add a To Do'),
+      mark_text: _('Mark as done'),
       todo_icon: sprite_icon('todo-add'),
       mark_icon: sprite_icon('todo-done', css_class: 'todo-undone'),
       issuable_id: issuable[:id],
@@ -401,7 +405,11 @@ module IssuablesHelper
       placement: is_collapsed ? 'left' : nil,
       container: is_collapsed ? 'body' : nil,
       boundary: 'viewport',
-      is_collapsed: is_collapsed
+      is_collapsed: is_collapsed,
+      track_label: "right_sidebar",
+      track_property: "update_todo",
+      track_event: "click_button",
+      track_value: ""
     }
   end
 

@@ -1,10 +1,19 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import settingsMixin from 'ee_else_ce/pages/projects/shared/permissions/mixins/settings_pannel_mixin';
+import { __ } from '~/locale';
 import projectFeatureSetting from './project_feature_setting.vue';
 import projectFeatureToggle from '~/vue_shared/components/toggle_button.vue';
 import projectSettingRow from './project_setting_row.vue';
-import { visibilityOptions, visibilityLevelDescriptions } from '../constants';
+import {
+  visibilityOptions,
+  visibilityLevelDescriptions,
+  featureAccessLevelMembers,
+  featureAccessLevelEveryone,
+} from '../constants';
 import { toggleHiddenClassBySelector } from '../external';
+
+const PAGE_FEATURE_ACCESS_LEVEL = __('Everyone');
 
 export default {
   components: {
@@ -18,6 +27,11 @@ export default {
     currentSettings: {
       type: Object,
       required: true,
+    },
+    canDisableEmails: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     canChangeVisibilityLevel: {
       type: Boolean,
@@ -95,6 +109,7 @@ export default {
       lfsEnabled: true,
       requestAccessEnabled: true,
       highlightChangesClass: false,
+      emailsDisabled: false,
     };
 
     return { ...defaults, ...this.currentSettings };
@@ -102,9 +117,9 @@ export default {
 
   computed: {
     featureAccessLevelOptions() {
-      const options = [[10, 'Only Project Members']];
+      const options = [featureAccessLevelMembers];
       if (this.visibilityLevel !== visibilityOptions.PRIVATE) {
-        options.push([20, 'Everyone With Access']);
+        options.push(featureAccessLevelEveryone);
       }
       return options;
     },
@@ -117,7 +132,7 @@ export default {
 
     pagesFeatureAccessLevelOptions() {
       if (this.visibilityLevel !== visibilityOptions.PUBLIC) {
-        return this.featureAccessLevelOptions.concat([[30, 'Everyone']]);
+        return this.featureAccessLevelOptions.concat([[30, PAGE_FEATURE_ACCESS_LEVEL]]);
       }
       return this.featureAccessLevelOptions;
     },
@@ -200,17 +215,17 @@ export default {
               <option
                 :value="visibilityOptions.PRIVATE"
                 :disabled="!visibilityAllowed(visibilityOptions.PRIVATE)"
-                >Private</option
+                >{{ __('Private') }}</option
               >
               <option
                 :value="visibilityOptions.INTERNAL"
                 :disabled="!visibilityAllowed(visibilityOptions.INTERNAL)"
-                >Internal</option
+                >{{ __('Internal') }}</option
               >
               <option
                 :value="visibilityOptions.PUBLIC"
                 :disabled="!visibilityAllowed(visibilityOptions.PUBLIC)"
-                >Public</option
+                >{{ __('Public') }}</option
               >
             </select>
             <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"></i>
@@ -332,5 +347,14 @@ export default {
         />
       </project-setting-row>
     </div>
+    <project-setting-row v-if="canDisableEmails" class="mb-3">
+      <label class="js-emails-disabled">
+        <input :value="emailsDisabled" type="hidden" name="project[emails_disabled]" />
+        <input v-model="emailsDisabled" type="checkbox" /> {{ __('Disable email notifications') }}
+      </label>
+      <span class="form-text text-muted">{{
+        __('This setting will override user notification preferences for all project members.')
+      }}</span>
+    </project-setting-row>
   </div>
 </template>

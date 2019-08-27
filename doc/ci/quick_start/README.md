@@ -13,6 +13,10 @@ NOTE: **Note:**
 Please keep in mind that only project Maintainers and Admin users have
 the permissions to access a project's settings.
 
+NOTE: **Note:**
+Coming over to GitLab from Jenkins? Check out our [reference](../jenkins/index.md)
+for converting your pre-existing pipelines over to our format.
+
 GitLab offers a [continuous integration][ci] service. If you
 [add a `.gitlab-ci.yml` file][yaml] to the root directory of your repository,
 and configure your GitLab project to use a [Runner], then each commit or
@@ -233,7 +237,7 @@ CI with various languages.
 [runner-install]: https://docs.gitlab.com/runner/install/
 [blog-ci]: https://about.gitlab.com/2015/05/06/why-were-replacing-gitlab-ci-jobs-with-gitlab-ci-dot-yml/
 [examples]: ../examples/README.md
-[ci]: https://about.gitlab.com/gitlab-ci/
+[ci]: https://about.gitlab.com/product/continuous-integration/
 [yaml]: ../yaml/README.md
 [runner]: ../runners/README.md
 [enabled]: ../enable_or_disable_ci.md

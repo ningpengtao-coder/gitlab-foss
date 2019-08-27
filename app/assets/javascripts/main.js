@@ -9,7 +9,11 @@ import './commons';
 import './behaviors';
 
 // lib/utils
-import { handleLocationHash, addSelectOnFocusBehaviour } from './lib/utils/common_utils';
+import {
+  handleLocationHash,
+  addSelectOnFocusBehaviour,
+  getCspNonceValue,
+} from './lib/utils/common_utils';
 import { localTimeAgo } from './lib/utils/datetime_utility';
 import { getLocationHash, visitUrl } from './lib/utils/url_utility';
 
@@ -33,9 +37,22 @@ import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
 import { __ } from './locale';
 
+import 'ee_else_ce/main_ee';
+
 // expose jQuery as global (TODO: remove these)
 window.jQuery = jQuery;
 window.$ = jQuery;
+
+// Add nonce to jQuery script handler
+jQuery.ajaxSetup({
+  converters: {
+    // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings, func-names
+    'text script': function(text) {
+      jQuery.globalEval(text, { nonce: getCspNonceValue() });
+      return text;
+    },
+  },
+});
 
 // inject test utilities if necessary
 if (process.env.NODE_ENV !== 'production' && gon && gon.test_env) {
@@ -105,6 +122,7 @@ function deferredInitialisation() {
       .then(() => {
         $('select.select2').select2({
           width: 'resolve',
+          minimumResultsForSearch: 10,
           dropdownAutoWidth: true,
         });
 
@@ -119,11 +137,15 @@ function deferredInitialisation() {
       .catch(() => {});
   }
 
+  const glTooltipDelay = localStorage.getItem('gl-tooltip-delay');
+  const delay = glTooltipDelay ? JSON.parse(glTooltipDelay) : 0;
+
   // Initialize tooltips
   $body.tooltip({
     selector: '.has-tooltip, [data-toggle="tooltip"]',
     trigger: 'hover',
     boundary: 'viewport',
+    delay,
   });
 
   // Initialize popovers

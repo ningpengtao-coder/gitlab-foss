@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import $ from 'jquery';
 import _ from 'underscore';
+import Api from '~/api';
 import { TEST_HOST } from 'spec/test_constants';
 import { headersInterceptor } from 'spec/helpers/vue_resource_helper';
 import actionsModule, * as actions from '~/notes/stores/actions';
@@ -8,7 +9,6 @@ import * as mutationTypes from '~/notes/stores/mutation_types';
 import * as notesConstants from '~/notes/constants';
 import createStore from '~/notes/stores';
 import mrWidgetEventHub from '~/vue_merge_request_widget/event_hub';
-import service from '~/notes/services/notes_service';
 import testAction from '../../helpers/vuex_action_helper';
 import { resetStore } from '../helpers';
 import {
@@ -18,6 +18,8 @@ import {
   noteableDataMock,
   individualNote,
 } from '../mock_data';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 
 const TEST_ERROR_MESSAGE = 'Test error message';
 
@@ -334,32 +336,28 @@ describe('Actions Notes Store', () => {
     });
   });
 
-  describe('deleteNote', () => {
-    const interceptor = (request, next) => {
-      next(
-        request.respondWith(JSON.stringify({}), {
-          status: 200,
-        }),
-      );
-    };
+  describe('removeNote', () => {
+    const endpoint = `${TEST_HOST}/note`;
+    let axiosMock;
 
     beforeEach(() => {
-      Vue.http.interceptors.push(interceptor);
+      axiosMock = new AxiosMockAdapter(axios);
+      axiosMock.onDelete(endpoint).replyOnce(200, {});
 
       $('body').attr('data-page', '');
     });
 
     afterEach(() => {
-      Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
+      axiosMock.restore();
 
       $('body').attr('data-page', '');
     });
 
     it('commits DELETE_NOTE and dispatches updateMergeRequestWidget', done => {
-      const note = { path: `${gl.TEST_HOST}`, id: 1 };
+      const note = { path: endpoint, id: 1 };
 
       testAction(
-        actions.deleteNote,
+        actions.removeNote,
         note,
         store.state,
         [
@@ -373,7 +371,7 @@ describe('Actions Notes Store', () => {
             type: 'updateMergeRequestWidget',
           },
           {
-            type: 'updateResolvableDiscussonsCounts',
+            type: 'updateResolvableDiscussionsCounts',
           },
         ],
         done,
@@ -381,12 +379,12 @@ describe('Actions Notes Store', () => {
     });
 
     it('dispatches removeDiscussionsFromDiff on merge request page', done => {
-      const note = { path: `${gl.TEST_HOST}`, id: 1 };
+      const note = { path: endpoint, id: 1 };
 
       $('body').attr('data-page', 'projects:merge_requests:show');
 
       testAction(
-        actions.deleteNote,
+        actions.removeNote,
         note,
         store.state,
         [
@@ -400,10 +398,49 @@ describe('Actions Notes Store', () => {
             type: 'updateMergeRequestWidget',
           },
           {
-            type: 'updateResolvableDiscussonsCounts',
+            type: 'updateResolvableDiscussionsCounts',
           },
           {
             type: 'diffs/removeDiscussionsFromDiff',
+          },
+        ],
+        done,
+      );
+    });
+  });
+
+  describe('deleteNote', () => {
+    const endpoint = `${TEST_HOST}/note`;
+    let axiosMock;
+
+    beforeEach(() => {
+      axiosMock = new AxiosMockAdapter(axios);
+      axiosMock.onDelete(endpoint).replyOnce(200, {});
+
+      $('body').attr('data-page', '');
+    });
+
+    afterEach(() => {
+      axiosMock.restore();
+
+      $('body').attr('data-page', '');
+    });
+
+    it('dispatches removeNote', done => {
+      const note = { path: endpoint, id: 1 };
+
+      testAction(
+        actions.deleteNote,
+        note,
+        {},
+        [],
+        [
+          {
+            type: 'removeNote',
+            payload: {
+              id: 1,
+              path: 'http://test.host/note',
+            },
           },
         ],
         done,
@@ -452,7 +489,7 @@ describe('Actions Notes Store', () => {
               type: 'startTaskList',
             },
             {
-              type: 'updateResolvableDiscussonsCounts',
+              type: 'updateResolvableDiscussionsCounts',
             },
           ],
           done,
@@ -527,7 +564,7 @@ describe('Actions Notes Store', () => {
           ],
           [
             {
-              type: 'updateResolvableDiscussonsCounts',
+              type: 'updateResolvableDiscussionsCounts',
             },
             {
               type: 'updateMergeRequestWidget',
@@ -552,7 +589,7 @@ describe('Actions Notes Store', () => {
           ],
           [
             {
-              type: 'updateResolvableDiscussonsCounts',
+              type: 'updateResolvableDiscussionsCounts',
             },
             {
               type: 'updateMergeRequestWidget',
@@ -587,10 +624,10 @@ describe('Actions Notes Store', () => {
     });
   });
 
-  describe('updateResolvableDiscussonsCounts', () => {
+  describe('updateResolvableDiscussionsCounts', () => {
     it('commits UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS', done => {
       testAction(
-        actions.updateResolvableDiscussonsCounts,
+        actions.updateResolvableDiscussionsCounts,
         null,
         {},
         [{ type: 'UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS' }],
@@ -712,7 +749,7 @@ describe('Actions Notes Store', () => {
         [
           { type: 'updateMergeRequestWidget' },
           { type: 'startTaskList' },
-          { type: 'updateResolvableDiscussonsCounts' },
+          { type: 'updateResolvableDiscussionsCounts' },
         ],
         done,
       );
@@ -846,9 +883,9 @@ describe('Actions Notes Store', () => {
     let flashContainer;
 
     beforeEach(() => {
-      spyOn(service, 'applySuggestion');
+      spyOn(Api, 'applySuggestion');
       dispatch.and.returnValue(Promise.resolve());
-      service.applySuggestion.and.returnValue(Promise.resolve());
+      Api.applySuggestion.and.returnValue(Promise.resolve());
       flashContainer = {};
     });
 
@@ -877,7 +914,7 @@ describe('Actions Notes Store', () => {
     it('when service fails, flashes error message', done => {
       const response = { response: { data: { message: TEST_ERROR_MESSAGE } } };
 
-      service.applySuggestion.and.returnValue(Promise.reject(response));
+      Api.applySuggestion.and.returnValue(Promise.reject(response));
 
       testSubmitSuggestion(done, () => {
         expect(commit).not.toHaveBeenCalled();
@@ -892,6 +929,33 @@ describe('Actions Notes Store', () => {
       testSubmitSuggestion(done, () => {
         expect(flashSpy).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('filterDiscussion', () => {
+    const path = 'some-discussion-path';
+    const filter = 0;
+
+    beforeEach(() => {
+      dispatch.and.returnValue(new Promise(() => {}));
+    });
+
+    it('fetches discussions with filter and persistFilter false', () => {
+      actions.filterDiscussion({ dispatch }, { path, filter, persistFilter: false });
+
+      expect(dispatch.calls.allArgs()).toEqual([
+        ['setLoadingState', true],
+        ['fetchDiscussions', { path, filter, persistFilter: false }],
+      ]);
+    });
+
+    it('fetches discussions with filter and persistFilter true', () => {
+      actions.filterDiscussion({ dispatch }, { path, filter, persistFilter: true });
+
+      expect(dispatch.calls.allArgs()).toEqual([
+        ['setLoadingState', true],
+        ['fetchDiscussions', { path, filter, persistFilter: true }],
+      ]);
     });
   });
 });

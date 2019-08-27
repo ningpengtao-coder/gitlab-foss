@@ -151,6 +151,28 @@ describe('Api', () => {
     });
   });
 
+  describe('projectUsers', () => {
+    it('fetches all users of a particular project', done => {
+      const query = 'dummy query';
+      const options = { unused: 'option' };
+      const projectPath = 'gitlab-org%2Fgitlab-ce';
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectPath}/users`;
+      mock.onGet(expectedUrl).reply(200, [
+        {
+          name: 'test',
+        },
+      ]);
+
+      Api.projectUsers('gitlab-org/gitlab-ce', query, options)
+        .then(response => {
+          expect(response.length).toBe(1);
+          expect(response[0].name).toBe('test');
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
   describe('projectMergeRequests', () => {
     const projectPath = 'abc';
     const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectPath}/merge_requests`;
@@ -406,6 +428,22 @@ describe('Api', () => {
       Api.user(userId)
         .then(({ data }) => {
           expect(data.name).toBe('testuser');
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('user counts', () => {
+    it('fetches single user counts', done => {
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/user_counts`;
+      mock.onGet(expectedUrl).reply(200, {
+        merge_requests: 4,
+      });
+
+      Api.userCounts()
+        .then(({ data }) => {
+          expect(data.merge_requests).toBe(4);
         })
         .then(done)
         .catch(done.fail);

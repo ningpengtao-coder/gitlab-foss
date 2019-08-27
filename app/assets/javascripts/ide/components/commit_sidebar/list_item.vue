@@ -45,6 +45,8 @@ export default {
   },
   computed: {
     iconName() {
+      // name: '-solid' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
+      // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
       const suffix = this.stagedList ? '-solid' : '';
 
       return `${getCommitIconMap(this.file).icon}${suffix}`;
@@ -107,7 +109,8 @@ export default {
       @click="openFileInEditor"
     >
       <span class="multi-file-commit-list-file-path d-flex align-items-center">
-        <file-icon :file-name="file.name" class="append-right-8" />{{ file.name }}
+        <file-icon :file-name="file.name" class="append-right-8" />
+        {{ file.name }}
       </span>
       <div class="ml-auto d-flex align-items-center">
         <div class="d-flex align-items-center ide-commit-list-changed-icon">

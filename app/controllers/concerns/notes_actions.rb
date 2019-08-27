@@ -73,6 +73,11 @@ module NotesActions
   # rubocop:disable Gitlab/ModuleWithInstanceVariables
   def update
     @note = Notes::UpdateService.new(project, current_user, update_note_params).execute(note)
+    unless @note
+      head :gone
+      return
+    end
+
     prepare_notes_for_rendering([@note])
 
     respond_to do |format|
@@ -203,17 +208,17 @@ module NotesActions
 
       # These params are also sent by the client but we need to set these based on
       # target_type and target_id because we're checking permissions based on that
-      create_params[:noteable_type] = params[:target_type].classify
+      create_params[:noteable_type] = noteable.class.name
 
-      case params[:target_type]
-      when 'commit'
-        create_params[:commit_id] = params[:target_id]
-      when 'merge_request'
-        create_params[:noteable_id] = params[:target_id]
+      case noteable
+      when Commit
+        create_params[:commit_id] = noteable.id
+      when MergeRequest
+        create_params[:noteable_id] = noteable.id
         # Notes on MergeRequest can have an extra `commit_id` context
         create_params[:commit_id] = params.dig(:note, :commit_id)
       else
-        create_params[:noteable_id] = params[:target_id]
+        create_params[:noteable_id] = noteable.id
       end
     end
   end
@@ -243,7 +248,7 @@ module NotesActions
   end
 
   def notes_finder
-    @notes_finder ||= NotesFinder.new(project, current_user, finder_params)
+    @notes_finder ||= NotesFinder.new(current_user, finder_params)
   end
 
   def note_serializer

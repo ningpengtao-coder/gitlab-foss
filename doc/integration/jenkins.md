@@ -1,4 +1,4 @@
-# Jenkins CI service **[STARTER]**
+# Jenkins CI service **(STARTER)**
 
 >**Note:**
 In GitLab 8.3, Jenkins integration using the
@@ -34,6 +34,9 @@ and [Migrating from Jenkins to GitLab](https://www.youtube.com/watch?v=RlEVGOpYF
   pipelines directly in GitLab.
 
 For a real use case, read the blog post [Continuous integration: From Jenkins to GitLab using Docker](https://about.gitlab.com/2017/07/27/docker-my-precious/).
+
+NOTE: **Moving from a traditional CI plug-in to a single application for the entire software development lifecycle can decrease hours spent on maintaining toolchains by 10% or more.**
+Visit the ['GitLab vs. Jenkins' comparison page](https://about.gitlab.com/devops-tools/jenkins-vs-gitlab.html) to learn how our built-in CI compares to Jenkins.
 
 ## Requirements
 

@@ -14,6 +14,7 @@ import sidebarTimeTrackingEventHub from '../../sidebar/event_hub';
 import { isInViewport, scrollToElement, isInMRPage } from '../../lib/utils/common_utils';
 import mrWidgetEventHub from '../../vue_merge_request_widget/event_hub';
 import { __ } from '~/locale';
+import Api from '~/api';
 
 let eTagPoll;
 
@@ -45,13 +46,13 @@ export const setNotesFetchedState = ({ commit }, state) =>
 
 export const toggleDiscussion = ({ commit }, data) => commit(types.TOGGLE_DISCUSSION, data);
 
-export const fetchDiscussions = ({ commit, dispatch }, { path, filter }) =>
+export const fetchDiscussions = ({ commit, dispatch }, { path, filter, persistFilter }) =>
   service
-    .fetchDiscussions(path, filter)
+    .fetchDiscussions(path, filter, persistFilter)
     .then(res => res.json())
     .then(discussions => {
       commit(types.SET_INITIAL_DISCUSSIONS, discussions);
-      dispatch('updateResolvableDiscussonsCounts');
+      dispatch('updateResolvableDiscussionsCounts');
     });
 
 export const updateDiscussion = ({ commit, state }, discussion) => {
@@ -60,18 +61,22 @@ export const updateDiscussion = ({ commit, state }, discussion) => {
   return utils.findNoteObjectById(state.discussions, discussion.id);
 };
 
-export const deleteNote = ({ commit, dispatch, state }, note) =>
-  service.deleteNote(note.path).then(() => {
-    const discussion = state.discussions.find(({ id }) => id === note.discussion_id);
+export const removeNote = ({ commit, dispatch, state }, note) => {
+  const discussion = state.discussions.find(({ id }) => id === note.discussion_id);
 
-    commit(types.DELETE_NOTE, note);
+  commit(types.DELETE_NOTE, note);
 
-    dispatch('updateMergeRequestWidget');
-    dispatch('updateResolvableDiscussonsCounts');
+  dispatch('updateMergeRequestWidget');
+  dispatch('updateResolvableDiscussionsCounts');
 
-    if (isInMRPage()) {
-      dispatch('diffs/removeDiscussionsFromDiff', discussion);
-    }
+  if (isInMRPage()) {
+    dispatch('diffs/removeDiscussionsFromDiff', discussion);
+  }
+};
+
+export const deleteNote = ({ dispatch }, note) =>
+  axios.delete(note.path).then(() => {
+    dispatch('removeNote', note);
   });
 
 export const updateNote = ({ commit, dispatch }, { endpoint, note }) =>
@@ -117,7 +122,7 @@ export const replyToDiscussion = ({ commit, state, getters, dispatch }, { endpoi
 
         dispatch('updateMergeRequestWidget');
         dispatch('startTaskList');
-        dispatch('updateResolvableDiscussonsCounts');
+        dispatch('updateResolvableDiscussionsCounts');
       } else {
         commit(types.ADD_NEW_REPLY_TO_DISCUSSION, res);
       }
@@ -135,7 +140,7 @@ export const createNewNote = ({ commit, dispatch }, { endpoint, data }) =>
 
         dispatch('updateMergeRequestWidget');
         dispatch('startTaskList');
-        dispatch('updateResolvableDiscussonsCounts');
+        dispatch('updateResolvableDiscussionsCounts');
       }
       return res;
     });
@@ -168,7 +173,7 @@ export const toggleResolveNote = ({ commit, dispatch }, { endpoint, isResolved, 
 
       commit(mutationType, res);
 
-      dispatch('updateResolvableDiscussonsCounts');
+      dispatch('updateResolvableDiscussionsCounts');
 
       dispatch('updateMergeRequestWidget');
     });
@@ -356,11 +361,11 @@ export const poll = ({ commit, state, getters, dispatch }) => {
 };
 
 export const stopPolling = () => {
-  eTagPoll.stop();
+  if (eTagPoll) eTagPoll.stop();
 };
 
 export const restartPolling = () => {
-  eTagPoll.restart();
+  if (eTagPoll) eTagPoll.restart();
 };
 
 export const fetchData = ({ commit, state, getters }) => {
@@ -383,12 +388,9 @@ export const toggleAward = ({ commit, getters }, { awardName, noteId }) => {
 export const toggleAwardRequest = ({ dispatch }, data) => {
   const { endpoint, awardName } = data;
 
-  return service
-    .toggleAward(endpoint, { name: awardName })
-    .then(res => res.json())
-    .then(() => {
-      dispatch('toggleAward', data);
-    });
+  return axios.post(endpoint, { name: awardName }).then(() => {
+    dispatch('toggleAward', data);
+  });
 };
 
 export const scrollToNoteIfNeeded = (context, el) => {
@@ -413,9 +415,9 @@ export const setLoadingState = ({ commit }, data) => {
   commit(types.SET_NOTES_LOADING_STATE, data);
 };
 
-export const filterDiscussion = ({ dispatch }, { path, filter }) => {
+export const filterDiscussion = ({ dispatch }, { path, filter, persistFilter }) => {
   dispatch('setLoadingState', true);
-  dispatch('fetchDiscussions', { path, filter })
+  dispatch('fetchDiscussions', { path, filter, persistFilter })
     .then(() => {
       dispatch('setLoadingState', false);
       dispatch('setNotesFetchedState', true);
@@ -442,15 +444,14 @@ export const startTaskList = ({ dispatch }) =>
       }),
   );
 
-export const updateResolvableDiscussonsCounts = ({ commit }) =>
+export const updateResolvableDiscussionsCounts = ({ commit }) =>
   commit(types.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS);
 
 export const submitSuggestion = (
   { commit, dispatch },
   { discussionId, noteId, suggestionId, flashContainer },
 ) =>
-  service
-    .applySuggestion(suggestionId)
+  Api.applySuggestion(suggestionId)
     .then(() => commit(types.APPLY_SUGGESTION, { discussionId, noteId, suggestionId }))
     .then(() => dispatch('resolveDiscussion', { discussionId }).catch(() => {}))
     .catch(err => {

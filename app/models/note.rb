@@ -27,6 +27,10 @@ class Note < ApplicationRecord
       def values
         constants.map {|const| self.const_get(const)}
       end
+
+      def value?(val)
+        values.include?(val)
+      end
     end
   end
 
@@ -158,6 +162,8 @@ class Note < ApplicationRecord
       Discussion.build_collection(all.includes(:noteable).fresh, context_noteable)
     end
 
+    # Note: Where possible consider using Discussion#lazy_find to return
+    # Discussions in order to benefit from having records batch loaded.
     def find_discussion(discussion_id)
       notes = where(discussion_id: discussion_id).fresh.to_a
 
@@ -290,7 +296,7 @@ class Note < ApplicationRecord
   end
 
   def special_role=(role)
-    raise "Role is undefined, #{role} not found in #{SpecialRole.values}" unless SpecialRole.values.include?(role)
+    raise "Role is undefined, #{role} not found in #{SpecialRole.values}" unless SpecialRole.value?(role)
 
     @special_role = role
   end

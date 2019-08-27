@@ -1,4 +1,4 @@
-# Epics API **[ULTIMATE]**
+# Epics API **(ULTIMATE)**
 
 Every API call to epic must be authenticated.
 
@@ -10,7 +10,7 @@ If epics feature is not available a `403` status code will be returned.
 
 The [epic issues API](epic_issues.md) allows you to interact with issues associated with an epic.
 
-# Milestone dates integration
+## Milestone dates integration
 
 > [Introduced][ee-6448] in GitLab 11.3.
 
@@ -65,6 +65,8 @@ Example response:
   "title": "Accusamus iste et ullam ratione voluptatem omnis debitis dolor est.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
   "state": "opened",
+  "web_edit_url": "http://localhost:3001/groups/test/-/epics/4",
+  "reference": "&4",
   "author": {
     "id": 10,
     "name": "Lu Mayer",
@@ -118,6 +120,8 @@ Example response:
   "title": "Ea cupiditate dolores ut vero consequatur quasi veniam voluptatem et non.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
   "state": "opened",
+  "web_edit_url": "http://localhost:3001/groups/test/-/epics/5",
+  "reference": "&5",
   "author":{
     "id": 7,
     "name": "Pamella Huel",
@@ -182,6 +186,8 @@ Example response:
   "title": "Epic",
   "description": "Epic description",
   "state": "opened",
+  "web_edit_url": "http://localhost:3001/groups/test/-/epics/6",
+  "reference": "&6",
   "author": {
     "name" : "Alexandra Bashirian",
     "avatar_url" : null,
@@ -247,6 +253,8 @@ Example response:
   "title": "New Title",
   "description": "Epic description",
   "state": "opened",
+  "web_edit_url": "http://localhost:3001/groups/test/-/epics/6",
+  "reference": "&6",
   "author": {
     "name" : "Alexandra Bashirian",
     "avatar_url" : null,
@@ -302,7 +310,7 @@ POST /groups/:id/epics/:epic_iid/todo
 | Attribute   | Type    | Required | Description                          |
 |-------------|---------|----------|--------------------------------------|
 | `id`        | integer/string | yes   | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user  |
-| `epic_iid ` | integer | yes          | The internal ID of a group's epic |
+| `epic_iid` | integer | yes          | The internal ID of a group's epic |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5/todo

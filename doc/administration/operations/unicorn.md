@@ -2,7 +2,7 @@
 
 ## Unicorn
 
-GitLab uses [Unicorn](http://unicorn.bogomips.org/), a pre-forking Ruby web
+GitLab uses [Unicorn](https://bogomips.org/unicorn/), a pre-forking Ruby web
 server, to handle web requests (web browsers and Git HTTP clients). Unicorn is
 a daemon written in Ruby and C that can load and run a Ruby on Rails
 application; in our case the Rails application is GitLab Community Edition or
@@ -69,7 +69,7 @@ unicorn['worker_memory_limit_min'] = "400 * 1 << 20"
 unicorn['worker_memory_limit_max'] = "650 * 1 << 20"
 ```
 
-Otherwise, you can set the `GITLAB_UNICORN_MEMORY_MIN` and `GITLAB_UNICORN_MEMORY_MIN`
+Otherwise, you can set the `GITLAB_UNICORN_MEMORY_MIN` and `GITLAB_UNICORN_MEMORY_MAX`
 [environment variables](../environment_variables.md).
 
 This is what a Unicorn worker memory restart looks like in unicorn_stderr.log.

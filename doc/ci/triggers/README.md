@@ -32,7 +32,7 @@ to protect trigger tokens.
 You can use the `CI_JOB_TOKEN` [variable][predef] (used to authenticate
 with the [GitLab Container Registry][registry]) in the following cases.
 
-#### When used with multi-project pipelines **[PREMIUM]**
+#### When used with multi-project pipelines **(PREMIUM)**
 
 > **Note**:
 The use of `CI_JOB_TOKEN` for multi-project pipelines was [introduced][ee-2017]
@@ -56,7 +56,7 @@ Pipelines triggered that way also expose a special variable:
 
 Read more about the [pipelines trigger API][trigapi].
 
-#### When a pipeline depends on the artifacts of another pipeline **[PREMIUM]**
+#### When a pipeline depends on the artifacts of another pipeline **(PREMIUM)**
 
 > The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
   in [GitLab Premium][ee] 9.5.
@@ -96,17 +96,6 @@ then use inside your scripts or `.gitlab-ci.yml`. You also have a nice
 overview of the time the triggers were last used.
 
 ![Triggers page overview](img/triggers_page.png)
-
-## Taking ownership of a trigger
-
-> **Note**:
-GitLab 9.0 introduced a trigger ownership to solve permission problems.
-
-Each created trigger when run will impersonate their associated user including
-their access to projects and their project permissions.
-
-You can take ownership of existing triggers by clicking *Take ownership*.
-From now on the trigger will be run as you.
 
 ## Revoking a trigger
 
@@ -282,8 +271,7 @@ Old triggers, created before GitLab 9.0 will be marked as legacy.
 
 Triggers with the legacy label do not have an associated user and only have
 access to the current project. They are considered deprecated and will be
-removed with one of the future versions of GitLab. You are advised to
-[take ownership](#taking-ownership-of-a-trigger) of any legacy triggers.
+removed with one of the future versions of GitLab. 
 
 [ee-2017]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2017
 [ee-2346]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2346

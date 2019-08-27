@@ -25,7 +25,7 @@ You can use GFM in the following areas:
 - Snippets (the snippet must be named with a `.md` extension)
 - Wiki pages
 - Markdown documents inside repositories
-- Epics **[ULTIMATE]**
+- Epics **(ULTIMATE)**
 
 You can also use other rich text files in GitLab. You might have to install a dependency
 to do so. Please see the [`gitlab-markup` gem project](https://gitlab.com/gitlab-org/gitlab-markup)
@@ -40,7 +40,7 @@ repositories are also processed with CommonMark. As of 11.8, the [Redcarpet Ruby
 has been removed and all issues and comments, including those from pre-11.1, are now processed
 using the [CommonMark Ruby Library](https://github.com/gjtorikian/commonmarker).
 
-The documentation website had its [markdown engine migrated from Redcarpet to Kramdown](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/108)
+The documentation website had its [markdown engine migrated from Redcarpet to Kramdown](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/108)
 in October 2018.
 
 You may have older issues, merge requests, or Markdown documents in your
@@ -56,12 +56,6 @@ render incorrectly:
   - dark
   - milk
 ```
-
-1. Chocolate
-  - dark
-  - milk
-
----
 
 Simply add a space to each nested item to align the `-` with the first character of
 the top list item (`C` in this case):
@@ -119,7 +113,7 @@ changing how standard markdown is used:
 | [links](#links)                       | [automatically linking URLs](#url-auto-linking) |
 
 ## New GFM markdown extensions
-    
+
 ### Colors
 
 > If this is not rendered correctly, [view it in GitLab itself](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/markdown.md#colors).
@@ -185,6 +179,49 @@ graph TD;
   C-->D;
 ```
 
+#### Subgraphs
+
+NOTE: **Note:** GitLab 12.1 and up now [requires quotes around subgraph
+titles that contain multiple words](https://github.com/knsv/mermaid/pull/845).
+
+Subgraphs can also be included:
+
+~~~
+```mermaid
+graph TB
+
+  SubGraph1 --> SubGraph1Flow
+  subgraph "SubGraph 1 Flow"
+  SubGraph1Flow(SubNode 1)
+  SubGraph1Flow -- Choice1 --> DoChoice1
+  SubGraph1Flow -- Choice2 --> DoChoice2
+  end
+
+  subgraph "Main Graph"
+  Node1[Node 1] --> Node2[Node 2]
+  Node2 --> SubGraph1[Jump to SubGraph1]
+  SubGraph1 --> FinalThing[Final Thing]
+end
+```
+~~~
+
+```mermaid
+graph TB
+
+  SubGraph1 --> SubGraph1Flow
+  subgraph "SubGraph 1 Flow"
+  SubGraph1Flow(SubNode 1)
+  SubGraph1Flow -- Choice1 --> DoChoice1
+  SubGraph1Flow -- Choice2 --> DoChoice2
+  end
+
+  subgraph "Main Graph"
+  Node1[Node 1] --> Node2[Node 2]
+  Node2 --> SubGraph1[Jump to SubGraph1]
+  SubGraph1 --> FinalThing[Final Thing]
+end
+```
+
 ### Emoji
 
 > If this is not rendered correctly, [view it in GitLab itself](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/markdown.md#emoji).
@@ -222,8 +259,7 @@ this font installed by default.
 
 ### Front matter
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/23331)
-  in GitLab 11.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/23331) in GitLab 11.6.
 
 Front matter is metadata included at the beginning of a markdown document, preceding
 its content. This data can be used by static site generators such as [Jekyll](https://jekyllrb.com/docs/front-matter/),
@@ -288,7 +324,7 @@ $example = array(
 
 > If this is not rendered correctly, [view it in GitLab itself](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/markdown.md#inline-diff).
 
-With inline diff tags you can display {+ additions +} or [- deletions -].
+With inline diff tags you can display `{+ additions +}` or `[- deletions -]`.
 
 The wrapping tags can be either curly braces or square brackets:
 
@@ -359,7 +395,7 @@ version to reference other projects from the same namespace.
 
 GFM will recognize the following:
 
-| references                      | input                      | cross-project reference                 | shortcut within same namespace | 
+| references                      | input                      | cross-project reference                 | shortcut within same namespace |
 | :------------------------------ | :------------------------- | :-------------------------------------- | :----------------------------- |
 | specific user                   | `@user_name`               |                                         |                                |
 | specific group                  | `@group_name`              |                                         |                                |
@@ -368,7 +404,7 @@ GFM will recognize the following:
 | issue                           | ``#123``                   | `namespace/project#123`                 | `project#123`                  |
 | merge request                   | `!123`                     | `namespace/project!123`                 | `project!123`                  |
 | snippet                         | `$123`                     | `namespace/project$123`                 | `project$123`                  |
-| epic **[ULTIMATE]**             | `&123`                     | `group1/subgroup&123`                   |                                |
+| epic **(ULTIMATE)**             | `&123`                     | `group1/subgroup&123`                   |                                |
 | label by ID                     | `~123`                     | `namespace/project~123`                 | `project~123`                  |
 | one-word label by name          | `~bug`                     | `namespace/project~bug`                 | `project~bug`                  |
 | multi-word label by name        | `~"feature request"`       | `namespace/project~"feature request"`   | `project~"feature request"`    |
@@ -397,6 +433,7 @@ unordered or ordered lists:
   - [ ] Sub-task 1
   - [x] Sub-task 2
   - [ ] Sub-task 3
+
 1. [x] Completed task
 1. [ ] Incomplete task
    1. [ ] Sub-task 1
@@ -408,6 +445,7 @@ unordered or ordered lists:
   - [ ] Sub-task 1
   - [x] Sub-task 2
   - [ ] Sub-task 3
+
 1. [x] Completed task
 1. [ ] Incomplete task
    1. [ ] Sub-task 1
@@ -488,6 +526,10 @@ This snippet links to `<wiki_root>/miscellaneous.md`:
 [Link to Related Page](/miscellaneous.md)
 ```
 
+### Embedding metrics in GitLab Flavored Markdown
+
+Metric charts can be embedded within GitLab Flavored Markdown. See [Embedding Metrics within GitLab flavored Markdown](../user/project/integrations/prometheus.md#embedding-metric-charts-within-gitlab-flavored-markdown) for more details.
+
 ## Standard markdown and extensions in GitLab
 
 All standard markdown formatting should work as expected within GitLab. Some standard
@@ -556,7 +598,7 @@ Inline `code` has `back-ticks around` it.
 
 Similarly, a whole block of code can be fenced with triple backticks ```` ``` ````,
 triple tildes (`~~~`), or indended 4 or more spaces to achieve a similar effect for
-a larger body of code. test.
+a larger body of code.
 
 ~~~
 ```
@@ -586,9 +628,11 @@ def function():
     print s
 ```
 
-    Using 4 spaces
-    is like using
-    3-backtick fences.
+```
+Using 4 spaces
+is like using
+3-backtick fences.
+```
 
 ~~~
 Tildes are OK too.
@@ -704,7 +748,7 @@ but_emphasis is_desired _here_
 ```
 
 perform_complicated_task
- 
+
 do_this_and_do_that_and_another_thing
 
 but_emphasis is_desired _here_
@@ -715,12 +759,12 @@ If you wish to emphasize only a part of a word, it can still be done with asteri
 
 ```md
 perform*complicated*task
- 
+
 do*this*and*do*that*and*another thing
 ```
 
 perform*complicated*task
- 
+
 do*this*and*do*that*and*another thing
 
 ### Footnotes
@@ -815,18 +859,6 @@ or underscores
 ___
 ```
 
-Three or more hyphens,
-
----
-
-asterisks,
-
-***
-
-or underscores
-
-___
-
 ### Images
 
 Examples:
@@ -910,9 +942,9 @@ are separated into their own lines:
 
   <dt>Markdown in HTML</dt>
   <dd>
-  
+
   Does *not* work **very** well. HTML tags will always work.
-  
+
   </dd>
 </dl>
 ```
@@ -925,9 +957,9 @@ are separated into their own lines:
 
   <dt>Markdown in HTML</dt>
   <dd>
-  
+
   Does <em>not</em> work <b>very</b> well. HTML tags will always work.
-  
+
   </dd>
 </dl>
 
@@ -974,7 +1006,7 @@ after the `</summary>` tag and before the `</details>` tag, as shown in the exam
 
 These details _will_ remain **hidden** until expanded.
 
-    PASTE LOGS HERE
+PASTE LOGS HERE
 
 </details>
 ```
@@ -986,7 +1018,7 @@ These details _will_ remain **hidden** until expanded.
 
 These details <em>will</em> remain <b>hidden</b> until expanded.
 
-    PASTE LOGS HERE
+PASTE LOGS HERE
 
 </details>
 
@@ -1115,31 +1147,31 @@ will point the link to `wikis/style` only when the link is inside of a wiki mark
 GFM will autolink almost any URL you put into your text:
 
 ```markdown
-* https://www.google.com
-* https://google.com/
-* ftp://ftp.us.debian.org/debian/
-* smb://foo/bar/baz
-* irc://irc.freenode.net/gitlab
-* http://localhost:3000
+- https://www.google.com
+- https://google.com/
+- ftp://ftp.us.debian.org/debian/
+- smb://foo/bar/baz
+- irc://irc.freenode.net/gitlab
+- http://localhost:3000
 ```
 
-* https://www.google.com
-* https://google.com/
-* ftp://ftp.us.debian.org/debian/
-* smb://foo/bar/baz
-* irc://irc.freenode.net/gitlab
-* http://localhost:3000
+- <https://www.google.com>
+- <https://google.com/>
+- <ftp://ftp.us.debian.org/debian/>
+- <smb://foo/bar/baz>
+- <irc://irc.freenode.net/gitlab>
+- <http://localhost:3000>
 
 ### Lists
 
 Ordered and unordered lists can be easily created. Add the number you want the list
-to start with, like `1. ` (with a space) at the start of each line for ordered lists.
+to start with, like `1.`, followed by a space, at the start of each line for ordered lists.
 After the first number, it does not matter what number you use, ordered lists will be
-numbered automatically by vertical order, so repeating `1. ` for all items in the
-same list is common. If you start with a number other than `1. `, it will use that as the first
+numbered automatically by vertical order, so repeating `1.` for all items in the
+same list is common. If you start with a number other than `1.`, it will use that as the first
 number, and count up from there.
 
-Add a `* `, `- ` or `+ ` (with a space) at the start of each line for unordered lists, but
+Add a `*`, `-` or `+`, followed by a space, at the start of each line for unordered lists, but
 you should not use a mix of them.
 
 Examples:
@@ -1147,28 +1179,34 @@ Examples:
 ```md
 1. First ordered list item
 2. Another item
-   * Unordered sub-list.
+   - Unordered sub-list.
 1. Actual numbers don't matter, just that it's a number
    1. Ordered sub-list
    1. Next ordered sub-list item
 4. And another item.
 
 * Unordered lists can use asterisks
+
 - Or minuses
+
 + Or pluses
 ```
 
+<!-- The "2." and "4." in the example above are changed to "1." below, only to match the standards on docs.gitlab.com -->
+
 1. First ordered list item
-2. Another item
-   * Unordered sub-list.
+1. Another item
+   - Unordered sub-list.
 1. Actual numbers don't matter, just that it's a number
    1. Ordered sub-list
    1. Next ordered sub-list item
-4. And another item.
+1. And another item.
 
-* Unordered lists can use asterisks
+- Unordered lists can use asterisks
+
 - Or minuses
-+ Or pluses
+
+- Or pluses
 
 ---
 
@@ -1182,14 +1220,14 @@ Example:
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 ```
 
 1. First ordered list item
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 
 ---
 
@@ -1203,14 +1241,14 @@ Example:
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 ```
 
 1. First ordered list item
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 
 ### Superscripts / Subscripts
 
@@ -1229,7 +1267,7 @@ while the equation for the theory of relativity is E = mc<sup>2</sup>.
 
 Tables aren't part of the core Markdown spec, but they are part of GFM.
 
-1. The first line contains the headers, separated by "pipes" (`|`). 
+1. The first line contains the headers, separated by "pipes" (`|`).
 1. The second line separates the headers from the cells, and must contain three or more dashes.
 1. The third, and any following lines, contain the cell values.
    - You **can't** have cells separated over many lines in the markdown, they must be kept to single lines,

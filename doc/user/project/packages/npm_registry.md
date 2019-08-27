@@ -1,4 +1,4 @@
-# GitLab NPM Registry **[PREMIUM]**
+# GitLab NPM Registry **(PREMIUM)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5934)
   in [GitLab Premium](https://about.gitlab.com/pricing/) 11.7.
@@ -11,16 +11,11 @@ project can have its own space to store NPM packages.
 NOTE: **Note:**
 Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported.
 
-
-NOTE: **Note:**
-As `@group/subgroup/project` is not a valid NPM package name, publishing a package 
-within a subgroup is not supported yet. 
-
 ## Enabling the NPM Registry
 
 NOTE: **Note:**
 This option is available only if your GitLab administrator has
-[enabled support for the NPM registry](../../../administration/packages.md).**[PREMIUM ONLY]**
+[enabled support for the NPM registry](../../../administration/packages.md).**(PREMIUM ONLY)**
 
 After the NPM registry is enabled, it will be available for all new projects
 by default. To enable it for existing projects, or if you want to disable it:
@@ -36,12 +31,15 @@ get familiar with the package naming convention.
 
 ## Package naming convention
 
-**Only packages that have the same path as the project** are supported. For
- example:
+**Packages must be scoped in the root namespace of the project**. The package
+name may be anything but it is preferred that the project name be used unless
+it is not possible due to a naming collision. For example:
 
 | Project                | Package                 | Supported |
 | ---------------------- | ----------------------- | --------- |
 | `foo/bar`              | `@foo/bar`              | Yes       |
+| `foo/bar/baz`          | `@foo/baz`              | Yes       |
+| `foo/bar/buz`          | `@foo/anything`         | Yes       |
 | `gitlab-org/gitlab-ce` | `@gitlab-org/gitlab-ce` | Yes       |
 | `gitlab-org/gitlab-ce` | `@foo/bar`              | No        |
 
@@ -51,40 +49,41 @@ Registry.
 ## Authenticating to the GitLab NPM Registry
 
 If a project is private or you want to upload an NPM package to GitLab,
-credentials will need to be provided for authentication. Support is available
-only for [OAuth tokens](../../../api/oauth2.md#resource-owner-password-credentials-flow).
+credentials will need to be provided for authentication. Support is available for [OAuth tokens](../../../api/oauth2.md#resource-owner-password-credentials-flow) or [personal access tokens](../../profile/personal_access_tokens.md).
 
-CAUTION: **2FA not supported:**
-Authentication for personal access tokens is not yet supported
-([#9140](https://gitlab.com/gitlab-org/gitlab-ee/issues/9140)). If you have 2FA
-enabled, you won't be able to authenticate to the GitLab NPM Registry.
+CAUTION: **2FA is only supported with personal access tokens:**
+If you have 2FA enabled, you need to use a [personal access token](../../profile/personal_access_tokens.md) with OAuth headers. Standard OAuth tokens won't be able to authenticate to the GitLab NPM Registry.
 
 ### Authenticating with an OAuth token
 
-To authenticate with an [OAuth token](../../../api/oauth2.md#resource-owner-password-credentials-flow),
-add a corresponding section to your `.npmrc` file:
+To authenticate with an [OAuth token](../../../api/oauth2.md#resource-owner-password-credentials-flow)
+or [personal access token](../../profile/personal_access_tokens.md), add a corresponding section to your `.npmrc` file:
 
 ```ini
 ; Set URL for your scoped packages.
 ; For example package with name `@foo/bar` will use this URL for download
 @foo:registry=https://gitlab.com/api/v4/packages/npm/
 
-; Add the OAuth token for the scoped packages URL. This will allow you to download
+; Add the token for the scoped packages URL. This will allow you to download
 ; `@foo/` packages from private projects.
-//gitlab.com/api/v4/packages/npm/:_authToken=<your_oauth_token>
+//gitlab.com/api/v4/packages/npm/:_authToken=<your_token>
 
-; Add OAuth token for uploading to the registry. Replace <your_project_id>
+; Add token for uploading to the registry. Replace <your_project_id>
 ; with the project you want your package to be uploaded to.
-//gitlab.com/api/v4/projects/<your_project_id>/packages/npm/:_authToken=<your_oauth_token>
+//gitlab.com/api/v4/projects/<your_project_id>/packages/npm/:_authToken=<your_token>
 ```
 
 Replace `<your_project_id>` with your project ID which can be found on the home page
-of your project and `<your_oauth_token>` with your OAuth token.
+of your project and `<your_token>` with your OAuth or personal access token.
 
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
 
 You should now be able to download and upload NPM packages to your project.
+
+NOTE: **Note:**
+If you encounter an error message with [Yarn](https://yarnpkg.com/en/), see the
+[troubleshooting section](#troubleshooting).
 
 ## Uploading packages
 
@@ -113,8 +112,37 @@ npm publish
 You can then navigate to your project's **Packages** page and see the uploaded
 packages or even delete them.
 
+If you attempt to publish a package with a name that already exists within
+a given scope, you will receive a `403 Forbidden!` error.
+
 ## Uploading a package with the same version twice
 
 If you upload a package with a same name and version twice, GitLab will show
 both packages in the UI, but the GitLab NPM Registry will expose the most recent
 one as it supports only one package per version for `npm install`.
+
+## Troubleshooting
+
+### Error running yarn with NPM registry
+
+If you are using [yarn](https://yarnpkg.com/en/) with the NPM registry, you may get
+an error message like:
+
+```sh
+yarn install v1.15.2
+warning package.json: No license field
+info No lockfile found.
+warning XXX: No license field
+[1/4] 🔍  Resolving packages...
+[2/4] 🚚  Fetching packages...
+error An unexpected error occurred: "https://gitlab.com/api/v4/projects/XXX/packages/npm/XXX/XXX/-/XXX/XXX-X.X.X.tgz: Request failed \"404 Not Found\"".
+info If you think this is a bug, please open a bug report with the information provided in "/Users/XXX/gitlab-migration/module-util/yarn-error.log".
+info Visit https://yarnpkg.com/en/docs/cli/install for documentation about this command
+```
+
+In this case, try adding this to your `.npmrc` file (and replace `<your_oauth_token>`
+with your with your OAuth or personal access token):
+
+```text
+//gitlab.com/api/v4/projects/:_authToken=<your_oauth_token>
+```

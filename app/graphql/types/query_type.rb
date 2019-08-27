@@ -22,11 +22,8 @@ module Types
     field :metadata, Types::MetadataType,
           null: true,
           resolver: Resolvers::MetadataResolver,
-          description: 'Metadata about GitLab' do |*args|
+          description: 'Metadata about GitLab'
 
-      authorize :read_instance_metadata
-    end
-
-    field :echo, GraphQL::STRING_TYPE, null: false, function: Functions::Echo.new
+    field :echo, GraphQL::STRING_TYPE, null: false, resolver: Resolvers::EchoResolver
   end
 end
