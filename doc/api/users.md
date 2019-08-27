@@ -1175,7 +1175,7 @@ Returns:
 
 ## Activate user
 
-[Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.3.
 
 Activates the specified user.  Available only for admin.
 
