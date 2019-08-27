@@ -21,10 +21,10 @@ module Gitlab
           Stages::Sorter
         ].freeze
 
-        def initialize(project, environment, dashboard)
+        def initialize(project, dashboard, params)
           @project = project
-          @environment = environment
           @dashboard = dashboard
+          @params = params
         end
 
         # Returns a new dashboard hash with the results of
@@ -32,7 +32,7 @@ module Gitlab
         def process(insert_project_metrics:)
           @dashboard.deep_symbolize_keys.tap do |dashboard|
             sequence(insert_project_metrics).each do |stage|
-              stage.new(@project, @environment, dashboard).transform!
+              stage.new(@project, dashboard, @params).transform!
             end
           end
         end
