@@ -31,7 +31,6 @@ export default {
       ],
       sections: ['prepare-executor'],
       section_header: true,
-      section_timestamp: 1566571786,
     },
     {
       offset: 1003,
@@ -105,6 +104,7 @@ export default {
       content: [],
       sections: ['prepare-executor'],
       section_footer: true,
+      section_duration: '10:00'
     },
     {
       offset: 1013,
@@ -116,7 +116,6 @@ export default {
       ],
       sections: ['prepare-script'],
       section_header: true,
-      section_timestamp: 1566571798,
     },
 
     {
@@ -126,14 +125,12 @@ export default {
       ],
       sections: ['get-sources'],
       section_header: true,
-      section_timestamp: 1566571800,
     },
     {
       offset: 1015,
       content: [
         {
-          text: `Reinitialized existing Git repository in /builds/gitlab-org/gitlab-ce/.git/<br />From
-      https://gitlab.com/gitlab-org/gitlab-ce`,
+          text: 'Reinitialized existing Git repository in /builds/gitlab-org/gitlab-ce/.git/ ',
         },
       ],
       sections: ['get-sources'],
@@ -142,13 +139,22 @@ export default {
       offset: 1016,
       content: [
         {
-          text: ' * [new branch] 66454-create-feature-flag -&gt; origin/66454-create-feature-flag',
+          text: 'From https://gitlab.com/gitlab-org/gitlab-ce',
         },
       ],
       sections: ['get-sources'],
     },
     {
       offset: 1017,
+      content: [
+        {
+          text: ' * [new branch] 66454-create-feature-flag -&gt; origin/66454-create-feature-flag',
+        },
+      ],
+      sections: ['get-sources'],
+    },
+    {
+      offset: 1018,
       content: [
         {
           text: 'Checking out 061606b4 as 66454-create-feature-flag...',
@@ -158,7 +164,7 @@ export default {
       sections: ['get-sources'],
     },
     {
-      offset: 1018,
+      offset: 1019,
       content: [
         {
           text: 'Removing .gitlab_shell_secret',
@@ -167,19 +173,10 @@ export default {
       sections: ['get-sources'],
     },
     {
-      offset: 1019,
-      content: [
-        {
-          text: 'Removing .gitlab_workhorse_secret',
-        },
-      ],
-      sections: ['get-sources'],
-    },
-    {
       offset: 1020,
       content: [
         {
-          text: 'Removing config/database.yml',
+          text: 'Removing .gitlab_workhorse_secret',
         },
       ],
       sections: ['get-sources'],
@@ -231,6 +228,7 @@ export default {
       content: [],
       sections: ['get-sources'],
       section_footer: true,
+      section_duration: '30:00'
     },
     {
       offset: 1027,
@@ -242,7 +240,6 @@ export default {
       ],
       sections: ['restore-cache'],
       section_header: true,
-      section_timestamp: 1566571811,
     },
     {
       offset: 1028,
@@ -279,6 +276,7 @@ export default {
       content: [],
       sections: ['restore-cache'],
       section_footer: true,
+      section_duration: '00:10'
     },
     {
       offset: 1033,
@@ -290,7 +288,6 @@ export default {
       ],
       sections: ['download-artifacts'],
       section_header: true,
-      section_timestamp: 1566571839,
     },
     {
       offset: 1034,
@@ -398,6 +395,7 @@ export default {
       content: [],
       sections: ['download-artifacts'],
       section_footer: true,
+      section_duration: '01:00:58'
     },
   ],
 };
