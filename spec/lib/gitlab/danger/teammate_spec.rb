@@ -50,6 +50,19 @@ describe Gitlab::Danger::Teammate do
         end
       end
 
+      context 'when role is Test Automation Engineer' do
+        let(:role) { 'Test Automation Engineer' }
+
+        it '#reviewer? returns false' do
+          expect(subject.reviewer?(project, :test, labels)).to be_falsey
+        end
+
+        it '#maintainer? returns false' do
+          expect(subject.maintainer?(project, :test, labels)).to be_falsey
+        end
+      end
+
+
       context 'when role is Test Automation Engineer, Manage' do
         let(:role) { 'Test Automation Engineer, Manage' }
 
