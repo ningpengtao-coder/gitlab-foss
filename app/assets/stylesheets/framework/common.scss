@@ -210,24 +210,22 @@ li.note {
 @mixin message($background-color, $border-color, $text-color) {
   border-left: 4px solid $border-color;
   color: $text-color;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: $background-color;
-  padding-left: 20px;
+  padding: $gl-padding $gl-padding-24;
+  margin-bottom: $gl-padding-12;
+  background-color: $background-color;
 
   &.centered {
     text-align: center;
   }
-}
-
-.warning_message {
-  @include message($orange-100, $orange-200, $orange-700);
 
   .close {
     font-size: $gl-font-size-large;
-    color: $orange-700;
-    cursor: pointer;
+    color: inherit;
   }
+}
+
+.warning_message {
+  @include message($orange-100, $orange-200, $orange-800);
 }
 
 .danger_message {
