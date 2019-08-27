@@ -1153,7 +1153,7 @@ Will return `201 OK` on success, `404 User Not Found` is user cannot be found or
 
 ## Deactivate user
 
-[Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/63921) in GitLab 12.3.
 
 Deactivates the specified user.  Available only for admin.
 
