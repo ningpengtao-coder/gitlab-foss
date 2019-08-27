@@ -1,5 +1,5 @@
 import Store from '~/issue_show/stores';
-import * as issueUtils from '~/issue_show/utils/issue_description';
+import * as updateDescription from '~/issue_show/utils/update_description';
 
 describe('Store', () => {
   let store;
@@ -30,11 +30,11 @@ describe('Store', () => {
   
 
     it('calls updateDetailsState', () => {
-      const spy = jest.spyOn(issueUtils, 'updateDetailsState')
+      const spy = jest.spyOn(updateDescription, 'default')
 
       store.updateState({ description: '' });
 
-      expect(issueUtils.updateDetailsState).toHaveBeenCalledTimes(1);
+      expect(updateDescription.default).toHaveBeenCalledTimes(1);
 
       spy.mockRestore();
     });

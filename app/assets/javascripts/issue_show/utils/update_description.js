@@ -5,7 +5,7 @@
  * @param {Array} details - All detail nodes inside of the issue description.
  */
 
-const updateDetailsState = (descriptionHtml = '', details = []) => {
+const updateDescription = (descriptionHtml = '', details = []) => {
   const placeholder = document.createElement('div');
   placeholder.innerHTML = descriptionHtml;
 
@@ -25,6 +25,6 @@ const updateDetailsState = (descriptionHtml = '', details = []) => {
   });
 
   return placeholder.innerHTML;
-}
+};
 
-export { updateDetailsState };
+export default updateDescription;

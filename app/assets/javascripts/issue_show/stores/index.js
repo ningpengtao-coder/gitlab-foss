@@ -1,5 +1,5 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { updateDetailsState } from '../utils/issue_description';
+import updateDescription from '../utils/update_description';
 
 export default class Store {
   constructor(initialState) {
@@ -23,7 +23,7 @@ export default class Store {
     const descriptionSection = document.body.querySelector('.detail-page-description.content-block');
     const details = descriptionSection.getElementsByTagName('details');
 
-    this.state.descriptionHtml = updateDetailsState(data.description, details);
+    this.state.descriptionHtml = updateDescription(data.description, details);
     this.state.titleHtml = data.title;
     this.state.lock_version = data.lock_version;
   }
