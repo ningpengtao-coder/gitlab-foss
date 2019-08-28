@@ -1,4 +1,6 @@
-import { secondsIn, timeWindowsKeyNames } from './constants';
+import { __ } from '~/locale';
+import dateFormat from 'dateformat';
+import { secondsIn, timeWindowsKeyNames, dateFormats } from './constants';
 
 export const getTimeDiff = timeWindow => {
   const end = Math.floor(Date.now() / 1000); // convert milliseconds to seconds
@@ -41,6 +43,44 @@ export const graphDataValidatorForValues = (isValues, graphData) => {
       return false;
     }).length === graphData.queries.length
   );
+};
+
+export const graphDataValidatorForAnomalyValues = (isValues, graphData) => {
+  const anomalySeriesCount = 3; // metric, upper, lower
+  return (
+    graphData.queries &&
+    graphData.queries.length === anomalySeriesCount &&
+    graphDataValidatorForValues(isValues, graphData)
+  );
+};
+
+export const getEarliestDatapoint = chartData =>
+  chartData.reduce((acc, series) => {
+    const { data } = series;
+    const { length } = data;
+    if (!length) {
+      return acc;
+    }
+
+    const [first] = data[0];
+    const [last] = data[length - 1];
+    const seriesEarliest = first < last ? first : last;
+
+    return seriesEarliest < acc || acc === null ? seriesEarliest : acc;
+  }, null);
+
+export const makeTimeAxis = config => {
+  const defaults = {
+    name: __('Time'),
+    type: 'time',
+    axisLabel: {
+      formatter: date => dateFormat(date, dateFormats.timeOfDay),
+    },
+    axisPointer: {
+      snap: true,
+    },
+  };
+  return { ...defaults, ...config };
 };
 
 export default {};
