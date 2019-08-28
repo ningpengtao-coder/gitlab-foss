@@ -374,7 +374,7 @@ export default {
       section_duration: '01:00:58'
     },
     {
-      offset: 1037,
+      offset: 1042,
       content: [
         {
           text: 'Downloading artifacts from coordinator... ok ',
