@@ -8,7 +8,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
 
   describe 'process' do
-    let(:process_params) { [project, environment, dashboard_yml] }
+    let(:process_params) { [project, dashboard_yml, { environment: environment }] }
     let(:dashboard) { described_class.new(*process_params).process(insert_project_metrics: true) }
 
     it 'includes a path for the prometheus endpoint with each metric' do
@@ -67,7 +67,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
 
     shared_examples_for 'errors with message' do |expected_message|
       it 'raises a DashboardLayoutError' do
-        error_class = Gitlab::Metrics::Dashboard::Stages::BaseStage::DashboardProcessingError
+        error_class = Gitlab::Metrics::Dashboard::Errors::DashboardProcessingError
 
         expect { dashboard }.to raise_error(error_class, expected_message)
       end
