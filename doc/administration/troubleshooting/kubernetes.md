@@ -72,9 +72,15 @@ Troubleshooting Kubernetes requires:
 - **Volume**: A directory containing data, accessible to the containers in a
   pod.
 
-## Kubernetes Workflows
+## Troubleshooting workflows
 
-### Helm Workflow
+The type of problem will determine what steps to take. The possible
+troubleshooting workflows are for:
+
+- Helm
+- Kubernetes integration
+
+### Helm workflow
 
 ```mermaid
 graph TD;
@@ -119,7 +125,7 @@ graph TD;
   T(It is likely the issue you are<br>encountering is either a<br>Kubernetes, bug, issue, or<br>configuration issue. You<br>should escalate to GitLab<br>support.)
 ```
 
-### Kubernetes Integration Workflow
+### Kubernetes integration Workflow
 ```mermaid
 graph LR;
   A --> |Yes| B
@@ -140,3 +146,41 @@ graph LR;
   H[Check the logs for this pod.<br>It likely will show errors.<br>Those would need to be resolved]
   I[This may be a bug/issue<br>in GitLab and will require<br>deeper investigation. Escalate<br>to GitLab support.]
 ```
+
+## Troubleshooting walkthrough
+
+Most Kubernetes troubleshooting can be broken down into 2 categories:
+
+- [Troubleshooting helm](#troubleshooting-helm)
+- [Troubleshooting Kubernetes integration](#troubleshooting-kubernetes-integration)
+
+Generally speaking, if it does not fall into those two categories, it is either:
+
+- Something GitLab support needs to look into.
+- Something a Kubernetes administrator needs to look into.
+
+Exercise caution. Issues that appear to be GitLab problems can be Kubernetes or
+infrastructure issues.
+
+### Troubleshooting helm
+
+TBD
+
+### Troubleshooting Kubernetes integration
+
+TBD
+
+## Common issues
+
+TBD
+
+## Replication
+
+Setting up Kubernetes can be tricky and costly.
+
+The easiest method is to spin up a minikube instance locally. If you are
+wanting to troubleshoot the Kubernetes integration, you would also want to spin
+up a local GitLab install (docker usually works best for this).
+
+You can read more using minkube via
+[Kubernetes documentation](https://kubernetes.io/docs/setup/learning-environment/minikube/).
