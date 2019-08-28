@@ -15,7 +15,7 @@ const updateDescription = (descriptionHtml = '', details = []) => {
     return descriptionHtml;
   };
 
-  [...newDescription].forEach((el, i) => {
+  Array.from(newDescription).forEach((el, i) => {
     /*
       * <details> has an open attribute that can have a value, "", "true", "false"
       * and will show the dropdown, which is why we are setting the attribute

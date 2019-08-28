@@ -30,6 +30,10 @@ describe('Store', () => {
   
 
     it('calls updateDetailsState', () => {
+      /*
+        * need to mock 'default' because we need to test its functionality in the next test
+        * so we spy on its default export and then reset the module.
+      */
       const spy = jest.spyOn(updateDescription, 'default')
 
       store.updateState({ description: '' });
