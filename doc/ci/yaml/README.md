@@ -2886,6 +2886,7 @@ test:mysql:
 You can see that the hidden keys are conveniently used as templates.
 
 ## Triggers
+
 NOTE: **Note:**
 Using a `trigger` with `when:manual` together it will result in the error
 `jobs:triggered-job when should be on_success, on_failure or always`.
