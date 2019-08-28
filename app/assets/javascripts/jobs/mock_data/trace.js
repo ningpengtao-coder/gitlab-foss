@@ -121,7 +121,7 @@ export default {
     {
       offset: 1014,
       content: [
-        { text: 'Fetching changes with git depth set to 20..', class: 'term-fg-l-green term-bold' },
+        { text: 'Fetching changes with git depth set to 20..', style: 'term-fg-l-green term-bold' },
       ],
       sections: ['get-sources'],
       section_header: true,
@@ -158,7 +158,7 @@ export default {
       content: [
         {
           text: 'Checking out 061606b4 as 66454-create-feature-flag...',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['get-sources'],
@@ -213,7 +213,7 @@ export default {
       content: [
         {
           text: 'Skipping Git submodules setup',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['get-sources'],
@@ -235,7 +235,7 @@ export default {
       content: [
         {
           text: 'Checking cache for debian-stretch-ruby-2.6.3-node-12.x-3...',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['restore-cache'],
@@ -266,7 +266,7 @@ export default {
       content: [
         {
           text: 'Successfully extracted cache',
-          class: 'term-fg-l-green term-bold ',
+          style: 'term-fg-l-green term-bold ',
         },
       ],
       sections: ['restore-cache'],
@@ -283,7 +283,7 @@ export default {
       content: [
         {
           text: 'Downloading artifacts for compile-assets pull-cache (278912482)...',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['download-artifacts'],
@@ -299,7 +299,7 @@ export default {
       content: [
         {
           text: 'Downloading artifacts from coordinator... ok ',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
         {
           text: ' id',
@@ -321,7 +321,7 @@ export default {
       content: [
         {
           text: 'Downloading artifacts for setup-test-env (278912484)...',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['download-artifacts'],
@@ -342,7 +342,7 @@ export default {
           text: `WARNING: tmp/tests/gitlab-shell/.gitlab_shell_secret: chmod
           tmp/tests/gitlab-shell/.gitlab_shell_secret: no such file or directory (suppressing
           repeats)`,
-          class: 'term-fg-yellow',
+          style: 'term-fg-yellow',
         },
       ],
       sections: ['download-artifacts'],
@@ -352,7 +352,7 @@ export default {
       content: [
         {
           text: 'Downloading artifacts for retrieve-tests-metadata (278912485)...',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
       ],
       sections: ['download-artifacts'],
@@ -381,7 +381,7 @@ export default {
         },
         {
           text: ' id',
-          class: 'term-fg-l-green term-bold',
+          style: 'term-fg-l-green term-bold',
         },
         {
           text: '=278912484 responseStatus=200 OK token=gdMnE5zT',
