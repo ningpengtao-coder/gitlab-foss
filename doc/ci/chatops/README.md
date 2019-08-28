@@ -12,6 +12,9 @@ GitLab ChatOps provides a method to interact with CI/CD jobs through chat servic
 NOTE: **Note:**
 ChatOps is currently in alpha with some important features missing, like access control.
 
+NOTE: **Note:**
+If your latest commit message contains "SKIP_CI" oder any variants that tell the pipeline to skip, your ChatOps wont function anymore until you commit something without a skip CI trigger.
+
 ## How it works
 
 GitLab ChatOps is built upon two existing features:
