@@ -46,7 +46,7 @@ which come already bundled with GitLab and are ready to go.
 
 If you don't find an existing project template that suits you,
 we've created this [group](https://gitlab.com/pages) of default projects
-containing the most popular SSGs templates to get you started.
+containing the most popular Static Site Generators (SSGs) templates to get you started.
 
 <table class="borderless-table center fixed-table middle width-80">
   <tr>
