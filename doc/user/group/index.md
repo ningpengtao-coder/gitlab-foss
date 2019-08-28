@@ -355,8 +355,8 @@ the group regardless of the IP restriction.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7297) in
 [GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
 
-You can restrict access to groups and their underlying projects by
-allowing only users with email addresses in particular domains to be added to the group.
+You can restrict access to groups by allowing only users with email addresses in 
+particular domains to be added to the group.
 
 Add email domains you want to whitelist and users with emails from different 
 domains won't be allowed to be added to this group.
