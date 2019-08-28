@@ -406,10 +406,7 @@ end
 
 ## Testing
 
-Make sure that your migration works for databases with data. An
-empty database does not guarantee that your migration is correct.
-
-Make sure your migration can be reversed.
+See the [Testing migrations guide](testing_migrations_guide.md).
 
 ## Data migration
 
