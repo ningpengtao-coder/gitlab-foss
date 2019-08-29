@@ -3,7 +3,7 @@
 module Gitlab
   module ImportExport
     class ProjectHashSerializer
-      CLASSES_TO_HASH = %w(Milestone).freeze
+      CLASSES_TO_HASH = %w(Milestone GroupLabel).freeze
 
       attr_reader :project, :tree, :cache
 
