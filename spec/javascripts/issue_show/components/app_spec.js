@@ -81,7 +81,6 @@ describe('Issuable output', () => {
         editedText = vm.$el.querySelector('.edited-text');
       })
       .then(() => {
-        console.log(document.querySelector('title'))
         expect(document.querySelector('title').innerText).toContain('this is a title (#1)');
         expect(vm.$el.querySelector('.title').innerHTML).toContain('<p>this is a title</p>');
         expect(vm.$el.querySelector('.md').innerHTML).toContain('<p>this is a description!</p>');

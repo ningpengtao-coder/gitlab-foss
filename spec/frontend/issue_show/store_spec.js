@@ -25,16 +25,15 @@ describe('Store', () => {
     });
 
     afterEach(() => {
-      document.getElementsByTagName('html')[0].innerHTML = ''; 
+      document.getElementsByTagName('html')[0].innerHTML = '';
     });
-  
 
     it('calls updateDetailsState', () => {
       /*
-        * need to mock 'default' because we need to test its functionality in the next test
-        * so we spy on its default export and then reset the module.
-      */
-      const spy = jest.spyOn(updateDescription, 'default')
+       * need to mock 'default' because we need to test its functionality in the next test
+       * so we spy on its default export and then reset the module.
+       */
+      const spy = jest.spyOn(updateDescription, 'default');
 
       store.updateState({ description: '' });
 
@@ -44,9 +43,14 @@ describe('Store', () => {
     });
 
     it('returns the correct value to be set as descriptionHtml', () => {
-      store.updateState({ description: '<details><summary>One</summary></details><details><summary>Two</summary></details>' });
+      store.updateState({
+        description:
+          '<details><summary>One</summary></details><details><summary>Two</summary></details>',
+      });
 
-      expect(store.state.descriptionHtml).toEqual('<details open="true"><summary>One</summary></details><details><summary>Two</summary></details>');
+      expect(store.state.descriptionHtml).toEqual(
+        '<details open="true"><summary>One</summary></details><details><summary>Two</summary></details>',
+      );
     });
 
     describe('when description details returned from api is different then whats currently on the dom', () => {

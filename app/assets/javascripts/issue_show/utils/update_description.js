@@ -11,17 +11,17 @@ const updateDescription = (descriptionHtml = '', details = []) => {
 
   const newDescription = placeholder.getElementsByTagName('details');
 
-  if(newDescription.length !== details.length) {
+  if (newDescription.length !== details.length) {
     return descriptionHtml;
-  };
+  }
 
   Array.from(newDescription).forEach((el, i) => {
     /*
-      * <details> has an open attribute that can have a value, "", "true", "false"
-      * and will show the dropdown, which is why we are setting the attribute
-      * explicitly to true.
-    */
-    if(details[i].open) el.setAttribute('open', true)
+     * <details> has an open attribute that can have a value, "", "true", "false"
+     * and will show the dropdown, which is why we are setting the attribute
+     * explicitly to true.
+     */
+    if (details[i].open) el.setAttribute('open', true);
   });
 
   return placeholder.innerHTML;
