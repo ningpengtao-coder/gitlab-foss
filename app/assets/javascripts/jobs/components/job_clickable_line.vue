@@ -12,7 +12,7 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
+    }
     // lineNumber: {
     //   type: Number,
     //   required: true,
@@ -34,31 +34,22 @@ export default {
     //   required: false,
     //   default: null,
     // },
-    currentPath: {
-      type: String,
-      required: true
-    }
   },
   components: {
     Icon,
   },
-  computed: {
-    buildLineNumber() {
-      return `${this.currentPath}#L${this.lineNumber}`;
-    },
-    lineNumber() {
-      return this.line.lineNumber + 1;
+  methods: {
+    handleRowClick() {
+
     }
   }
 };
 </script>
 
 <template>
-  <div class="line">
-    <a :href="buildLineNumber" :id="`L${lineNumber}`">{{ lineNumber }}</a>
-    <span v-if="line.section_header">!</span>
-
-    <span v-for="(content, i) in line.content" :key="i" class="line-text">
+  <button type="button" class="line" @onClick="handleRowClick">
+    <a>{{ line.lineNumber + 1 }}</a>
+    <span v-for="(content, i) in line.content" :key="i">
       {{ content.text }}
     </span>
   </div>

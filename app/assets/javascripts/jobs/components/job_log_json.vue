@@ -11,6 +11,7 @@ export default {
   data() {
     return {
       sections: linesParser(log.lines),
+      currentPath: document.location.href
     };
   },
 
@@ -22,17 +23,11 @@ export default {
 };
 </script>
 <template>
-  <pre>
-    <code>
-      <template v-for="(section, index) in sections">
-        <div v-if="section.isHeader" :key="`header-${index}`">
-          <log-line is-header :line="section" />
-          <log-line v-for="line in section.lines" :key="line.offset" :line="line" />
-        </div>
-        <div v-else :key="index">
-           <log-line v-for="line in section.lines" :key="line.offset" :line="line" />
-        </div>
-      </template>
-    </code>
+  <pre class="">
+    <template v-for="(section, index) in sections">
+      <div v-if="section.isHeader" :key="`header-${index}`">
+        <log-line v-for="line in section.lines" :key="line.offset" :line="line" :current-path="currentPath"/>
+      </div><log-line v-else :line="section" :key="section.offset" :current-path="currentPath"/>
+    </template>
   </pre>
 </template>

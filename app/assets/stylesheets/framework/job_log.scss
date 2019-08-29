@@ -1,0 +1,16 @@
+.job-log {
+  @include build-trace();
+}
+
+.line {
+  position: relative;
+}
+
+.line-text {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.collapsible {
+
+}
