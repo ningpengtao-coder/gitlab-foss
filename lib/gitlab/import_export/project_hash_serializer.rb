@@ -44,11 +44,13 @@ module Gitlab
           # ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  zero-length delimited identifier at or near """"
           # LINE 1: ORDER BY "issue_assignees".""
           hash[association.to_s] = if records.respond_to?(:to_ary) && records.model.primary_key.present?
-            [].tap do |res|
-              records.in_batches do |batch|
-                res << batch.map { |el| serializable_hash(el, opts) }
-              end
+            res = []
+
+            records.in_batches do |batch|
+              res += batch.map { |el| serializable_hash(el, opts) }
             end
+
+            res
           elsif records.respond_to?(:to_ary)
             records.to_ary.map { |a| serializable_hash(a, opts) }
           else
