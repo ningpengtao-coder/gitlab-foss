@@ -14,6 +14,7 @@ export default {
     GlBadge,
     Icon,
     UserAvatarLink,
+    MilestoneList: () => import('ee_component/releases/components/milestone_list.vue'),
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -49,6 +50,16 @@ export default {
     hasAuthor() {
       return !_.isEmpty(this.author);
     },
+    shouldRenderMilestones() {
+      return Boolean(this.release.milestone);
+    },
+    milestones() {
+      // At the moment, a release can only be associated to
+      // one milestone. This will be expanded to be many-to-many
+      // in the near future, so we pass the milestone as an
+      // array here in anticipation of this change.
+      return [this.release.milestone];
+    },
   },
 };
 </script>
@@ -72,6 +83,12 @@ export default {
           <icon name="tag" class="align-middle" />
           <span v-gl-tooltip.bottom :title="__('Tag')">{{ release.tag_name }}</span>
         </div>
+
+        <milestone-list
+          v-if="shouldRenderMilestones"
+          class="append-right-4 js-milestone-list"
+          :milestones="milestones"
+        />
 
         <div class="append-right-4">
           &bull;
