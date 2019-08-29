@@ -3,8 +3,10 @@ import flash from '~/flash';
 import { __ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import ContributorsStatGraph from './stat_graph_contributors';
+import initContributorsGraphs from '~/contributors';
 
 document.addEventListener('DOMContentLoaded', () => {
+  initContributorsGraphs();
   const url = document.querySelector('.js-graphs-show').dataset.projectGraphPath;
 
   axios
@@ -22,4 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
       $('.loading-graph').hide();
     })
     .catch(() => flash(__('Error fetching contributors data.')));
+
+
 });

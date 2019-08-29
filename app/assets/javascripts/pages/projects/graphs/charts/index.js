@@ -5,6 +5,7 @@ import _ from 'underscore';
 import { barChartOptions, pieChartOptions } from '~/lib/utils/chart_utils';
 
 document.addEventListener('DOMContentLoaded', () => {
+  debugger;
   const projectChartData = JSON.parse(document.getElementById('projectChartData').innerHTML);
 
   const barChart = (selector, data) => {
