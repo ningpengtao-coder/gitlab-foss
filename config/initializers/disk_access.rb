@@ -86,6 +86,6 @@ module FileWithLog
   end
 end
 
-if !Rails.env.production? || Env.key?('GITLAB_TRACE_DISK_ACCESS')
+if !Rails.env.production? || ENV.key?('GITLAB_TRACE_DISK_ACCESS')
   ::File.include(FileWithLog)
 end
