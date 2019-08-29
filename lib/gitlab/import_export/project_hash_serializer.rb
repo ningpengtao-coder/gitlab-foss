@@ -20,7 +20,7 @@ module Gitlab
       private
 
       # From: https://github.com/rails/rails/blob/5-2-stable/activemodel/lib/active_model/serialization.rb
-      # Updated for our case
+      # Added `in_batches` and caching
       def serializable_hash(obj, options = nil)
         options ||= {}
 
@@ -78,14 +78,7 @@ module Gitlab
         CLASSES_TO_HASH.each {|c| cache[c] = {}}
       end
 
-      # From: https://github.com/rails/rails/blob/5-2-stable/activemodel/lib/active_model/serialization.rb
-      #
-      # Add associations specified via the <tt>:include</tt> option.
-      #
-      # Expects a block that takes as arguments:
-      #   +association+ - name of the association
-      #   +records+     - the association record(s) to be serialized
-      #   +opts+        - options for the association records
+      # From https://github.com/rails/rails/blob/5-2-stable/activemodel/lib/active_model/serialization.rb
       def serializable_add_includes(obj, options = {}) #:nodoc:
         return unless includes = options[:include]
 
