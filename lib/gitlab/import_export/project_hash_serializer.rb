@@ -13,7 +13,6 @@ module Gitlab
         init_cache
       end
 
-
       def execute
         serializable_hash(project, tree)
       end
@@ -36,26 +35,25 @@ module Gitlab
         end
 
         hash = {}
-        attribute_names.each { |n| hash[n] = obj.send(n) }
-        Array(options[:methods]).each { |m| hash[m.to_s] = obj.send(m) }
+        attribute_names.each { |n| hash[n] = obj.send(n) } # rubocop:disable GitlabSecurity/PublicSend
+        Array(options[:methods]).each { |m| hash[m.to_s] = obj.send(m) } # rubocop:disable GitlabSecurity/PublicSend
 
         serializable_add_includes(obj, options) do |association, records, opts|
-          # In_batches doesn't work if the model doesn't have primary key:
-          # ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  zero-length delimited identifier at or near """"
-          # LINE 1: ORDER BY "issue_assignees".""
-          hash[association.to_s] = if records.respond_to?(:to_ary) && records.model.primary_key.present?
-            res = []
+          res = []
 
-            records.in_batches do |batch|
+          # in_batches doesn't work if the model doesn't have primary key
+          if records.respond_to?(:to_ary) && records.model.primary_key.present?
+            # Not all models use EachBatch, whereas ActiveRecord guarantees all models can use in_batches
+            records.in_batches do |batch| # rubocop:disable Cop/InBatches
               res += batch.map { |el| serializable_hash(el, opts) }
             end
-
-            res
           elsif records.respond_to?(:to_ary)
-            records.to_ary.map { |a| serializable_hash(a, opts) }
+            res = records.to_ary.map { |a| serializable_hash(a, opts) }
           else
-            serializable_hash(records, opts)
+            res = serializable_hash(records, opts)
           end
+
+          hash[association.to_s] = res
         end
 
         cache_if_needed(obj, options, hash)
@@ -96,7 +94,7 @@ module Gitlab
         end
 
         includes.each do |association, opts|
-          if records = obj.send(association)
+          if records = obj.send(association) # rubocop:disable GitlabSecurity/PublicSend
             yield association, records, opts
           end
         end
