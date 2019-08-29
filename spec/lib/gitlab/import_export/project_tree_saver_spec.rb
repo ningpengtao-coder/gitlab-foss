@@ -196,10 +196,9 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
 
       it 'has pipeline builds' do
         builds_count = saved_project_json
-          .dig('ci_pipelines', 0, 'stages', 0, 'statuses')
-          .count { |hash| hash['type'] == 'Ci::Build' }
+          .dig('ci_pipelines').length
 
-        expect(builds_count).to eq(1)
+        expect(builds_count).to eq(3)
       end
 
       it 'has no when YML attributes but only the DB column' do
@@ -359,18 +358,22 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
     milestone = create(:milestone, project: project)
     merge_request = create(:merge_request, source_project: project, milestone: milestone)
 
-    ci_build = create(:ci_build, project: project, when: nil)
-    ci_build.pipeline.update(project: project)
-    create(:commit_status, project: project, pipeline: ci_build.pipeline)
+    pipelines = []
 
-    create(:milestone, project: project)
-    create(:discussion_note, noteable: issue, project: project)
-    create(:note, noteable: merge_request, project: project)
-    create(:note, noteable: snippet, project: project)
-    create(:note_on_commit,
-           author: user,
-           project: project,
-           commit_id: ci_build.pipeline.sha)
+    3.times do |i|
+      pipelines.push(create(:ci_empty_pipeline, project: project, sha: project.commit.sha, ref: 'master'))
+      ci_build = create(:ci_build, project: project, when: nil, pipeline: pipelines[i])
+      ci_build.pipeline.update(project: project)
+      create(:commit_status, project: project, pipeline: ci_build.pipeline)
+      create(:milestone, project: project)
+      create(:discussion_note, noteable: issue, project: project)
+      create(:note, noteable: merge_request, project: project)
+      create(:note, noteable: snippet, project: project)
+      create(:note_on_commit,
+            author: user,
+            project: project,
+            commit_id: ci_build.pipeline.sha)
+    end
 
     create(:resource_label_event, label: project_label, issue: issue)
     create(:resource_label_event, label: group_label, merge_request: merge_request)

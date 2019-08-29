@@ -62,6 +62,13 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(Milestone.find_by_description('test milestone').issues.count).to eq(2)
       end
 
+      it 'has ci pipeline builds in reverse chronological order' do
+        first_build = @project.ci_pipelines.first
+        last_build = @project.ci_pipelines.last
+
+        expect(first_build["created_at"]).to be < last_build["created_at"]
+      end
+
       context 'when importing a project with cached_markdown_version and note_html' do
         context 'for an Issue' do
           it 'does not import note_html' do
