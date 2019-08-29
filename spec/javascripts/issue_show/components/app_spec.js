@@ -21,6 +21,14 @@ describe('Issuable output', () => {
   beforeEach(done => {
     setFixtures(`
       <div>
+        <div class="detail-page-description content-block">
+        <details open>
+          <summary>One</summary>
+        </details>
+        <details>
+          <summary>Two</summary>
+        </details>
+      </div>
         <div class="flash-container"></div>
         <span id="task_status"></span>
       </div>
@@ -73,6 +81,7 @@ describe('Issuable output', () => {
         editedText = vm.$el.querySelector('.edited-text');
       })
       .then(() => {
+        console.log(document.querySelector('title'))
         expect(document.querySelector('title').innerText).toContain('this is a title (#1)');
         expect(vm.$el.querySelector('.title').innerHTML).toContain('<p>this is a title</p>');
         expect(vm.$el.querySelector('.md').innerHTML).toContain('<p>this is a description!</p>');
