@@ -160,6 +160,10 @@ module QA
     module Group
       autoload :New, 'qa/page/group/new'
       autoload :Show, 'qa/page/group/show'
+
+      module Settings
+        autoload :General, 'qa/page/group/settings/general'
+      end
     end
 
     module File
@@ -207,6 +211,7 @@ module QA
         autoload :Main, 'qa/page/project/settings/main'
         autoload :Repository, 'qa/page/project/settings/repository'
         autoload :CICD, 'qa/page/project/settings/ci_cd'
+        autoload :AutoDevops, 'qa/page/project/settings/auto_devops'
         autoload :DeployKeys, 'qa/page/project/settings/deploy_keys'
         autoload :DeployTokens, 'qa/page/project/settings/deploy_tokens'
         autoload :ProtectedBranches, 'qa/page/project/settings/protected_branches'
@@ -303,8 +308,10 @@ module QA
         autoload :Repository, 'qa/page/admin/settings/repository'
         autoload :General, 'qa/page/admin/settings/general'
         autoload :MetricsAndProfiling, 'qa/page/admin/settings/metrics_and_profiling'
+        autoload :Network, 'qa/page/admin/settings/network'
 
         module Component
+          autoload :IpLimits, 'qa/page/admin/settings/component/ip_limits'
           autoload :RepositoryStorage, 'qa/page/admin/settings/component/repository_storage'
           autoload :AccountAndLimit, 'qa/page/admin/settings/component/account_and_limit'
           autoload :PerformanceBar, 'qa/page/admin/settings/component/performance_bar'
@@ -359,6 +366,13 @@ module QA
     autoload :KubernetesCluster, 'qa/service/kubernetes_cluster'
     autoload :Omnibus, 'qa/service/omnibus'
     autoload :Runner, 'qa/service/runner'
+
+    module ClusterProvider
+      autoload :Base, 'qa/service/cluster_provider/base'
+      autoload :Gcloud, 'qa/service/cluster_provider/gcloud'
+      autoload :Minikube, 'qa/service/cluster_provider/minikube'
+      autoload :K3d, 'qa/service/cluster_provider/k3d'
+    end
   end
 
   ##
