@@ -38,6 +38,9 @@ export default {
 
 <template>
   <div class="line">
-    <a>{{ line.lineNumber }}</a>
+    <a>{{ line.lineNumber + 1 }}</a>
+    <span v-for="(content, i) in line.content" :key="i">
+      {{ content.text }}
+    </span>
   </div>
 </template>
