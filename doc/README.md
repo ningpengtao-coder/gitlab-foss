@@ -13,6 +13,8 @@ description: 'Learn how to use and administer GitLab, the most scalable Git-base
 
 Welcome to [GitLab](https://about.gitlab.com/) Documentation.
 
+Just a change
+
 Here you can access the complete documentation for GitLab, the single application for the
 [entire DevOps lifecycle](#the-entire-devops-lifecycle).
 
