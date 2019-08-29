@@ -1,0 +1,5 @@
+---
+title: Add batching and caching to project export serialization
+merge_request: 32359
+author:
+type: performance
