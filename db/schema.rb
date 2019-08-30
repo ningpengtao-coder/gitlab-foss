@@ -935,7 +935,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.integer "cluster_type", limit: 2, default: 3, null: false
     t.string "domain"
     t.boolean "managed", default: true, null: false
-    t.boolean "namespace_per_environment", default: false, null: false
+    t.boolean "namespace_per_environment", default: true, null: false
     t.index ["enabled"], name: "index_clusters_on_enabled"
     t.index ["user_id"], name: "index_clusters_on_user_id"
   end
@@ -1286,11 +1286,11 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.date "due_date_fixed"
     t.boolean "start_date_is_fixed"
     t.boolean "due_date_is_fixed"
-    t.integer "state", limit: 2, default: 1, null: false
     t.integer "closed_by_id"
     t.datetime "closed_at"
     t.integer "parent_id"
     t.integer "relative_position"
+    t.integer "state_id", limit: 2, default: 1, null: false
     t.index ["assignee_id"], name: "index_epics_on_assignee_id"
     t.index ["author_id"], name: "index_epics_on_author_id"
     t.index ["closed_by_id"], name: "index_epics_on_closed_by_id"
