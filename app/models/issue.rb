@@ -182,6 +182,10 @@ class Issue < ApplicationRecord
     !moved_to_id.nil?
   end
 
+  def duplicated?
+    !duplicated_to_id.nil?
+  end
+
   def can_move?(user, to_project = nil)
     if to_project
       return false unless user.can?(:admin_issue, to_project)
