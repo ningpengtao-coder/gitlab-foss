@@ -57,7 +57,7 @@ To disable the expiration, set it to `0`. The default unit is in seconds.
 NOTE: **Note:**
 If you change this setting, it will only apply to artifacts created after the setting change.
 The [GitLab rails cheat sheet](https://docs.gitlab.com/debug/gitlab_rails_cheat_sheet.html#remove-artifacts-more-than-a-week-old)
-describes how to clean out old artifacts.
+describes how to remove old artifacts.
 
 ## Shared Runners pipeline minutes quota **(STARTER ONLY)**
 
