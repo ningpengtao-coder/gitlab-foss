@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('db', 'migrate', '20190829131947_backfill_release_name_with_tag.rb')
+require Rails.root.join('db', 'post_migrate', '20190829131947_backfill_release_name_with_tag.rb')
 
 describe BackfillReleaseNameWithTag, :migration do
   let(:releases)   { table(:releases) }
