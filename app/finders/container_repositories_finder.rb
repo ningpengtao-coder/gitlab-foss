@@ -1,34 +1,22 @@
 # frozen_string_literal: true
 
 class ContainerRepositoriesFinder
-  # id: group or project id
-  # container_type: :group or :project
-  def initialize(id:, container_type:)
-    @id = id
-    @type = container_type.to_sym
+  # subject: group or project
+  def initialize(user:, subject:)
+    @user = user
+    @subject = subject
   end
 
   def execute
-    if project_type?
-      project.container_repositories
-    else
-      group.container_repositories
-    end
+    return unless allowed_subjects.include?(@subject.class)
+    return unless Ability.allowed?(@user, :read_container_image, @subject)
+
+    @subject.container_repositories
   end
 
   private
 
-  attr_reader :id, :type
-
-  def project_type?
-    type == :project
-  end
-
-  def project
-    Project.find(id)
-  end
-
-  def group
-    Group.find(id)
+  def allowed_subjects
+    [Project, Group]
   end
 end
