@@ -1815,6 +1815,11 @@ job split into three separate jobs.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
+NOTE: **Note:**
+Using a `trigger` with `when:manual` together it will result in the error
+`jobs:triggered-job when should be on_success, on_failure or always`.
+This is because `when:manual` will prevent any trigger from being used.
+
 `trigger` allows you to define downstream pipeline trigger. When a job created
 from `trigger` definition is started by GitLab, a downstream pipeline gets
 created.
@@ -2886,11 +2891,6 @@ test:mysql:
 You can see that the hidden keys are conveniently used as templates.
 
 ## Triggers
-
-NOTE: **Note:**
-Using a `trigger` with `when:manual` together it will result in the error
-`jobs:triggered-job when should be on_success, on_failure or always`.
-This is because `when:manual` will prevent any trigger from being used.
 
 Triggers can be used to force a rebuild of a specific branch, tag or commit,
 with an API call when a pipeline gets created using a trigger token.
