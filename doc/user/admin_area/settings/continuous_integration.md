@@ -54,6 +54,11 @@ This setting is set per job and can be overridden in
 [`.gitlab-ci.yml`](../../../ci/yaml/README.md#artifactsexpire_in).
 To disable the expiration, set it to `0`. The default unit is in seconds.
 
+NOTE: **Note:**
+If you change this setting, it will only apply to artifacts created after the setting change.
+The [GitLab rails cheat sheet](https://docs.gitlab.com/debug/gitlab_rails_cheat_sheet.html#remove-artifacts-more-than-a-week-old)
+describes how to remove old artifacts.
+
 ## Shared Runners pipeline minutes quota **(STARTER ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1078)
