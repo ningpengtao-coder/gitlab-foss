@@ -10,11 +10,7 @@ describe BackfillReleaseNameWithTag, :migration do
 
   let(:namespace)  { namespaces.create(name: 'foo', path: 'foo') }
   let(:project)    { projects.create!(namespace_id: namespace.id, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
-  let!(:release)   { releases.create!(project_id: project.id, name: 'test', tag: 'v1.0.0', released_at: 2.days.ago) }
-
-  before do
-    release.update_column(:name, nil)
-  end
+  let!(:release)   { releases.create!(project_id: project.id, name: nil, tag: 'v1.0.0', released_at: 2.days.ago) }
 
   it 'defaults name to tag value' do
     expect(release.tag).to be_present
