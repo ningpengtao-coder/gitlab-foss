@@ -429,6 +429,61 @@ args: {
 }
 ```
 
+### Signing
+
+The SAML integration supports both embedded and `GET` parameters for a signature. In order to sign, you need to define the private key and the public certificate of your GitLab instance. The settings related to signing can be set in the `security` section of the configuration.
+
+```yaml
+args: {
+        assertion_consumer_service_url: 'https://gitlab.example.com/users/auth/saml/callback',
+        idp_cert_fingerprint: '43:51:43:a1:b5:fc:8b:b7:0a:3a:a9:b1:0f:66:73:a8',
+        idp_sso_target_url: 'https://login.example.com/idp',
+        issuer: 'https://gitlab.example.com',
+        name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+        certificate: '-----BEGIN CERTIFICATE----- 
+          <redacted> 
+          -----END CERTIFICATE-----', 
+        private_key: '-----BEGIN PRIVATE KEY----- 
+          <redacted> 
+          -----END PRIVATE KEY-----',
+        security: {
+          authn_requests_signed: true, # enable signature on AuthNRequest
+          want_assertions_signed: true, # enable the requirement of signed assertion
+          embed_sign: true, # embedded signature or HTTP GET parameter signature
+          metadata_signed: false, # enable signature on Metadata
+          signature_method: 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256', 
+          digest_method: 'http://www.w3.org/2001/04/xmlenc#sha256',     
+        }
+}
+```
+
+GitLab will sign the request and responses with its private key. Your Identity Provider will validate the signature of the received request and responses with the public x500 certificate of GitLab. For more information on this option, see the [ruby-saml gem documentation](https://github.com/onelogin/ruby-saml/tree/v1.7.0). The ruby-saml gem is used by the [omniauth-saml gem](https://github.com/omniauth/omniauth-saml) to implement the client-side of the SAML authentication.
+
+### Encryption
+
+The SAML integration supports EncryptedAssertion. You need define the private key and the public certificate of your GitLab instance in the SAML settings:
+
+```yaml
+args: {
+        assertion_consumer_service_url: 'https://gitlab.example.com/users/auth/saml/callback',
+        idp_cert_fingerprint: '43:51:43:a1:b5:fc:8b:b7:0a:3a:a9:b1:0f:66:73:a8',
+        idp_sso_target_url: 'https://login.example.com/idp',
+        issuer: 'https://gitlab.example.com',
+        name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+        certificate: '-----BEGIN CERTIFICATE----- 
+          <redacted> 
+          -----END CERTIFICATE-----', 
+        private_key: '-----BEGIN PRIVATE KEY----- 
+          <redacted> 
+          -----END PRIVATE KEY-----'
+}
+```
+
+Your Identity Provider will encrypt the assertion with the public certificate of GitLab. GitLab will decrypt the EncryptedAssertion with its private key.
+
+>**Note:**
+This integration uses the `certificate` and `private_key` settings for both the sign and encrypt/decrypt processes.
+
 ## Troubleshooting
 
 ### 500 error after login
