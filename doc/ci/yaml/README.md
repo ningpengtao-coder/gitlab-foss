@@ -825,7 +825,7 @@ The above script will:
 
 NOTE: **Note:**
 Using `when:manual` and `trigger` together will result in the error
-`jobs:triggered-job when should be on_success, on_failure or always`.
+`jobs:#{job-name} when should be on_success, on_failure or always`.
 This is because `when:manual` will prevent any trigger from being used.
 
 Manual actions are a special type of job that are not executed automatically,
@@ -1817,7 +1817,7 @@ job split into three separate jobs.
 
 NOTE: **Note:**
 Using a `trigger` with `when:manual` together it will result in the error
-`jobs:triggered-job when should be on_success, on_failure or always`.
+`jobs:#{job-name} when should be on_success, on_failure or always`.
 This is because `when:manual` will prevent any trigger from being used.
 
 `trigger` allows you to define downstream pipeline trigger. When a job created
