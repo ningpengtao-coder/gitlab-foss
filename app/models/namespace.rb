@@ -319,7 +319,11 @@ class Namespace < ApplicationRecord
   private
 
   def all_projects_with_pages
-    all_projects.migrate_project_pages_metadata
+    if all_projects.project_pages_metadata_not_migrated.exists?
+      BackgroundMigrations::MigratePages.new.perform_on_relation(
+        all_projects.project_pages_metadata_not_migrated)
+    end
+
     all_projects.with_pages_deployed
   end
 
