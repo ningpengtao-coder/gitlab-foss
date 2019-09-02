@@ -1,5 +1,9 @@
 # GitLab tests in the Continuous Integration (CI) context
 
+## Pipelines for merge requests
+
+TBD
+
 ## Test suite parallelization on the CI
 
 Our current CI parallelization setup is as follows:
