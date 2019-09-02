@@ -63,20 +63,10 @@ export default {
         return [new Date(item.date), item.commits];
       });
 
-        debugger
       return [
         {
           name: 'Commits',
           data
-         /* data: [
-            ['Mon', 1220],
-            ['Tue', 932],
-            ['Wed', 901],
-            ['Thu', 934],
-            ['Fri', 1290],
-            ['Sat', 1330],
-            ['Sun', 1320],
-          ],*/
         },
       ];
     },
@@ -91,6 +81,21 @@ export default {
     },
     showChart() {
       return !this.loading && this.chartHasData();
+    },
+
+    contributors() {
+      const commitsByAuthor = ContributorsStatGraphUtil.get_author_data(this.parsedLog, 'commits').slice(0, 5);
+      return commitsByAuthor.map((item) => {
+        return {
+          ...item,
+          dates: [{
+            name: 'Commits',
+            data: Object.keys(item.dates).map((date) => {
+              return [new Date(date), item.dates[date]];
+            }),
+          }],
+        };
+      });
     },
     // chartOptions() {
     //   return {
@@ -161,6 +166,14 @@ export default {
         <gl-area-chart v-if="!loading"
                        :data="chartData2"
                        :option="chartOptions"/>
-        This is just the beginning
+        <div class="contributors-list row" v-if="!loading">
+            <div class="person col-6" v-for="contributor in contributors">
+                <h4>{{contributor.author_name}}</h4>
+                <p>{{contributor.author_email}}</p>
+                <p>{{contributor.commits}}</p>
+                <gl-area-chart :data="contributor.dates"
+                               :option="chartOptions"/>
+            </div>
+        </div>
     </div>
 </template>
