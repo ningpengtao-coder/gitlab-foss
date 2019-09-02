@@ -2488,6 +2488,9 @@ msgstr ""
 msgid "Closes this %{quick_action_target}."
 msgstr ""
 
+msgid "Cluster %{cluster} was used."
+msgstr ""
+
 msgid "ClusterIntegration| %{custom_domain_start}More information%{custom_domain_end}."
 msgstr ""
 
