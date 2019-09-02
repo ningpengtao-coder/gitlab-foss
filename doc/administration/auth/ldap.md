@@ -564,7 +564,7 @@ LDAP server please double-check the LDAP `port` and `encryption` settings used b
 GitLab. Common combinations are `encryption: 'plain'` and `port: 389`, OR
 `encryption: 'simple_tls'` and `port: 636`.
 
-### LDAP Provider Offline
+### Connection times out
 
 If your configured LDAP provider and/or endpoint is offline or otherwise unreachable by GitLab, no LDAP user will be able to authenticate and log in. GitLab does not cache or store credentials for LDAP users to provide authentication during an LDAP outage.
 
