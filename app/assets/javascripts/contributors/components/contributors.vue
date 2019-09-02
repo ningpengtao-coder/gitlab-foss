@@ -6,6 +6,19 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import { GlChartLegend } from '@gitlab/ui/charts';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
+import ContributorsStatGraphUtil from '../../pages/projects/graphs/show/stat_graph_contributors_util';
+
+const chartOptions = {
+  'xAxis': {
+    'type': 'time',
+    'name': 'Time',
+    'axisLabel': {},
+    minInterval: 3600 * 24 * 1000 * 365,
+  },
+  yAxis: {
+    name: 'Number of commits',
+  }
+};
 
 export default {
   components: {
@@ -23,33 +36,52 @@ export default {
     return {
       svgs: {},
       chart: null,
-      seriesInfo: [
-        {
-          type: 'solid',
-          name: s__('IssuesAnalytics | Issues created'),
-          color: '#1F78D1',
-        },
-      ],
+      chartOptions,
     };
   },
   computed: {
     ...mapState('contributors', ['chartData', 'loading']),
     ...mapGetters('contributors', ['hasFilters', 'appliedFilters']),
-    data() {
-      const { chartData, chartHasData } = this;
-      const data = [];
+    chartData2() {
+      // const { chartData, chartHasData } = this;
+      // const data = [];
+      //
+      // if (chartHasData()) {
+      //   Object.keys(chartData).forEach(key => {
+      //     const date = new Date(key);
+      //     const label = `${getMonthNames(true)[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+      //     const val = chartData[key];
+      //
+      //     data.push([label, val]);
+      //   });
+      // }
+      //
+      // return data;
+      if (!this.chartHasData) return;
 
-      if (chartHasData()) {
-        Object.keys(chartData).forEach(key => {
-          const date = new Date(key);
-          const label = `${getMonthNames(true)[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
-          const val = chartData[key];
+      const data = this.totalCommits.map((item) => {
+        return [new Date(item.date), item.commits];
+      });
 
-          data.push([label, val]);
-        });
-      }
-
-      return data;
+        debugger
+      return [
+        {
+          name: 'Commits',
+          data
+         /* data: [
+            ['Mon', 1220],
+            ['Tue', 932],
+            ['Wed', 901],
+            ['Thu', 934],
+            ['Fri', 1290],
+            ['Sat', 1330],
+            ['Sun', 1320],
+          ],*/
+        },
+      ];
+    },
+    chartHasData() {
+      return !this.loading && this.chartData;
     },
     chartLabels() {
       return this.data.map(val => val[0]);
@@ -60,25 +92,22 @@ export default {
     showChart() {
       return !this.loading && this.chartHasData();
     },
-    chartOptions() {
-      return {
-        dataZoom: [
-          {
-            type: 'slider',
-            startValue: 0,
-            handleIcon: this.svgs['scroll-handle'],
-          },
-        ],
-      };
+    // chartOptions() {
+    //   return {
+    //     dataZoom: [
+    //       {
+    //         type: 'slider',
+    //         startValue: 0,
+    //         handleIcon: this.svgs['scroll-handle'],
+    //       },
+    //     ],
+    //   };
+    // },
+    parsedLog() {
+      return ContributorsStatGraphUtil.parse_log(this.chartData);
     },
-    series() {
-      return this.data.map(val => val[1]);
-    },
-    seriesAverage() {
-      return engineeringNotation(average(...this.series), 0);
-    },
-    seriesTotal() {
-      return engineeringNotation(sum(...this.series));
+    totalCommits() {
+      return ContributorsStatGraphUtil.get_total_data(this.parsedLog, 'commits');
     },
   },
   watch: {
@@ -118,15 +147,20 @@ export default {
         })
         .catch(() => {});
     },
+    getTotalData(){
+      return ContributorsStatGraphUtil.get_total_data(this.parsed_log, this.field);
+    }
   },
 };
 </script>
 <template>
-  <div class="issues-analytics-wrapper">
-     <!--   <div v-if="loading" class="issues-analytics-loading text-center">
-          <gl-loading-icon :inline="true" :size="4"/>
-        </div>-->
-
-    This is just the beginning
-  </div>
+    <div class="issues-analytics-wrapper">
+        <div v-if="loading" class="issues-analytics-loading text-center">
+            <gl-loading-icon :inline="true" :size="4"/>
+        </div>
+        <gl-area-chart v-if="!loading"
+                       :data="chartData2"
+                       :option="chartOptions"/>
+        This is just the beginning
+    </div>
 </template>
