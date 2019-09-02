@@ -163,6 +163,53 @@ module Gitlab
             issue_iid: quick_action_target.iid
           }
         end
+
+        desc _('Add Zoom meeting')
+        explanation _('Adds a Zoom meeting')
+        params '<URL>' # TODO support meeting ID?
+        types Issue
+        condition do
+          !Gitlab::ZoomLinkExtractor.new(quick_action_target.description).match?
+        end
+        parse_params do |url|
+          Gitlab::ZoomLinkExtractor.new(url).links.last
+        end
+        command :zoom do |url|
+          existing = Gitlab::ZoomLinkExtractor.new(quick_action_target.description).match?
+
+          case
+          when existing
+            message = _('A Zoom Meeting already exists on this issue.')
+          when url
+            message = _('Added Zoom meeting %{url}') % { url: url }
+            @updates[:description] = "#{quick_action_target.description} #{url}"
+          else
+            message = _('Failed to add unrecognized Zoom URL')
+          end
+
+          @execution_message[:zoom] = message
+        end
+
+        desc _('Remove Zoom meeting')
+        explanation _('Remove Zoom meeting')
+        execution_message _('Zoom meeting removed')
+        types Issue
+        condition do
+          Gitlab::ZoomLinkExtractor.new(quick_action_target.description).match?
+        end
+        command :remove_zoom do
+          url = Gitlab::ZoomLinkExtractor.new(quick_action_target.description).links.last
+
+          case
+          when url
+            message = _('Zoom meeting %{url} removed') % { url: url }
+            @updates[:description] = quick_action_target.description.sub(url, '')
+          else
+            message = _('Failed to remove a Zoom meeting')
+          end
+
+          @execution_message[:remove_zoom] = message
+        end
       end
     end
   end

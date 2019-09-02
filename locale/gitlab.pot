@@ -484,6 +484,9 @@ msgstr ""
 msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
 msgstr ""
 
+msgid "A Zoom Meeting already exists on this issue."
+msgstr ""
+
 msgid "A default branch cannot be chosen for an empty project."
 msgstr ""
 
@@ -651,6 +654,9 @@ msgstr ""
 msgid "Add README"
 msgstr ""
 
+msgid "Add Zoom meeting"
+msgstr ""
+
 msgid "Add a %{type} token"
 msgstr ""
 
@@ -762,6 +768,9 @@ msgstr ""
 msgid "Added %{label_references} %{label_text}."
 msgstr ""
 
+msgid "Added Zoom meeting %{url}"
+msgstr ""
+
 msgid "Added a To Do."
 msgstr ""
 
@@ -778,6 +787,9 @@ msgid "Adds %{labels} %{label_text}."
 msgstr ""
 
 msgid "Adds a To Do."
+msgstr ""
+
+msgid "Adds a Zoom meeting"
 msgstr ""
 
 msgid "Admin Area"
@@ -4903,6 +4915,9 @@ msgstr ""
 msgid "Failed create wiki"
 msgstr ""
 
+msgid "Failed to add unrecognized Zoom URL"
+msgstr ""
+
 msgid "Failed to apply commands."
 msgstr ""
 
@@ -4964,6 +4979,9 @@ msgid "Failed to move this issue because target project doesn't exist."
 msgstr ""
 
 msgid "Failed to promote label due to internal error. Please contact administrators."
+msgstr ""
+
+msgid "Failed to remove a Zoom meeting"
 msgstr ""
 
 msgid "Failed to remove issue from board, please try again."
@@ -9504,6 +9522,9 @@ msgstr ""
 msgid "Remove Runner"
 msgstr ""
 
+msgid "Remove Zoom meeting"
+msgstr ""
+
 msgid "Remove all or specific assignee(s)"
 msgstr ""
 
@@ -13630,6 +13651,12 @@ msgid "Your projects"
 msgstr ""
 
 msgid "Your request for access has been queued for review."
+msgstr ""
+
+msgid "Zoom meeting %{url} removed"
+msgstr ""
+
+msgid "Zoom meeting removed"
 msgstr ""
 
 msgid "a deleted user"
