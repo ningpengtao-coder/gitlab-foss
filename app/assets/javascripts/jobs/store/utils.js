@@ -9,11 +9,11 @@ export const linesParser = (lines = []) => {
       acc.push({
         isClosed: true,
         isHeader: true,
-        lines: [{
+        line: {
           ...line,
           lineNumber: index,
-        }],
-        lineNumber: index,
+        },
+        lines: [],
       });
     } else if (acc.length && acc[acc.length - 1].isHeader) {
       acc[acc.length - 1].lines.push({

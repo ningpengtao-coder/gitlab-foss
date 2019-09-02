@@ -1,5 +1,4 @@
 .job-log {
-
   clear: left;
   min-height: 42px;
   padding: 15px 0;
@@ -15,13 +14,45 @@
 
 .line {
   position: relative;
+  white-space: normal;
+  padding: 0 15px 0 62px;
+  margin: 0;
 }
 
 .line-text {
-  white-space: pre-wrap;
   overflow-wrap: break-word;
 }
 
-.collapsible {
+.line-number {
+  color: #f1f1f1;
+  padding: 0 10px;
 
+
+  display: inline-block;
+    text-align: right;
+    min-width: 40px;
+    margin-left: -40px;
+    cursor: pointer;
+    text-decoration: none;
+    position: absolute;
+    padding-right: 1em;
+
+  &:hover {
+    text-decoration: underline;
+    color: #f1f1f1;
+  }
+}
+
+.collapsible-line {
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($white-light, 0.2);
+  }
+
+  .arrow {
+    position: absolute;
+    margin-left: -50px;
+  }
 }

@@ -309,7 +309,7 @@ export default {
             @scrollJobLogTop="scrollTop"
             @scrollJobLogBottom="scrollBottom"
           />
-          <log :trace="trace" :is-complete="isTraceComplete" />
+          <log :is-complete="isTraceComplete" />
         </div>
         <!-- EO job log -->
 
