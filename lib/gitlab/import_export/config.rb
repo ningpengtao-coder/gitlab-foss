@@ -3,34 +3,48 @@
 module Gitlab
   module ImportExport
     class Config
-      # Returns a Hash of the YAML file, including EE specific data if EE is
-      # used.
+      def initialize(project = nil)
+        @project = project
+      end
+
+      # Returns a Hash of the YAML file
       def to_h
-        hash = parse_yaml
-        ee_hash = hash['ee']
+        hash = parse_yaml.dup
 
-        if merge? && ee_hash
-          ee_hash.each do |key, value|
-            if key == 'project_tree'
-              merge_project_tree(value, hash[key])
-            else
-              merge_attributes_list(value, hash[key])
-            end
-          end
-        end
-
-        # We don't want to expose this section after this point, as it is no
-        # longer needed.
+        # The YAML file contains `ee` settings. The EE-specific
+        # Gitlab::ImportExport::Config module handles these.
         hash.delete('ee')
 
+        # Merge in any feature flagged project tree properties that are enabled
+        merge_feature_flagged_project_tree!(hash)
+
         hash
+      end
+
+      private
+
+      attr_accessor :project
+
+      # Merges any project tree relationships defined under a `feature_flag.project_tree` key
+      # if the feature is enabled for the project
+      def merge_feature_flagged_project_tree!(hash)
+        flagged_hash = hash.delete('feature_flagged')
+        return unless flagged_hash && project
+
+        flagged_hash.each do |flag_name, flagged_tree|
+          default_enabled = flagged_tree.delete('default_enabled')
+
+          next unless Feature.enabled?(flag_name, @project, default_enabled: default_enabled)
+
+          merge_project_tree!(flagged_tree['project_tree'], hash['project_tree'])
+        end
       end
 
       # Merges a project relationships tree into the target tree.
       #
       # @param [Array<Hash|Symbol>] source_values
       # @param [Array<Hash|Symbol>] target_values
-      def merge_project_tree(source_values, target_values)
+      def merge_project_tree!(source_values, target_values)
         source_values.each do |value|
           if value.is_a?(Hash)
             # Examples:
@@ -42,7 +56,7 @@ module Gitlab
                 .find { |h| h.is_a?(Hash) && h[key] }
 
               if target
-                merge_project_tree(val, target[key])
+                merge_project_tree!(val, target[key])
               else
                 target_values << { key => val.dup }
               end
@@ -54,25 +68,11 @@ module Gitlab
         end
       end
 
-      # Merges a Hash containing a flat list of attributes, such as the entries
-      # in a `excluded_attributes` section.
-      #
-      # @param [Hash] source_values
-      # @param [Hash] target_values
-      def merge_attributes_list(source_values, target_values)
-        source_values.each do |key, values|
-          target_values[key] ||= []
-          target_values[key].concat(values)
-        end
-      end
-
-      def merge?
-        Gitlab.ee?
-      end
-
       def parse_yaml
-        YAML.load_file(Gitlab::ImportExport.config_file)
+        @parse_yaml ||= YAML.load_file(Gitlab::ImportExport.config_file)
       end
     end
   end
 end
+
+Gitlab::ImportExport::Config.prepend_if_ee('EE::Gitlab::ImportExport::Config')

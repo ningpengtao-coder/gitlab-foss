@@ -160,6 +160,8 @@ module Gitlab
             next
           end
 
+          remove_feature_dependent_sub_relations(relation_item)
+
           # The transaction at this level is less speedy than one single transaction
           # But we can't have it in the upper level or GC won't get rid of the AR objects
           # after we save the batch.
@@ -189,6 +191,10 @@ module Gitlab
           relation_hash, sub_relation = assign_relation_hash(relation_item, sub_relation)
           relation_item[sub_relation.to_s] = create_relation(sub_relation, relation_hash) unless relation_hash.blank?
         end
+      end
+
+      def remove_feature_dependent_sub_relations(_)
+        # no-op
       end
 
       def assign_relation_hash(relation_item, sub_relation)
@@ -229,3 +235,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::ImportExport::ProjectTreeRestorer.prepend_if_ee('EE::Gitlab::ImportExport::ProjectTreeRestorer')
