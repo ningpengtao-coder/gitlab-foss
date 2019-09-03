@@ -10,7 +10,7 @@ that are responsible for certain files in a repository.
 
 You can choose and add the `CODEOWNERS` file in three places:
 
-- to the root directory of the repository
+- inside the root directory of the repository
 - inside the `.gitlab/` directory
 - inside the `docs/` directory
 
