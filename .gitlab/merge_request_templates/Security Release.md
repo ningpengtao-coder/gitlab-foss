@@ -1,6 +1,6 @@
 <!--
 # README first!
-This MR should be created on `dev.gitlab.org`.
+This MR should be created on `gitlab.com` in the `gitlab-org/security` group.
 
 See [the general developer security release guidelines](https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md).
 
@@ -18,18 +18,17 @@ manually merging CE into EE is no longer required.
 
 ## Developer checklist
 
-- [ ] Link to the developer security workflow issue on `dev.gitlab.org`
 - [ ] MR targets `master`, or `X-Y-stable` for backports
 - [ ] Milestone is set for the version this MR applies to
 - [ ] Title of this MR is the same as for all backports
 - [ ] A [CHANGELOG entry](https://docs.gitlab.com/ee/development/changelog.html) is added without a `merge_request` value, with `type` set to `security`
-- [ ] Add a link to this MR in the `links` section of related issue
 - [ ] Set up an EE MR (always required for CE merge requests): EE_MR_LINK_HERE
-- [ ] Assign to a reviewer (that is not a release manager)
+- [ ] Assign to a reviewer _who is not a release manager_
 
-## Reviewer checklist
+## Reviewer/Maintainer checklist
 
 - [ ] Correct milestone is applied and the title is matching across all backports
-- [ ] Assigned to `@gitlab-release-tools-bot` with passing CI pipelines
+- [ ] Ensure the latest pipeline is passing
+- [ ] Instead of merging, reassign to the `@gitlab-release-tools-bot` user
 
 /label ~security
