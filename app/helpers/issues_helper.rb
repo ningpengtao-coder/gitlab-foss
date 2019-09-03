@@ -150,6 +150,27 @@ module IssuesHelper
       can?(current_user, :create_merge_request_in, @project)
   end
 
+  def issue_closed_label(issue, current_user)
+    if issue.moved? && can?(current_user, :read_issue, issue.moved_to)
+      closed_label_text(issue, 'moved')
+    elsif issue.duplicated? && can?(current_user, :read_issue, issue.duplicated_to)
+      closed_label_text(issue, 'duplicated')
+    else
+      _("Closed")
+    end
+  end
+
+  private
+
+  def closed_label_text(issue, action)
+    related_issue = issue.try(:"#{action}_to")
+    link_start = "<a href=\"#{issue_path(related_issue)}\" class=\"text-white text-underline\">".html_safe
+    link_end = '</a>'.html_safe
+
+    s_('IssuableStatus|Closed (%{link_start}%{action}%{link_end})').html_safe %
+      { link_start: link_start, link_end: link_end, action: action }
+  end
+
   # Required for Banzai::Filter::IssueReferenceFilter
   module_function :url_for_issue
   module_function :url_for_internal_issue
