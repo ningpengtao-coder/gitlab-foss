@@ -7,6 +7,7 @@ describe Banzai::Filter::RelativeLinkFilter do
     contexts.reverse_merge!({
       commit:         commit,
       project:        project,
+      current_user:   user,
       group:          group,
       project_wiki:   project_wiki,
       ref:            ref,
@@ -33,7 +34,8 @@ describe Banzai::Filter::RelativeLinkFilter do
     %(<div>#{element}</div>)
   end
 
-  let(:project)        { create(:project, :repository) }
+  let(:project)        { create(:project, :repository, :public) }
+  let(:user)           { create(:user) }
   let(:group)          { nil }
   let(:project_path)   { project.full_path }
   let(:ref)            { 'markdown' }
@@ -72,6 +74,11 @@ describe Banzai::Filter::RelativeLinkFilter do
 
   context 'with an empty repository' do
     let(:project) { create(:project_empty_repo) }
+    include_examples :preserve_unchanged
+  end
+
+  context 'without project repository access' do
+    let(:project) { create(:project, :repository, repository_access_level: ProjectFeature::PRIVATE) }
     include_examples :preserve_unchanged
   end
 
@@ -282,51 +289,63 @@ describe Banzai::Filter::RelativeLinkFilter do
     let(:relative_path) { "/#{project.full_path}#{upload_path}" }
 
     context 'to a project upload' do
-      context 'with an absolute URL' do
-        let(:absolute_path) { Gitlab.config.gitlab.url + relative_path }
-        let(:only_path) { false }
+      shared_examples 'rewrite project uploads' do
+        context 'with an absolute URL' do
+          let(:absolute_path) { Gitlab.config.gitlab.url + relative_path }
+          let(:only_path) { false }
 
-        it 'rewrites the link correctly' do
+          it 'rewrites the link correctly' do
+            doc = filter(link(upload_path))
+
+            expect(doc.at_css('a')['href']).to eq(absolute_path)
+          end
+        end
+
+        it 'rebuilds relative URL for a link' do
           doc = filter(link(upload_path))
+          expect(doc.at_css('a')['href']).to eq(relative_path)
 
-          expect(doc.at_css('a')['href']).to eq(absolute_path)
+          doc = filter(nested(link(upload_path)))
+          expect(doc.at_css('a')['href']).to eq(relative_path)
+        end
+
+        it 'rebuilds relative URL for an image' do
+          doc = filter(image(upload_path))
+          expect(doc.at_css('img')['src']).to eq(relative_path)
+
+          doc = filter(nested(image(upload_path)))
+          expect(doc.at_css('img')['src']).to eq(relative_path)
+        end
+
+        it 'does not modify absolute URL' do
+          doc = filter(link('http://example.com'))
+          expect(doc.at_css('a')['href']).to eq 'http://example.com'
+        end
+
+        it 'supports unescaped Unicode filenames' do
+          path = '/uploads/한글.png'
+          doc = filter(link(path))
+
+          expect(doc.at_css('a')['href']).to eq("/#{project.full_path}/uploads/%ED%95%9C%EA%B8%80.png")
+        end
+
+        it 'supports escaped Unicode filenames' do
+          path = '/uploads/한글.png'
+          escaped = Addressable::URI.escape(path)
+          doc = filter(image(escaped))
+
+          expect(doc.at_css('img')['src']).to eq("/#{project.full_path}/uploads/%ED%95%9C%EA%B8%80.png")
         end
       end
 
-      it 'rebuilds relative URL for a link' do
-        doc = filter(link(upload_path))
-        expect(doc.at_css('a')['href']).to eq(relative_path)
+      context 'without project repository access' do
+        let(:project) { create(:project, :repository, repository_access_level: ProjectFeature::PRIVATE) }
 
-        doc = filter(nested(link(upload_path)))
-        expect(doc.at_css('a')['href']).to eq(relative_path)
+        it_behaves_like 'rewrite project uploads'
       end
 
-      it 'rebuilds relative URL for an image' do
-        doc = filter(image(upload_path))
-        expect(doc.at_css('img')['src']).to eq(relative_path)
-
-        doc = filter(nested(image(upload_path)))
-        expect(doc.at_css('img')['src']).to eq(relative_path)
-      end
-
-      it 'does not modify absolute URL' do
-        doc = filter(link('http://example.com'))
-        expect(doc.at_css('a')['href']).to eq 'http://example.com'
-      end
-
-      it 'supports unescaped Unicode filenames' do
-        path = '/uploads/한글.png'
-        doc = filter(link(path))
-
-        expect(doc.at_css('a')['href']).to eq("/#{project.full_path}/uploads/%ED%95%9C%EA%B8%80.png")
-      end
-
-      it 'supports escaped Unicode filenames' do
-        path = '/uploads/한글.png'
-        escaped = Addressable::URI.escape(path)
-        doc = filter(image(escaped))
-
-        expect(doc.at_css('img')['src']).to eq("/#{project.full_path}/uploads/%ED%95%9C%EA%B8%80.png")
+      context 'with project repository access' do
+        it_behaves_like 'rewrite project uploads'
       end
     end
 

@@ -9,6 +9,7 @@ module Banzai
     # Context options:
     #   :commit
     #   :group
+    #   :current_user
     #   :project
     #   :project_wiki
     #   :ref
@@ -48,7 +49,7 @@ module Banzai
 
         if html_attr.value.start_with?('/uploads/')
           process_link_to_upload_attr(html_attr)
-        elsif linkable_files?
+        elsif linkable_files? && repo_visible_to_user?
           process_link_to_repository_attr(html_attr)
         end
       end
@@ -166,6 +167,10 @@ module Banzai
         Gitlab.config.gitlab.relative_url_root.presence || '/'
       end
 
+      def repo_visible_to_user?
+        project && Ability.allowed?(current_user, :download_code, project)
+      end
+
       def ref
         context[:ref] || project.default_branch
       end
@@ -176,6 +181,10 @@ module Banzai
 
       def project
         context[:project]
+      end
+
+      def current_user
+        context[:current_user]
       end
 
       def repository

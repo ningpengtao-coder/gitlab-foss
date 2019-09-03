@@ -37,8 +37,8 @@ class Project < ApplicationRecord
 
   BoardLimitExceeded = Class.new(StandardError)
 
-  STATISTICS_ATTRIBUTE = 'repositories_count'.freeze
-  UNKNOWN_IMPORT_URL = 'http://unknown.git'.freeze
+  STATISTICS_ATTRIBUTE = 'repositories_count'
+  UNKNOWN_IMPORT_URL = 'http://unknown.git'
   # Hashed Storage versions handle rolling out new storage to project and dependents models:
   # nil: legacy
   # 1: repository
@@ -55,12 +55,16 @@ class Project < ApplicationRecord
   VALID_MIRROR_PORTS = [22, 80, 443].freeze
   VALID_MIRROR_PROTOCOLS = %w(http https ssh git).freeze
 
+  ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT = 10
+
   SORTING_PREFERENCE_FIELD = :projects_sort
 
   cache_markdown_field :description, pipeline: :description
 
   delegate :feature_available?, :builds_enabled?, :wiki_enabled?,
            :merge_requests_enabled?, :issues_enabled?, :pages_enabled?, :public_pages?,
+           :merge_requests_access_level, :issues_access_level, :wiki_access_level,
+           :snippets_access_level, :builds_access_level, :repository_access_level,
            to: :project_feature, allow_nil: true
 
   delegate :base_dir, :disk_path, :ensure_storage_path_exists, to: :storage
@@ -2189,6 +2193,10 @@ class Project < ApplicationRecord
 
   def has_pool_repository?
     pool_repository.present?
+  end
+
+  def access_request_approvers_to_be_notified
+    members.maintainers.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
   end
 
   private

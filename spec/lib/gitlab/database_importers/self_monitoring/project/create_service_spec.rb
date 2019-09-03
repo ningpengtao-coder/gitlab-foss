@@ -130,7 +130,7 @@ describe Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService do
       end
 
       it 'returns error when saving project ID fails' do
-        allow(application_setting).to receive(:update) { false }
+        allow(application_setting).to receive(:save) { false }
 
         expect { result }.to raise_error(StandardError, 'Could not save project ID')
       end
@@ -176,14 +176,28 @@ describe Gitlab::DatabaseImporters::SelfMonitoring::Project::CreateService do
       end
 
       context 'with non default prometheus address' do
+        let(:listen_address) { 'https://localhost:9090' }
+
         let(:prometheus_settings) do
           {
             enable: true,
-            listen_address: 'https://localhost:9090'
+            listen_address: listen_address
           }
         end
 
         it_behaves_like 'has prometheus service', 'https://localhost:9090'
+
+        context 'with :9090 symbol' do
+          let(:listen_address) { :':9090' }
+
+          it_behaves_like 'has prometheus service', 'http://localhost:9090'
+        end
+
+        context 'with 0.0.0.0:9090' do
+          let(:listen_address) { '0.0.0.0:9090' }
+
+          it_behaves_like 'has prometheus service', 'http://localhost:9090'
+        end
       end
 
       context 'when prometheus setting is not present in gitlab.yml' do

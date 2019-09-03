@@ -29,7 +29,10 @@ export default {
     EnvironmentsBlock,
     ErasedBlock,
     Icon,
-    Log: () =>  import('./job_log_json.vue'),
+    Log: () =>
+      gon && gon.features && gon.features.jobLogJson
+        ? import('./job_log_json.vue')
+        : import('./job_log.vue'),
     LogTopBar,
     StuckBlock,
     UnmetPrerequisitesBlock,

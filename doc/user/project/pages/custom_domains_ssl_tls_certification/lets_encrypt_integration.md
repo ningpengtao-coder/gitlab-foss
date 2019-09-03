@@ -21,6 +21,10 @@ such as [#64870](https://gitlab.com/gitlab-org/gitlab-ce/issues/64870).
 See all the related issues linked from this [issue's description](https://gitlab.com/gitlab-org/gitlab-ce/issues/28996)
 for more information.
 
+Note: **Note:**
+Using this feature requires two separate IP addresses, one for the GitLab domain
+and one GitLab Pages domain.
+
 ## Requirements
 
 Before you can enable automatic provisioning of a SSL certificate for your domain, make sure you have:
