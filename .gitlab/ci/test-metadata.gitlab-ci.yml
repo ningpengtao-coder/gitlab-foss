@@ -63,6 +63,7 @@ flaky-examples-check:
   variables:
     NEW_FLAKY_SPECS_REPORT: rspec_flaky/report-new.json
   allow_failure: true
+  needs: ["rspec unit pg", "rspec system pg", "rspec integration pg", "rspec-fast-spec-helper"]
   only:
     refs:
       - branches

@@ -286,6 +286,7 @@ coverage:
     - .default-cache
     - .default-before_script
     - .except-docs-qa
+  needs: ["rspec unit pg", "rspec system pg", "rspec integration pg", "rspec-fast-spec-helper"]
   cache:
     policy: pull
   variables:
