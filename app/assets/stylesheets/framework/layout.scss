@@ -169,3 +169,26 @@ body {
     }
   }
 }
+
+.create-merge-request-iframe {
+  .navbar-gitlab, .development, .content-wrapper .alert-wrapper, .merge-request-form .btn-cancel, .mr-compare {
+    display: none !important;
+  }
+
+  .merge-request-form .middle-block.row-content-block {
+    margin: -16px;
+    background: white;
+    position: fixed;
+    bottom: 0;
+    width: 340px;
+
+    .btn {
+      width: 100%;
+      background-color: $blue-500;
+    }
+  }
+
+  .content-wrapper, .layout-page {
+    margin-top: 0 !important;
+  }
+}

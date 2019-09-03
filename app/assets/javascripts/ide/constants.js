@@ -47,6 +47,7 @@ export const diffViewerErrors = Object.freeze({
 export const rightSidebarViews = {
   pipelines: { name: 'pipelines-list', keepAlive: true },
   jobsDetail: { name: 'jobs-detail', keepAlive: false },
+  createMergeRequest: { name: 'create-merge-request', keepAlive: false },
   mergeRequestInfo: { name: 'merge-request-info', keepAlive: true },
   clientSidePreview: { name: 'clientside', keepAlive: false },
 };

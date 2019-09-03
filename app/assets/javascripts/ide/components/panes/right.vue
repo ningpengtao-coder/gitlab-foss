@@ -8,6 +8,7 @@ import { rightSidebarViews } from '../../constants';
 import PipelinesList from '../pipelines/list.vue';
 import JobsDetail from '../jobs/detail.vue';
 import MergeRequestInfo from '../merge_requests/info.vue';
+import CreateMergeRequest from '../merge_requests/create.vue';
 import ResizablePanel from '../resizable_panel.vue';
 import Clientside from '../preview/clientside.vue';
 
@@ -21,6 +22,7 @@ export default {
     JobsDetail,
     ResizablePanel,
     MergeRequestInfo,
+    CreateMergeRequest,
     Clientside,
   },
   props: {
@@ -40,6 +42,12 @@ export default {
     },
     defaultTabs() {
       return [
+        {
+          show: !this.currentMergeRequestId,
+          title: __('New Merge Request'),
+          views: [rightSidebarViews.createMergeRequest],
+          icon: 'merge-request',
+        },
         {
           show: this.currentMergeRequestId,
           title: __('Merge Request'),
