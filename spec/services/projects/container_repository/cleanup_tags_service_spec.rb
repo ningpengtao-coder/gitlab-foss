@@ -52,15 +52,15 @@ describe Projects::ContainerRepository::CleanupTagsService do
         { 'name_regex' => '.*' }
       end
 
-      it 'does remove B* and C' do
-        # The :A cannot be removed as config is shared with :latest
+      it 'does remove A, B* and C' do
         # The :E cannot be removed as it does not have valid manifest
 
-        expect_delete('sha256:configB').twice
-        expect_delete('sha256:configC')
-        expect_delete('sha256:configD')
+        expect_delete_tag('sha256:configA')
+        expect_delete_image('sha256:configB')
+        expect_delete_image('sha256:configC')
+        expect_delete_image('sha256:configD')
 
-        is_expected.to include(status: :success, deleted: %w(D Bb Ba C))
+        is_expected.to include(status: :success, deleted: %w(D A Bb Ba C))
       end
     end
 
@@ -70,8 +70,8 @@ describe Projects::ContainerRepository::CleanupTagsService do
       end
 
       it 'does remove C and D' do
-        expect_delete('sha256:configC')
-        expect_delete('sha256:configD')
+        expect_delete_image('sha256:configC')
+        expect_delete_image('sha256:configD')
 
         is_expected.to include(status: :success, deleted: %w(D C))
       end
@@ -82,10 +82,10 @@ describe Projects::ContainerRepository::CleanupTagsService do
         { 'name_regex' => 'Ba' }
       end
 
-      it 'does not remove the tag' do
-        # Issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/21405
+      it 'DOES remove the tag' do
+        expect_delete_tag('sha256:configB')
 
-        is_expected.to include(status: :success, deleted: [])
+        is_expected.to include(status: :success, deleted: %w(Ba))
       end
     end
 
@@ -96,9 +96,10 @@ describe Projects::ContainerRepository::CleanupTagsService do
       end
 
       it 'does remove C as it is oldest' do
-        expect_delete('sha256:configC')
+        expect_delete_tag('sha256:configB')
+        expect_delete_image('sha256:configC')
 
-        is_expected.to include(status: :success, deleted: %w(C))
+        is_expected.to include(status: :success, deleted: %w(Ba C))
       end
     end
 
@@ -109,8 +110,8 @@ describe Projects::ContainerRepository::CleanupTagsService do
       end
 
       it 'does remove B* and C as they are older than 1 day' do
-        expect_delete('sha256:configB').twice
-        expect_delete('sha256:configC')
+        expect_delete_image('sha256:configB')
+        expect_delete_image('sha256:configC')
 
         is_expected.to include(status: :success, deleted: %w(Bb Ba C))
       end
@@ -124,10 +125,51 @@ describe Projects::ContainerRepository::CleanupTagsService do
       end
 
       it 'does remove B* and C' do
-        expect_delete('sha256:configB').twice
-        expect_delete('sha256:configC')
+        expect_delete_image('sha256:configB')
+        expect_delete_image('sha256:configC')
 
         is_expected.to include(status: :success, deleted: %w(Bb Ba C))
+      end
+    end
+
+    context 'as a developer' do
+      let(:developer) { create(:user) }
+      let(:service) { described_class.new(project, developer, params) }
+
+      before do
+        project.add_developer(developer)
+      end
+
+      context 'using the names param' do
+        let(:params) do
+          { 'names' => ['C'] }
+        end
+
+        it 'can delete the tags by name' do
+          expect_delete_image('sha256:configC')
+
+          is_expected.to include(status: :success, deleted: %w(C))
+        end
+      end
+
+      context 'using regex param' do
+        let(:params) do
+          { 'name_regex' => '.*' }
+        end
+
+        it 'cant delete the tags by regex' do
+          is_expected.to include(status: :error, message: 'empty or missing names param')
+        end
+      end
+
+      context 'with empty list of names' do
+        let(:params) do
+          { 'names' => [] }
+        end
+
+        it 'cant delete the tags by regex' do
+          is_expected.to include(status: :error, message: 'empty or missing names param')
+        end
       end
     end
   end
@@ -154,7 +196,15 @@ describe Projects::ContainerRepository::CleanupTagsService do
     end
   end
 
-  def expect_delete(digest)
+  def expect_delete_tag(digest)
+    expect_any_instance_of(ContainerRegistry::Client)
+      .to receive(:put_dummy_tag)
+      .with(repository.path, anything)
+
+    expect_delete_image(digest)
+  end
+
+  def expect_delete_image(digest)
     expect_any_instance_of(ContainerRegistry::Client)
       .to receive(:delete_repository_tag)
       .with(repository.path, digest)

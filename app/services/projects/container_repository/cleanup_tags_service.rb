@@ -1,21 +1,35 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Projects
   module ContainerRepository
     class CleanupTagsService < BaseService
       def execute(container_repository)
         return error('feature disabled') unless can_use?
-        return error('access denied') unless can_admin?
+        return error('access denied') unless can_clean_up_tags?
 
         tags = container_repository.tags
         tags_by_digest = group_by_digest(tags)
 
-        tags = without_latest(tags)
-        tags = filter_by_name(tags)
-        tags = with_manifest(tags)
-        tags = order_by_date(tags)
-        tags = filter_keep_n(tags)
-        tags = filter_by_older_than(tags)
+        if can_admin?
+          tags = without_latest(tags)
+
+          tags = if names_param.any?
+                   filter_by_name(tags)
+                 else
+                   filter_by_regex(tags)
+                 end
+
+          tags = with_manifest(tags)
+          tags = order_by_date(tags)
+          tags = filter_keep_n(tags)
+          tags = filter_by_older_than(tags)
+        else
+          return error('empty or missing names param') if names_param.empty?
+
+          tags = filter_by_name(tags)
+        end
 
         deleted_tags = delete_tags(tags, tags_by_digest)
 
@@ -24,23 +38,29 @@ module Projects
 
       private
 
+      def can_clean_up_tags?
+        can_admin? || can_delete_tag?
+      end
+
       def delete_tags(tags_to_delete, tags_by_digest)
         deleted_digests = group_by_digest(tags_to_delete).select do |digest, tags|
-          delete_tag_digest(digest, tags, tags_by_digest[digest])
+          delete_tag_digest(digest, tags, tags_by_digest[digest].size)
         end
 
         deleted_digests.values.flatten
       end
 
-      def delete_tag_digest(digest, tags, other_tags)
-        # Issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/21405
-        # we have to remove all tags due
-        # to Docker Distribution bug unable
-        # to delete single tag
-        return unless tags.count == other_tags.count
-
-        # delete all tags
-        tags.map(&:delete)
+      def delete_tag_digest(digest, tags, same_digest_count)
+        # if we are removing all tags for the digest,
+        # just call .delete_image
+        # as deleting one tag removes all tags and the image
+        if tags.size == same_digest_count
+          tags.first.delete_image
+          tags
+        else
+          # delete the selected tags
+          tags.map(&:delete)
+        end
       end
 
       def group_by_digest(tags)
@@ -60,11 +80,21 @@ module Projects
         tags.sort_by { |tag| tag.created_at || now }.reverse
       end
 
-      def filter_by_name(tags)
+      def filter_by_regex(tags)
         regex = Gitlab::UntrustedRegexp.new("\\A#{params['name_regex']}\\z")
 
         tags.select do |tag|
           regex.scan(tag.name).any?
+        end
+      end
+
+      def names_param
+        @names_param ||= (params['names'] || []).to_set
+      end
+
+      def filter_by_name(tags)
+        tags.select do |tag|
+          names_param.include?(tag.name)
         end
       end
 
@@ -84,6 +114,10 @@ module Projects
 
       def can_admin?
         can?(current_user, :admin_container_image, project)
+      end
+
+      def can_delete_tag?
+        can?(current_user, :destroy_container_image, project)
       end
 
       def can_use?
