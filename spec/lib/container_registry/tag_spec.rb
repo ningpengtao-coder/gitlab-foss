@@ -179,11 +179,39 @@ describe ContainerRegistry::Tag do
       end
     end
 
+    describe '#delete_image' do
+      before do
+        stub_request(:delete, 'http://registry.gitlab/v2/group/test/manifests/sha256:digest')
+          .with(headers: headers)
+          .to_return(status: 200)
+      end
+
+      it 'correctly deletes the image' do
+        expect(tag.delete_image).to be_truthy
+      end
+    end
+
     describe '#delete' do
       before do
         stub_request(:delete, 'http://registry.gitlab/v2/group/test/manifests/sha256:digest')
           .with(headers: headers)
           .to_return(status: 200)
+
+        stub_request(:post, 'http://registry.gitlab/v2/group/test/blobs/uploads/')
+          .with(headers: headers)
+          .to_return(status: 200, headers: { 'Location' => 'http://registry.gitlab/v2/group/test/blobs/uploads/foobar123' })
+
+        stub_request(:put, 'http://registry.gitlab/v2/group/test/blobs/uploads/foobar123?digest=sha256:73b20b59e1a1c2b20e508616702aefe0022c9ff785398d7b1965c08846356ad4')
+         .with(headers: headers)
+         .to_return(status: 201, headers: {})
+
+        stub_request(:put, 'http://registry.gitlab/v2/group/test/blobs/uploads/foobar123?digest=sha256:3454bd3db87cdbd71feefd8d42dd32674e032d2e50daa5c8ad79135e872646c5')
+         .with(headers: headers)
+         .to_return(status: 201, headers: {})
+
+        stub_request(:put, 'http://registry.gitlab/v2/group/test/manifests/tag')
+         .with(headers: headers)
+         .to_return(status: 200, headers: {})
       end
 
       it 'correctly deletes the tag' do

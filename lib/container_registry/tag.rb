@@ -107,6 +107,19 @@ module ContainerRegistry
     # rubocop: enable CodeReuse/ActiveRecord
 
     def delete
+      # Replace the image with a dummy image,
+      # so we don't delete the original image
+      client.put_dummy_tag(repository.path, name)
+
+      # put_dummy changes the tag digest,
+      # so we make sure we're fetching the up-to-date one
+      clear_memoization(:digest)
+
+      delete_image
+    end
+
+    # Deletes the image associated with this tag
+    def delete_image
       return unless digest
 
       client.delete_repository_tag(repository.path, digest)
