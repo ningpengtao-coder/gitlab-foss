@@ -1,0 +1,52 @@
+- project = local_assigns.fetch(:project)
+
+.filtered-search-block.d-flex.flex-column.flex-md-row.row-content-block.second-block
+  = form_tag project_artifacts_path(project), id: 'project-artifacts-search', method: :get, class: 'filter-form js-filter-form w-100' do
+    - if params[:search].present?
+      = hidden_field_tag :search, params[:search]
+    .filtered-search-wrapper.d-flex.flex-column.flex-md-row
+      .filtered-search-box
+        = dropdown_tag(sprite_icon('history'),
+          options: { wrapper_class: 'filtered-search-history-dropdown-wrapper',
+          toggle_class: 'filtered-search-history-dropdown-toggle-button',
+          dropdown_class: 'filtered-search-history-dropdown',
+          content_class: 'filtered-search-history-dropdown-content',
+          title: _('Recent searches') }) do
+          .js-filtered-search-history-dropdown{ data: { full_path: project_artifacts_path(project) } }
+        .filtered-search-box-input-container.droplab-dropdown
+          .scroll-container
+            %ul.tokens-container.list-unstyled
+              %li.input-token
+                %input.form-control.filtered-search{ { id: 'filtered-project-artifacts', placholder: _('Search or filter results...'), autocomplete: 'off' } }
+          #js-dropdown-hint.filtered-search-input-dropdown-menu.dropdown-menu.hint-dropdown
+            %ul{ data: { dropdown: true } }
+              %li.filter-dropdown-item{ data: { action: 'submit' } }
+                %button.btn.btn-link{ type: 'button' }
+                  = sprite_icon('search')
+                  %span
+                    = _('Press Enter or click to search')
+            %ul.filter-dropdown{ data: { dynamic: true, dropdown: true } }
+              %li.filter-dropdown-item
+                %button.btn.btn-link{ type: 'button' }
+                  -# Encapsulate static class name `{{icon}}` inside #{} to bypass
+                  -# haml lint's ClassAttributeWithStaticValue
+                  %svg
+                    %use{ 'xlink:href': "#{'{{icon}}'}" }
+                  %span.js-filter-hint
+                    {{hint}}
+                  %span.js-filter-tag.dropdown-light-content
+                    {{tag}}
+
+          #js-dropdown-project-artifact-deleted-branches.filtered-search-input-dropdown-menu.dropdown-menu
+            %ul{ data: { dropdown: true } }
+              %li.filter-dropdown-item{ data: { value: 'true' } }
+                = button_tag class: %w[btn btn-link] do
+                  = _('Yes')
+              %li.filter-dropdown-item{ data: { value: 'false' } }
+                = button_tag class: %w[btn btn-link] do
+                  = _('No')
+
+        = button_tag class: %w[clear-search hidden] do
+          = icon('times')
+      .filter-dropdown-container
+        = render 'sort_dropdown', project: project

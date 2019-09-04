@@ -1,0 +1,10 @@
+- @no_container = true
+- page_title _('Artifacts')
+
+%div{ class: container_class }
+  .my-2.d-flex
+    .artifacts-size
+      = _('Total artifacts size: %{total_size}') % { total_size: number_to_human_size(@total_size, precicion: 2) }
+  = render 'search_bar', project: @project
+  .content-list.builds-content-list
+    = render "table", jobs: @jobs_with_artifacts, project: @project
