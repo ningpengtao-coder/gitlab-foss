@@ -172,17 +172,12 @@
           .card-header.bg-warning.text-white
             Deactivate this user
           .card-body
-            %p Deactivating a user has the following effects:
-            %ul
-              %li The user will be logged out
-              %li The user will not be able to access git repositories
-              %li The user will not be able to access the API
-              %li The user will not receive any notifications
-              %li When the user logs back in, their account will reactivate as a fully active account
-              %li Personal projects, group and user history will be left intact
-              = render_if_exists 'admin/users/user_deactivation_effects'
+            = render partial: 'admin/users/user_deactivation_effects'
             %br
-            = link_to 'Deactivate user', deactivate_admin_user_path(@user), data: { confirm: 'USER WILL BE DEACTIVATED! Are you sure?' }, method: :put, class: "btn btn-warning"
+            %button.btn.btn-warning{ data: { 'gl-modal-action': 'deactivate',
+              url: deactivate_admin_user_path(@user),
+              username: sanitize_name(@user.name) } }
+              = s_('AdminUsers|Deactivate user')
 
       - if @user.blocked?
         .card.border-info
@@ -200,14 +195,12 @@
           .card-header.bg-warning.text-white
             Block this user
           .card-body
-            %p Blocking user has the following effects:
-            %ul
-              %li User will not be able to login
-              %li User will not be able to access git repositories
-              %li Personal projects will be left
-              %li Owned groups will be left
+            = render partial: 'admin/users/user_block_effects'
             %br
-            = link_to 'Block user', block_admin_user_path(@user), data: { confirm: 'USER WILL BE BLOCKED! Are you sure?' }, method: :put, class: "btn btn-warning"
+            %button.btn.btn-warning{ data: { 'gl-modal-action': 'block',
+              url: block_admin_user_path(@user),
+              username: sanitize_name(@user.name) } }
+              = s_('AdminUsers|Block user')
       - if @user.access_locked?
         .card.border-info
           .card-header.bg-info.text-white
@@ -225,12 +218,10 @@
             %p Deleting a user has the following effects:
             = render 'users/deletion_guidance', user: @user
             %br
-            %button.delete-user-button.btn.btn-danger{ data: { toggle: 'modal',
-              target: '#delete-user-modal',
+            %button.delete-user-button.btn.btn-danger{ data: { 'gl-modal-action': 'delete',
               delete_user_url: admin_user_path(@user),
               block_user_url: block_admin_user_path(@user),
-              username: @user.name,
-              delete_contributions: false }, type: 'button' }
+              username: sanitize_name(@user.name) } }
               = s_('AdminUsers|Delete user')
           - else
             - if @user.solo_owned_groups.present?
@@ -257,15 +248,13 @@
               the user, and projects in them, will also be removed. Commits
               to other projects are unaffected.
             %br
-              %button.delete-user-button.btn.btn-danger{ data: { toggle: 'modal',
-                target: '#delete-user-modal',
+              %button.delete-user-button.btn.btn-danger{ data: { 'gl-modal-action': 'delete-with-contributions',
                 delete_user_url: admin_user_path(@user, hard_delete: true),
                 block_user_url: block_admin_user_path(@user),
-                username: @user.name,
-                delete_contributions: true }, type: 'button' }
+                username: @user.name } }
                 = s_('AdminUsers|Delete user and contributions')
           - else
             %p
               You don't have access to delete this user.
 
-        #delete-user-modal
+= render partial: 'admin/users/modals'
