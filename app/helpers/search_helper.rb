@@ -34,12 +34,12 @@ module SearchHelper
       from: from,
       to: to,
       count: count,
-      scope: search_entries_info_label(scope, count),
+      scope: search_entries_scope_label(scope, count),
       term: term
     }
   end
 
-  def search_entries_info_label(scope, count)
+  def search_entries_scope_label(scope, count)
     case scope
     when 'blobs', 'snippet_blobs', 'wiki_blobs'
       ns_('SearchResults|result', 'SearchResults|results', count)
@@ -70,6 +70,13 @@ module SearchHelper
     else
       s_("SearchResults|Showing %{count} %{scope} for \"%{term}\"")
     end
+  end
+
+  def search_entries_empty_message(scope, term)
+    (_("We couldn't find any %{scope} matching %{term}") % {
+      scope: search_entries_scope_label(scope, 0),
+      term: "<code>#{term}</code>"
+    }).html_safe
   end
 
   def find_project_for_result_blob(projects, result)

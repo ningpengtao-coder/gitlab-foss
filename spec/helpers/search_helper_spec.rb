@@ -140,6 +140,15 @@ describe SearchHelper do
     end
   end
 
+  describe 'search_entries_empty_message' do
+    it 'returns the formatted entry message' do
+      message = search_entries_empty_message('projects', 'foo')
+
+      expect(message).to eq("We couldn't find any projects matching <code>foo</code>")
+      expect(message).to be_html_safe
+    end
+  end
+
   describe 'search_filter_input_options' do
     context 'project' do
       before do
