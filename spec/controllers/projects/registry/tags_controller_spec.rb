@@ -84,17 +84,19 @@ describe Projects::Registry::TagsController do
 
       context 'when there is matching tag present' do
         before do
-          stub_container_registry_tags(repository: repository.path, tags: %w[rc1 test.])
+          stub_container_registry_tags(repository: repository.path, tags: %w[rc1 test.], with_manifest: true)
         end
 
         it 'makes it possible to delete regular tag' do
-          expect_any_instance_of(ContainerRegistry::Tag).to receive(:delete)
+          expect(CleanupContainerRepositoryWorker).to receive(:perform_async)
+            .with(user.id, repository.id, names: ['rc1'])
 
           destroy_tag('rc1')
         end
 
         it 'makes it possible to delete a tag that ends with a dot' do
-          expect_any_instance_of(ContainerRegistry::Tag).to receive(:delete)
+          expect(CleanupContainerRepositoryWorker).to receive(:perform_async)
+            .with(user.id, repository.id, names: ['test.'])
 
           destroy_tag('test.')
         end

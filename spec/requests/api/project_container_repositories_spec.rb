@@ -150,7 +150,7 @@ describe API::ProjectContainerRepositories do
           expect(response).to have_gitlab_http_status(:accepted)
         end
 
-        context 'called multiple times in one hour' do
+        context 'called multiple times in one hour', :clean_gitlab_redis_shared_state do
           it 'returns 400 with an error message' do
             stub_exclusive_lease_taken(lease_key, timeout: 1.hour)
             subject
@@ -210,18 +210,39 @@ describe API::ProjectContainerRepositories do
     context 'for developer' do
       let(:api_user) { developer }
 
-      before do
-        stub_container_registry_tags(repository: root_repository.path, tags: %w(rootA), with_manifest: true)
+      context 'when there are multiple tags' do
+        let(:expected_tag_sha) { 'sha256:4c8e63ca4cb663ce6c688cb06f1c372b088dac5b6d7ad7d49cd620d85cf72a15' }
+
+        before do
+          stub_container_registry_tags(repository: root_repository.path, tags: %w(rootA rootB), with_manifest: true)
+        end
+
+        it 'properly removes tag' do
+          expect_any_instance_of(ContainerRegistry::Client)
+            .to receive(:put_dummy_tag).with(root_repository.path, 'rootA')
+          expect_any_instance_of(ContainerRegistry::Client)
+            .to receive(:delete_repository_tag).with(root_repository.path, expected_tag_sha)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(:accepted)
+        end
       end
 
-      it 'properly removes tag' do
-        expect_any_instance_of(ContainerRegistry::Client)
-          .to receive(:delete_repository_tag).with(root_repository.path,
-            'sha256:4c8e63ca4cb663ce6c688cb06f1c372b088dac5b6d7ad7d49cd620d85cf72a15')
+      context 'when there\'s only one tag' do
+        before do
+          stub_container_registry_tags(repository: root_repository.path, tags: %w(rootA), with_manifest: true)
+        end
 
-        subject
+        it 'properly removes tag' do
+          expect_any_instance_of(ContainerRegistry::Client)
+            .to receive(:delete_repository_tag).with(root_repository.path,
+              'sha256:4c8e63ca4cb663ce6c688cb06f1c372b088dac5b6d7ad7d49cd620d85cf72a15')
 
-        expect(response).to have_gitlab_http_status(:ok)
+          subject
+
+          expect(response).to have_gitlab_http_status(:accepted)
+        end
       end
     end
   end

@@ -106,9 +106,11 @@ module API
         authorize_destroy_container_image!
         validate_tag!
 
-        tag.delete
+        ::Projects::ContainerRepository::CleanupTagsService
+          .new(repository&.project, current_user, 'names' => [declared_params[:tag_name]])
+          .execute(repository)
 
-        status :ok
+        status :accepted
       end
     end
 

@@ -53,7 +53,8 @@ describe 'Container Registry', :js do
       find('.js-toggle-repo').click
       wait_for_requests
 
-      expect_any_instance_of(ContainerRegistry::Tag).to receive(:delete).and_return(true)
+      expect(CleanupContainerRepositoryWorker).to receive(:perform_async)
+        .with(user.id, container_repository.id, names: ['latest'])
 
       click_on(class: 'js-delete-registry-row', visible: false)
       expect(find('.modal .modal-title')).to have_content 'Remove image'

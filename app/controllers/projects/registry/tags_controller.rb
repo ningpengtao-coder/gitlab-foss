@@ -19,14 +19,14 @@ module Projects
       end
 
       def destroy
-        if tag.delete
-          respond_to do |format|
-            format.json { head :no_content }
-          end
-        else
-          respond_to do |format|
-            format.json { head :bad_request }
-          end
+        CleanupContainerRepositoryWorker.perform_async(
+          current_user.id,
+          image.id,
+          names: [params[:id]]
+        )
+
+        respond_to do |format|
+          format.json { head :accepted }
         end
       end
 
@@ -69,10 +69,6 @@ module Projects
       def image
         @image ||= project.container_repositories
           .find(params[:repository_id])
-      end
-
-      def tag
-        @tag ||= image.tag(params[:id])
       end
     end
   end
