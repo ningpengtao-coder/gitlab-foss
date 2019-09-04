@@ -13,7 +13,7 @@ NOTE: **Note:**
 ChatOps is currently in alpha with some important features missing, like access control.
 
 NOTE: **Note:**
-If your latest commit message contains "SKIP_CI" oder any variants that tell the pipeline to skip, your ChatOps wont function anymore until you commit something without a skip CI trigger.
+If your latest commit message contains "SKIP_CI" or any variants that tell the pipeline to skip, your ChatOps wont function until you commit again without a skip CI trigger.
 
 ## How it works
 
