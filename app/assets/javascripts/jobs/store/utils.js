@@ -1,10 +1,18 @@
 /**
+ * Parses the job log content into a structure usable by the template
+ *
+ * For collaspible lines (section_header = true):
+ *    - creates a new array to hold the lines that are collpasible,
+ *    - adds a isClosed property to handle toggle
+ *    - adds a isHeader property to handle template logic
+ * For each line:
+ *    - adds the index as  lineNumber
  *
  * @param {Array} lines
  * @returns {Array}
  */
-export const linesParser = (lines = []) => {
-  return lines.reduce((acc, line, index) => {
+export default (lines = []) =>
+  lines.reduce((acc, line, index) => {
     if (line.section_header) {
       acc.push({
         isClosed: true,
@@ -29,7 +37,3 @@ export const linesParser = (lines = []) => {
 
     return acc;
   }, []);
-};
-
-// todo
-export const isLastLineRepeated = () => {};

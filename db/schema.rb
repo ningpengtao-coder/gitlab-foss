@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_02_131045) do
+ActiveRecord::Schema.define(version: 2019_09_02_160015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -1310,9 +1310,11 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
     t.datetime_with_timezone "updated_at", null: false
     t.integer "action", limit: 2, null: false
     t.string "target_type"
+    t.bigint "group_id"
     t.index ["action"], name: "index_events_on_action"
     t.index ["author_id", "project_id"], name: "index_events_on_author_id_and_project_id"
     t.index ["created_at", "author_id"], name: "analytics_index_events_on_created_at_and_author_id"
+    t.index ["group_id"], name: "index_events_on_group_id"
     t.index ["project_id", "created_at"], name: "index_events_on_project_id_and_created_at"
     t.index ["project_id", "id"], name: "index_events_on_project_id_and_id"
     t.index ["target_type", "target_id"], name: "index_events_on_target_type_and_target_id"
@@ -2158,6 +2160,13 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
     t.index ["user_id"], name: "index_merge_trains_on_user_id"
   end
 
+  create_table "milestone_releases", force: :cascade do |t|
+    t.bigint "milestone_id", null: false
+    t.bigint "release_id", null: false
+    t.index ["milestone_id", "release_id"], name: "index_miletone_releases_on_milestone_and_release", unique: true
+    t.index ["release_id"], name: "index_milestone_releases_on_release_id"
+  end
+
   create_table "milestones", id: :serial, force: :cascade do |t|
     t.string "title", null: false
     t.integer "project_id"
@@ -2869,8 +2878,8 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
     t.integer "project_id"
     t.string "title", null: false
     t.string "query", null: false
-    t.string "y_label"
-    t.string "unit"
+    t.string "y_label", null: false
+    t.string "unit", null: false
     t.string "legend"
     t.integer "group", null: false
     t.datetime_with_timezone "created_at", null: false
@@ -3831,6 +3840,7 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
   add_foreign_key "epics", "users", column: "assignee_id", name: "fk_dccd3f98fc", on_delete: :nullify
   add_foreign_key "epics", "users", column: "author_id", name: "fk_3654b61b03", on_delete: :cascade
   add_foreign_key "epics", "users", column: "closed_by_id", name: "fk_aa5798e761", on_delete: :nullify
+  add_foreign_key "events", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "events", "projects", on_delete: :cascade
   add_foreign_key "events", "users", column: "author_id", name: "fk_edfd187b6f", on_delete: :cascade
   add_foreign_key "fork_network_members", "fork_networks", on_delete: :cascade
@@ -3932,6 +3942,8 @@ ActiveRecord::Schema.define(version: 2019_09_02_131045) do
   add_foreign_key "merge_trains", "merge_requests", on_delete: :cascade
   add_foreign_key "merge_trains", "projects", column: "target_project_id", on_delete: :cascade
   add_foreign_key "merge_trains", "users", on_delete: :cascade
+  add_foreign_key "milestone_releases", "milestones", on_delete: :cascade
+  add_foreign_key "milestone_releases", "releases", on_delete: :cascade
   add_foreign_key "milestones", "namespaces", column: "group_id", name: "fk_95650a40d4", on_delete: :cascade
   add_foreign_key "milestones", "projects", name: "fk_9bd0a0c791", on_delete: :cascade
   add_foreign_key "namespace_aggregation_schedules", "namespaces", on_delete: :cascade

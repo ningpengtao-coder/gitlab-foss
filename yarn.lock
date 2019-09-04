@@ -996,10 +996,10 @@
   resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.71.0.tgz#c8e6e8f500ea91e5cbba4ac08df533fb2e622a00"
   integrity sha512-kkeNic/FFwaqKnzwio4NE7whBOZ/toRJ8cS0587DBotajAzSYhph5ij4TCY2GTjPa33zIJ5OUr/k90C0Kr71hQ==
 
-"@gitlab/ui@5.20.2":
-  version "5.20.2"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-5.20.2.tgz#a51270d5a521e71059c5fd05f86cfc835f5e28ae"
-  integrity sha512-TSaD5Cz0YXBTsRtQwsa7LbS2O5h0CL3YkdYmBKrMZkphL76xQaN08ZImkQ5Xl8cD1ZiWN2CsTvoUbF19UP2V1w==
+"@gitlab/ui@5.21.0":
+  version "5.21.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-5.21.0.tgz#975cf0bca3d16dd080d67ed392b9d24cd64695ac"
+  integrity sha512-8TMVM+pJXf7omHgKMMZ1FiltuyMOTwfQ3iFgorQzcuhio9u35DJpWi45S2TF7m6CrlpJi7dMX3BsXLbF7ViSUw==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.2.1"
@@ -4909,7 +4909,7 @@ exports-loader@^0.7.0:
 
 express@^4.16.2, express@^4.16.3:
   version "4.16.3"
-  resolved "http://registry.npmjs.org/express/-/express-4.16.3.tgz#6af8a502350db3246ecc4becf6b5a34d22f7ed53"
+  resolved "https://registry.npmjs.org/express/-/express-4.16.3.tgz#6af8a502350db3246ecc4becf6b5a34d22f7ed53"
   integrity sha1-avilAjUNsyRuzEvs9rWjTSL37VM=
   dependencies:
     accepts "~1.3.5"
@@ -8304,7 +8304,7 @@ mixin-deep@^1.2.0:
 
 mkdirp@0.5.x, mkdirp@0.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
-  resolved "http://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
+  resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
   dependencies:
     minimist "0.0.8"

@@ -1960,7 +1960,10 @@ msgstr ""
 msgid "CICD|The Auto DevOps pipeline will run if no alternative CI configuration file is found."
 msgstr ""
 
-msgid "CICD|You must add a %{kubernetes_cluster_start}Kubernetes cluster integration%{kubernetes_cluster_end} to this project with a domain in order for your deployment strategy to work correctly."
+msgid "CICD|You must add a %{base_domain_link_start}base domain%{link_end} to your %{kubernetes_cluster_link_start}Kubernetes cluster%{link_end} in order for your deployment strategy to work."
+msgstr ""
+
+msgid "CICD|You must add a %{kubernetes_cluster_link_start}Kubernetes cluster integration%{link_end} to this project with a domain in order for your deployment strategy to work correctly."
 msgstr ""
 
 msgid "CICD|group enabled"
@@ -8182,6 +8185,9 @@ msgstr ""
 msgid "Pipeline|Coverage"
 msgstr ""
 
+msgid "Pipeline|Detached merge request pipeline"
+msgstr ""
+
 msgid "Pipeline|Duration"
 msgstr ""
 
@@ -8189,6 +8195,12 @@ msgid "Pipeline|Existing branch name or tag"
 msgstr ""
 
 msgid "Pipeline|Key"
+msgstr ""
+
+msgid "Pipeline|Merge train pipeline"
+msgstr ""
+
+msgid "Pipeline|Merged result pipeline"
 msgstr ""
 
 msgid "Pipeline|Pipeline"
@@ -10868,6 +10880,9 @@ msgid "Staged %{type}"
 msgstr ""
 
 msgid "Star a label to make it a priority label. Order the prioritized labels to change their relative priority, by dragging."
+msgstr ""
+
+msgid "Star labels to start sorting by priority"
 msgstr ""
 
 msgid "Star toggle failed. Try again later."
