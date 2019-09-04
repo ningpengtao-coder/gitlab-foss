@@ -36,7 +36,6 @@ to be enabled:
 ## Limitations
 
 - Files uploaded must have a file extension of either `png`, `jpg`, `jpeg`, `gif`, `bmp`, `tiff` or `ico`.
-  The [`svg` extension is not yet supported](https://gitlab.com/gitlab-org/gitlab-ee/issues/12771).
 - Design uploads are limited to 10 files at a time.
 - [Designs cannot yet be deleted](https://gitlab.com/gitlab-org/gitlab-ee/issues/11089).
 - Design Management is
