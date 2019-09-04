@@ -68,14 +68,50 @@ describe ZoomMeeting do
   end
 
   describe 'limit number of meetings per issue' do
-    shared_examples 'can add a meeting to issue'
+    shared_examples 'can add meetings' do
+      it 'can add new Zoom meetings' do
+        create(:zoom_meeting, :added_to_issue, issue: issue)
+      end
+    end
 
-    shared_examples 'cannot add a meeting to issue'
+    shared_examples 'cannot add meetings' do
+      it 'fails to add a new meeting' do
+        expect do
+          create(:zoom_meeting, :added_to_issue, issue: issue)
+        end.to raise_error ActiveRecord::RecordNotUnique
+      end
+    end
 
-    context 'when no other Zoom meeting is added'
+    let(:issue) { create(:issue, project: project) }
 
-    context 'when Zoom meeting is already added'
+    context 'without meetings' do
+      it_behaves_like 'can add meetings'
+    end
 
-    context 'when Zoom meeting is already added to another issue'
+    context 'when no other meeting is added' do
+      before do
+        create(:zoom_meeting, :removed_from_issue, issue: issue)
+      end
+
+      it_behaves_like 'can add meetings'
+    end
+
+    context 'when meeting is added' do
+      before do
+        create(:zoom_meeting, :added_to_issue, issue: issue)
+      end
+
+      it_behaves_like 'cannot add meetings'
+    end
+
+    context 'when meeting is added to another issue' do
+      let(:another_issue) { create(:issue, project: project) }
+
+      before do
+        create(:zoom_meeting, :added_to_issue, issue: another_issue)
+      end
+
+      it_behaves_like 'can add meetings'
+    end
   end
 end
