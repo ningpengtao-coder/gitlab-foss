@@ -2,6 +2,7 @@
 
 require 'faraday'
 require 'faraday_middleware'
+require 'digest'
 
 module ContainerRegistry
   class Client
@@ -9,6 +10,9 @@ module ContainerRegistry
 
     DOCKER_DISTRIBUTION_MANIFEST_V2_TYPE = 'application/vnd.docker.distribution.manifest.v2+json'
     OCI_MANIFEST_V1_TYPE = 'application/vnd.oci.image.manifest.v1+json'
+    CONTAINER_IMAGE_V1_TYPE = 'application/vnd.docker.container.image.v1+json'
+    IMAGE_ROOTFS_DIFF_TYPE = 'application/vnd.docker.image.rootfs.diff.tar.gzip'
+
     ACCEPTED_TYPES = [DOCKER_DISTRIBUTION_MANIFEST_V2_TYPE, OCI_MANIFEST_V1_TYPE].freeze
 
     # Taken from: FaradayMiddleware::FollowRedirects
@@ -36,6 +40,45 @@ module ContainerRegistry
       faraday.delete("/v2/#{name}/manifests/#{reference}").success?
     end
 
+    def upload_blob(name, content, digest)
+      upload = faraday.post("/v2/#{name}/blobs/uploads/")
+
+      location = URI(upload.headers['location'])
+
+      faraday.put("#{location.path}?#{location.query}") do |req|
+        req.params['digest'] = digest
+        req.headers['Content-Type'] = 'application/octet-stream'
+        req.body = content
+      end
+    end
+
+    # Replace a tag on the registry with a dummy tag.
+    # This is a hack as the registry doesn't support deleting individual
+    # tags. This code effectively pushes a dummy image and assigns the tag to it.
+    # This way when the tag is deleted only the dummy image is affected.
+    # See https://gitlab.com/gitlab-org/gitlab-ce/issues/21405 for a discussion
+    def put_dummy_tag(name, reference)
+      # Docker doesn't seem to care for the actual content of these blobs,
+      # so we're just uploading dummy gibberish
+      image = "gitlab_dummy_image_container"
+      rootfs = "gitlab_dummy_rootfs.tar.gz"
+
+      blobs = [image, rootfs]
+
+      digests = blobs.each_with_object({}) do |blob, hash|
+        hash[blob] = "sha256:#{Digest::SHA256.hexdigest(blob)}"
+      end
+
+      # simply upload these fake blobs to docker registry
+      digests.each_pair do |blob, digest|
+        upload_blob(name, blob, digest)
+      end
+
+      # upload the replacement docker manifest for the tag,
+      # so that it points to the dummy image
+      upload_manifest(name, reference, digests: digests, image: image, rootfs: rootfs)
+    end
+
     def blob(name, digest, type = nil)
       type ||= 'application/octet-stream'
       response_body faraday_blob.get("/v2/#{name}/blobs/#{digest}", nil, 'Accept' => type), allow_redirect: true
@@ -46,6 +89,31 @@ module ContainerRegistry
     end
 
     private
+
+    def upload_manifest(name, reference, digests:, image:, rootfs:)
+      faraday.put("/v2/#{name}/manifests/#{reference}") do |req|
+        req.headers['Content-Type'] = DOCKER_DISTRIBUTION_MANIFEST_V2_TYPE
+
+        json = {
+          schemaVersion: 2,
+          mediaType: DOCKER_DISTRIBUTION_MANIFEST_V2_TYPE,
+          config: {
+            mediaType: CONTAINER_IMAGE_V1_TYPE,
+            size: image.size,
+            digest: digests[image]
+          },
+          layers: [
+            {
+              mediaType: IMAGE_ROOTFS_DIFF_TYPE,
+              size: rootfs.size,
+              digest: digests[rootfs]
+            }
+          ]
+        }.to_json
+
+        req.body = json
+      end
+    end
 
     def initialize_connection(conn, options)
       conn.request :json
