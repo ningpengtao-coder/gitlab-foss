@@ -8,6 +8,8 @@ module Gitlab
         include GithubImport::Queue
         include StageMethods
 
+        sidekiq_options memory_killer_memory_growth_kb: 50, memory_killer_max_memory_growth_kb: 200_000
+
         # project - An instance of Project.
         def import(_, project)
           project.after_import

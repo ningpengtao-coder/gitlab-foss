@@ -6,6 +6,12 @@ class RepositoryImportWorker
   include ProjectStartImport
   include ProjectImportOptions
 
+  # Whitelist this job from Gitlab::SidekiqDaemon::MemoryKiller
+  # [TODO] statistic the better value. Maybe staging server is a good test environment?
+  # The value 50 means: contribute 50K rss increase per second. This is estimated from: 15M RSS increase when import running for 300 seconds.
+  sidekiq_options memory_killer_memory_growth_kb: 50, memory_killer_max_memory_growth_kb: 300_000
+
+
   def perform(project_id)
     @project = Project.find(project_id)
 
