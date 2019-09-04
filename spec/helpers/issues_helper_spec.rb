@@ -142,7 +142,7 @@ describe IssuesHelper do
         expect(link_to_discussions_to_resolve(merge_request, nil)).to include(expected_path)
       end
 
-      it "containst the reference to the merge request" do
+      it "contains the reference to the merge request" do
         expect(link_to_discussions_to_resolve(merge_request, nil)).to include(merge_request.to_reference)
       end
     end
@@ -183,6 +183,69 @@ describe IssuesHelper do
 
       expect(helper).to receive(:can?).with(project.owner, :create_issue, project).and_return(true)
       expect(helper.show_new_issue_link?(project)).to be_truthy
+    end
+  end
+
+  describe '#issue_closed_label' do
+    let(:new_issue) { create(:issue, project: project) }
+    let(:guest)     { create(:user) }
+
+    before do
+      allow(helper).to receive(:can?) do |*args|
+        Ability.allowed?(*args)
+      end
+    end
+
+    shared_examples 'successfully displays label with linked issue' do |action|
+      let(:label) { "Closed (<a href=\"/#{new_issue.project.full_path}/issues/#{new_issue.iid}\" class=\"text-white text-underline\">#{action}</a>)" }
+
+      it { expect(helper.issue_closed_label(issue, user)).to match(label) }
+    end
+
+    shared_examples 'successfully displays label without linked issue' do
+      it { expect(helper.issue_closed_label(issue, user)).to match('Closed') }
+    end
+
+    context 'with closed issue' do
+      let(:user) { project.owner }
+
+      it_behaves_like 'successfully displays label without linked issue'
+    end
+
+    context 'with moved issue' do
+      before do
+        issue.update(moved_to: new_issue)
+      end
+
+      context 'when user has permission to see new issue' do
+        let(:user) { project.owner }
+
+        it_behaves_like 'successfully displays label with linked issue', 'moved'
+      end
+
+      context 'when user has no permission to see new issue' do
+        let(:user) { guest }
+
+        it_behaves_like 'successfully displays label without linked issue'
+      end
+    end
+
+    context 'with duplicated issue' do
+      before do
+        issue.update(duplicated_to: new_issue)
+      end
+
+      context 'when user has permission to see new issue' do
+        let(:user) { project.owner }
+
+        it_behaves_like 'successfully displays label with linked issue', 'duplicated'
+      end
+
+      context 'when user has no permission to see new issue' do
+        let(:user) { guest }
+
+        it_behaves_like 'successfully displays label without linked issue'
+      end
     end
   end
 end
