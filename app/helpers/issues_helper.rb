@@ -152,9 +152,9 @@ module IssuesHelper
 
   def issue_closed_label(issue, current_user)
     if issue.moved? && can?(current_user, :read_issue, issue.moved_to)
-      closed_label_text(issue, 'moved')
+      closed_label_with_link(issue, 'moved')
     elsif issue.duplicated? && can?(current_user, :read_issue, issue.duplicated_to)
-      closed_label_text(issue, 'duplicated')
+      closed_label_with_link(issue, 'duplicated')
     else
       _("Closed")
     end
@@ -162,8 +162,10 @@ module IssuesHelper
 
   private
 
-  def closed_label_text(issue, action)
+  def closed_label_with_link(issue, action)
     related_issue = issue.try(:"#{action}_to")
+    return _("Closed") unless related_issue
+
     link_start = "<a href=\"#{issue_path(related_issue)}\" class=\"text-white text-underline\">".html_safe
     link_end = '</a>'.html_safe
 
