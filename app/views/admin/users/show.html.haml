@@ -161,10 +161,7 @@
           .card-header.bg-info.text-white
             Reactivate this user
           .card-body
-            %p Reactivating a user will:
-            %ul
-              %li Restore user access to the account, including web, Git and API.
-              = render_if_exists 'admin/users/user_activation_effects'
+            = render partial: 'admin/users/user_activation_effects'
             %br
             = link_to 'Activate user', activate_admin_user_path(@user), method: :put, class: "btn btn-info", data: { confirm: 'Are you sure?' }
       - elsif @user.can_be_deactivated?

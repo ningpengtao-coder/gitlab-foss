@@ -816,12 +816,6 @@ msgstr ""
 msgid "Admin Section"
 msgstr ""
 
-msgid "AdminArea| You are about to permanently delete the user %{username}. Issues, merge requests, and groups linked to them will be transferred to a system-wide \"Ghost-user\". To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
-msgstr ""
-
-msgid "AdminArea| You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
-msgstr ""
-
 msgid "AdminArea|Stop all jobs"
 msgstr ""
 
@@ -906,16 +900,37 @@ msgstr ""
 msgid "AdminUsers|Admins"
 msgstr ""
 
+msgid "AdminUsers|Block"
+msgstr ""
+
 msgid "AdminUsers|Block user"
+msgstr ""
+
+msgid "AdminUsers|Block user %{username}?"
 msgstr ""
 
 msgid "AdminUsers|Blocked"
 msgstr ""
 
+msgid "AdminUsers|Blocking user has the following effects:"
+msgstr ""
+
 msgid "AdminUsers|Cannot unblock LDAP blocked users"
 msgstr ""
 
+msgid "AdminUsers|Deactivate"
+msgstr ""
+
+msgid "AdminUsers|Deactivate User %{username}?"
+msgstr ""
+
+msgid "AdminUsers|Deactivate user"
+msgstr ""
+
 msgid "AdminUsers|Deactivated"
+msgstr ""
+
+msgid "AdminUsers|Deactivating a user has the following effects:"
 msgstr ""
 
 msgid "AdminUsers|Delete User %{username} and contributions?"
@@ -942,6 +957,21 @@ msgstr ""
 msgid "AdminUsers|No users found"
 msgstr ""
 
+msgid "AdminUsers|Owned groups will be left"
+msgstr ""
+
+msgid "AdminUsers|Personal projects will be left"
+msgstr ""
+
+msgid "AdminUsers|Personal projects, group and user history will be left intact"
+msgstr ""
+
+msgid "AdminUsers|Reactivating a user will:"
+msgstr ""
+
+msgid "AdminUsers|Restore user access to the account, including web, Git and API."
+msgstr ""
+
 msgid "AdminUsers|Search by name, email or username"
 msgstr ""
 
@@ -951,16 +981,40 @@ msgstr ""
 msgid "AdminUsers|Sort by"
 msgstr ""
 
+msgid "AdminUsers|The user will be logged out"
+msgstr ""
+
+msgid "AdminUsers|The user will not be able to access git repositories"
+msgstr ""
+
+msgid "AdminUsers|The user will not be able to access the API"
+msgstr ""
+
+msgid "AdminUsers|The user will not receive any notifications"
+msgstr ""
+
 msgid "AdminUsers|To confirm, type %{projectName}"
 msgstr ""
 
 msgid "AdminUsers|To confirm, type %{username}"
 msgstr ""
 
-msgid "AdminUsers|User will be blocked"
+msgid "AdminUsers|User will not be able to access git repositories"
+msgstr ""
+
+msgid "AdminUsers|User will not be able to login"
+msgstr ""
+
+msgid "AdminUsers|When the user logs back in, their account will reactivate as a fully active account"
 msgstr ""
 
 msgid "AdminUsers|Without projects"
+msgstr ""
+
+msgid "AdminUsers|You are about to permanently delete the user %{username}. Issues, merge requests, and groups linked to them will be transferred to a system-wide \"Ghost-user\". To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
+msgstr ""
+
+msgid "AdminUsers|You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
 msgstr ""
 
 msgid "Advanced"
@@ -1321,9 +1375,6 @@ msgid "Archived projects"
 msgstr ""
 
 msgid "Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches. <strong>The repository cannot be committed to, and no issues, comments or other entities can be created.</strong>"
-msgstr ""
-
-msgid "Are you sure"
 msgstr ""
 
 msgid "Are you sure that you want to archive this project?"
@@ -1754,9 +1805,6 @@ msgid "Bitbucket Server Import"
 msgstr ""
 
 msgid "Bitbucket import"
-msgstr ""
-
-msgid "Block"
 msgstr ""
 
 msgid "Blocked"
@@ -3795,9 +3843,6 @@ msgid "DayTitle|S"
 msgstr ""
 
 msgid "DayTitle|W"
-msgstr ""
-
-msgid "Deactivate"
 msgstr ""
 
 msgid "Debug"

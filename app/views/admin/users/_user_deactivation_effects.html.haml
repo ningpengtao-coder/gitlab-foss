@@ -13,3 +13,4 @@
     = s_('AdminUsers|When the user logs back in, their account will reactivate as a fully active account')
   %li
     = s_('AdminUsers|Personal projects, group and user history will be left intact')
+  = render_if_exists 'admin/users/user_deactivation_effects_on_seats'
