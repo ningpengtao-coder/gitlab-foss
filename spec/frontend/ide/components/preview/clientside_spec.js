@@ -25,11 +25,7 @@ describe('IDE clientside preview', () => {
     getRawFileData: jest.fn().mockReturnValue(Promise.resolve('')),
   };
 
-  const nextTicks = ({ vm, count = 10 } = {}) =>
-    Array.from({ length: count }).reduce(
-      chain => chain.then(() => vm.$nextTick()),
-      Promise.resolve(),
-    );
+  const waitForCalls = () => new Promise(setImmediate);
 
   const createComponent = ({ state, getters } = {}) => {
     store = new Vuex.Store({
@@ -269,7 +265,7 @@ describe('IDE clientside preview', () => {
 
         jest.advanceTimersByTime(250);
 
-        return nextTicks({ vm: wrapper.vm, count: 5 }).then(() => {
+        return waitForCalls().then(() => {
           expect(smooshpack.Manager).toHaveBeenCalled();
         });
       });
