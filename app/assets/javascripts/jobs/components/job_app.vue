@@ -16,6 +16,8 @@ import LogTopBar from './job_log_controllers.vue';
 import StuckBlock from './stuck_block.vue';
 import UnmetPrerequisitesBlock from './unmet_prerequisites_block.vue';
 import Sidebar from './sidebar.vue';
+import Log from './log/log.vue';
+
 import { sprintf } from '~/locale';
 import delayedJobMixin from '../mixins/delayed_job_mixin';
 
@@ -29,7 +31,7 @@ export default {
     EnvironmentsBlock,
     ErasedBlock,
     Icon,
-    Log: () => import('./job_log_json.vue'),
+    Log,
     LogTopBar,
     StuckBlock,
     UnmetPrerequisitesBlock,
