@@ -346,8 +346,6 @@ DETAIL: Non-superuser cannot connect if the server does not request a password.
 [...]
 ```
 
-This can happen when the tracking database and the main database are not running on the same host.
-
 Please check that `127.0.0.1/24` is added to `postgresql['md5_auth_cidr_addresses']`.
 
 #### Checking configuration
