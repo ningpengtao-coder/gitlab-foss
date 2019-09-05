@@ -347,10 +347,10 @@ DETAIL: Non-superuser cannot connect if the server does not request a password.
 ```
 
 Since [GitLab 10.6](https://docs.gitlab.com/ee/administration/geo/replication/version_specific_updates.html#updating-to-gitlab-106)
-Geo requires a password to be set for the database user `gitlab` in order to use the Foreign Data Wrapper. 
+Geo requires a password to be set for the database user `gitlab` in order to use the Foreign Data Wrapper.
 
 1. [Check if the password is correct](https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html#checking-configuration)
-2. Ensure that the settings are [as described in the Geo installation instructions](https://docs.gitlab.com/ee/administration/geo/replication/database.html):
+1. Ensure that the settings are [as described in the Geo installation instructions](https://docs.gitlab.com/ee/administration/geo/replication/database.html):
 
 The `postgresql['md5_auth_cidr_addresses']` setting in `gitlab.rb` determines which addresses are allowed to connect from the tracking database to the main database.
 
@@ -370,6 +370,7 @@ postgresql['md5_auth_cidr_addresses'] = ['<primary_node_ip>/32', '<secondary_nod
 ```
 
 On the **secondary**:
+
 ```sh
 ##
 ## Secondary address
