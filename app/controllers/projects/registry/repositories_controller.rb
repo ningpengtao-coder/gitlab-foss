@@ -8,6 +8,7 @@ module Projects
 
       def index
         @images = project.container_repositories
+        track(:list_repositories)
 
         respond_to do |format|
           format.html
@@ -21,6 +22,7 @@ module Projects
 
       def destroy
         DeleteContainerRepositoryWorker.perform_async(current_user.id, image.id)
+        track(:delete_repository)
 
         respond_to do |format|
           format.json { head :no_content }
@@ -31,6 +33,10 @@ module Projects
 
       def image
         @image ||= project.container_repositories.find(params[:id])
+      end
+
+      def track(action)
+        Gitlab::Tracking.event('Projects::Registry::RepositoriesController', action.to_s)
       end
 
       ##
