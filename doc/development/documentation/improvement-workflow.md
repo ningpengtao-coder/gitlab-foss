@@ -56,6 +56,40 @@ To request a post-merge review, [create an issue for one using the Doc Review te
 1. If EE and CE MRs exist, merge the EE MR first, then the CE MR.
 1. After merging, if there has not been a technical writer review and an issue for a follow-up review was not already created and linked from the MR, [create the issue using the Doc Review template](https://gitlab.com/gitlab-org/gitlab-ce/issues/new?issuable_template=Doc%20Review) and link it from the MR.
 
+### Merge request review criteria
+
+Use the following criteria when reviewing the documentation portion of a Merge Request. You can
+think of this as a checklist.
+
+- Are the appropriate documentation labels applied?
+
+  - `docs-only`: For a MR that changes only documentation files.
+  - `devops::insert_devops_stage`: Matching the relevant DevOps stage/group.
+
+- Is the technical content correct?
+
+  Technical content must first be reviewed by a subject matter expert. If that has not been done, the MR should be reassigned to an SME, then reassigned for documentation review.
+
+- Does the content meet the documentation guidelines?
+
+  Add comments where the content does not comply.
+
+- Does the content meet the GitLab documentation style guide?
+
+  Add suggested changes where the content does not comply.
+
+- Does the content render correctly?
+
+  Check the review app to confirm the amended content renders correctly.
+
+- Are there discussions to be resolved?
+
+  All discussion threads must be resolved before accepting a merge request.
+
+- Are there merge conflicts?
+
+  Merge conflicts must be resolved before approving and accepting a MR.
+
 ## Other ways to help
 
 If you have ideas for further documentation resources that would be best
