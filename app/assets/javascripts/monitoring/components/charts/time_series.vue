@@ -278,7 +278,7 @@ export default {
   >
     <div :class="{ 'prometheus-graph-embed w-100 p-3': showBorder }">
       <div class="prometheus-graph-header">
-        <h5 class="prometheus-graph-title js-graph-title">{{ graphData.title }}</h5>
+        <h5 class="prometheus-graph-title js-graph-title text-truncate">{{ graphData.title }}</h5>
         <gl-button
           v-if="exportMetricsToCsvEnabled"
           :href="downloadLink"
@@ -289,7 +289,7 @@ export default {
         >
           {{ __('Download CSV') }}
         </gl-button>
-        <div class="prometheus-graph-widgets js-graph-widgets">
+        <div class="prometheus-graph-widgets js-graph-widgets prepend-right-32">
           <slot></slot>
         </div>
       </div>

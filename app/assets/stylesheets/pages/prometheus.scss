@@ -42,8 +42,18 @@
 
   h5 {
     font-size: $gl-font-size-large;
-    margin: 0;
+    margin: 0 10px 0 0;
   }
+}
+
+.prometheus-graph-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 10px;
+}
+
+.prometheus-graph-widgets {
+  flex: 1;
 }
 
 .prometheus-graph-cursor {

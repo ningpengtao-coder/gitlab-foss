@@ -475,7 +475,7 @@ export default {
             :project-path="projectPath"
             group-id="monitor-time-series-chart"
           >
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-between">
               <alert-widget
                 v-if="alertWidgetAvailable && graphData"
                 :modal-id="`alert-modal-${index}-${graphIndex}`"
