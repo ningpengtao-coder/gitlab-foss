@@ -1,0 +1,44 @@
+{
+  "chartType": "line, area or column for now",
+  "chartOptions": {
+    "xAxis": {
+      "name": "Series Name",
+      "type": "value, category, time or log / check https://echarts.apache.org/en/option.html#xAxis.type"
+    }
+  },
+  "source": [
+    {
+      "name": "Requested",
+      "data": [
+        [
+          "Mon",
+          1184
+        ],
+        [
+          "Tue",
+          1346
+        ],
+        [
+          "Wed",
+          1035
+        ],
+        [
+          "Thu",
+          1226
+        ],
+        [
+          "Fri",
+          1421
+        ],
+        [
+          "Sat",
+          1347
+        ],
+        [
+          "Sun",
+          1035
+        ]
+      ]
+    }
+  ]
+}
