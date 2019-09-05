@@ -346,7 +346,40 @@ DETAIL: Non-superuser cannot connect if the server does not request a password.
 [...]
 ```
 
-Please check that `127.0.0.1/24` is added to `postgresql['md5_auth_cidr_addresses']`.
+Since [GitLab 10.6](https://docs.gitlab.com/ee/administration/geo/replication/version_specific_updates.html#updating-to-gitlab-106)
+Geo requires a password to be set for the database user `gitlab` in order to use the Foreign Data Wrapper. 
+
+1. [Check if the password is correct](https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html#checking-configuration)
+2. Ensure that the settings are [as described in the Geo installation instructions](https://docs.gitlab.com/ee/administration/geo/replication/database.html):
+
+The `postgresql['md5_auth_cidr_addresses']` setting in `gitlab.rb` determines which addresses are allowed to connect from the tracking database to the main database.
+
+On the **primary**:
+
+```sh
+## Primary address
+## - replace '<primary_node_ip>' with the public or VPC address of your Geo primary node
+##
+postgresql['listen_address'] = '<primary_node_ip>'
+
+##
+# Allow PostgreSQL client authentication from the primary and secondary IPs. These IPs may be
+# public or VPC addresses in CIDR format, for example ['198.51.100.1/32', '198.51.100.2/32']
+##
+postgresql['md5_auth_cidr_addresses'] = ['<primary_node_ip>/32', '<secondary_node_ip>/32']
+```
+
+On the **secondary**:
+```sh
+##
+## Secondary address
+## - replace '<secondary_node_ip>' with the public or VPC address of your Geo secondary node
+##
+postgresql['listen_address'] = '<secondary_node_ip>'
+postgresql['md5_auth_cidr_addresses'] = ['<secondary_node_ip>/32']
+```
+
+If the tracking database and the main database run on the same machine, you can also add `127.0.0.1/32` (localhost) to `postgresql['md5_auth_cidr_addresses']`.
 
 #### Checking configuration
 
