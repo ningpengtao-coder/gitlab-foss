@@ -8,6 +8,7 @@ module Projects
       LIMIT = 15
 
       def index
+        track(:list_tags)
         respond_to do |format|
           format.json do
             render json: ContainerTagsSerializer
@@ -20,6 +21,8 @@ module Projects
 
       def destroy
         if tag.delete
+          track(:delete_tag)
+
           respond_to do |format|
             format.json { head :no_content }
           end
@@ -48,9 +51,11 @@ module Projects
           return
         end
 
+        track(:delete_tag_bulk)
         success_count = 0
         @tags.each do |tag|
           if tag.delete
+            track(:delete_tag)
             success_count += 1
           end
         end
@@ -61,6 +66,10 @@ module Projects
       end
 
       private
+
+      def track(action)
+        Gitlab::Tracking.event('Projects::Registry::TagsController', action.to_s)
+      end
 
       def tags
         Kaminari::PaginatableArray.new(image.tags, limit: LIMIT)

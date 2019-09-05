@@ -36,6 +36,11 @@ describe Projects::Registry::TagsController do
         expect(response).to match_response_schema('registry/tags')
         expect(response).to include_pagination_headers
       end
+
+      it 'tracks the event' do
+        expect(Gitlab::Tracking).to receive(:event).with(anything, 'list_tags')
+        get_tags
+      end
     end
 
     context 'when user can read the registry' do
@@ -98,6 +103,12 @@ describe Projects::Registry::TagsController do
 
           destroy_tag('test.')
         end
+
+        it 'tracks the event' do
+          allow_any_instance_of(ContainerRegistry::Tag).to receive(:delete) { true }
+          expect(Gitlab::Tracking).to receive(:event).with(anything, 'delete_tag')
+          destroy_tag('test.')
+        end
       end
     end
 
@@ -128,6 +139,14 @@ describe Projects::Registry::TagsController do
         it 'makes it possible to delete tags in bulk' do
           allow_any_instance_of(ContainerRegistry::Tag).to receive(:delete) { |*args| ContainerRegistry::Tag.delete(*args) }
           expect(ContainerRegistry::Tag).to receive(:delete).exactly(2).times
+
+          bulk_destroy_tags(['rc1', 'test.'])
+        end
+
+        it 'tracks the event' do
+          allow_any_instance_of(ContainerRegistry::Tag).to receive(:delete) { |*args| ContainerRegistry::Tag.delete(*args) }
+          expect(ContainerRegistry::Tag).to receive(:delete).exactly(2).times
+          expect(Gitlab::Tracking).to receive(:event).with(anything, 'delete_tag_bulk')
 
           bulk_destroy_tags(['rc1', 'test.'])
         end
