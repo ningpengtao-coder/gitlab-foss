@@ -20,7 +20,7 @@ import MonitorSingleStatChart from './charts/single_stat.vue';
 import GraphGroup from './graph_group.vue';
 import EmptyState from './empty_state.vue';
 import { sidebarAnimationDuration, timeWindows } from '../constants';
-import { getTimeDiff, getTimeWindow } from '../utils';
+import { getTimeDiff, getTimeWindow, uniqMetricsId } from '../utils';
 
 let sidebarMutationObserver;
 
@@ -245,7 +245,7 @@ export default {
         return charts;
       }
       return charts.filter(chart =>
-        chart.metrics.some(metric => this.metricsWithData.includes(metric.metric_id)),
+        chart.metrics.some(metric => this.metricsWithData.includes(uniqMetricsId(metric))),
       );
     },
     csvText(graphData) {
@@ -266,7 +266,7 @@ export default {
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
-      return _.pick(this.allAlerts, alert => metricIdsForChart.includes(alert.metricId));
+      return _.pick(this.allAlerts, alert => metricIdsForChart.includes(uniqMetricsId(metric)));
     },
     getGraphAlertValues(queries) {
       return Object.values(this.getGraphAlerts(queries));

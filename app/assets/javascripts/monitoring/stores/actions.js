@@ -4,6 +4,7 @@ import createFlash from '~/flash';
 import statusCodes from '../../lib/utils/http_status';
 import { backOff } from '../../lib/utils/common_utils';
 import { s__, __ } from '../../locale';
+import { uniqMetricsId } from '../utils';
 
 const MAX_REQUESTS = 3;
 
@@ -164,7 +165,7 @@ export const fetchPrometheusMetric = ({ commit }, { metric, params }) => {
   };
 
   return fetchPrometheusResult(metric.prometheus_endpoint_path, queryParams).then(result => {
-    commit(types.SET_QUERY_RESULT, { metricId: metric.metric_id, result });
+    commit(types.SET_QUERY_RESULT, { metricId: uniqMetricsId(metric), result });
   });
 };
 

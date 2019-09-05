@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import { normalizeMetrics, sortMetrics, normalizeQueryResult } from './utils';
+import { uniqMetricsId } from '../utils';
 
 export default {
   [types.REQUEST_METRICS_DATA](state) {
@@ -59,7 +60,7 @@ export default {
     state.groups.forEach(group => {
       group.metrics.forEach(metric => {
         metric.queries.forEach(query => {
-          if (query.metric_id === metricId) {
+          if (uniqMetricsId(query) === metricId) {
             state.metricsWithData.push(metricId);
             // ensure dates/numbers are correctly formatted for charts
             const normalizedResults = result.map(normalizeQueryResult);
