@@ -923,6 +923,8 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.text "encrypted_access_token"
     t.string "encrypted_access_token_iv"
     t.boolean "legacy_abac", default: false, null: false
+    t.boolean "cloud_run", default: false, null: false
+    t.index ["cloud_run"], name: "index_cluster_providers_gcp_on_cloud_run"
     t.index ["cluster_id"], name: "index_cluster_providers_gcp_on_cluster_id", unique: true
   end
 
