@@ -90,6 +90,12 @@ module Clusters
         end
       end
 
+      def status_states
+        self.class.state_machines[:status].states.each_with_object({}) do |state, states|
+          states[state.name] = state.value
+        end
+      end
+
       def updateable?
         installed? || updated? || update_errored?
       end

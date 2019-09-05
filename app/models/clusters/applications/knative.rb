@@ -21,7 +21,7 @@ module Clusters
         return unless not_installable?
         return unless verify_cluster?
 
-        self.status = 'installable'
+        self.status = status_states[:installable]
       end
 
       state_machine :status do
