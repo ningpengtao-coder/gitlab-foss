@@ -8,6 +8,9 @@ require_relative '../lib/gitlab'
 require_relative '../config/initializers/0_inject_enterprise_edition_module'
 
 module QA
+  module NewModule
+  end
+
   ##
   # GitLab QA runtime classes, mostly singletons.
   #
