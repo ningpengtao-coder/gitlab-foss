@@ -378,6 +378,14 @@
                 %strong.fly-out-top-item-name
                   = _('Members')
 
+
+      = nav_link(controller: :snippets) do
+        = link_to 'test', class: 'shortcuts-snippets' do
+          .nav-icon-container
+            = sprite_icon('question')
+          %span.nav-item-name
+            = _('Test datasources')
+
       = render 'shared/sidebar_toggle_button'
 
       -# Shortcut to Project > Activity
