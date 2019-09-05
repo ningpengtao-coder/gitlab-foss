@@ -15,7 +15,8 @@
     .issuable-status-box.status-box.status-box-issue-closed{ class: issue_button_visibility(@issue, false) }
       = sprite_icon('mobile-issue-close', size: 16, css_class: 'd-block d-sm-none')
       .d-none.d-sm-block
-        = issue_closed_label(@issue, current_user)
+      = _("Closed")
+      = issue_closed_link(@issue, current_user, css_class: 'text-white text-underline')
     .issuable-status-box.status-box.status-box-open{ class: issue_button_visibility(@issue, true) }
       = sprite_icon('issue-open-m', size: 16, css_class: 'd-block d-sm-none')
       %span.d-none.d-sm-block Open

@@ -186,7 +186,7 @@ describe IssuesHelper do
     end
   end
 
-  describe '#issue_closed_label' do
+  describe '#issue_closed_link' do
     let(:new_issue) { create(:issue, project: project) }
     let(:guest)     { create(:user) }
 
@@ -196,56 +196,68 @@ describe IssuesHelper do
       end
     end
 
-    shared_examples 'successfully displays label with linked issue' do |action|
-      let(:label) { "Closed (<a href=\"/#{new_issue.project.full_path}/issues/#{new_issue.iid}\" class=\"text-white text-underline\">#{action}</a>)" }
+    shared_examples 'successfully displays link to issue and with css class' do |action|
+      it 'returns link' do
+        link = "<a class=\"#{css_class}\" href=\"/#{new_issue.project.full_path}/issues/#{new_issue.iid}\">(#{action})</a>"
 
-      it { expect(helper.issue_closed_label(issue, user)).to match(label) }
+        expect(helper.issue_closed_link(issue, user, css_class: css_class)).to match(link)
+      end
     end
 
-    shared_examples 'successfully displays label without linked issue' do
-      it { expect(helper.issue_closed_label(issue, user)).to match('Closed') }
+    shared_examples 'does not display link' do
+      it 'returns nil' do
+        expect(helper.issue_closed_link(issue, user)).to be_nil
+      end
     end
 
-    context 'with closed issue' do
+    context 'with linked issue' do
+      context 'with moved issue' do
+        before do
+          issue.update(moved_to: new_issue)
+        end
+
+        context 'when user has permission to see new issue' do
+          let(:user)      { project.owner }
+          let(:css_class) { 'text-white text-underline' }
+
+          it_behaves_like 'successfully displays link to issue and with css class', 'moved'
+        end
+
+        context 'when user has no permission to see new issue' do
+          let(:user) { guest }
+
+          it_behaves_like 'does not display link'
+        end
+      end
+
+      context 'with duplicated issue' do
+        before do
+          issue.update(duplicated_to: new_issue)
+        end
+
+        context 'when user has permission to see new issue' do
+          let(:user)      { project.owner }
+          let(:css_class) { 'text-white text-underline' }
+
+          it_behaves_like 'successfully displays link to issue and with css class', 'duplicated'
+        end
+
+        context 'when user has no permission to see new issue' do
+          let(:user) { guest }
+
+          it_behaves_like 'does not display link'
+        end
+      end
+    end
+
+    context 'without linked issue' do
       let(:user) { project.owner }
 
-      it_behaves_like 'successfully displays label without linked issue'
-    end
-
-    context 'with moved issue' do
       before do
-        issue.update(moved_to: new_issue)
+        issue.update(moved_to: nil, duplicated_to: nil)
       end
 
-      context 'when user has permission to see new issue' do
-        let(:user) { project.owner }
-
-        it_behaves_like 'successfully displays label with linked issue', 'moved'
-      end
-
-      context 'when user has no permission to see new issue' do
-        let(:user) { guest }
-
-        it_behaves_like 'successfully displays label without linked issue'
-      end
-    end
-
-    context 'with duplicated issue' do
-      before do
-        issue.update(duplicated_to: new_issue)
-      end
-
-      context 'when user has permission to see new issue' do
-        let(:user) { project.owner }
-
-        it_behaves_like 'successfully displays label with linked issue', 'duplicated'
-      end
-
-      context 'when user has no permission to see new issue' do
-        let(:user) { guest }
-
-        it_behaves_like 'successfully displays label without linked issue'
-      end
+      it_behaves_like 'does not display link'
     end
   end
 end

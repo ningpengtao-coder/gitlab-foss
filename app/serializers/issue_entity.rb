@@ -24,6 +24,12 @@ class IssueEntity < IssuableEntity
     end
   end
 
+  expose :duplicated_to_id do |issue|
+    if issue.duplicated_to_id.present? && can?(request.current_user, :read_issue, issue.duplicated_to)
+      issue.duplicated_to_id
+    end
+  end
+
   expose :web_url do |issue|
     project_issue_path(issue.project, issue)
   end

@@ -2467,9 +2467,6 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-msgid "Closed (duplicated)"
-msgstr ""
-
 msgid "Closed this %{quick_action_target}."
 msgstr ""
 
@@ -6229,9 +6226,6 @@ msgid "Invite member"
 msgstr ""
 
 msgid "Invocations"
-msgstr ""
-
-msgid "IssuableStatus|Closed (%{moved_link_start}moved%{moved_link_end})"
 msgstr ""
 
 msgid "IssuableStatus|moved"
