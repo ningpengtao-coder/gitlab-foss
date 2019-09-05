@@ -14,6 +14,7 @@ import {
   setEndpoints,
   setGettingStartedEmptyState,
 } from '~/monitoring/stores/actions';
+import { uniqMetricsId } from '~/monitoring/utils';
 import storeState from '~/monitoring/stores/state';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { resetStore } from '../helpers';
@@ -327,7 +328,7 @@ describe('Monitoring store actions', () => {
 
       setTimeout(() => {
         expect(commit).toHaveBeenCalledWith(types.SET_QUERY_RESULT, {
-          metricId: metric.metric_id,
+          metricId: uniqMetricsId(metric),
           result: data.result,
         });
         done();
