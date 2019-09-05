@@ -266,7 +266,7 @@ export default {
     getGraphAlerts(queries) {
       if (!this.allAlerts) return {};
       const metricIdsForChart = queries.map(q => q.metricId);
-      return _.pick(this.allAlerts, alert => metricIdsForChart.includes(uniqMetricsId(metric)));
+      return _.pick(this.allAlerts, alert => metricIdsForChart.includes(uniqMetricsId(alert)));
     },
     getGraphAlertValues(queries) {
       return Object.values(this.getGraphAlerts(queries));

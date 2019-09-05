@@ -11,9 +11,7 @@ export const getTimeDiff = timeWindow => {
   };
 };
 
-export const uniqMetricsId = metric => {
-  return metric.metric_id + metric.id;
-}
+export const uniqMetricsId = metric => metric.metric_id + metric.id;
 
 export const getTimeWindow = ({ start, end }) =>
   Object.entries(secondsIn).reduce((acc, [timeRange, value]) => {
