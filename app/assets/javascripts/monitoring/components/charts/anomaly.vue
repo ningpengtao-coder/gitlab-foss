@@ -4,6 +4,7 @@ import dateFormat from 'dateformat';
 import { GlLink, GlButton } from '@gitlab/ui';
 import { GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import { debounceByAnimationFrame, roundOffFloat } from '~/lib/utils/common_utils';
+import { hexToRgb } from '~/lib/utils/color_utils';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
 import {
@@ -138,6 +139,13 @@ export default {
         ? style.area.opacity
         : areaOpacityValues.default;
       return style.area;
+    },
+    areaColorAsRgba() {
+      if (this.areaStyle.color && _.isNumber(this.areaStyle.opacity)) {
+        const rgb = hexToRgb(this.areaStyle.color);
+        return `rgba(${rgb.join(',')},${this.areaStyle.opacity})`;
+      }
+      return null;
     },
     chartData() {
       return [
@@ -293,10 +301,9 @@ export default {
         type: 'line',
         stack: stackKey,
         lineStyle: {
-          color: this.primaryColor,
-          opacity: 0,
+          color: this.areaColorAsRgba, // appears in the legend
         },
-        color: this.primaryColor, // used in the tooltip
+        color: this.areaColorAsRgba, // appears in the tooltip
         symbol: 'none',
         ...series,
       };
@@ -342,6 +349,7 @@ export default {
         v-bind="$attrs"
         :data="chartData"
         :option="chartOptions"
+        :include-legend-avg-max="false"
         :format-tooltip-text="formatTooltipText"
         :thresholds="thresholds"
         :width="width"

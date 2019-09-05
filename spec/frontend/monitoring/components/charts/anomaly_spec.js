@@ -1,6 +1,9 @@
 import Anomaly from '~/monitoring/components/charts/anomaly.vue';
-import { graphTypes } from '~/monitoring/constants';
+
 import { GlLineChart } from '@gitlab/ui/dist/charts';
+import { shallowMount } from '@vue/test-utils';
+import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
+import { graphTypes } from '~/monitoring/constants';
 import {
   anomalyDeploymentData,
   mockProjectPath,
@@ -9,10 +12,13 @@ import {
   anomalyMockResultValues,
 } from '../../mock_data';
 import { TEST_HOST } from 'helpers/test_constants';
-import { shallowMount } from '@vue/test-utils';
 
+const blue = '#0000FF';
+const blueAsRgb = '0,0,255';
 const mockWidgets = 'mockWidgets';
 const projectPath = `${TEST_HOST}${mockProjectPath}`;
+
+jest.mock('~/lib/utils/icon_utils'); // mock getSvgIconPathContent
 
 const makeAnomalyGraphData = (datasetName, template = anomalyMockGraphData) => {
   const queries = anomalyMockResultValues[datasetName].map((values, index) => ({
@@ -43,6 +49,8 @@ describe('Anomaly chart component', () => {
 
     beforeEach(() => {
       anomalyGraphData = makeAnomalyGraphData('noAnomaly');
+
+      getSvgIconPathContent.mockReturnValue(Promise.resolve('PATH'));
 
       anomalyChart = makeAnomalyChart({
         graphData: anomalyGraphData,
@@ -101,6 +109,7 @@ describe('Anomaly chart component', () => {
           graphData,
           deploymentData: anomalyDeploymentData,
         });
+        wrapper.vm.primaryColor = blue;
         glChart = wrapper.find(GlLineChart);
       });
 
@@ -181,14 +190,15 @@ describe('Anomaly chart component', () => {
         });
 
         it('is 2 stacked line series', () => {
-          expect(boundarySeries.length).toBe(2);
           boundarySeries.forEach(series => {
             expect(series).toEqual(
               expect.objectContaining({
                 lineStyle: {
-                  color: null,
-                  opacity: 0,
+                  // a lower opacity shade of `blue`
+                  color: expect.stringContaining(blueAsRgb),
                 },
+                // a lower opacity shade of `blue`
+                color: expect.stringContaining(blueAsRgb),
                 type: 'line',
               }),
             );
@@ -230,7 +240,6 @@ describe('Anomaly chart component', () => {
 
     describe('with anomalies', () => {
       const wrapperGraphData = makeAnomalyGraphData('oneAnomaly');
-      const primaryColor = 'nonAnomalyBlue';
       let props;
 
       beforeEach(() => {
@@ -238,7 +247,7 @@ describe('Anomaly chart component', () => {
           graphData: wrapperGraphData,
         });
         const glChart = wrapper.find(GlLineChart);
-        wrapper.vm.primaryColor = primaryColor;
+        wrapper.vm.primaryColor = blue;
         props = glChart.props();
       });
 
@@ -254,9 +263,9 @@ describe('Anomaly chart component', () => {
         const colorFn = props.data[0].itemStyle.color;
 
         expect(colorFn).toBeInstanceOf(Function);
-        expect(colorFn({ dataIndex: 0 })).toEqual(primaryColor);
-        expect(colorFn({ dataIndex: 1 })).not.toEqual(primaryColor);
-        expect(colorFn({ dataIndex: 2 })).toEqual(primaryColor);
+        expect(colorFn({ dataIndex: 0 })).toEqual(blue);
+        expect(colorFn({ dataIndex: 1 })).not.toEqual(blue);
+        expect(colorFn({ dataIndex: 2 })).toEqual(blue);
       });
     });
 
