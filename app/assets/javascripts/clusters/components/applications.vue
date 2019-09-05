@@ -64,6 +64,16 @@ export default {
       required: false,
       default: false,
     },
+    cloudRun: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    cloudRunHelpPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data: () => ({
     elasticsearchLogo,
@@ -467,6 +477,8 @@ export default {
         :request-status="applications.knative.requestStatus"
         :request-reason="applications.knative.requestReason"
         :installed="applications.knative.installed"
+        :installed-via="cloudRun ? 'Cloud Run' : null"
+        :installed-via-link="cloudRun ? cloudRunHelpPath : null"
         :install-failed="applications.knative.installFailed"
         :install-application-request-params="{ hostname: applications.knative.hostname }"
         :uninstallable="applications.knative.uninstallable"
@@ -500,7 +512,7 @@ export default {
           </p>
 
           <knative-domain-editor
-            v-if="knative.installed || (helmInstalled && rbac)"
+            v-if="(knative.installed || (helmInstalled && rbac)) && !cloudRun"
             :knative="knative"
             :ingress-dns-help-path="ingressDnsHelpPath"
             @save="saveKnativeDomain"

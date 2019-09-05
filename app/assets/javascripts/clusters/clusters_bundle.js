@@ -50,6 +50,8 @@ export default class Clusters {
       clustersHelpPath,
       deployBoardsHelpPath,
       clusterId,
+      cloudRun,
+      cloudRunHelpPath,
     } = document.querySelector('.js-edit-cluster-form').dataset;
 
     this.clusterId = clusterId;
@@ -64,11 +66,13 @@ export default class Clusters {
       environmentsHelpPath,
       clustersHelpPath,
       deployBoardsHelpPath,
+      cloudRunHelpPath,
     );
     this.store.setManagePrometheusPath(managePrometheusPath);
     this.store.updateStatus(clusterStatus);
     this.store.updateStatusReason(clusterStatusReason);
     this.store.updateRbac(hasRbac);
+    this.store.updateCloudRun(cloudRun);
     this.service = new ClustersService({
       endpoint: statusPath,
       installHelmEndpoint: installHelmPath,
@@ -138,6 +142,8 @@ export default class Clusters {
             managePrometheusPath: this.state.managePrometheusPath,
             ingressDnsHelpPath: this.state.ingressDnsHelpPath,
             rbac: this.state.rbac,
+            cloudRun: this.state.cloudRun,
+            cloudRunHelpPath: this.state.cloudRunHelpPath,
           },
         });
       },

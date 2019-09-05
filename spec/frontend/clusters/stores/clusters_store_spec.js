@@ -52,6 +52,7 @@ describe('Clusters Store', () => {
         helpPath: null,
         ingressHelpPath: null,
         environmentsHelpPath: null,
+        cloudRun: false,
         clustersHelpPath: null,
         deployBoardsHelpPath: null,
         status: mockResponseData.status,

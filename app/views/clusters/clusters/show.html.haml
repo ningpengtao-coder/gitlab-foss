@@ -18,6 +18,7 @@
   update_knative_path: clusterable.update_applications_cluster_path(@cluster, :knative),
   toggle_status: @cluster.enabled? ? 'true': 'false',
   has_rbac: has_rbac_enabled?(@cluster) ? 'true': 'false',
+  cloud_run: cloud_run?(@cluster) ? 'true': 'false',
   cluster_type: @cluster.cluster_type,
   cluster_status: @cluster.status_name,
   cluster_status_reason: @cluster.status_reason,
@@ -27,6 +28,7 @@
   environments_help_path: help_page_path('ci/environments', anchor: 'defining-environments'),
   clusters_help_path: help_page_path('user/project/clusters/index.md', anchor: 'deploying-to-a-kubernetes-cluster'),
   deploy_boards_help_path: help_page_path('user/project/deploy_boards.html', anchor: 'enabling-deploy-boards'),
+  cloud_run_help_path: help_page_path('user/project/clusters/index.md', anchor: 'cloud-run-on-gke'),
   manage_prometheus_path: manage_prometheus_path,
   cluster_id: @cluster.id } }
 

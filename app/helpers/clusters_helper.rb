@@ -20,4 +20,8 @@ module ClustersHelper
 
     !cluster.provider.legacy_abac?
   end
+
+  def cloud_run?(cluster)
+    cluster&.gcp? && cluster&.provider_gcp&.cloud_run?
+  end
 end

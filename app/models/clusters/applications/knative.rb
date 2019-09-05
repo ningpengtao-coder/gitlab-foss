@@ -18,6 +18,8 @@ module Clusters
       include AfterCommitQueue
 
       def set_initial_status
+        return self.status = status_states[:installed] if cloud_run_cluster?
+
         return unless not_installable?
         return unless verify_cluster?
 
@@ -26,6 +28,8 @@ module Clusters
 
       state_machine :status do
         after_transition any => [:installed] do |application|
+          break if application.cloud_run_cluster?
+
           application.run_after_commit do
             ClusterWaitForIngressIpAddressWorker.perform_in(
               FETCH_IP_ADDRESS_DELAY, application.name, application.id)
@@ -47,6 +51,10 @@ module Clusters
         { "domain" => hostname }.to_yaml
       end
 
+      def allowed_to_uninstall?
+        !cloud_run_cluster?
+      end
+
       def install_command
         Gitlab::Kubernetes::Helm::InstallCommand.new(
           name: name,
@@ -63,6 +71,7 @@ module Clusters
         return unless installed?
         return if external_ip
         return if external_hostname
+        return if cloud_run_cluster?
 
         ClusterWaitForIngressIpAddressWorker.perform_async(name, id)
       end
@@ -79,6 +88,10 @@ module Clusters
           predelete: delete_knative_services_and_metrics,
           postdelete: delete_knative_istio_leftovers
         )
+      end
+
+      def cloud_run_cluster?
+        cluster&.gcp? && cluster&.provider_gcp&.cloud_run?
       end
 
       private
