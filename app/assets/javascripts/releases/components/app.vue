@@ -1,5 +1,5 @@
 <script>
-  import ASpike from './../../aSpike';
+  import ASpike from '../../AAgeneric_chart';
 
   export default {
     name: 'ReleasesApp',

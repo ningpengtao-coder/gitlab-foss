@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import ASpike from './components/issues_analytics.vue';
+import GenericChart from './components/generic_chart.vue';
 import store from './stores';
 
 export default () => {
@@ -11,10 +11,10 @@ export default () => {
     el,
     store,
     components: {
-      ASpike,
+      GenericChart,
     },
     render(createElement) {
-      return createElement('a-spike', {
+      return createElement('generic-chart', {
         props: {
           endpoint: 'some',
         },
