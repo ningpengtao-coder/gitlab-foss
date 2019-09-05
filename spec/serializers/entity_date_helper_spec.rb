@@ -57,11 +57,17 @@ describe EntityDateHelper do
       end
     end
 
-    context 'when milestone due date is today' do
+    context 'when milestone due date is today and current time is 00:00:00' do
       let(:milestone_remaining) { date_helper_class.remaining_days_in_words(Date.today) }
 
-      it 'returns today' do
-        expect(milestone_remaining).to eq("<strong>Today</strong>")
+      it 'returns 1 day remaining' do
+        expect(milestone_remaining).to eq("<strong>1</strong> day remaining")
+      end
+
+      it 'returns hours remaining when queried mid-day' do
+        Timecop.freeze(Time.utc(2017, 3, 17, 13, 10)) do
+          expect(milestone_remaining).to eq("<strong>11</strong> hours remaining")
+        end
       end
     end
 

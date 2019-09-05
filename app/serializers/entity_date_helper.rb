@@ -48,7 +48,10 @@ module EntityDateHelper
     if due_date&.past?
       content_tag(:strong, _('Past due'))
     elsif due_date&.today?
-      content_tag(:strong, _('Today'))
+      duration = distance_of_time_in_words(Time.now, due_date.end_of_day)
+      content = extract_duration(duration)
+
+      "#{content} #{_('remaining')}".html_safe
     elsif start_date&.future?
       content_tag(:strong, _('Upcoming'))
     elsif due_date
@@ -59,9 +62,7 @@ module EntityDateHelper
       #
       # Need to improve the i18n here and do a full translation
       # of the string instead of piecewise translations.
-      content = time_ago
-        .gsub(/\d+/) { |match| "<strong>#{match}</strong>" }
-        .remove('about ')
+      content = extract_duration(time_ago)
       remaining_or_ago = is_upcoming ? _('remaining') : _('ago')
 
       "#{content} #{remaining_or_ago}".html_safe
@@ -69,5 +70,11 @@ module EntityDateHelper
       days = (Date.today - start_date).to_i
       "#{content_tag(:strong, days)} #{'day'.pluralize(days)} elapsed".html_safe
     end
+  end
+
+  private
+
+  def extract_duration(duration)
+    duration.gsub(/\d+/) {|match| "<strong>#{match}</strong>"}.remove('about ')
   end
 end
