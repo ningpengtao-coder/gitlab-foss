@@ -16,6 +16,12 @@ en:
         api_url: "Sentry API URL"
       project/metrics_setting:
         external_dashboard_url: "External dashboard URL"
+    errors:
+      models:
+        approval_project_rule:
+          attributes:
+            name:
+              cannot_be_modified: cannot be modified
   views:
     pagination:
       previous: "Prev"
