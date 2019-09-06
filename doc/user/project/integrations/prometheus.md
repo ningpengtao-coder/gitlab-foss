@@ -38,6 +38,16 @@ Once you have a connected Kubernetes cluster with Helm installed, deploying a ma
 
 ![Managed Prometheus Deploy](img/prometheus_deploy.png)
 
+#### Getting metrics to display on your the Metrics Dashboard
+
+After completing the steps above, you will also need deployments in order to view the Operations > Metrics page. Setting up Auto DevOps will help you to quickly create a deployment:
+
+1. On the **Operations > Kubernetes** page, ensure that, in addition to Prometheus and Helm Tiller, you also have Runner and Ingress installed. Copy the Ingress endpoint.
+1. Navigate to the **Settings > CI/CD** page. In the Auto DevOps section, select a deployment strategy and save your changes.
+1.  On the same page, in the Variables section, add in the copied Ingress endpoint. Use the variable `KEY: KUBE_INGRESS_BASE_DOMAIN`
+1.  Navigate to the **CI/CD > Pipelines** page. Run a pipeline on any branch.
+1.  When the pipeline has run succesfully, graphs will be available on the **Operations > Metrics** page
+
 #### About managed Prometheus deployments
 
 Prometheus is deployed into the `gitlab-managed-apps` namespace, using the [official Helm chart](https://github.com/helm/charts/tree/master/stable/prometheus). Prometheus is only accessible within the cluster, with GitLab communicating through the [Kubernetes API](https://kubernetes.io/docs/concepts/overview/kubernetes-api/).
