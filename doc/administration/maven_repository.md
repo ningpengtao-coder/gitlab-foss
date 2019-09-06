@@ -1,5 +1,5 @@
 ---
-redirect_to: 'packages.md'
+redirect_to: 'package_registry/index.md'
 ---
 
-This document was moved to [another location](packages.md).
+This document was moved to [another location](package_registry/index.md).

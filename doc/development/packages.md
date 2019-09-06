@@ -46,7 +46,7 @@ Group-level and instance-level endpoints are good to have but are optional.
 
 NOTE: **Note:**
 To avoid name conflict for instance-level endpoints we use
-[the package naming convention](../user/project/packages/npm_registry.md#package-naming-convention)
+[the package naming convention](../user/package_registry/npm_registry/index.md#package-naming-convention)
 
 ## Configuration
 

@@ -461,7 +461,7 @@ With [GitLab Issues Analytics](issues_analytics/index.md), you can see a bar cha
 
 ## Dependency Proxy **(PREMIUM)**
 
-Use GitLab as a [dependency proxy](dependency_proxy/index.md) for upstream Docker images.
+Use GitLab as a [dependency proxy](../package_registry/dependency_proxy/index.md) for upstream Docker images.
 
 <!-- ## Troubleshooting
 
