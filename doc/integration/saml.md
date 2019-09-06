@@ -481,7 +481,7 @@ args: {
 
 Your Identity Provider will encrypt the assertion with the public certificate of GitLab. GitLab will decrypt the EncryptedAssertion with its private key.
 
->**Note:**
+NOTE: **Note:**
 This integration uses the `certificate` and `private_key` settings for both the sign and encrypt/decrypt processes.
 
 ## Troubleshooting
