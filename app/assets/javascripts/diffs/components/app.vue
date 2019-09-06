@@ -104,7 +104,7 @@ export default {
       plainDiffPath: state => state.diffs.plainDiffPath,
       emailPatchPath: state => state.diffs.emailPatchPath,
     }),
-    ...mapState('diffs', ['showTreeList', 'isLoading', 'startVersion']),
+    ...mapState('diffs', ['showTreeList', 'isLoading', 'startVersion', 'showFileByFile']),
     ...mapGetters('diffs', ['isParallelView', 'currentDiffIndex']),
     ...mapGetters(['isNotesFetched', 'getNoteableData']),
     targetBranch() {
@@ -274,7 +274,8 @@ export default {
       }
     },
     showFile(idx) {
-      return (gon.features && !gon.features.fileByFile) || idx === this.currentDiffIndex;
+      const show = (gon.features&&!gon.features.fileByFileDefault&&!this.showFileByFile)||idx===this.currentDiffIndex;
+      return show;
     },
   },
   minTreeWidth: MIN_TREE_WIDTH,

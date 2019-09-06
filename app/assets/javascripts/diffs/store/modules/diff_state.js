@@ -27,6 +27,7 @@ export default () => ({
   highlightedRow: null,
   renderTreeList: true,
   showWhitespace: true,
+  showFileByFile: false,
   fileFinderVisible: false,
   dismissEndpoint: '',
   showSuggestPopover: true,

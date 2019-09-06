@@ -52,6 +52,7 @@ export default {
       'latestVersionPath',
       'addedLines',
       'removedLines',
+      'showFileByFile'
     ]),
     comparableDiffs() {
       return this.mergeRequestDiffs.slice(1);
@@ -69,7 +70,7 @@ export default {
       return this.mergeRequestDiff.base_version_path;
     },
     showToggle() {
-      return gon.features && !gon.features.fileByFile;
+      return gon.features && !gon.features.fileByFileDefault && !this.showFileByFile;
     },
   },
   created() {

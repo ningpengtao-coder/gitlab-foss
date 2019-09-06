@@ -17,7 +17,8 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   before_action :authenticate_user!, only: [:assign_related_issues]
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
   before_action do
-    push_frontend_feature_flag(:file_by_file)
+    push_frontend_feature_flag(:file_by_file_default)
+    push_frontend_feature_flag(:file_by_file_option)
   end
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]

@@ -37,6 +37,7 @@ export const TREE_TYPE = 'tree';
 export const TREE_LIST_STORAGE_KEY = 'mr_diff_tree_list';
 export const WHITESPACE_STORAGE_KEY = 'mr_show_whitespace';
 export const TREE_LIST_WIDTH_STORAGE_KEY = 'mr_tree_list_width';
+export const FILE_BY_FILE_STORAGE_KEY = 'mr_file_by_file';
 
 export const INITIAL_TREE_WIDTH = 320;
 export const MIN_TREE_WIDTH = 240;

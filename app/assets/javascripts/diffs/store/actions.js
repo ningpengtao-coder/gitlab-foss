@@ -23,6 +23,7 @@ import {
   TREE_LIST_STORAGE_KEY,
   WHITESPACE_STORAGE_KEY,
   TREE_LIST_WIDTH_STORAGE_KEY,
+  FILE_BY_FILE_STORAGE_KEY,
   OLD_LINE_KEY,
   NEW_LINE_KEY,
   TYPE_KEY,
@@ -136,7 +137,7 @@ export const startRenderDiffsQueue = ({ state, commit }) => {
           (file.viewer && (!file.viewer.collapsed || !file.viewer.name === diffViewerModes.text)),
       );
 
-      if (gon.features && gon.features.fileByFile && state.currentDiffFileId === '') {
+      if (gon.features && gon.features.fileByFileDefault && state.currentDiffFileId === '') {
         commit(types.UPDATE_CURRENT_DIFF_FILE_ID, state.diffFiles[0].file_hash);
       }
 
@@ -316,7 +317,8 @@ export const toggleTreeOpen = ({ commit }, path) => {
 
 export const scrollToFile = ({ state, commit }, path) => {
   const { fileHash } = state.treeEntries[path];
-  if (gon.features && !gon.features.fileByFile) document.location.hash = fileHash;
+  const showFileByFile = gon.features && !gon.features.fileByFileDefault && !state.showFileByFile;
+  if (showFileByFile) document.location.hash = fileHash;
 
   commit(types.UPDATE_CURRENT_DIFF_FILE_ID, fileHash);
 };
@@ -356,6 +358,18 @@ export const setShowWhitespace = ({ commit }, { showWhitespace, pushState = fals
 
   if (pushState) {
     historyPushState(mergeUrlParams({ w: showWhitespace ? '0' : '1' }, window.location.href));
+  }
+
+  eventHub.$emit('refetchDiffData');
+};
+
+export const setShowFileByFile = ({ commit }, { showFileByFile, pushState = false }) => {
+  commit(types.SET_SHOW_FILE_BY_FILE, showFileByFile);
+
+  localStorage.setItem(FILE_BY_FILE_STORAGE_KEY, showFileByFile);
+
+  if (pushState) {
+    historyPushState(mergeUrlParams({ f: showFileByFile ? '0' : '1' }, window.location.href));
   }
 
   eventHub.$emit('refetchDiffData');

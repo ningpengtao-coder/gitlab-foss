@@ -268,6 +268,9 @@ export default {
   [types.SET_SHOW_WHITESPACE](state, showWhitespace) {
     state.showWhitespace = showWhitespace;
   },
+  [types.SET_SHOW_FILE_BY_FILE](state, showFileByFile) {
+    state.showFileByFile = showFileByFile;
+  },
   [types.TOGGLE_FILE_FINDER_VISIBLE](state, visible) {
     state.fileFinderVisible = visible;
   },

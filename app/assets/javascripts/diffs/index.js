@@ -87,9 +87,10 @@ export default function initDiffsApp(store) {
 
       this.setRenderTreeList(renderTreeList);
       this.setShowWhitespace({ showWhitespace: getParameterValues('w')[0] !== '1' });
+      this.setShowFileByFile({ showFileByFile: getParameterValues('f')[0] !== '1' });
     },
     methods: {
-      ...mapActions('diffs', ['setRenderTreeList', 'setShowWhitespace']),
+      ...mapActions('diffs', ['setRenderTreeList', 'setShowWhitespace', 'setShowFileByFile']),
     },
     render(createElement) {
       return createElement('diffs-app', {

@@ -44,11 +44,10 @@ export default {
     };
   },
   computed: {
-    ...mapState('diffs', ['currentDiffFileId']),
+    ...mapState('diffs', ['currentDiffFileId', 'showFileByFile']),
     isSelected() {
       return (
-        gon.features &&
-        gon.features.fileByFile &&
+        (this.showFileByFile || (gon.features && gon.features.fileByFileDefault)) &&
         this.currentDiffFileId === this.file.fileHash
       );
     },
