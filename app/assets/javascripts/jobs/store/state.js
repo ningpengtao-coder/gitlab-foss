@@ -16,7 +16,7 @@ export default () => ({
   // Used to check if we should keep the automatic scroll
   isScrolledToBottomBeforeReceivingTrace: true,
 
-  trace: '',
+  trace: [],
   isTraceComplete: false,
   traceSize: 0,
   isTraceSizeVisible: false,

@@ -9,6 +9,7 @@
  *    - adds the index as  lineNumber
  *
  * TODO: Check if line has content before adding it to the array
+ *
  * @param {Array} lines
  * @returns {Array}
  */

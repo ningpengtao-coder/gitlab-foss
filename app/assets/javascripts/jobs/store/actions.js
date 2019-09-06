@@ -13,6 +13,8 @@ import {
   scrollDown,
   scrollUp,
 } from '~/lib/utils/scroll_utils';
+//todo remove
+import log from '../mock_data/trace';
 
 export const setJobEndpoint = ({ commit }, endpoint) => commit(types.SET_JOB_ENDPOINT, endpoint);
 export const setTraceOptions = ({ commit }, options) => commit(types.SET_TRACE_OPTIONS, options);
@@ -155,9 +157,9 @@ export const fetchTrace = ({ dispatch, state }) =>
     })
     .then(({ data }) => {
       dispatch('toggleScrollisInBottom', isScrolledToBottom());
-      dispatch('receiveTraceSuccess', data);
+      dispatch('receiveTraceSuccess', log);
 
-      if (!data.complete) {
+      if (!log.complete) {
         traceTimeout = setTimeout(() => {
           dispatch('fetchTrace');
         }, 4000);
@@ -177,6 +179,9 @@ export const receiveTraceError = ({ commit }) => {
   clearTimeout(traceTimeout);
   flash(__('An error occurred while fetching the job log.'));
 };
+
+export const toggleCollapsibleLine = ({ commit }, section) =>
+  commit(types.TOGGLE_COLLAPSIBLE_LINE, section);
 
 /**
  * Jobs list on sidebar - depend on stages dropdown
