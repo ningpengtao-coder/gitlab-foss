@@ -13,8 +13,6 @@ import {
   scrollDown,
   scrollUp,
 } from '~/lib/utils/scroll_utils';
-//todo remove
-import log from '../mock_data/trace';
 
 export const setJobEndpoint = ({ commit }, endpoint) => commit(types.SET_JOB_ENDPOINT, endpoint);
 export const setTraceOptions = ({ commit }, options) => commit(types.SET_TRACE_OPTIONS, options);
@@ -157,9 +155,9 @@ export const fetchTrace = ({ dispatch, state }) =>
     })
     .then(({ data }) => {
       dispatch('toggleScrollisInBottom', isScrolledToBottom());
-      dispatch('receiveTraceSuccess', log);
+      dispatch('receiveTraceSuccess', data);
 
-      if (!log.complete) {
+      if (!data.complete) {
         traceTimeout = setTimeout(() => {
           dispatch('fetchTrace');
         }, 4000);

@@ -17,6 +17,8 @@ export default () => ({
   isScrolledToBottomBeforeReceivingTrace: true,
 
   trace: [],
+  originalTrace: [],
+
   isTraceComplete: false,
   traceSize: 0,
   isTraceSizeVisible: false,

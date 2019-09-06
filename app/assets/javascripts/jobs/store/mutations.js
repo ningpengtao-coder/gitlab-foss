@@ -1,6 +1,10 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
-import logLinesParser from './utils';
+import { logLinesParser, updateIncrementalTrace } from './utils';
+
+//todo remove
+import oldLog from '../mock_data/trace';
+import newLog from '../mock_data/trace_incremental';
 
 export default {
   [types.SET_JOB_ENDPOINT](state, endpoint) {
@@ -24,19 +28,22 @@ export default {
       state.traceState = log.state;
     }
 
-    debugger;
     if (log.append) {
-      // TODO - if append, we need to check the last line before adding the rest
-     // state.trace += log.html;
+      state.originalTrace = state.originalTrace.concat(log.trace);
+      state.trace = updateIncrementalTrace(state.originalTrace, state.trace, log.lines)
       state.traceSize += log.size;
     } else {
       // When the job still does not have a trace
       // the trace response will not have a defined
       // html or size. We keep the old value otherwise these
       // will be set to `undefined`
+      state.originalTrace = log.lines || state.trace;
       state.trace = logLinesParser(log.lines) || state.trace;
       state.traceSize = log.size || state.traceSize;
     }
+
+    state.originalTrace = oldLog.lines;
+    state.trace = updateIncrementalTrace(state.originalTrace, logLinesParser(oldLog.lines), newLog.lines)
 
     if (state.traceSize < log.total) {
       state.isTraceSizeVisible = true;

@@ -1,3 +1,4 @@
+import _ from 'underscore';
 /**
  * Parses the job log content into a structure usable by the template
  *
@@ -13,7 +14,7 @@
  * @param {Array} lines
  * @returns {Array}
  */
-export default (lines = []) =>
+export const logLinesParser = (lines = []) =>
   lines.reduce((acc, line, index) => {
     if (line.section_header) {
       acc.push({
@@ -39,3 +40,59 @@ export default (lines = []) =>
 
     return acc;
   }, []);
+
+/**
+ * When the trace is not complete, backend may send the last received line
+ * in the new response.
+ *
+ * We need to check if that is the case by looking for the offset property
+ * before parsing the incremental part
+ */
+
+/**
+ * When the trace is not complete, backend may send the last received line
+ * in the new response.
+ *
+ * We need to check if that is the case by looking for the offset property
+ * before parsing the incremental part
+ *
+ * @param array originalTrace
+ * @param array oldLog
+ * @param array newLog
+ */
+export const updateIncrementalTrace = (originalTrace = [], oldLog = [], newLog = []) => {
+  const firstLine = newLog[0];
+  const firstLineOffset = firstLine.offset;
+
+  // We are going to return a new array,
+  // let's make a shallow copy to make sure we
+  // are not updating the state outside of a mutation first.
+  const cloneOldLog = [...oldLog];
+
+  const lastIndex = cloneOldLog.length - 1;
+  const lastLine = cloneOldLog[lastIndex];
+
+  // The last line may be inside a collpasible section
+  // If it is, we use the not parsed saved log, remove the last element
+  // and parse the first received part togheter with the incremental log
+  if (
+    lastLine.isHeader &&
+    (lastLine.line.offset === firstLineOffset ||
+      (lastLine.lines.length &&
+        lastLine.lines[lastLine.lines.length - 1].offset === firstLineOffset))
+  ) {
+    const cloneOriginal = [...originalTrace];
+    cloneOriginal.splice(cloneOriginal.length - 1);
+    return logLinesParser(cloneOriginal.concat(newLog));
+
+  } else if (lastLine.offset === firstLineOffset) {
+    cloneOldLog.splice(lastIndex);
+    return cloneOldLog.concat(logLinesParser(newLog));
+
+  } 
+    // there are no matches, let's parse the new log and return them together
+    return cloneOldLog.concat(logLinesParser(newLog));
+  
+};
+
+export const isNewJobLogActive = () => gon && gon.features && gon.features.jobLogJson;

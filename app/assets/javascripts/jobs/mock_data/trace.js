@@ -15,11 +15,11 @@ export default {
   lines: [
     {
       offset: 1000,
-      content: [{ text: 'Running with gitlab-runner 12.1.0 (de7731dd)' }],
+      content: [{ text: __('Running with gitlab-runner 12.1.0 (de7731dd)') }],
     },
     {
       offset: 1001,
-      content: [{ text: ' on docker-auto-scale-com 8a6210b8' }],
+      content: [{ text: __(' on docker-auto-scale-com 8a6210b8') }],
     },
     {
       offset: 1002,
@@ -34,12 +34,12 @@ export default {
     },
     {
       offset: 1003,
-      content: [{ text: 'Starting service postgres:9.6.14 ...' }],
+      content: [{ text: __('Starting service postgres:9.6.14 ...') }],
       sections: ['prepare-executor'],
     },
     {
       offset: 1004,
-      content: [{ text: 'Pulling docker image postgres:9.6.14 ...' }],
+      content: [{ text: __('Pulling docker image postgres:9.6.14 ...') }],
       sections: ['prepare-executor'],
     },
     {
@@ -74,7 +74,7 @@ export default {
     },
     {
       offset: 1009,
-      content: [{ text: 'Waiting for services to be up and running...' }],
+      content: [{ text: __('Waiting for services to be up and running...') }],
       sections: ['prepare-executor'],
     },
     {
@@ -110,8 +110,8 @@ export default {
       offset: 1013,
       content: [
         {
-          text: `Running on runner-8a6210b8-project-13083-concurrent-0 via
-      runner-8a6210b8-gsrm-1566561403-37c881a0...`,
+          text: __(`Running on runner-8a6210b8-project-13083-concurrent-0 via
+      runner-8a6210b8-gsrm-1566561403-37c881a0...`),
         },
       ],
       sections: ['prepare-script'],
@@ -121,7 +121,7 @@ export default {
     {
       offset: 1014,
       content: [
-        { text: 'Fetching changes with git depth set to 20..', style: 'term-fg-l-green term-bold' },
+        { text: __('Fetching changes with git depth set to 20..'), style: 'term-fg-l-green term-bold' },
       ],
       sections: ['get-sources'],
       section_header: true,
@@ -130,7 +130,7 @@ export default {
       offset: 1015,
       content: [
         {
-          text: 'Reinitialized existing Git repository in /builds/gitlab-org/gitlab-ce/.git/ ',
+          text: __('Reinitialized existing Git repository in /builds/gitlab-org/gitlab-ce/.git/ '),
         },
       ],
       sections: ['get-sources'],
@@ -157,7 +157,7 @@ export default {
       offset: 1018,
       content: [
         {
-          text: 'Checking out 061606b4 as 66454-create-feature-flag...',
+          text: __('Checking out 061606b4 as 66454-create-feature-flag...'),
           style: 'term-fg-l-green term-bold',
         },
       ],
@@ -212,7 +212,7 @@ export default {
       offset: 1024,
       content: [
         {
-          text: 'Skipping Git submodules setup',
+          text: __('Skipping Git submodules setup'),
           style: 'term-fg-l-green term-bold',
         },
       ],
@@ -234,7 +234,7 @@ export default {
       offset: 1027,
       content: [
         {
-          text: 'Checking cache for debian-stretch-ruby-2.6.3-node-12.x-3...',
+          text: __('Checking cache for debian-stretch-ruby-2.6.3-node-12.x-3...'),
           style: 'term-fg-l-green term-bold',
         },
       ],
@@ -265,7 +265,7 @@ export default {
       offset: 1031,
       content: [
         {
-          text: 'Successfully extracted cache',
+          text: __('Successfully extracted cache'),
           style: 'term-fg-l-green term-bold ',
         },
       ],
@@ -282,7 +282,7 @@ export default {
       offset: 1033,
       content: [
         {
-          text: 'Downloading artifacts for compile-assets pull-cache (278912482)...',
+          text: __('Downloading artifacts for compile-assets pull-cache (278912482)...'),
           style: 'term-fg-l-green term-bold',
         },
       ],
@@ -298,20 +298,20 @@ export default {
       offset: 1035,
       content: [
         {
-          text: 'Downloading artifacts from coordinator... ok ',
+          text: __('Downloading artifacts from coordinator... ok '),
           style: 'term-fg-l-green term-bold',
         },
         {
-          text: ' id',
+          text: __(' id'),
         },
         {
           text: '=278912482 responseStatus',
         },
         {
-          text: '=200 OK token',
+          text: __('=200 OK token'),
         },
         {
-          text: '=DUNW1asp',
+          text: __('=DUNW1asp'),
         },
       ],
       sections: ['download-artifacts'],
@@ -320,7 +320,7 @@ export default {
       offset: 1036,
       content: [
         {
-          text: 'Downloading artifacts for setup-test-env (278912484)...',
+          text: __('Downloading artifacts for setup-test-env (278912484)...'),
           style: 'term-fg-l-green term-bold',
         },
       ],
@@ -351,7 +351,7 @@ export default {
       offset: 1039,
       content: [
         {
-          text: 'Downloading artifacts for retrieve-tests-metadata (278912485)...',
+          text: __('Downloading artifacts for retrieve-tests-metadata (278912485)...'),
           style: 'term-fg-l-green term-bold',
         },
       ],
@@ -377,10 +377,10 @@ export default {
       offset: 1042,
       content: [
         {
-          text: 'Downloading artifacts from coordinator... ok ',
+          text: __('Downloading artifacts from coordinator... ok '),
         },
         {
-          text: ' id',
+          text: __(' id'),
           style: 'term-fg-l-green term-bold',
         },
         {
