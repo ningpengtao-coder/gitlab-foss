@@ -341,7 +341,15 @@ module SystemNoteService
   def change_description(noteable, project, author)
     body = 'changed the description'
 
-    create_note(NoteSummary.new(noteable, project, author, body, action: 'description'))
+    create_note(NoteSummary.new(noteable, project, author, body, action: 'description')).tap do |note|
+      next unless Feature.enabled?(:description_diffs)
+
+      DescriptionChange.create(
+        system_note_id: note.id,
+        old_description: noteable.description_before_last_save,
+        new_description: noteable.description
+      )
+    end
   end
 
   # Called when the confidentiality changes

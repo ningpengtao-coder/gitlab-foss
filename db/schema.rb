@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_05_223900) do
+ActiveRecord::Schema.define(version: 2019_09_05_233225) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -1165,6 +1165,13 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.index ["project_id", "iid"], name: "index_deployments_on_project_id_and_iid", unique: true
     t.index ["project_id", "status", "created_at"], name: "index_deployments_on_project_id_and_status_and_created_at"
     t.index ["project_id", "status"], name: "index_deployments_on_project_id_and_status"
+  end
+
+  create_table "description_changes", force: :cascade do |t|
+    t.bigint "system_note_id", null: false
+    t.text "old_description"
+    t.text "new_description"
+    t.index ["system_note_id"], name: "index_description_changes_on_system_note_id"
   end
 
   create_table "design_management_designs", force: :cascade do |t|
@@ -3827,6 +3834,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "clusters", name: "fk_289bba3222", on_delete: :nullify
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
+  add_foreign_key "description_changes", "notes", column: "system_note_id"
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
   add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", name: "fk_03c671965c", on_delete: :cascade

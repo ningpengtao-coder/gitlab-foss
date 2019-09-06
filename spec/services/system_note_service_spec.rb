@@ -414,6 +414,37 @@ describe SystemNoteService do
       it 'sets the note text' do
         expect(subject.note).to eq('changed the description')
       end
+
+      context 'description diffs' do
+        before do
+          noteable.update(description: "New description")
+        end
+
+        context 'when feature is enabled' do
+          before do
+            stub_feature_flags(description_diffs: true)
+          end
+
+          it 'saves the description changes' do
+            subject
+
+            description_change = DescriptionChange.where(system_note_id: subject.id).first
+
+            expect(description_change.old_description).to eq(noteable.description_before_last_save)
+            expect(description_change.new_description).to eq(noteable.description)
+          end
+        end
+
+        context 'when feature is not enabled' do
+          before do
+            stub_feature_flags(description_diffs: false)
+          end
+
+          it 'does not save the description changes' do
+            expect { subject }.not_to change { DescriptionChange.count }
+          end
+        end
+      end
     end
   end
 
