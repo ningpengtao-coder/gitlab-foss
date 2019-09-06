@@ -250,7 +250,7 @@ class ApplicationController < ActionController::Base
   end
 
   def default_headers
-    headers['X-Frame-Options'] = 'DENY'
+    headers['X-Frame-Options'] = 'sameorigin'
     headers['X-XSS-Protection'] = '1; mode=block'
     headers['X-UA-Compatible'] = 'IE=edge'
     headers['X-Content-Type-Options'] = 'nosniff'
