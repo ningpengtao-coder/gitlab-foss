@@ -2,12 +2,12 @@ import $ from 'jquery';
 import { sprintf, __ } from '~/locale';
 import flash from '~/flash';
 import * as rootTypes from '../../mutation_types';
-import { createCommitPayload, createNewMergeRequestUrl } from '../../utils';
+import { createCommitPayload } from '../../utils';
 import router from '../../../ide_router';
 import service from '../../../services';
 import * as types from './mutation_types';
 import consts from './constants';
-import { activityBarViews } from '../../../constants';
+import { activityBarViews, rightSidebarViews } from '../../../constants';
 import eventHub from '../../../eventhub';
 
 export const updateCommitMessage = ({ commit }, message) => {
@@ -153,16 +153,9 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
       })
         .then(() => {
           if (state.shouldCreateMR) {
-            const { currentProject } = rootGetters;
-            const targetBranch = getters.isCreatingNewBranch
-              ? rootState.currentBranchId
-              : currentProject.default_branch;
-
-            dispatch(
-              'redirectToUrl',
-              createNewMergeRequestUrl(currentProject.web_url, getters.branchName, targetBranch),
-              { root: true },
-            );
+            dispatch('rightPane/open', rightSidebarViews.createMergeRequest, {
+              root: true,
+            });
           }
 
           commit(rootTypes.CLEAR_STAGED_CHANGES, null, { root: true });

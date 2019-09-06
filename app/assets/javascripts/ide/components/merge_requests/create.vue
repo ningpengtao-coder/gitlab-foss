@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Icon from '../../../vue_shared/components/icon.vue';
 import TitleComponent from '../../../issue_show/components/title.vue';
 import DescriptionComponent from '../../../issue_show/components/description.vue';
@@ -13,7 +13,7 @@ export default {
     DescriptionComponent,
   },
   computed: {
-
+    ...mapState(['currentBranchId', 'currentProjectId'])
   },
   methods: {
     onload: () => {
@@ -25,6 +25,12 @@ export default {
 
 <template>
   <div class="ide-create-merge-request d-flex flex-column h-100">
-    <iframe id="js-create-mr-sidebar" src="/h5bp/html5-boilerplate/merge_requests/new?merge_request%5Bsource_branch%5D=root-master-patch-44385&amp;merge_request%5Btarget_branch%5D=master" class="h-100 border-0" style="margin: -8px -16px;" @load=onload()></iframe>
+    <iframe
+      id="js-create-mr-sidebar"
+      :src="`/${currentProjectId}/merge_requests/new?merge_request%5Bsource_branch%5D=${currentBranchId}&amp;merge_request%5Btarget_branch%5D=master`"
+      class="h-100 border-0"
+      style="margin: -8px -16px;"
+      @load=onload()>
+    </iframe>
   </div>
 </template>
