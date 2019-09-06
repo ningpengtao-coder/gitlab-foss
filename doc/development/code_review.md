@@ -127,6 +127,26 @@ through Slack). If you can't assign a merge request, `@` mentioning a maintainer
 This
 [saves reviewers time and helps authors catch mistakes earlier](https://www.ibm.com/developerworks/rational/library/11-proven-practices-for-peer-review/index.html#__RefHeading__97_174136755).
 
+### The responsibility of the reviewer
+
+Reviewers are encouraged to look at the following:
+
+- Merge request title and description are accurate
+- Merge request description checkboxes are ticked as approrpriate
+- Documentation label applied if there are docs changes
+- Correct milestone is applied (if applicable)
+- Ensure the merge request branch is not too far behind the target branch
+(ideally less than 100 commits)
+- Ensure all CI jobs are paassing
+- Examine any Danger bot warnings or errors
+- Examing any code degradations
+
+When a reviewer is happy with the state of the merge request, they should:
+
+- Click the Approve button.
+- Advise the merge request author they have reviewed and approved.
+- Assign to the nominated maintainer.
+
 ### The responsibility of the maintainer
 
 Maintainers are responsible for the overall health, quality, and consistency of
