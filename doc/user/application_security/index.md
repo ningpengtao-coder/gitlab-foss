@@ -181,6 +181,29 @@ An approval will be optional when a security report:
 - Contains no new vulnerabilities.
 - Contains only new vulnerabilities of `low` or `medium` severity.
 
+### Enabling License Approvals within a project
+
+To enable License Approvals, a [project approval rule](../project/merge_requests/merge_request_approvals.md#multiple-approval-rules-premium)
+must be created with the case-sensitive name `License-Check`. This approval
+group must be set with an "Approvals required" count greater than zero.
+
+Once this group has been added to your project, the approval rule will be enabled
+for all Merge Requests. To configure how this rule behaves, you can choose which
+licenses to `approve` or `blacklist` in the
+[project policies for License Compliance](license_compliance/index.md#project-policies-for-license-compliance) section.
+
+Any code changes made will cause the count of approvals required to reset.
+
+An approval will be required when a license report:
+
+- Contains a dependency that includes a software license that is `blacklisted`.
+- Is not generated during pipeline execution.
+
+An approval will be optional when a license report:
+
+- Contains no software license violations.
+- Contains only new licenses that are `approved` or unknown.
+
 <!-- ## Troubleshooting
 
 Include any troubleshooting steps that you can foresee. If you know beforehand what issues
