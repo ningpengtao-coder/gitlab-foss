@@ -88,9 +88,10 @@ If you are using a self-hosted GitLab instance, this process requires that you h
 ### Using a GitHub token
 
 NOTE: **Note:**
-For a proper author/assignee mapping for issues and pull requests, the [GitHub integration method (above)](#using-the-github-integration)
+For a proper author and assignee mapping for issues and pull requests, the [GitHub integration method (above)](#using-the-github-integration)
 should be used instead of the personal access token. If you are using GitLab.com or a self-hosted GitLab instance with the GitHub
-integration enabled, that should be the preferred method to import your repositories. Read more in the [How it works](#how-it-works) section.
+integration enabled, it is strongly recommended that you use the GitHub integration method to import your repositories. Read more in the
+[How it works](#how-it-works) section.
 
 If you are not using the GitHub integration, you can still perform an authorization with GitHub to grant GitLab access your repositories:
 
