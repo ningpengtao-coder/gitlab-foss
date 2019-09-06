@@ -11,6 +11,7 @@ module Gitlab
 
           def perform!
             # Allocate next IID. This operation must be outside of transactions of pipeline creations.
+            fail if Gitlab::Database.inside_transaction?
             pipeline.ensure_project_iid!
 
             # Protect the pipeline. This is assigned in Populate instead of
