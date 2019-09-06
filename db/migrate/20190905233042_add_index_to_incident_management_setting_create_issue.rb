@@ -11,7 +11,11 @@ class AddIndexToIncidentManagementSettingCreateIssue < ActiveRecord::Migration[5
 
   disable_ddl_transaction!
 
-  def change
+  def up
     add_concurrent_index :project_incident_management_settings, :create_issue
+  end
+
+  def down
+    remove_concurrent_index :project_incident_management_settings, :create_issue
   end
 end
