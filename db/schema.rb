@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_05_223900) do
+ActiveRecord::Schema.define(version: 2019_09_05_233042) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -272,7 +272,6 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.boolean "lock_memberships_to_ldap", default: false, null: false
     t.boolean "time_tracking_limit_to_hours", default: false, null: false
     t.string "grafana_url", default: "/-/grafana", null: false
-    t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.string "outbound_local_requests_whitelist", limit: 255, default: [], null: false, array: true
     t.integer "raw_blob_request_limit", default: 300, null: false
     t.boolean "allow_local_requests_from_web_hooks_and_services", default: false, null: false
@@ -284,6 +283,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.text "asset_proxy_whitelist"
     t.text "encrypted_asset_proxy_secret_key"
     t.string "encrypted_asset_proxy_secret_key_iv"
+    t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -619,9 +619,9 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.integer "project_id", null: false
     t.integer "timeout"
     t.integer "timeout_source", default: 1, null: false
-    t.boolean "interruptible"
     t.jsonb "config_options"
     t.jsonb "config_variables"
+    t.boolean "interruptible"
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_interruptible_false", where: "(interruptible = false)"
     t.index ["project_id"], name: "index_ci_builds_metadata_on_project_id"
@@ -2549,7 +2549,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.string "title"
     t.integer "active_pipelines_limit"
     t.integer "pipeline_size_limit"
-    t.integer "active_jobs_limit", default: 0
+    t.integer "active_jobs_limit", default: 0, null: false
     t.index ["name"], name: "index_plans_on_name"
   end
 
@@ -2690,6 +2690,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.boolean "create_issue", default: true, null: false
     t.boolean "send_email", default: false, null: false
     t.text "issue_template_key"
+    t.index ["create_issue"], name: "index_project_incident_management_settings_on_create_issue"
   end
 
   create_table "project_metrics_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
@@ -2843,6 +2844,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.boolean "service_desk_enabled", default: true
     t.integer "approvals_before_merge", default: 0, null: false
     t.boolean "emails_disabled"
+    t.index "lower((name)::text)", name: "index_projects_on_lower_name"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))"
     t.index ["created_at"], name: "index_projects_on_created_at"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
@@ -3039,6 +3041,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.string "path", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index "lower((path)::text) varchar_pattern_ops", name: "index_redirect_routes_on_path_unique_text_pattern_ops", unique: true
     t.index ["path"], name: "index_redirect_routes_on_path", unique: true
     t.index ["source_type", "source_id"], name: "index_redirect_routes_on_source_type_and_source_id"
   end
@@ -3565,6 +3568,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_223900) do
     t.integer "bot_type", limit: 2
     t.string "first_name", limit: 255
     t.string "last_name", limit: 255
+    t.index "lower((name)::text)", name: "index_on_users_name_lower"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id"
     t.index ["admin"], name: "index_users_on_admin"
     t.index ["bot_type"], name: "index_users_on_bot_type"
