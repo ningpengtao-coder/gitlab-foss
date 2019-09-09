@@ -4,15 +4,14 @@ import StageColumnComponent from './stage_column_component.vue';
 import GraphMixin from '../../mixins/graph_component_mixin';
 import { debounceByAnimationFrame } from '~/lib/utils/common_utils';
 
-let debouncedResize;
-let sidebarMutationObserver;
-
 export default {
   components: {
     StageColumnComponent,
     GlLoadingIcon,
   },
   mixins: [GraphMixin],
+  debouncedResize: null,
+  sidebarMutationObserver: null,
   data() {
     return {
       graphLeftPadding: 0,
@@ -20,21 +19,21 @@ export default {
     };
   },
   beforeDestroy() {
-    window.removeEventListener('resize', debouncedResize);
+    window.removeEventListener('resize', this.$options.debouncedResize);
 
-    if (sidebarMutationObserver) {
-      sidebarMutationObserver.disconnect();
+    if (this.$options.sidebarMutationObserver) {
+      this.$options.sidebarMutationObserver.disconnect();
     }
   },
   created() {
-    debouncedResize = debounceByAnimationFrame(this.setGraphPadding);
-    window.addEventListener('resize', debouncedResize);
+    this.$options.debouncedResize = debounceByAnimationFrame(this.setGraphPadding);
+    window.addEventListener('resize', this.$options.debouncedResize);
   },
   mounted() {
     this.setGraphPadding();
 
-    sidebarMutationObserver = new MutationObserver(this.handleLayoutChange);
-    sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
+    this.$options.sidebarMutationObserver = new MutationObserver(this.handleLayoutChange);
+    this.$options.sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
       attributes: true,
       childList: false,
       subtree: false,
