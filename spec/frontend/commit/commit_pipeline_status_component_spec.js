@@ -2,30 +2,25 @@ import Visibility from 'visibilityjs';
 import Poll from '~/lib/utils/poll';
 import flash from '~/flash';
 import CommitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
-
 import { shallowMount } from '@vue/test-utils';
+import { getJSONFixture } from '../helpers/fixtures';
 
 jest.mock('~/lib/utils/poll');
 jest.mock('visibilityjs');
 jest.mock('~/flash');
+
+const mockFetchData = jest.fn();
 /* eslint-disable-next-line prefer-arrow-callback */
 jest.mock('~/projects/tree/services/commit_pipeline_service', function PipelineService() {
   return jest.fn().mockImplementation(() => ({
-    fetchData: jest.fn().mockReturnValue(Promise.resolve()),
+    fetchData: mockFetchData.mockReturnValue(Promise.resolve()),
   }));
 });
 
 describe('Commit pipeline status component', () => {
   let wrapper;
-  const mockCiStatus = {
-    details_path: '/root/hello-world/pipelines/1',
-    favicon: 'canceled.ico',
-    group: 'canceled',
-    has_details: true,
-    icon: 'status_canceled',
-    label: 'canceled',
-    text: 'canceled',
-  };
+  const { pipelines } = getJSONFixture('pipelines/pipelines.json');
+  const { status: mockCiStatus } = pipelines[0].details;
 
   const defaultProps = {
     endpoint: 'endpoint',
@@ -41,18 +36,9 @@ describe('Commit pipeline status component', () => {
     });
   };
 
-  beforeEach(() => {});
-
   afterEach(() => {
-    jest.clearAllMocks();
-    if (wrapper) {
-      wrapper.destroy();
-      wrapper = null;
-    }
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('Visibility management', () => {
@@ -68,8 +54,7 @@ describe('Commit pipeline status component', () => {
       });
 
       it('requests pipeline data', () => {
-        const [pollInstance] = Poll.mock.instances;
-        expect(pollInstance.makeRequest).not.toHaveBeenCalled();
+        expect(mockFetchData).toHaveBeenCalled();
       });
     });
 
@@ -80,19 +65,12 @@ describe('Commit pipeline status component', () => {
       });
 
       it('starts polling', () => {
-        const [pollInstance] = Poll.mock.instances;
+        const [pollInstance] = [...Poll.mock.instances].reverse();
         expect(pollInstance.makeRequest).toHaveBeenCalled();
       });
     });
 
     describe('when component changes its visibility', () => {
-      let visibilityHandler;
-      beforeEach(() => {
-        Visibility.change.mockImplementation(handler => {
-          visibilityHandler = handler;
-        });
-      });
-
       it.each`
         visibility | action
         ${false}   | ${'restart'}
@@ -103,6 +81,7 @@ describe('Commit pipeline status component', () => {
           Visibility.hidden.mockReturnValue(!visibility);
           createComponent();
           Visibility.hidden.mockReturnValue(visibility);
+          const [visibilityHandler] = Visibility.change.mock.calls[0];
           visibilityHandler();
           const [pollInstance] = Poll.mock.instances;
           expect(pollInstance[action]).toHaveBeenCalled();
@@ -126,10 +105,6 @@ describe('Commit pipeline status component', () => {
         return { makeRequest: jest.fn(), restart: jest.fn(), stop: jest.fn() };
       });
       createComponent();
-    });
-
-    afterEach(() => {
-      Poll.mockReset();
     });
 
     describe('is successful', () => {

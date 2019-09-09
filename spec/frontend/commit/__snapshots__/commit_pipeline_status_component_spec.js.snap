@@ -23,13 +23,13 @@ exports[`Commit pipeline status component when polling is successful renders CI 
   class="ci-status-link"
 >
   <a
-    href="/root/hello-world/pipelines/1"
+    href="/frontend-fixtures/pipelines-project/pipelines/7"
   >
     <ciicon-stub
-      aria-label="Pipeline: canceled"
+      aria-label="Pipeline: pending"
       cssclasses=""
       data-container="body"
-      data-original-title="Pipeline: canceled"
+      data-original-title="Pipeline: pending"
       size="24"
       status="[object Object]"
       title=""
