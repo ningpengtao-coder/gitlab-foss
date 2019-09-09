@@ -104,6 +104,9 @@ class Project < ApplicationRecord
     unless: :ci_cd_settings,
     if: proc { ProjectCiCdSetting.available? }
 
+  after_create :create_project_pages_metadatum,
+    unless: :project_pages_metadatum
+
   after_create :set_timestamps_for_create
   after_update :update_forks_visibility_level
 
@@ -295,6 +298,8 @@ class Project < ApplicationRecord
 
   has_many :external_pull_requests, inverse_of: :project
 
+  has_one :project_pages_metadatum, inverse_of: :project
+
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :project_feature, update_only: true
   accepts_nested_attributes_for :import_data
@@ -423,6 +428,10 @@ class Project < ApplicationRecord
   scope :with_group_runners_enabled, -> do
     joins(:ci_cd_settings)
     .where(project_ci_cd_settings: { group_runners_enabled: true })
+  end
+
+  scope :with_pages_deployed, -> do
+    where('EXISTS (?)', ProjectPagesMetadatum.project_scoped.deployed.select(1))
   end
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
@@ -1643,6 +1652,10 @@ class Project < ApplicationRecord
     "#{url}/#{url_path}"
   end
 
+  def pages_group_root?
+    pages_group_url == pages_url
+  end
+
   def pages_subdomain
     full_path.partition('/').first
   end
@@ -1681,6 +1694,7 @@ class Project < ApplicationRecord
     # Projects with a missing namespace cannot have their pages removed
     return unless namespace
 
+    mark_pages_as_not_deployed unless destroyed?
     ::Projects::UpdatePagesConfigurationService.new(self).execute
 
     # 1. We rename pages to temporary directory
@@ -1693,6 +1707,14 @@ class Project < ApplicationRecord
     end
   end
   # rubocop: enable CodeReuse/ServiceClass
+
+  def mark_pages_as_deployed
+    ProjectPagesMetadatum.update_pages_deployed(self, true)
+  end
+
+  def mark_pages_as_not_deployed
+    ProjectPagesMetadatum.update_pages_deployed(self, false)
+  end
 
   # rubocop:disable Gitlab/RailsLogger
   def write_repository_config(gl_full_path: full_path)
@@ -2213,8 +2235,8 @@ class Project < ApplicationRecord
     members.maintainers.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
   end
 
-  def pages_lookup_path(domain: nil)
-    Pages::LookupPath.new(self, domain: domain)
+  def pages_lookup_path(trim_prefix: nil, domain: nil)
+    Pages::LookupPath.new(self, trim_prefix: trim_prefix, domain: domain)
   end
 
   private

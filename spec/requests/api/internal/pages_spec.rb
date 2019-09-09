@@ -43,6 +43,10 @@ describe API::Internal::Pages do
           super(host, headers)
         end
 
+        def deploy_pages(project)
+          project.mark_pages_as_deployed
+        end
+
         context 'not existing host' do
           it 'responds with 404 Not Found' do
             query_host('pages.gitlab.io')
@@ -56,18 +60,71 @@ describe API::Internal::Pages do
           let(:project) { create(:project, namespace: namespace, name: 'gitlab-ce') }
           let!(:pages_domain) { create(:pages_domain, domain: 'pages.gitlab.io', project: project) }
 
-          it 'responds with the correct domain configuration' do
-            query_host('pages.gitlab.io')
+          context 'when there are no pages deployed for the related project' do
+            it 'responds with 204 No Content' do
+              query_host('pages.gitlab.io')
 
-            expect(response).to have_gitlab_http_status(200)
-            expect(response).to match_response_schema('internal/pages/virtual_domain')
+              expect(response).to have_gitlab_http_status(204)
+            end
+          end
 
-            expect(json_response['certificate']).to eq(pages_domain.certificate)
-            expect(json_response['key']).to eq(pages_domain.key)
+          context 'when there are pages deployed for the related project' do
+            it 'responds with the correct domain configuration' do
+              deploy_pages(project)
 
-            lookup_path = json_response['lookup_paths'][0]
-            expect(lookup_path['prefix']).to eq('/')
-            expect(lookup_path['source']['path']).to eq('gitlab-org/gitlab-ce/public/')
+              query_host('pages.gitlab.io')
+
+              expect(response).to have_gitlab_http_status(200)
+              expect(response).to match_response_schema('internal/pages/virtual_domain')
+
+              expect(json_response['certificate']).to eq(pages_domain.certificate)
+              expect(json_response['key']).to eq(pages_domain.key)
+
+              lookup_path = json_response['lookup_paths'][0]
+              expect(lookup_path['prefix']).to eq('/')
+              expect(lookup_path['source']['path']).to eq('gitlab-org/gitlab-ce/public/')
+            end
+          end
+        end
+
+        context 'namespaced domain' do
+          let(:group) { create(:group, name: 'mygroup') }
+
+          before do
+            allow(Settings.pages).to receive(:host).and_return('gitlab-pages.io')
+            allow(Gitlab.config.pages).to receive(:url).and_return("http://gitlab-pages.io")
+          end
+
+          context 'regular project' do
+            it 'responds with the correct domain configuration' do
+              project = create(:project, group: group, name: 'myproject')
+              deploy_pages(project)
+
+              query_host('mygroup.gitlab-pages.io')
+
+              expect(response).to have_gitlab_http_status(200)
+              expect(response).to match_response_schema('internal/pages/virtual_domain')
+
+              lookup_path = json_response['lookup_paths'][0]
+              expect(lookup_path['prefix']).to eq('/myproject/')
+              expect(lookup_path['source']['path']).to eq('mygroup/myproject/public/')
+            end
+          end
+
+          context 'group root project' do
+            it 'responds with the correct domain configuration' do
+              project = create(:project, group: group, name: 'mygroup.gitlab-pages.io')
+              deploy_pages(project)
+
+              query_host('mygroup.gitlab-pages.io')
+
+              expect(response).to have_gitlab_http_status(200)
+              expect(response).to match_response_schema('internal/pages/virtual_domain')
+
+              lookup_path = json_response['lookup_paths'][0]
+              expect(lookup_path['prefix']).to eq('/')
+              expect(lookup_path['source']['path']).to eq('mygroup/mygroup.gitlab-pages.io/public/')
+            end
           end
         end
       end
