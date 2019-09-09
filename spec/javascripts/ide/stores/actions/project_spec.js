@@ -238,21 +238,27 @@ describe('IDE store project actions', () => {
     };
 
     beforeEach(() => {
-      store.state.entries = {
-        foo: { pending: false },
-        'foo/bar-pending': { pending: true },
-        'foo/bar': { pending: false },
-      };
+      Object.assign(store.state, {
+        entries: {
+          foo: { pending: false },
+          'foo/bar-pending': { pending: true },
+          'foo/bar': { pending: false },
+        },
+      });
     });
 
     describe('empty repo', () => {
       beforeEach(() => {
         spyOn(store, 'dispatch').and.returnValue(Promise.resolve());
 
-        store.state.currentProjectId = 'abc/def';
-        store.state.projects['abc/def'] = {
-          empty_repo: true,
-        };
+        Object.assign(store.state, {
+          currentProjectId: 'abc/def',
+          projects: {
+            'abc/def': {
+              empty_repo: true,
+            },
+          },
+        });
       });
 
       afterEach(() => {
@@ -262,10 +268,7 @@ describe('IDE store project actions', () => {
       it('dispatches showEmptyState action right away', done => {
         openBranch(store, branch)
           .then(() => {
-            expect(store.dispatch.calls.allArgs()).toEqual([
-              ['setCurrentBranchId', branch.branchId],
-              ['showEmptyState', branch],
-            ]);
+            expect(store.dispatch.calls.allArgs()).toEqual([['showEmptyState', branch]]);
             done();
           })
           .catch(done.fail);

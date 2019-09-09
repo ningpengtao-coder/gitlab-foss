@@ -93,56 +93,67 @@ export const showEmptyState = ({ commit, state }, { projectId, branchId }) => {
 };
 
 export const openBranch = ({ dispatch, state, getters }, { projectId, branchId, basePath }) => {
-  dispatch('setCurrentBranchId', branchId);
-
-  if (getters.emptyRepo) {
-    return dispatch('showEmptyState', { projectId, branchId });
-  }
-  return dispatch('getBranchData', {
-    projectId,
-    branchId,
-  })
-    .then(() => {
-      dispatch('getMergeRequestsForBranch', {
-        projectId,
-        branchId,
-      });
-      dispatch('getFiles', {
+  const bootstrap = () =>
+    new Promise((resolve, reject) => {
+      dispatch('getBranchData', {
         projectId,
         branchId,
       })
         .then(() => {
-          if (basePath) {
-            const path = basePath.slice(-1) === '/' ? basePath.slice(0, -1) : basePath;
-            const treeEntryKey = Object.keys(state.entries).find(
-              key => key === path && !state.entries[key].pending,
-            );
-            const treeEntry = state.entries[treeEntryKey];
-
-            if (treeEntry) {
-              dispatch('handleTreeEntryAction', treeEntry);
-            } else {
-              dispatch('createTempEntry', {
-                name: path,
-                type: 'blob',
-              });
-            }
-          }
+          dispatch('getMergeRequestsForBranch', {
+            projectId,
+            branchId,
+          });
+          return dispatch('getFiles', {
+            projectId,
+            branchId,
+          });
         })
-        .catch(
-          () =>
-            new Error(
-              sprintf(
-                __('An error occurred whilst getting files for - %{branchId}'),
-                {
-                  branchId: `<strong>${_.escape(projectId)}/${_.escape(branchId)}</strong>`,
-                },
-                false,
-              ),
-            ),
-        );
-    })
-    .catch(() => {
-      dispatch('showBranchNotFoundError', branchId);
+        .then(() => resolve())
+        .catch(() => {
+          dispatch('showBranchNotFoundError', branchId);
+          reject();
+        });
     });
+  const fileHandler = () => {
+    if (basePath) {
+      const path = basePath.slice(-1) === '/' ? basePath.slice(0, -1) : basePath;
+      const treeEntryKey = Object.keys(state.entries).find(
+        key => key === path && !state.entries[key].pending,
+      );
+      const treeEntry = state.entries[treeEntryKey];
+
+      if (treeEntry) {
+        dispatch('handleTreeEntryAction', treeEntry);
+      } else {
+        dispatch('createTempEntry', {
+          name: path,
+          type: 'blob',
+        });
+      }
+    }
+  };
+  const currentProject = state.projects[projectId];
+  if (getters.emptyRepo) {
+    return dispatch('showEmptyState', { projectId, branchId });
+  }
+  if (!currentProject || !currentProject.branches[branchId]) {
+    dispatch('setCurrentBranchId', branchId);
+
+    return bootstrap()
+      .then(() => fileHandler())
+      .catch(
+        () =>
+          new Error(
+            sprintf(
+              __('An error occurred whilst getting files for - %{branchId}'),
+              {
+                branchId: `<strong>${_.escape(projectId)}/${_.escape(branchId)}</strong>`,
+              },
+              false,
+            ),
+          ),
+      );
+  }
+  return fileHandler();
 };
