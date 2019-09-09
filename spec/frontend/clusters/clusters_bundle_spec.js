@@ -327,14 +327,14 @@ describe('Clusters', () => {
     });
   });
 
-  describe('handleSuccess', () => {
+  describe('handleClusterStatusSuccess', () => {
     beforeEach(() => {
       jest.spyOn(cluster.store, 'updateStateFromServer').mockReturnThis();
       jest.spyOn(cluster, 'toggleIngressDomainHelpText').mockReturnThis();
       jest.spyOn(cluster, 'checkForNewInstalls').mockReturnThis();
       jest.spyOn(cluster, 'updateContainer').mockReturnThis();
 
-      cluster.handleSuccess({ data: {} });
+      cluster.handleClusterStatusSuccess({ data: {} });
     });
 
     it('updates clusters store', () => {

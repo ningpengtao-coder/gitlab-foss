@@ -111,15 +111,19 @@ export default class Clusters {
     this.initApplications(clusterType);
     this.initEnvironments();
 
-    if (clusterEnvironmentsPath) {
-      this.fetchEnvironments();
+    if (clusterEnvironmentsPath && this.environments) {
+      this.store.toggleFetchEnvironments(true);
+
+      this.initPolling('fetchClusterEnvironments', data =>
+        this.handleClusterEnvironmentsSuccess(data),
+      );
     }
 
     this.updateContainer(null, this.store.state.status, this.store.state.statusReason);
 
     this.addListeners();
     if (statusPath && !this.environments) {
-      this.initPolling();
+      this.initPolling('fetchClusterStatus', data => this.handleClusterStatusSuccess(data));
     }
   }
 
@@ -179,16 +183,9 @@ export default class Clusters {
     });
   }
 
-  fetchEnvironments() {
-    this.store.toggleFetchEnvironments(true);
-
-    this.service
-      .fetchClusterEnvironments()
-      .then(data => {
-        this.store.toggleFetchEnvironments(false);
-        this.store.updateEnvironments(data.data);
-      })
-      .catch(() => Clusters.handleError());
+  handleClusterEnvironmentsSuccess(data) {
+    this.store.toggleFetchEnvironments(false);
+    this.store.updateEnvironments(data.data);
   }
 
   static initDismissableCallout() {
@@ -224,21 +221,16 @@ export default class Clusters {
     eventHub.$off('uninstallApplication');
   }
 
-  initPolling() {
+  initPolling(method, successCallback) {
     this.poll = new Poll({
       resource: this.service,
-      method: 'fetchData',
-      successCallback: data => this.handleSuccess(data),
+      method,
+      successCallback,
       errorCallback: () => Clusters.handleError(),
     });
 
     if (!Visibility.hidden()) {
       this.poll.makeRequest();
-    } else {
-      this.service
-        .fetchData()
-        .then(data => this.handleSuccess(data))
-        .catch(() => Clusters.handleError());
     }
 
     Visibility.change(() => {
@@ -254,7 +246,7 @@ export default class Clusters {
     Flash(s__('ClusterIntegration|Something went wrong on our end.'));
   }
 
-  handleSuccess(data) {
+  handleClusterStatusSuccess(data) {
     const prevStatus = this.store.state.status;
     const prevApplicationMap = Object.assign({}, this.store.state.applications);
 
