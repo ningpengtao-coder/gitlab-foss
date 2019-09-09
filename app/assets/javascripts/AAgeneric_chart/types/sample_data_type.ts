@@ -13,7 +13,8 @@ export interface ChartOptions {
 
 export interface SourceEntity {
   name?: string;
-  data: number[]
+  // first element in array is xAxis, second - yAxis value
+  data: [string, number][]
 }
 
 enum ChartType {
