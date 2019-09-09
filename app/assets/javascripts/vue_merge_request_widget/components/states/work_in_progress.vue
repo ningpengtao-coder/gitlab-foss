@@ -1,5 +1,6 @@
 <script>
 import $ from 'jquery';
+import '~/flash';
 import statusIcon from '../mr_widget_status_icon.vue';
 import tooltip from '../../../vue_shared/directives/tooltip';
 import eventHub from '../../event_hub';
