@@ -3,6 +3,7 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import StageColumnComponent from './stage_column_component.vue';
 import GraphMixin from '../../mixins/graph_component_mixin';
 import { debounceByAnimationFrame } from '~/lib/utils/common_utils';
+import { LAYOUT_CHANGE_DELAY } from '~/pipelines/constants';
 
 export default {
   components: {
@@ -52,7 +53,7 @@ export default {
     },
     handleLayoutChange() {
       // wait until animations finish, then recalculate padding
-      window.setTimeout(this.setGraphPadding, 300);
+      window.setTimeout(this.setGraphPadding, LAYOUT_CHANGE_DELAY);
     },
   },
 };
