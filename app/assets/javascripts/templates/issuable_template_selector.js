@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-return */
 
 import $ from 'jquery';
+import '~/gl_dropdown';
 import Api from '../api';
 import TemplateSelector from '../blob/template_selector';
 import { __ } from '~/locale';
