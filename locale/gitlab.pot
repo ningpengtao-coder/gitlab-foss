@@ -10431,10 +10431,10 @@ msgstr ""
 msgid "Set up CI/CD"
 msgstr ""
 
-msgid "Set up a %{type} Runner manually"
+msgid "Set up a %{type} Runner automatically"
 msgstr ""
 
-msgid "Set up a specific Runner automatically"
+msgid "Set up a %{type} Runner manually"
 msgstr ""
 
 msgid "Set up new U2F device"
