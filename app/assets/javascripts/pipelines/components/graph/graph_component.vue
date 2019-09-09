@@ -66,7 +66,7 @@ export default {
           paddingRight: `${graphRightPadding}px`,
         }"
       >
-        <div v-if="isLoading" class="m-auto"><gl-loading-icon :size="3" /></div>
+        <gl-loading-icon v-if="isLoading" class="m-auto" :size="3" />
 
         <ul v-if="!isLoading" class="stage-column-list">
           <stage-column-component
