@@ -62,7 +62,7 @@ describe('Commit pipeline status component', () => {
         createComponent();
       });
 
-      it('does not starts polling', () => {
+      it('does not start polling', () => {
         const [pollInstance] = Poll.mock.instances;
         expect(pollInstance.makeRequest).not.toHaveBeenCalled();
       });
