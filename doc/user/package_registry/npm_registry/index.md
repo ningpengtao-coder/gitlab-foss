@@ -14,7 +14,7 @@ Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported.
 
 NOTE: **Note:**
 This option is available only if your GitLab administrator has
-[enabled support for the NPM registry](../../../administration/packages.md).**(PREMIUM ONLY)**
+[enabled support for the NPM registry](../../../administration/package_registry/index.md).**(PREMIUM ONLY)**
 
 After the NPM registry is enabled, it will be available for all new projects
 by default. To enable it for existing projects, or if you want to disable it:

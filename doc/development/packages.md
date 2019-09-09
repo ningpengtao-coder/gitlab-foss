@@ -1,8 +1,8 @@
 # Packages **(PREMIUM)**
 
-This document will guide you through adding another [package management system](../administration/packages.md) support to GitLab.
+This document will guide you through adding another [package management system](../administration/package_registry/index.md) support to GitLab.
 
-See already supported package types in [Packages documentation](../administration/packages.md)
+See already supported package types in [Packages documentation](../administration/package_registry/index.md)
 
 Since GitLab packages' UI is pretty generic, it is possible to add new
 package system support by solely backend changes. This guide is superficial and does

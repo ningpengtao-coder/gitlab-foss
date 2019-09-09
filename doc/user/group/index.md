@@ -285,7 +285,7 @@ To change your group path:
 
 CAUTION: **Caution:**
 It is currently not possible to rename a namespace if it contains a
-project with [Container Registry](../project/container_registry.md) tags,
+project with [Container Registry](../package_registry/container_registry/index.md) tags,
 because the project cannot be moved.
 
 TIP: **TIP:**

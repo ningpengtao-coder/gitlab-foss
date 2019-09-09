@@ -1,6 +1,6 @@
 # Packages API **(PREMIUM)**
 
-This is the API docs of [GitLab Packages](../administration/packages.md).
+This is the API docs of [GitLab Packages](../administration/package_registry/index.md).
 
 ## List project packages
 
