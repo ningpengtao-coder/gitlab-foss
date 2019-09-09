@@ -33,26 +33,26 @@ export default {
     },
   },
   computed: {
-    ...mapState(['currentMergeRequestId', 'clientsidePreviewEnabled']),
+    ...mapState(['currentBranchId', 'currentMergeRequestId', 'clientsidePreviewEnabled']),
     ...mapState('rightPane', ['isOpen', 'currentView']),
     ...mapGetters(['packageJson']),
     ...mapGetters('rightPane', ['isActiveView', 'isAliveView']),
+    showMergeRequestTab() {
+      return this.currentBranchId !== 'master'
+    },
+    mergeRequestTabTitle() {
+      return this.currentMergeRequestId ? __('Merge Request') : __('New Merge Request')
+    },
     showLivePreview() {
       return this.packageJson && this.clientsidePreviewEnabled;
     },
     defaultTabs() {
       return [
         {
-          show: !this.currentMergeRequestId,
-          title: __('New Merge Request'),
+          show: this.showMergeRequestTab,
+          title: this.mergeRequestTabTitle,
           views: [rightSidebarViews.createMergeRequest],
           icon: 'merge-request',
-        },
-        {
-          show: this.currentMergeRequestId,
-          title: __('Merge Request'),
-          views: [rightSidebarViews.mergeRequestInfo],
-          icon: 'text-description',
         },
         {
           show: true,
