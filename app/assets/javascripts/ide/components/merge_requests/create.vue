@@ -62,6 +62,7 @@ export default {
 <template>
   <div class="ide-create-merge-request d-flex flex-column h-100">
     <iframe
+      v-once
       id="js-create-mr-sidebar"
       :src="mergeRequestSrc"
       class="h-100 border-0"
