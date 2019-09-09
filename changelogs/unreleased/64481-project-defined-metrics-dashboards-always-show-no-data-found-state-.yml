@@ -1,0 +1,5 @@
+---
+title: Project-defined metrics dashboards always show 'No Data Found' state
+merge_request: 32720
+author:
+type: fixed
