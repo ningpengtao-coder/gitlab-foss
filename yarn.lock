@@ -1593,6 +1593,11 @@ acorn@^6.0.1, acorn@^6.0.2, acorn@^6.0.5, acorn@^6.0.7:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.2.1.tgz#3ed8422d6dec09e6121cc7a843ca86a330a86b51"
   integrity sha512-JD0xT5FCRDNyjDda3Lrg/IxFscp9q4tiYtxE1/nOzlKCk7hIRuYjhq1kCNkbPjMRMZuFq20HNQn1I9k8Oj0E+Q==
 
+add@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/add/-/add-2.0.6.tgz#248f0a9f6e5a528ef2295dbeec30532130ae2235"
+  integrity sha1-JI8Kn25aUo7yKV2+7DBTITCuIjU=
+
 after@0.8.2:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/after/-/after-0.8.2.tgz#fedb394f9f0e02aa9768e702bda23b505fae7e1f"
@@ -1982,6 +1987,11 @@ autosize@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.0.tgz#7a0599b1ba84d73bd7589b0d9da3870152c69237"
   integrity sha1-egWZsbqE1zvXWJsNnaOHAVLGkjc=
+
+awesome-json2json@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/awesome-json2json/-/awesome-json2json-0.5.2.tgz#aa08e503fe30d590f276040926ef830e40cc8c7f"
+  integrity sha512-KebKk3qGgMzYMrHfv5na8ly+ASgpLQSOCCepNS7pJkgC5xAuvLVr+Yn0KQFHsh6Y+KPJ8UBNUGBySQO29FdQ4Q==
 
 aws-sign2@~0.7.0:
   version "0.7.0"
@@ -7354,6 +7364,11 @@ json-buffer@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.0.tgz#5b1f397afc75d677bde8bcfc0e47e1f9a3d9a898"
   integrity sha1-Wx85evx11ne96Lz8Dkfh+aPZqJg=
+
+json-format-highlight@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/json-format-highlight/-/json-format-highlight-1.0.1.tgz#047caf8e36020e5cf5cc80df6717cf8a5b9836a4"
+  integrity sha512-LPbx2Wr6AQb0IPD3lQ+NorDBUwpimY5dFTOYQNWplHonbUfy99w1CjQPI486ZsD8ud5sea3UQ27iZCPEW2kiNQ==
 
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
@@ -13203,6 +13218,11 @@ yarn-deduplicate@^1.1.1:
     "@yarnpkg/lockfile" "^1.1.0"
     commander "^2.10.0"
     semver "^5.3.0"
+
+yarn@^1.17.3:
+  version "1.17.3"
+  resolved "https://registry.yarnpkg.com/yarn/-/yarn-1.17.3.tgz#60e0b77d079eb78e753bb616f7592b51b6a9adce"
+  integrity sha512-CgA8o7nRZaQvmeF/WBx2FC7f9W/0X59T2IaLYqgMo6637wfp5mMEsM3YXoJtKUspnpmDJKl/gGFhnqS+sON7hA==
 
 yeast@0.1.2:
   version "0.1.2"
