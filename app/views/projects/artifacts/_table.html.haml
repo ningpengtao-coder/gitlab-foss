@@ -1,10 +1,10 @@
-- if jobs.blank?
+- if artifacts.blank?
   %div
     .nothing-here-block No jobs to show
 - else
   .table-holder
     .ci-table
-      .gl-responsive-table-row.table-row-header{ role: 'row' }
+      .gl-responsive-table-row.table-row-header.px-md-3{ role: 'row' }
         .table-section.section-25{ role: 'rowheader' }= _('Job')
         .table-section.section-15{ role: 'rowheader' }= _('Name')
         .table-section.section-20{ role: 'rowheader' }= _('Creation date')
@@ -12,6 +12,6 @@
         .table-section.section-10{ role: 'rowheader' }= _('Size')
         .table-section.section-10{ role: 'rowheader' }
 
-      = render partial: 'artifact', collection: jobs, as: :job, locals: { project: project }
+      = render partial: 'artifact', collection: artifacts, as: :artifact, locals: { project: project }
 
-  = paginate_collection(jobs)
+  = paginate artifacts, theme: "gitlab", total_pages: @total_pages

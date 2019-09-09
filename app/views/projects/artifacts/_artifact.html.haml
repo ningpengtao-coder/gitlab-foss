@@ -1,62 +1,63 @@
 - project = local_assigns.fetch(:project)
 
-.gl-responsive-table-row{ id: dom_id(job) }
-  .table-section.section-25.section-wrap
+.gl-responsive-table-row.px-md-3{ id: dom_id(artifact) }
+  .table-section.section-25.section-wrap.commit
     .table-mobile-header{ role: 'rowheader' }= _('Job')
     .table-mobile-content
-      .branch-commit
-        - if can?(current_user, :read_build, job)
-          = link_to project_job_path(project, job) do
-            %span.build-link= job.id
+      .branch-commit.cgray
+        - if can?(current_user, :read_build, project)
+          = link_to project_job_path(project, artifact.job) do
+            %span.build-link ##{artifact.job_id}
         - else
-          %span.build-link= job.id
+          %span.build-link ##{artifact.job_id}
 
-        - if job.ref
+        - if artifact.job.ref
           .icon-container
-            = job.tag? ? icon('tag') : sprite_icon('fork', css_class: 'sprite')
-          = link_to job.ref, project_ref_path(project, job.ref), class: 'ref-name'
+            = artifact.job.tag? ? icon('tag') : sprite_icon('branch', css_class: 'sprite')
+          = link_to artifact.job.ref, project_ref_path(project, artifact.job.ref), class: 'ref-name'
         - else
-          .light= none
+          .light= _('none')
         .icon-container.commit-icon
           = custom_icon('icon_commit')
 
-        = link_to job.short_sha, project_commit_path(project, job.sha), class: 'commit-sha'
+        - if artifact.job.sha
+          = link_to artifact.job.short_sha, project_commit_path(project, artifact.job.sha), class: 'commit-sha mr-0'
 
   .table-section.section-15.section-wrap
     .table-mobile-header{ role: 'rowheader' }= _('Name')
     .table-mobile-content
-      = job.name
+      = artifact.job.name
 
   .table-section.section-20
     .table-mobile-header{ role: 'rowheader' }= _('Creation date')
     .table-mobile-content
       %p.finished-at
         = icon("calendar")
-        %span= time_ago_with_tooltip(job.created_at)
+        %span= time_ago_with_tooltip(artifact.created_at)
 
   .table-section.section-20
     .table-mobile-header{ role: 'rowheader' }= _('Expiration date')
     .table-mobile-content
-      - if job.artifacts_expire_at
+      - if artifact.expire_at
         %p.finished-at
           = icon("calendar")
-          %span= time_ago_with_tooltip(job.artifacts_expire_at)
+          %span= time_ago_with_tooltip(artifact.expire_at)
 
   .table-section.section-10
     .table-mobile-header{ role: 'rowheader' }= _('Size')
     .table-mobile-content
-      = number_to_human_size(job.sum_artifacts_size, precision: 2)
+      = number_to_human_size(artifact.size, precision: 2)
 
   .table-section.table-button-footer.section-10
     .btn-group.table-action-buttons
       .btn-group
-        - if can?(current_user, :read_build, job)
-          = link_to download_project_job_artifacts_path(job.project, job), rel: 'nofollow', download: '', title: _('Download artifacts'), data: { placement: 'top', container: 'body' }, ref: 'tooltip', aria: { label: _('Download artifacts') }, class: 'btn btn-build has-tooltip' do
+        - if can?(current_user, :read_build, project)
+          = link_to download_project_job_artifacts_path(project, artifact.job), rel: 'nofollow', download: '', title: _('Download artifacts'), data: { placement: 'top', container: 'body' }, ref: 'tooltip', aria: { label: _('Download artifacts') }, class: 'btn btn-build has-tooltip' do
             = sprite_icon('download')
 
-          = link_to browse_project_job_artifacts_path(job.project, job), rel: 'nofollow', title: _('Browse artifacts'), data: { placement: 'top', container: 'body' }, ref: 'tooltip', aria: { label: _('Browse artifacts') }, class: 'btn btn-build has-tooltip' do
-            = sprite_icon('earth')
+          = link_to browse_project_job_artifacts_path(project, artifact.job), rel: 'nofollow', title: _('Browse artifacts'), data: { placement: 'top', container: 'body' }, ref: 'tooltip', aria: { label: _('Browse artifacts') }, class: 'btn btn-build has-tooltip' do
+            = sprite_icon('folder-open')
 
-        - if can?(current_user, :destroy_artifacts, job.project)
-          = link_to namespace_project_job_artifacts_path(job.project.namespace, job.project, job), data: { placement: 'top', container: 'body', confirm: _('Are you sure you want to delete these artifacts?') }, method: :delete, title: _('Delete artifacts'), ref: 'tooltip', aria: { label: _('Delete artifacts') }, class: 'btn btn-remove has-tooltip' do
+        - if can?(current_user, :destroy_artifacts, project)
+          = link_to namespace_project_job_artifacts_path(project.namespace, project, artifact.job), data: { placement: 'top', container: 'body', confirm: _('Are you sure you want to delete these artifacts?') }, method: :delete, title: _('Delete artifacts'), ref: 'tooltip', aria: { label: _('Delete artifacts') }, class: 'btn btn-remove has-tooltip' do
             = sprite_icon('remove')

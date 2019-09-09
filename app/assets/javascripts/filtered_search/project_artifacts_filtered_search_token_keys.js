@@ -1,16 +1,8 @@
 import FilteredSearchTokenKeys from './filtered_search_token_keys';
 
 const tokenKeys = [
-  {
-    key: 'deleted-branches',
-    type: 'string',
-    param: 'deleted-branches',
-    symbol: '',
-    icon: 'tag',
-    tag: 'Yes or No', // eslint-disable-line @gitlab/i18n/no-non-i18n-strings
-    lowercaseValueOnSubmit: true,
-    capitalizeTokenValue: true,
-  },
+  // Currently, no filtering is implemented. This will be fixed in future iterations.
+  // See https://gitlab.com/gitlab-org/gitlab-ce/issues/48862 for more information.
 ];
 
 const ProjectArtifactsFilteredSearchTokenKeys = new FilteredSearchTokenKeys(tokenKeys);

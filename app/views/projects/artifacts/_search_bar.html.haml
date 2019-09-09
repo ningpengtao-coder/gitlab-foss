@@ -37,15 +37,6 @@
                   %span.js-filter-tag.dropdown-light-content
                     {{tag}}
 
-          #js-dropdown-project-artifact-deleted-branches.filtered-search-input-dropdown-menu.dropdown-menu
-            %ul{ data: { dropdown: true } }
-              %li.filter-dropdown-item{ data: { value: 'true' } }
-                = button_tag class: %w[btn btn-link] do
-                  = _('Yes')
-              %li.filter-dropdown-item{ data: { value: 'false' } }
-                = button_tag class: %w[btn btn-link] do
-                  = _('No')
-
         = button_tag class: %w[clear-search hidden] do
           = icon('times')
       .filter-dropdown-container
