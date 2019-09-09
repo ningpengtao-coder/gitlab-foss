@@ -21,7 +21,7 @@ This file is called `resque.yml` for historical reasons. We are **NOT**
 using Resque at the moment. It is used to specify Redis configuration
 values when a single database instance of Redis is desired.
 
-# Advanced Redis configuration files
+## Advanced Redis configuration files
 
 In more advanced configurations of Redis key-value storage, it is desirable
 to separate the keys by lifecycle and intended use to ease provisioning and
@@ -32,27 +32,29 @@ persistence policies, and other Redis customization) for connections
 to Redis single instances, Redis sentinel, and Redis clusters.
 
 If desired, the routing URL provided by these settings can be used with:
+
 1. Unix Socket
-    1. named socket for each Redis instance desired.
-    2. `database number` for each Redis instance desired.
-2. TCP Socket
-    1. `host name` or IP for each Redis instance desired
-    2. TCP port number for each Redis instance desired
-    3. `database number` for each Redis instance desired
+   1. named socket for each Redis instance desired.
+   1. `database number` for each Redis instance desired.
+1. TCP Socket
+   1. `host name` or IP for each Redis instance desired
+   1. TCP port number for each Redis instance desired
+   1. `database number` for each Redis instance desired
 
-## Example URL attribute formats for GitLab Redis `.yml` configuration files
-* Unix Socket, default Redis database (0)
-    * `url: unix:/path/to/redis.sock`
-    * `url: unix:/path/to/redis.sock?db=`
-* Unix Socket, Redis database 44
-    * `url: unix:/path/to/redis.sock?db=44`
-    * `url: unix:/path/to/redis.sock?extra=foo&db=44`
-* TCP Socket for Redis on localhost, port 6379, database 33
-    * `url: redis://:mynewpassword@localhost:6379/33`
-* TCP Socket for Redis on remote host `myserver`, port 6379, database 33
-    * `url: redis://:mynewpassword@myserver:6379/33`
+### Example URL attribute formats for GitLab Redis `.yml` configuration files
 
-## redis.cache.yml
+- Unix Socket, default Redis database (0)
+  - `url: unix:/path/to/redis.sock`
+  - `url: unix:/path/to/redis.sock?db=`
+- Unix Socket, Redis database 44
+  - `url: unix:/path/to/redis.sock?db=44`
+  - `url: unix:/path/to/redis.sock?extra=foo&db=44`
+- TCP Socket for Redis on localhost, port 6379, database 33
+  - `url: redis://:mynewpassword@localhost:6379/33`
+- TCP Socket for Redis on remote host `myserver`, port 6379, database 33
+  - `url: redis://:mynewpassword@myserver:6379/33`
+
+### redis.cache.yml
 
 If configured, `redis.cache.yml` overrides the
 `resque.yml` settings to configure the Redis database instance
@@ -64,26 +66,28 @@ an alternate location for configuration settings.
 
 The order of precedence for the URL used to connect to the Redis instance
 used for `cache` is:
+
 1. URL from a configuration file pointed to by the
-`GITLAB_REDIS_CACHE_CONFIG_FILE` environment variable
-2. URL from `redis.cache.yml`
-3. URL from a configuration file pointed to by the
-`GITLAB_REDIS_CONFIG_FILE` environment variable
-4. URL from `resque.yml`
-5. `redis://localhost:6380`
+   `GITLAB_REDIS_CACHE_CONFIG_FILE` environment variable
+1. URL from `redis.cache.yml`
+1. URL from a configuration file pointed to by the
+   `GITLAB_REDIS_CONFIG_FILE` environment variable
+1. URL from `resque.yml`
+1. `redis://localhost:6380`
 
 The order of precedence for all other configuration settings for `cache`
 are selected from only the first of the following files found (if a setting
 is not provided in an earlier file, the remainder of the files are not
 searched):
-1. the configuration file pointed to by the
-`GITLAB_REDIS_CACHE_CONFIG_FILE` environment variable
-2. the configuration file `redis.cache.yml`
-3. the configuration file pointed to by the
-`GITLAB_REDIS_CONFIG_FILE` environment variable
-4. the configuration file `resque.yml`
 
-## redis.queues.yml
+1. the configuration file pointed to by the
+   `GITLAB_REDIS_CACHE_CONFIG_FILE` environment variable
+1. the configuration file `redis.cache.yml`
+1. the configuration file pointed to by the
+   `GITLAB_REDIS_CONFIG_FILE` environment variable
+1. the configuration file `resque.yml`
+
+### redis.queues.yml
 
 If configured, `redis.queues.yml` overrides the
 `resque.yml` settings to configure the Redis database instance
@@ -98,26 +102,28 @@ configuration settings.
 
 The order of precedence for the URL used to connect to the Redis instance
 used for `queues` is:
+
 1. URL from a configuration file pointed to by the
-`GITLAB_REDIS_QUEUES_CONFIG_FILE` environment variable
-2. URL from `redis.queues.yml`
-3. URL from a configuration file pointed to by the
+   `GITLAB_REDIS_QUEUES_CONFIG_FILE` environment variable
+1. URL from `redis.queues.yml`
+1. URL from a configuration file pointed to by the
 `GITLAB_REDIS_CONFIG_FILE` environment variable
-4. URL from `resque.yml`
-5. `redis://localhost:6381`
+1. URL from `resque.yml`
+1. `redis://localhost:6381`
 
 The order of precedence for all other configuration settings for `queues`
 are selected from only the first of the following files found (if a setting
 is not provided in an earlier file, the remainder of the files are not
 searched):
-1. the configuration file pointed to by the
-`GITLAB_REDIS_QUEUES_CONFIG_FILE` environment variable
-2. the configuration file `redis.queues.yml`
-3. the configuration file pointed to by the
-`GITLAB_REDIS_CONFIG_FILE` environment variable
-4. the configuration file `resque.yml`
 
-## redis.shared_state.yml
+1. the configuration file pointed to by the
+   `GITLAB_REDIS_QUEUES_CONFIG_FILE` environment variable
+1. the configuration file `redis.queues.yml`
+1. the configuration file pointed to by the
+   `GITLAB_REDIS_CONFIG_FILE` environment variable
+1. the configuration file `resque.yml`
+
+### redis.shared_state.yml
 
 If configured, `redis.shared_state.yml` overrides the
 `resque.yml` settings to configure the Redis database instance
@@ -129,21 +135,23 @@ an alternate location for configuration settings.
 
 The order of precedence for the URL used to connect to the Redis instance
 used for `shared_state` is:
+
 1. URL from a configuration file pointed to by the
-`GITLAB_REDIS_SHARED_STATE_CONFIG_FILE` environment variable
-2. URL from `redis.shared_state.yml`
-3. URL from a configuration file pointed to by the
-`GITLAB_REDIS_CONFIG_FILE` environment variable
-4. URL from `resque.yml`
-5. `redis://localhost:6382`
+   `GITLAB_REDIS_SHARED_STATE_CONFIG_FILE` environment variable
+1. URL from `redis.shared_state.yml`
+1. URL from a configuration file pointed to by the
+   `GITLAB_REDIS_CONFIG_FILE` environment variable
+1. URL from `resque.yml`
+1. `redis://localhost:6382`
 
 The order of precedence for all other configuration settings for `shared_state`
 are selected from only the first of the following files found (if a setting
 is not provided in an earlier file, the remainder of the files are not
 searched):
+
 1. the configuration file pointed to by the
-`GITLAB_REDIS_SHARED_STATE_CONFIG_FILE` environment variable
-2. the configuration file `redis.shared_state.yml`
-3. the configuration file pointed to by the
-`GITLAB_REDIS_CONFIG_FILE` environment variable
-4. the configuration file `resque.yml`
+   `GITLAB_REDIS_SHARED_STATE_CONFIG_FILE` environment variable
+1. the configuration file `redis.shared_state.yml`
+1. the configuration file pointed to by the
+   `GITLAB_REDIS_CONFIG_FILE` environment variable
+1. the configuration file `resque.yml`

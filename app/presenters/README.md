@@ -24,7 +24,7 @@ Presenters should be used for:
 
 - Data and logic methods that can be pulled & combined into single methods from
   view. This can include loops extracted from views too. A good example is
-  https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7073/diffs.
+  <https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7073/diffs>.
 - Data and logic methods that can be pulled from models.
 - Simple text output methods: it's ok if the method returns a string, but not a
   whole DOM element for which we'd need HAML, a view context, helpers etc.
@@ -42,7 +42,7 @@ Nonetheless, the main issue is that concerns don’t make the model object more
 cohesive. The code is just better organized. In other words, there’s no real
 change to the API of the model.
 
-– https://www.toptal.com/ruby-on-rails/decoupling-rails-components
+– <https://www.toptal.com/ruby-on-rails/decoupling-rails-components>
 
 ## Benefits
 

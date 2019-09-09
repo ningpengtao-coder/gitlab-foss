@@ -1,4 +1,4 @@
-## Developer Certificate of Origin + License
+# Developer Certificate of Origin + License
 
 By contributing to GitLab B.V., You accept and agree to the following terms and
 conditions for Your present and future Contributions submitted to GitLab B.V.
@@ -40,7 +40,7 @@ This [documentation](doc/development/contributing/index.md#closing-policy-for-is
 
 This [documentation](doc/development/contributing/index.md#helping-others) has been moved.
 
-## I want to contribute!
+## I want to contribute
 
 [View the new documentation](https://about.gitlab.com/community/contribute/) to find the latest information.
 

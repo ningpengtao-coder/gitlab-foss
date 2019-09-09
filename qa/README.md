@@ -70,9 +70,9 @@ will need to [modify your GDK setup](https://gitlab.com/gitlab-org/gitlab-qa/blo
 ### Writing tests
 
 - [Writing tests from scratch tutorial](../doc/development/testing_guide/end_to_end/quick_start_guide.md)
-    - [Best practices](../doc/development/testing_guide/best_practices.md)
-    - [Using page objects](../doc/development/testing_guide/end_to_end/page_objects.md)
-    - [Guidelines](../doc/development/testing_guide/index.md)
+  - [Best practices](../doc/development/testing_guide/best_practices.md)
+  - [Using page objects](../doc/development/testing_guide/end_to_end/page_objects.md)
+  - [Guidelines](../doc/development/testing_guide/index.md)
 
 ### Running specific tests
 
@@ -133,7 +133,6 @@ on every request. This is necessary on gitlab.com to direct traffic to the
 canary fleet. To do this set `QA_COOKIES="gitlab_canary=true"`.
 
 To set multiple cookies, separate them with the `;` character, for example: `QA_COOKIES="cookie1=value;cookie2=value2"`
-
 
 ### Building a Docker image to test
 

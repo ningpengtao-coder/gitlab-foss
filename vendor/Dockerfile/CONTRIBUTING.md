@@ -1,4 +1,4 @@
-## Developer Certificate of Origin + License
+# Developer Certificate of Origin + License
 
 By contributing to GitLab B.V., You accept and agree to the following terms and
 conditions for Your present and future Contributions submitted to GitLab B.V.

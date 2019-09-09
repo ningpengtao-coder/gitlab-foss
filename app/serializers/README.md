@@ -12,15 +12,15 @@ that is usually consumed by a frontend code.
 
 Using serializers, instead of `to_json` method, has several benefits:
 
-* it helps to prevent exposure of a sensitive data stored in the database
-* it makes it easier to test what should and should not be exposed
-* it makes it easier to reuse serialization entities that are building blocks
-* it makes it easier to move complexity from controllers to easily testable
+- it helps to prevent exposure of a sensitive data stored in the database
+- it makes it easier to test what should and should not be exposed
+- it makes it easier to reuse serialization entities that are building blocks
+- it makes it easier to move complexity from controllers to easily testable
   classes
-* it encourages hiding complexity behind intentions-revealing interfaces
-* it makes it easier to take care about serialization performance concerns
-* it makes it easier to reduce merge conflicts between CE -> EE
-* it makes it easier to benefit from domain driven development techniques
+- it encourages hiding complexity behind intentions-revealing interfaces
+- it makes it easier to take care about serialization performance concerns
+- it makes it easier to reduce merge conflicts between CE -> EE
+- it makes it easier to benefit from domain driven development techniques
 
 ## What is a serializer?
 
@@ -250,57 +250,57 @@ MyObjectSerializer.new.represent(object.present)
 
 1. Do not invoke a serializer from within a serialization entity.
 
-    If you need to use a serializer from within a serialization entity, it is
-    possible that you are missing a class for an important domain concept.
+   If you need to use a serializer from within a serialization entity, it is
+   possible that you are missing a class for an important domain concept.
 
-    Consider creating a new domain class and a corresponding serialization
-    entity for it.
+   Consider creating a new domain class and a corresponding serialization
+   entity for it.
 
 1. Use only one approach to switch behavior of the serializer.
 
-    It is possible to use a few approaches to switch a behavior of the
-    serializer. Most common are using a [Fluent Interface][fluent-interface]
-    and creating a separate `represent_something` methods.
+   It is possible to use a few approaches to switch a behavior of the
+   serializer. Most common are using a [Fluent Interface][fluent-interface]
+   and creating a separate `represent_something` methods.
 
-    Whatever you choose, it might be better to use only one approach at a time.
+   Whatever you choose, it might be better to use only one approach at a time.
 
 1. Do not forget about creating specs for serialization entities.
 
-    Writing tests for the serializer indeed does cover testing a behavior of
-    serialization entities that the serializer instantiates. However it might
-    be a good idea to write separate tests for entities as well, because these
-    are meant to be reused in different serializers, and a serializer can
-    change a behavior of a serialization entity.
+   Writing tests for the serializer indeed does cover testing a behavior of
+   serialization entities that the serializer instantiates. However it might
+   be a good idea to write separate tests for entities as well, because these
+   are meant to be reused in different serializers, and a serializer can
+   change a behavior of a serialization entity.
 
 1. Use `ActiveRecord::Relation` where possible
 
-    Using an `ActiveRecord::Relation` might help from the performance perspective.
+   Using an `ActiveRecord::Relation` might help from the performance perspective.
 
 1. Be diligent about passing an additional context from the controller.
 
-    Using `EntityRequest` and `RequestAwareEntity` is a workaround for the lack
-    of high-level mechanism. It is meant to be refactored, and current
-    implementation is error prone. Imagine the situation that one serialization
-    entity requires `request.user` attribute, but the second one wants
-    `request.current_user`. When it happens that these two entities are used in
-    the same serialization request, you might need to pass both parameters to
-    the serializer, which is obviously not a perfect situation.
+   Using `EntityRequest` and `RequestAwareEntity` is a workaround for the lack
+   of high-level mechanism. It is meant to be refactored, and current
+   implementation is error prone. Imagine the situation that one serialization
+   entity requires `request.user` attribute, but the second one wants
+   `request.current_user`. When it happens that these two entities are used in
+   the same serialization request, you might need to pass both parameters to
+   the serializer, which is obviously not a perfect situation.
 
-    When in doubt, pass only `current_user` and `project` if these are required.
+   When in doubt, pass only `current_user` and `project` if these are required.
 
 1. Keep performance concerns in mind
 
-    Using a serializer incorrectly can have significant impact on the
-    performance.
+   Using a serializer incorrectly can have significant impact on the
+   performance.
 
-    Because serializers are technically presenters, it is often necessary
-    to calculate, for example, paths to various controller-actions.
-    Since using URL helpers usually involve passing `project` and `namespace`
-    adding `includes(project: :namespace)` in the serializer, can help to avoid
-    N+1 queries.
+   Because serializers are technically presenters, it is often necessary
+   to calculate, for example, paths to various controller-actions.
+   Since using URL helpers usually involve passing `project` and `namespace`
+   adding `includes(project: :namespace)` in the serializer, can help to avoid
+   N+1 queries.
 
-    Also, try to avoid using `Enumerable#map` or other methods that will
-    execute a database query eagerly.
+   Also, try to avoid using `Enumerable#map` or other methods that will
+   execute a database query eagerly.
 
 1. Avoid passing `only` and `except` from the controller.
 1. Write tests checking for N+1 queries.
@@ -310,7 +310,7 @@ MyObjectSerializer.new.represent(object.present)
 
 ## Future
 
-* [Next iteration of serializers][issue-27569]
+- [Next iteration of serializers][issue-27569]
 
 [grape-project]: http://www.ruby-grape.org
 [grape-entity-project]: https://github.com/ruby-grape/grape-entity

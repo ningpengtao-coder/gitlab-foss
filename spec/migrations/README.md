@@ -91,7 +91,7 @@ Example: `describe SomeClass, :migration, schema: 20170608152748`.
 ### Example
 
 This spec tests the [`lib/gitlab/background_migration/archive_legacy_traces.rb`](https://gitlab.com/gitlab-org/gitlab-ce/blob/v11.6.5/lib/gitlab/background_migration/archive_legacy_traces.rb)
-background migration. You can find the complete spec on 
+background migration. You can find the complete spec on
 [`spec/lib/gitlab/background_migration/archive_legacy_traces_spec.rb`](https://gitlab.com/gitlab-org/gitlab-ce/blob/v11.6.5/spec/lib/gitlab/background_migration/archive_legacy_traces_spec.rb)
 
 ```ruby
