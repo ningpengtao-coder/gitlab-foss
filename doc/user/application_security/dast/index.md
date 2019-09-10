@@ -132,6 +132,48 @@ variables:
   DAST_FULL_SCAN_ENABLED: "true"
 ```
 
+#### Domain validation
+
+Since ZAP full scan actively attacks the target application, DAST sends a ping to the target (normally `DAST_WEBSITE` or `environment_url.txt`) beforehand.
+The target's response must include a `Gitlab-DAST-Confirmation` header. The value of the header can be anything.
+If DAST does not see the header in the response, it will not perform the scan.
+
+![IMAGE OF DAST ERROR MESSAGE]()
+
+Here are examples of adding the `Gitlab-DAST-Confirmation` header to a response in Rails, Django, and Node with Express.
+
+##### [Ruby on Rails](https://guides.rubyonrails.org/action_controller_overview.html#setting-custom-headers)
+
+```ruby
+class DastWebsiteTargetController < ActionController::Base
+  def dast_website_target
+    response.headers['Gitlab-DAST-Confirmation'] = true
+
+    head :ok
+  end
+end
+```
+
+##### [Django](https://docs.djangoproject.com/en/1.10/ref/request-response/#setting-header-fields)
+
+```python
+class DastWebsiteTargetView(View):
+    def head(self, *args, **kwargs):
+      response = HttpResponse()
+      response['Gitlab-Dast-Confirmation'] = true
+
+      return response
+```
+
+##### [Node (with Express)](http://expressjs.com/en/5x/api.html#res.append)
+
+```javascript
+app.get('/dast-website-target', function(req, res) {
+  res.append('Gitlab-DAST-Confirmation', 'true')
+  res.send('Respond to DAST ping')
+})
+```
+
 ### Customizing the DAST settings
 
 The DAST settings can be changed through environment variables by using the
