@@ -31,6 +31,7 @@ class Project < ApplicationRecord
   include FeatureGate
   include OptionallySearch
   include FromUnion
+  include EachBatch
   extend Gitlab::Cache::RequestCache
 
   extend Gitlab::ConfigHelper

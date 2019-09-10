@@ -2,7 +2,7 @@ class Gitlab::Seeder::Users
   include ActionView::Helpers::NumberHelper
 
   RANDOM_USERS_COUNT = 20
-  MASS_USERS_COUNT = 1_500_000
+  MASS_USERS_COUNT = 1_000_000
 
   attr_reader :opts
 
@@ -40,14 +40,34 @@ class Gitlab::Seeder::Users
   def create_mass_users!
     encrypted_password = Devise::Encryptor.digest(User, '12345678')
 
-    User.insert_using_generate_series(1, MASS_USERS_COUNT, debug: true) do |sql|
-      sql.username = raw("'user' || seq")
-      sql.name = raw("'User ' || seq")
-      sql.email = raw("'user' || seq || '@example.com'")
-      sql.confirmed_at = raw("('1388530801'::timestamp + seq)::date") # 2014-01-01
-      sql.encrypted_password = encrypted_password
+    Gitlab::Seeder.with_mass_insert(MASS_USERS_COUNT, User) do
+      User.insert_using_generate_series(1, MASS_USERS_COUNT) do |sql|
+        sql.username = raw("'seed_user' || seq")
+        sql.name = raw("'Seed user ' || seq")
+        sql.email = raw("'seed_user' || seq || '@example.com'")
+        sql.confirmed_at = raw("('2019-09-10'::date + seq)")
+        sql.projects_limit = 10_000_000 # no limit
+        sql.encrypted_password = encrypted_password
+      end
     end
-    puts "\n#{number_with_delimiter(MASS_USERS_COUNT)} users created!"
+
+    # We can't use a sub-query here given we want to insert it just for the new
+    # namespaces.
+    Gitlab::Seeder.with_mass_insert(MASS_USERS_COUNT, Namespace, :batch) do
+      existing_namespaces = Namespace.pluck(:id)
+      User.where.not(id: existing_namespaces).find_in_batches(batch_size: 1_000) do |users|
+        rows = users.map do |user|
+          {
+            name: user.username,
+            path: user.username,
+            owner_id: user.id
+          }
+        end
+
+        Gitlab::Database.bulk_insert('namespaces', rows)
+        print '.'
+      end
+    end
   end
 end
 
