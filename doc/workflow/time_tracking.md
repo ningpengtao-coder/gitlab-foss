@@ -30,7 +30,7 @@ in a comment in both an issue or a merge request.
 
 Below is an example of how you can use those new quick actions inside a comment.
 
-![Time tracking example in a comment](time-tracking/time-tracking-example.png)
+![Time tracking example in a comment](time-tracking/time-tracking-example_v12_2.png)
 
 Adding time entries (time spent or estimates) is limited to project members.
 
