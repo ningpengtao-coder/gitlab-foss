@@ -154,7 +154,7 @@ class DastWebsiteTargetController < ActionController::Base
 end
 ```
 
-##### [Django](https://docs.djangoproject.com/en/1.10/ref/request-response/#setting-header-fields)
+##### [Django](https://docs.djangoproject.com/en/2.2/ref/request-response/#setting-header-fields)
 
 ```python
 class DastWebsiteTargetView(View):
