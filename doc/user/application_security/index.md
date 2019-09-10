@@ -188,7 +188,7 @@ must be created with the case-sensitive name `License-Check`. This approval
 group must be set with an "Approvals required" count greater than zero.
 
 Once this group has been added to your project, the approval rule will be enabled
-for all Merge Requests. To configure how this rule behaves, you can choose which
+for all merge requests. To configure how this rule behaves, you can choose which
 licenses to `approve` or `blacklist` in the
 [project policies for License Compliance](license_compliance/index.md#project-policies-for-license-compliance) section.
 
