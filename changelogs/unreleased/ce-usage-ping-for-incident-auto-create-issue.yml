@@ -1,0 +1,5 @@
+---
+title: Add index to create_issue column in project_incident_management_settings
+merge_request: 32736
+author:
+type: performance
