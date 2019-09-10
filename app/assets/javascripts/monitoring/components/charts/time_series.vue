@@ -1,7 +1,7 @@
 <script>
 import { __ } from '~/locale';
 import { mapState } from 'vuex';
-import { GlLink, GlButton } from '@gitlab/ui';
+import { GlLink, GlButton, GlTooltip } from '@gitlab/ui';
 import { GlAreaChart, GlLineChart, GlChartSeriesLabel } from '@gitlab/ui/dist/charts';
 import dateFormat from 'dateformat';
 import { debounceByAnimationFrame, roundOffFloat } from '~/lib/utils/common_utils';
@@ -17,6 +17,7 @@ export default {
   components: {
     GlAreaChart,
     GlLineChart,
+    GlTooltip
     GlButton,
     GlChartSeriesLabel,
     GlLink,
@@ -68,6 +69,7 @@ export default {
         isDeployment: false,
         sha: '',
       },
+      showTitleTooltip: false,
       width: 0,
       height: chartHeight,
       svgs: {},
@@ -211,6 +213,11 @@ export default {
   watch: {
     containerWidth: 'onResize',
   },
+  mounted() {
+    if (this.$refs.chartTitle.scrollWidth > this.$refs.chartTitle.offsetWidth) {
+      this.showTitleTooltip = true;
+    }
+  },
   beforeDestroy() {
     window.removeEventListener('resize', debouncedResize);
   },
@@ -278,7 +285,12 @@ export default {
   >
     <div :class="{ 'prometheus-graph-embed w-100 p-3': showBorder }">
       <div class="prometheus-graph-header">
-        <h5 class="prometheus-graph-title js-graph-title text-truncate">{{ graphData.title }}</h5>
+        <h5 class="prometheus-graph-title js-graph-title text-truncate">
+          {{ graphData.title }}
+        </h5>
+        <gl-tooltip :target="() => $refs.chartTitle" :disabled="!showTitleTooltip">
+          {{ graphData.title }}
+        </gl-tooltip>
         <gl-button
           v-if="exportMetricsToCsvEnabled"
           :href="downloadLink"

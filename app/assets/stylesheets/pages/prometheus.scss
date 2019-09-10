@@ -56,6 +56,10 @@
   flex: 1;
 }
 
+.alert-current-setting {
+  max-width: 240px;
+}
+
 .prometheus-graph-cursor {
   position: absolute;
   background: $gray-600;
