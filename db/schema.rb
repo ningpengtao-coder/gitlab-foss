@@ -272,6 +272,7 @@ ActiveRecord::Schema.define(version: 2019_09_05_233042) do
     t.boolean "lock_memberships_to_ldap", default: false, null: false
     t.boolean "time_tracking_limit_to_hours", default: false, null: false
     t.string "grafana_url", default: "/-/grafana", null: false
+    t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.string "outbound_local_requests_whitelist", limit: 255, default: [], null: false, array: true
     t.integer "raw_blob_request_limit", default: 300, null: false
     t.boolean "allow_local_requests_from_web_hooks_and_services", default: false, null: false
@@ -283,7 +284,6 @@ ActiveRecord::Schema.define(version: 2019_09_05_233042) do
     t.text "asset_proxy_whitelist"
     t.text "encrypted_asset_proxy_secret_key"
     t.string "encrypted_asset_proxy_secret_key_iv"
-    t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
@@ -619,9 +619,9 @@ ActiveRecord::Schema.define(version: 2019_09_05_233042) do
     t.integer "project_id", null: false
     t.integer "timeout"
     t.integer "timeout_source", default: 1, null: false
+    t.boolean "interruptible"
     t.jsonb "config_options"
     t.jsonb "config_variables"
-    t.boolean "interruptible"
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id_and_interruptible_false", where: "(interruptible = false)"
     t.index ["project_id"], name: "index_ci_builds_metadata_on_project_id"
@@ -2690,7 +2690,6 @@ ActiveRecord::Schema.define(version: 2019_09_05_233042) do
     t.boolean "create_issue", default: true, null: false
     t.boolean "send_email", default: false, null: false
     t.text "issue_template_key"
-    t.index ["create_issue"], name: "index_project_incident_management_settings_on_create_issue"
   end
 
   create_table "project_metrics_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
