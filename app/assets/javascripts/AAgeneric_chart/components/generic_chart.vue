@@ -44,14 +44,19 @@
         ];
       },
       chartOptions() {
-        return this.chartData.chartOptions;
+        return {
+          'xAxis': {
+            'name': 'Series Name',
+            'type': 'value',
+          },
+        };
       },
       showChart() {
         return !this.loading && this.chartHasData();
       },
     },
     methods: {
-      ...mapActions('dataSource', ['fetchChartData']),
+      ...mapActions('dataSource', ['fetchChartData', 'setChartData']),
       onCreated(chart) {
         this.chart = chart;
       },
@@ -69,15 +74,16 @@
         this.formattedInput = '';
       },
       json2json() {
-        function stringToObject(str){
-          return eval(`(${ str })`)
+        function stringToObject(str) {
+          return eval(`(${str})`);
         }
 
         const formatter = stringToObject(this.formatterFn);
         const userJson = stringToObject(this.userJson);
         console.log(formatter, userJson);
         const transformed = json2json(userJson, formatter);
-        this.chartJson = this.formatHighlight(transformed);
+        this.setChartData(transformed);
+        this.chartJson = this.formatHighlight(transformed.source);
       },
     },
   };
@@ -136,18 +142,18 @@
                 <pre v-html="chartJson"/>
             </div>
         </div>
-        <div class="row">
-            <label class="dropdown-input pt-3 pb-3 mb-0 border-bottom block position-relative" @click.stop>
-                <input
-                        ref="searchInput"
-                        v-model="chartUrl"
-                        :placeholder="__('Chart url')"
-                        type="search"
-                        class="form-control dropdown-input-field"
-                        @blur="getChartData"
-                />
-            </label>
-        </div>
+        <!--        <div class="row">
+                    <label class="dropdown-input pt-3 pb-3 mb-0 border-bottom block position-relative" @click.stop>
+                        <input
+                                ref="searchInput"
+                                v-model="chartUrl"
+                                :placeholder="__('Chart url')"
+                                type="search"
+                                class="form-control dropdown-input-field"
+                                @blur="getChartData"
+                        />
+                    </label>
+                </div>-->
 
 
         <div v-if="showChart" class="issues-analytics-chart">

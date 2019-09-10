@@ -37,5 +37,9 @@ export const fetchChartData = ({ commit, dispatch, getters }, url) => {
 
 };
 
+export const setChartData = ({ commit }, data) => {
+  commit(types.SET_CHART_DATA, data);
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
