@@ -1,6 +1,14 @@
-import { getTimeDiff, graphDataValidatorForValues } from '~/monitoring/utils';
+import {
+  getTimeDiff,
+  graphDataValidatorForValues,
+  graphDataValidatorForAnomalyValues,
+} from '~/monitoring/utils';
 import { timeWindows } from '~/monitoring/constants';
-import { graphDataPrometheusQuery, graphDataPrometheusQueryRange } from './mock_data';
+import {
+  graphDataPrometheusQuery,
+  graphDataPrometheusQueryRange,
+  anomalyMockGraphData,
+} from './mock_data';
 
 describe('getTimeDiff', () => {
   function secondsBetween({ start, end }) {
@@ -59,6 +67,20 @@ describe('graphDataValidatorForValues', () => {
   it('validates data with the query_range format', () => {
     const validGraphData = graphDataValidatorForValues(false, graphDataPrometheusQueryRange);
 
+    expect(validGraphData).toBe(true);
+  });
+});
+
+describe('graphDataValidatorForAnomalyValues', () => {
+  /*
+   * Anomaly charts can accept results for exactly 3 queries,
+   * Anomaly validation also require graphDataValidatorForValues to have `values`
+   */
+  it('validates data with the query format', () => {
+    const validAnomalyData = graphDataValidatorForAnomalyValues(anomalyMockGraphData);
+    const validGraphData = graphDataValidatorForValues(false, anomalyMockGraphData);
+
+    expect(validAnomalyData).toBe(true);
     expect(validGraphData).toBe(true);
   });
 });

@@ -45,15 +45,30 @@ export const graphDataValidatorForValues = (isValues, graphData) => {
   );
 };
 
-export const graphDataValidatorForAnomalyValues = (isValues, graphData) => {
+/**
+ * This function validates the graph data contains exactly 3 queries plus
+ * value validations from graphDataValidatorForValues.
+ * @param {Object} isValues
+ * @param {Object} graphData  the graph data response from a prometheus request
+ * @returns {boolean} true if the data is valid
+ */
+export const graphDataValidatorForAnomalyValues = graphData => {
   const anomalySeriesCount = 3; // metric, upper, lower
   return (
     graphData.queries &&
     graphData.queries.length === anomalySeriesCount &&
-    graphDataValidatorForValues(isValues, graphData)
+    graphDataValidatorForValues(false, graphData)
   );
 };
 
+/**
+ * This function returns the earliest time value in all series of a chart.
+ * @param {Object} chartData  chart data with data to populate a timeseries.
+ * data should be an array of data points [t, y] where t is a ISO formatted date,
+ * and is sorted by t (time).
+ * @returns {(String|null)} earliest x value from all series, or null when the
+ * chart series data is empty.
+ */
 export const getEarliestDatapoint = chartData =>
   chartData.reduce((acc, series) => {
     const { data } = series;
@@ -69,18 +84,16 @@ export const getEarliestDatapoint = chartData =>
     return seriesEarliest < acc || acc === null ? seriesEarliest : acc;
   }, null);
 
-export const makeTimeAxis = config => {
-  const defaults = {
-    name: __('Time'),
-    type: 'time',
-    axisLabel: {
-      formatter: date => dateFormat(date, dateFormats.timeOfDay),
-    },
-    axisPointer: {
-      snap: true,
-    },
-  };
-  return { ...defaults, ...config };
-};
+export const makeTimeAxis = config => ({
+  name: __('Time'),
+  type: 'time',
+  axisLabel: {
+    formatter: date => dateFormat(date, dateFormats.timeOfDay),
+  },
+  axisPointer: {
+    snap: true,
+  },
+  ...config,
+});
 
 export default {};

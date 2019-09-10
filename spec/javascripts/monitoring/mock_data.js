@@ -1,3 +1,7 @@
+import { anomalyMockGraphData as importedAnomalyMockGraphData } from '../../frontend/monitoring/mock_data';
+
+export const anomalyMockGraphData = importedAnomalyMockGraphData;
+
 export const mockApiEndpoint = `${gl.TEST_HOST}/monitoring/mock`;
 
 export const mockProjectPath = '/frontend-fixtures/environments-project';

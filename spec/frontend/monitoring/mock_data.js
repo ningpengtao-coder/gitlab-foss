@@ -1,6 +1,4 @@
-import * as mockData from '../../javascripts/monitoring/mock_data';
-
-export const { mockProjectPath } = mockData;
+export const mockProjectPath = '/frontend-fixtures/environments-project';
 
 export const anomalyDeploymentData = [
   {
