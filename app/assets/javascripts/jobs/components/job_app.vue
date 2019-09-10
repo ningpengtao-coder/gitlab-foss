@@ -82,6 +82,11 @@ export default {
       type: String,
       required: true,
     },
+    subscriptionsMoreMinutesUrl: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   computed: {
     ...mapState([
@@ -264,6 +269,7 @@ export default {
           :quota-limit="job.runners.quota.limit"
           :runners-path="runnerHelpUrl"
           :project-path="projectPath"
+          :subscriptions-more-minutes-url="subscriptionsMoreMinutesUrl"
         />
 
         <environments-block

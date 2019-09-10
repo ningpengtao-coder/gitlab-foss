@@ -23,6 +23,7 @@ describe Ci::CreatePipelineService do
       trigger_request: nil,
       variables_attributes: nil,
       merge_request: nil,
+      external_pull_request: nil,
       push_options: nil,
       source_sha: nil,
       target_sha: nil,
@@ -36,8 +37,11 @@ describe Ci::CreatePipelineService do
                  source_sha: source_sha,
                  target_sha: target_sha }
 
-      described_class.new(project, user, params).execute(
-        source, save_on_errors: save_on_errors, trigger_request: trigger_request, merge_request: merge_request)
+      described_class.new(project, user, params).execute(source,
+        save_on_errors: save_on_errors,
+        trigger_request: trigger_request,
+        merge_request: merge_request,
+        external_pull_request: external_pull_request)
     end
     # rubocop:enable Metrics/ParameterLists
 
@@ -220,11 +224,11 @@ describe Ci::CreatePipelineService do
           expect(pipeline_on_previous_commit.reload).to have_attributes(status: 'canceled', auto_canceled_by_id: pipeline.id)
         end
 
-        it 'does not cancel running outdated pipelines' do
+        it 'cancels running outdated pipelines' do
           pipeline_on_previous_commit.run
-          execute_service
+          head_pipeline = execute_service
 
-          expect(pipeline_on_previous_commit.reload).to have_attributes(status: 'running', auto_canceled_by_id: nil)
+          expect(pipeline_on_previous_commit.reload).to have_attributes(status: 'canceled', auto_canceled_by_id: head_pipeline.id)
         end
 
         it 'cancel created outdated pipelines' do
@@ -242,6 +246,202 @@ describe Ci::CreatePipelineService do
           pipeline
 
           expect(pending_pipeline.reload).to have_attributes(status: 'pending', auto_canceled_by_id: nil)
+        end
+
+        context 'when the interruptible attribute is' do
+          context 'not defined' do
+            before do
+              config = YAML.dump(rspec: { script: 'echo' })
+              stub_ci_pipeline_yaml_file(config)
+            end
+
+            it 'is cancelable' do
+              pipeline = execute_service
+
+              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_nil
+            end
+          end
+
+          context 'set to true' do
+            before do
+              config = YAML.dump(rspec: { script: 'echo', interruptible: true })
+              stub_ci_pipeline_yaml_file(config)
+            end
+
+            it 'is cancelable' do
+              pipeline = execute_service
+
+              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_truthy
+            end
+          end
+
+          context 'set to false' do
+            before do
+              config = YAML.dump(rspec: { script: 'echo', interruptible: false })
+              stub_ci_pipeline_yaml_file(config)
+            end
+
+            it 'is not cancelable' do
+              pipeline = execute_service
+
+              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_falsy
+            end
+          end
+
+          context 'not defined, but an environment is' do
+            before do
+              config = YAML.dump(rspec: { script: 'echo', environment: { name: "review/$CI_COMMIT_REF_NAME" } })
+              stub_ci_pipeline_yaml_file(config)
+            end
+
+            it 'is not cancelable' do
+              pipeline = execute_service
+
+              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_nil
+            end
+          end
+
+          context 'overriding the environment definition' do
+            before do
+              config = YAML.dump(rspec: { script: 'echo', environment: { name: "review/$CI_COMMIT_REF_NAME" }, interruptible: true })
+              stub_ci_pipeline_yaml_file(config)
+            end
+
+            it 'is cancelable' do
+              pipeline = execute_service
+
+              expect(pipeline.builds.find_by(name: 'rspec').interruptible).to be_truthy
+            end
+          end
+        end
+
+        context 'interruptible builds' do
+          before do
+            stub_ci_pipeline_yaml_file(YAML.dump(config))
+          end
+
+          let(:config) do
+            {
+              stages: %w[stage1 stage2 stage3 stage4],
+
+              build_1_1: {
+                stage: 'stage1',
+                script: 'echo'
+              },
+              build_1_2: {
+                stage: 'stage1',
+                script: 'echo',
+                interruptible: true
+              },
+              build_2_1: {
+                stage: 'stage2',
+                script: 'echo',
+                when: 'delayed',
+                start_in: '10 minutes'
+              },
+              build_3_1: {
+                stage: 'stage3',
+                script: 'echo',
+                interruptible: false
+              },
+              build_4_1: {
+                stage: 'stage4',
+                script: 'echo'
+              }
+            }
+          end
+
+          it 'properly configures interruptible status' do
+            interruptible_status =
+              pipeline_on_previous_commit
+                .builds
+                .joins(:metadata)
+                .pluck(:name, 'ci_builds_metadata.interruptible')
+
+            expect(interruptible_status).to contain_exactly(
+              ['build_1_1', nil],
+              ['build_1_2', true],
+              ['build_2_1', nil],
+              ['build_3_1', false],
+              ['build_4_1', nil]
+            )
+          end
+
+          context 'when only interruptible builds are running' do
+            context 'when build marked explicitly by interruptible is running' do
+              it 'cancels running outdated pipelines' do
+                pipeline_on_previous_commit
+                  .builds
+                  .find_by_name('build_1_2')
+                  .run!
+
+                pipeline
+
+                expect(pipeline_on_previous_commit.reload).to have_attributes(
+                  status: 'canceled', auto_canceled_by_id: pipeline.id)
+              end
+            end
+
+            context 'when build that is not marked as interruptible is running' do
+              it 'cancels running outdated pipelines' do
+                pipeline_on_previous_commit
+                  .builds
+                  .find_by_name('build_2_1')
+                  .tap(&:enqueue!)
+                  .run!
+
+                pipeline
+
+                expect(pipeline_on_previous_commit.reload).to have_attributes(
+                  status: 'canceled', auto_canceled_by_id: pipeline.id)
+              end
+            end
+          end
+
+          context 'when an uninterruptible build is running' do
+            it 'does not cancel running outdated pipelines' do
+              pipeline_on_previous_commit
+                .builds
+                .find_by_name('build_3_1')
+                .tap(&:enqueue!)
+                .run!
+
+              pipeline
+
+              expect(pipeline_on_previous_commit.reload).to have_attributes(
+                status: 'running', auto_canceled_by_id: nil)
+            end
+          end
+
+          context 'when an build is waiting on an interruptible scheduled task' do
+            it 'cancels running outdated pipelines' do
+              allow(Ci::BuildScheduleWorker).to receive(:perform_at)
+
+              pipeline_on_previous_commit
+                .builds
+                .find_by_name('build_2_1')
+                .schedule!
+
+              pipeline
+
+              expect(pipeline_on_previous_commit.reload).to have_attributes(
+                status: 'canceled', auto_canceled_by_id: pipeline.id)
+            end
+          end
+
+          context 'when a uninterruptible build has finished' do
+            it 'does not cancel running outdated pipelines' do
+              pipeline_on_previous_commit
+                .builds
+                .find_by_name('build_3_1')
+                .success!
+
+              pipeline
+
+              expect(pipeline_on_previous_commit.reload).to have_attributes(
+                status: 'running', auto_canceled_by_id: nil)
+            end
+          end
         end
       end
 
@@ -769,6 +969,152 @@ describe Ci::CreatePipelineService do
           expect(pipeline.builds.count).to eq(1)
           expect(pipeline.builds.first.persisted_environment).to be_nil
           expect(pipeline.builds.first.deployment).to be_nil
+        end
+      end
+    end
+
+    describe 'Pipeline for external pull requests' do
+      let(:pipeline) do
+        execute_service(source: source,
+                        external_pull_request: pull_request,
+                        ref: ref_name,
+                        source_sha: source_sha,
+                        target_sha: target_sha)
+      end
+
+      before do
+        stub_ci_pipeline_yaml_file(YAML.dump(config))
+      end
+
+      let(:ref_name) { 'refs/heads/feature' }
+      let(:source_sha) { project.commit(ref_name).id }
+      let(:target_sha) { nil }
+
+      context 'when source is external pull request' do
+        let(:source) { :external_pull_request_event }
+
+        context 'when config has external_pull_requests keywords' do
+          let(:config) do
+            {
+              build: {
+                stage: 'build',
+                script: 'echo'
+              },
+              test: {
+                stage: 'test',
+                script: 'echo',
+                only: ['external_pull_requests']
+              },
+              pages: {
+                stage: 'deploy',
+                script: 'echo',
+                except: ['external_pull_requests']
+              }
+            }
+          end
+
+          context 'when external pull request is specified' do
+            let(:pull_request) { create(:external_pull_request, project: project, source_branch: 'feature', target_branch: 'master') }
+            let(:ref_name) { pull_request.source_ref }
+
+            it 'creates an external pull request pipeline' do
+              expect(pipeline).to be_persisted
+              expect(pipeline).to be_external_pull_request_event
+              expect(pipeline.external_pull_request).to eq(pull_request)
+              expect(pipeline.source_sha).to eq(source_sha)
+              expect(pipeline.builds.order(:stage_id)
+                .map(&:name))
+                .to eq(%w[build test])
+            end
+
+            context 'when ref is tag' do
+              let(:ref_name) { 'refs/tags/v1.1.0' }
+
+              it 'does not create an extrnal pull request pipeline' do
+                expect(pipeline).not_to be_persisted
+                expect(pipeline.errors[:tag]).to eq(["is not included in the list"])
+              end
+            end
+
+            context 'when pull request is created from fork' do
+              it 'does not create an external pull request pipeline'
+            end
+
+            context "when there are no matched jobs" do
+              let(:config) do
+                {
+                  test: {
+                    stage: 'test',
+                    script: 'echo',
+                    except: ['external_pull_requests']
+                  }
+                }
+              end
+
+              it 'does not create a detached merge request pipeline' do
+                expect(pipeline).not_to be_persisted
+                expect(pipeline.errors[:base]).to eq(["No stages / jobs for this pipeline."])
+              end
+            end
+          end
+
+          context 'when external pull request is not specified' do
+            let(:pull_request) { nil }
+
+            it 'does not create an external pull request pipeline' do
+              expect(pipeline).not_to be_persisted
+              expect(pipeline.errors[:external_pull_request]).to eq(["can't be blank"])
+            end
+          end
+        end
+
+        context "when config does not have external_pull_requests keywords" do
+          let(:config) do
+            {
+              build: {
+                stage: 'build',
+                script: 'echo'
+              },
+              test: {
+                stage: 'test',
+                script: 'echo'
+              },
+              pages: {
+                stage: 'deploy',
+                script: 'echo'
+              }
+            }
+          end
+
+          context 'when external pull request is specified' do
+            let(:pull_request) do
+              create(:external_pull_request,
+                project: project,
+                source_branch: Gitlab::Git.ref_name(ref_name),
+                target_branch: 'master')
+            end
+
+            it 'creates an external pull request pipeline' do
+              expect(pipeline).to be_persisted
+              expect(pipeline).to be_external_pull_request_event
+              expect(pipeline.external_pull_request).to eq(pull_request)
+              expect(pipeline.source_sha).to eq(source_sha)
+              expect(pipeline.builds.order(:stage_id)
+                .map(&:name))
+                .to eq(%w[build test pages])
+            end
+          end
+
+          context 'when external pull request is not specified' do
+            let(:pull_request) { nil }
+
+            it 'does not create an external pull request pipeline' do
+              expect(pipeline).not_to be_persisted
+
+              expect(pipeline.errors[:base])
+                .to eq(['Failed to build the pipeline!'])
+            end
+          end
         end
       end
     end
