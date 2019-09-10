@@ -38,15 +38,22 @@ Once you have a connected Kubernetes cluster with Helm installed, deploying a ma
 
 ![Managed Prometheus Deploy](img/prometheus_deploy.png)
 
-#### Getting metrics to display on your the Metrics Dashboard
+#### Getting metrics to display on the Metrics Dashboard
 
-After completing the steps above, you will also need deployments in order to view the Operations > Metrics page. Setting up Auto DevOps will help you to quickly create a deployment:
+After completing the steps above, you will also need deployments in order to view the
+**Operations > Metrics** page. Setting up [Auto DevOps](../../topics/autodevops/index.md)
+will help you to quickly create a deployment:
 
-1. On the **Operations > Kubernetes** page, ensure that, in addition to Prometheus and Helm Tiller, you also have Runner and Ingress installed. Copy the Ingress endpoint.
-1. Navigate to the **Settings > CI/CD** page. In the Auto DevOps section, select a deployment strategy and save your changes.
-1. On the same page, in the Variables section, add in the copied Ingress endpoint. Use the variable `KEY: KUBE_INGRESS_BASE_DOMAIN`
-1. Navigate to the **CI/CD > Pipelines** page. Run a pipeline on any branch.
-1. When the pipeline has run succesfully, graphs will be available on the **Operations > Metrics** page
+1. Navigate to your project's **Operations > Kubernetes** page, and ensure that,
+   in addition to "Prometheus" and "Helm Tiller", you also have "Runner" and "Ingress"
+   installed. Once "Ingress" is installed, copy its endpoint.
+1. Navigate to your project's **Settings > CI/CD** page. In the Auto DevOps section,
+   select a deployment strategy and save your changes.
+1. On the same page, in the Variables section, add a variable named `KUBE_INGRESS_BASE_DOMAIN`
+   with the value of the Ingress endpoint you have copied in the previous step. Leave the type
+   to "Variable".
+1. Navigate to your project's **CI/CD > Pipelines** page, and run a pipeline on any branch.
+1. When the pipeline has run successfully, graphs will be available on the **Operations > Metrics** page.
 
 #### About managed Prometheus deployments
 
