@@ -887,6 +887,11 @@ The following table lists variables used to disable jobs.
 | `PERFORMANCE_DISABLED`                  | From GitLab 11.0, used to disable the `performance` job. If the variable is present, the job will not be created. |
 | `REVIEW_DISABLED`                       | From GitLab 11.0, used to disable the `review` and the manual `review:stop` job. If the variable is present, these jobs will not be created. |
 | `SAST_DISABLED`                         | From GitLab 11.0, used to disable the `sast` job. If the variable is present, the job will not be created. |
+| `DEPENDENCY_SCANNING_DISABLED`          | From GitLab 11.0, used to disable the `dependency_scanning` job. If the variable is present, the job will not be created. |
+| `DAST_SCANNING_DISABLED`                | From GitLab 11.0, used to disable the `dast` job. If the variable is present, the job will not be created. |
+| `CONTAINER_SCANNING_DISABLED`           | From GitLab 11.0, used to disable the `container_scanning` job. If the variable is present, the job will not be created. |
+| `LICENSE_MANAGEMENT_DISABLED`           | From GitLab 11.0, used to disable the `license_management` job. If the variable is present, the job will not be created. |
+| `SAST_DISABLED`                         | From GitLab 11.0, used to disable the `sast` job. If the variable is present, the job will not be created. |
 | `TEST_DISABLED`                         | From GitLab 11.0, used to disable the `test` job. If the variable is present, the job will not be created. |
 
 #### Application secret variables
