@@ -39,17 +39,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: $gl-padding-8;
-
-  h5 {
-    font-size: $gl-font-size-large;
-    margin: 0 10px 0 0;
-  }
 }
 
 .prometheus-graph-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-right: 10px;
+  font-size: $gl-font-size-large;
 }
 
 .prometheus-graph-widgets {

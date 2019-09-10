@@ -17,7 +17,7 @@ export default {
   components: {
     GlAreaChart,
     GlLineChart,
-    GlTooltip
+    GlTooltip,
     GlButton,
     GlChartSeriesLabel,
     GlLink,
@@ -214,7 +214,8 @@ export default {
     containerWidth: 'onResize',
   },
   mounted() {
-    if (this.$refs.chartTitle.scrollWidth > this.$refs.chartTitle.offsetWidth) {
+    const chartTitleEl = this.$refs.chartTitle;
+    if (chartTitleEl && chartTitleEl.scrollWidth > chartTitleEl.offsetWidth) {
       this.showTitleTooltip = true;
     }
   },
@@ -285,7 +286,10 @@ export default {
   >
     <div :class="{ 'prometheus-graph-embed w-100 p-3': showBorder }">
       <div class="prometheus-graph-header">
-        <h5 class="prometheus-graph-title js-graph-title text-truncate">
+        <h5
+          ref="chartTitle"
+          class="prometheus-graph-title js-graph-title text-truncate append-right-8"
+        >
           {{ graphData.title }}
         </h5>
         <gl-tooltip :target="() => $refs.chartTitle" :disabled="!showTitleTooltip">
