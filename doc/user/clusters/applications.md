@@ -117,6 +117,27 @@ balancing, SSL termination, and name-based virtual hosting. It acts as a
 web proxy for your applications and is useful if you want to use [Auto
 DevOps](../../topics/autodevops/index.md) or deploy your own web apps.
 
+#### Modsecurity Application Firewall
+
+By default we enable
+[`modsecurity`](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#modsecurity)
+to check requests against [OWASP's Core Rule Set](https://www.modsecurity.org/CRS/Documentation/).
+This feature runs in "Detection-only mode" unless configured and is viewable by
+checking your ingress controller's modsec log for rule violations.
+This can be done by tailing the audit log on your ingress-controller pod:
+
+```
+kubectl -n gitlab-managed-apps exec -it ingress-nginx-ingress-controller-8675309-bz5n4 -- tail -f /var/log/modsec_audit.log
+```
+
+There is a small performance overhead by enabling modsecurity, however,
+if this is considered significant for your application you can disable this
+using a feature flag by running the following command within the rails console:
+
+```ruby
+Feature.disable(:ingress_modsecurity)
+```
+
 NOTE: **Note:**
 The
 [stable/nginx-ingress](https://github.com/helm/charts/tree/master/stable/nginx-ingress)
