@@ -7,17 +7,33 @@ describe BackfillReleaseNameWithTag, :migration do
   let(:releases)   { table(:releases) }
   let(:namespaces) { table(:namespaces) }
   let(:projects)   { table(:projects) }
-
   let(:namespace)  { namespaces.create(name: 'foo', path: 'foo') }
-  let(:project)    { projects.create!(namespace_id: namespace.id, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
-  let!(:release)   { releases.create!(project_id: project.id, name: nil, tag: 'v1.0.0', released_at: 2.days.ago) }
 
-  it 'defaults name to tag value' do
-    expect(release.tag).to be_present
+  context 'public project' do
+    let(:project) { projects.create!(namespace_id: namespace.id, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
+    let!(:release) { releases.create!(project_id: project.id, name: nil, tag: 'v1.0.0', released_at: 2.days.ago) }
 
-    migrate!
+    it 'defaults name to tag value' do
+      expect(release.tag).to be_present
 
-    release.reload
-    expect(release.name).to eq(release.tag)
+      migrate!
+      release.reload
+
+      expect(release.name).to eq(release.tag)
+    end
+  end
+
+  context 'private project' do
+    let(:project) { projects.create!(namespace_id: namespace.id, visibility_level: Gitlab::VisibilityLevel::PRIVATE) }
+    let!(:release) { releases.create!(project_id: project.id, name: nil, tag: 'v1.0.0', released_at: 2.days.ago) }
+
+    it 'defaults name to tag value' do
+      expect(release.tag).to be_present
+
+      migrate!
+      release.reload
+
+      expect(release.name).to eq("release-#{release.id}")
+    end
   end
 end
