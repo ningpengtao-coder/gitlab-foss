@@ -50,9 +50,7 @@ export const dataStructure = () => ({
   lastOpenedAt: 0,
   mrChange: null,
   deleted: false,
-  prevPath: '',
-  movedPath: '',
-  moved: false,
+  prevPath: undefined,
 });
 
 export const decorateData = entity => {
@@ -129,7 +127,7 @@ export const commitActionForFile = file => {
 
 export const getCommitFiles = stagedFiles =>
   stagedFiles.reduce((acc, file) => {
-    if (file.moved || file.type === 'tree') return acc;
+    if (file.type === 'tree') return acc;
 
     return acc.concat({
       ...file,
@@ -148,8 +146,8 @@ export const createCommitPayload = ({
   commit_message: state.commitMessage || getters.preBuiltCommitMessage,
   actions: getCommitFiles(rootState.stagedFiles).map(f => ({
     action: commitActionForFile(f),
-    file_path: f.moved ? f.movedPath : f.path,
-    previous_path: f.prevPath === '' ? undefined : f.prevPath,
+    file_path: f.path,
+    previous_path: f.prevPath,
     content: f.prevPath && !f.changed ? null : f.content || undefined,
     encoding: f.base64 ? 'base64' : 'text',
     last_commit_id:

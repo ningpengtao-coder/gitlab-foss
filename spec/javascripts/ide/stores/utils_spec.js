@@ -237,31 +237,6 @@ describe('Multi-file store utils', () => {
   });
 
   describe('getCommitFiles', () => {
-    it('returns list of files excluding moved files', () => {
-      const files = [
-        {
-          path: 'a',
-          type: 'blob',
-          deleted: true,
-        },
-        {
-          path: 'c',
-          type: 'blob',
-          moved: true,
-        },
-      ];
-
-      const flattendFiles = utils.getCommitFiles(files);
-
-      expect(flattendFiles).toEqual([
-        {
-          path: 'a',
-          type: 'blob',
-          deleted: true,
-        },
-      ]);
-    });
-
     it('filters out folders from the list', () => {
       const files = [
         {

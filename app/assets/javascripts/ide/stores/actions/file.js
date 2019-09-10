@@ -186,11 +186,6 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
     dispatch('restoreTree', file.parentPath);
   }
 
-  if (file.movedPath) {
-    commit(types.DISCARD_FILE_CHANGES, file.movedPath);
-    commit(types.REMOVE_FILE_FROM_CHANGED, file.movedPath);
-  }
-
   commit(types.DISCARD_FILE_CHANGES, path);
   commit(types.REMOVE_FILE_FROM_CHANGED, path);
 

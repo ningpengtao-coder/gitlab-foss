@@ -138,8 +138,6 @@ export default {
       content: stagedFile ? stagedFile.content : state.entries[path].raw,
       changed: false,
       deleted: false,
-      moved: false,
-      movedPath: '',
     });
 
     if (deleted) {
