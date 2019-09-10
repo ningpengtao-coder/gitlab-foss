@@ -38,10 +38,6 @@ class Gitlab::Seeder::Users
   end
 
   def create_mass_users!
-    # Disable database insertion logs so speed isn't limited by ability to print to console
-    old_logger = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = nil
-
     encrypted_password = Devise::Encryptor.digest(User, '12345678')
 
     User.insert_using_generate_series(1, MASS_USERS_COUNT, debug: true) do |sql|
@@ -52,9 +48,6 @@ class Gitlab::Seeder::Users
       sql.encrypted_password = encrypted_password
     end
     puts "\n#{number_with_delimiter(MASS_USERS_COUNT)} users created!"
-
-    # Reset logging
-    ActiveRecord::Base.logger = old_logger
   end
 end
 

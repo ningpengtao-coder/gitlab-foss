@@ -102,16 +102,9 @@ class Gitlab::Seeder::Projects
   end
 
   def create_mass_projects!
-    # Disable database insertion logs so speed isn't limited by ability to print to console
-    old_logger = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger = nil
-
     create_mass_projects_by_visility!(:private)
     create_mass_projects_by_visility!(:internal)
     create_mass_projects_by_visility!(:public)
-
-    # Reset logging
-    ActiveRecord::Base.logger = old_logger
   end
 
   def create_mass_projects_by_visility!(visibility)

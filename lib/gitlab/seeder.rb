@@ -15,6 +15,10 @@ end
 module Gitlab
   class Seeder
     def self.quiet
+      # Disable database insertion logs so speed isn't limited by ability to print to console
+      old_logger = ActiveRecord::Base.logger
+      ActiveRecord::Base.logger = nil
+
       mute_notifications
       mute_mailer
 
@@ -23,6 +27,7 @@ module Gitlab
       yield
 
       SeedFu.quiet = false
+      ActiveRecord::Base.logger = old_logger
       puts "\nOK".color(:green)
     end
 
