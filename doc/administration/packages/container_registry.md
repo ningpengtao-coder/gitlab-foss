@@ -4,7 +4,7 @@
 > - Container Registry manifest `v1` support was added in GitLab 8.9 to support
 >   Docker versions earlier than 1.10.
 > - This document is about the admin guide. To learn how to use GitLab Container
->   Registry [user documentation](../../user/package_registry/container_registry/index.md).
+>   Registry [user documentation](../../user/packages/container_registry/index.md).
 
 With the Container Registry integrated into GitLab, every project can have its
 own space to store its Docker images.

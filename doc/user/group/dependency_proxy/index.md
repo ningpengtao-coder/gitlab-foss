@@ -1,5 +1,5 @@
 ---
-redirect_to: '../../package_registry/dependency_proxy/index.md'
+redirect_to: '../../packages/dependency_proxy/index.md'
 ---
 
-This document was moved to [another location](../../package_registry/dependency_proxy/index.md).
+This document was moved to [another location](../../packages/dependency_proxy/index.md).

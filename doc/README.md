@@ -36,7 +36,7 @@ Have a look at some of our most popular documentation resources:
 |:----------------------------------------------------------------|:-----------------------------------------------------------------|
 | [Configuring `.gitlab-ci.yml`](ci/yaml/README.md)               | Complete syntax documentation for configuring your CI pipelines. |
 | [GitLab CI/CD examples](ci/examples/README.md)                  | Get up to speed quickly with common CI/CD scenarios.             |
-| [GitLab Container Registry](administration/package_registry/container_registry.md) | Host containers within GitLab.                |
+| [GitLab Container Registry](administration/packages/container_registry.md) | Host containers within GitLab.                |
 | [GitLab Pages](user/project/pages/index.md)                     | Host static websites for your projects with GitLab.              |
 | [GitLab.com settings](user/gitlab_com/index.md)                 | Settings for GitLab.com.                                         |
 | [Kubernetes integration](user/project/clusters/index.md)        | Use GitLab with Kubernetes.                                      |
@@ -256,8 +256,8 @@ The following documentation relates to the DevOps **Package** stage:
 
 | Package Topics                                                  | Description                                            |
 |:----------------------------------------------------------------|:-------------------------------------------------------|
-| [GitLab Container Registry](administration/package_registry/container_registry.md) | Learn how to use GitLab's built-in Container Registry. |
-| [GitLab Packages](administration/package_registry/index.md) **(PREMIUM)**          | Use GitLab as an NPM registry or Maven repository.     |
+| [GitLab Container Registry](administration/packages/container_registry.md) | Learn how to use GitLab's built-in Container Registry. |
+| [GitLab Packages](administration/packages/index.md) **(PREMIUM)**          | Use GitLab as an NPM registry or Maven repository.     |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">

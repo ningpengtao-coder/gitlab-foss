@@ -13,7 +13,7 @@ have its own space to store its Docker images.
 
 This document is the user guide. To learn how to enable GitLab Container
 Registry across your GitLab instance, visit the
-[administrator documentation](../../../administration/package_registry/container_registry.md).
+[administrator documentation](../../../administration/packages/container_registry.md).
 
 You can read more about Docker Registry at <https://docs.docker.com/registry/introduction/>.
 
@@ -22,7 +22,7 @@ You can read more about Docker Registry at <https://docs.docker.com/registry/int
 If you cannot find the **Packages > Container Registry** entry under your
 project's sidebar, it is not enabled in your GitLab instance. Ask your
 administrator to enable GitLab Container Registry following the
-[administration documentation](../../../administration/package_registry/container_registry.md).
+[administration documentation](../../../administration/packages/container_registry.md).
 
 If you are using GitLab.com, this is enabled by default so you can start using
 the Registry immediately. Currently there is a soft (10GB) size restriction for
@@ -154,4 +154,4 @@ name.
 Troubleshooting the GitLab Container Registry, most of the times, requires
 administration access to the GitLab server.
 
-[Read how to troubleshoot the Container Registry](../../../administration/package_registry/container_registry.md#troubleshooting).
+[Read how to troubleshoot the Container Registry](../../../administration/packages/container_registry.md#troubleshooting).

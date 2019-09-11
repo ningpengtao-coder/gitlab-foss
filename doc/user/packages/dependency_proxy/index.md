@@ -4,7 +4,7 @@
 
 NOTE: **Note:**
 This is the user guide. In order to use the dependency proxy, an administrator
-must first [configure it](../../../administration/package_registry/dependency_proxy.md).
+must first [configure it](../../../administration/packages/dependency_proxy.md).
 
 For many organizations, it is desirable to have a local proxy for frequently used
 upstream images/packages. In the case of CI/CD, the proxy is responsible for

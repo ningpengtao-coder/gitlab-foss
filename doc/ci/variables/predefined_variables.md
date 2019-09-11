@@ -120,5 +120,5 @@ future GitLab releases.**
 | `GITLAB_FEATURES`                       | 10.6   | all    | The comma separated list of licensed features available for your instance and plan |
 
 [gitlab-deploy-token]: ../../user/project/deploy_tokens/index.md#gitlab-deploy-token
-[registry]: ../../user/package_registry/container_registry/index.md
+[registry]: ../../user/packages/container_registry/index.md
 [dependent-repositories]: ../../user/project/new_ci_build_permissions_model.md#dependent-repositories
