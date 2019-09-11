@@ -15,6 +15,7 @@ describe('Release block', () => {
     author_name: 'Release bot',
     author_email: 'release-bot@example.com',
     released_at: '2012-05-28T05:00:00-07:00',
+    tag_path: '/tag_example',
     author: {
       avatar_url: 'uploads/-/system/user/avatar/johndoe/avatar.png',
       id: 482476,
@@ -96,12 +97,30 @@ describe('Release block', () => {
     expect(vm.$el.textContent).toContain(release.name);
   });
 
-  it('renders commit sha', () => {
+  it('renders commit sha', done => {
     expect(vm.$el.textContent).toContain(release.commit.short_id);
+    expect(vm.$el.querySelector('a[href="/commit/example"]')).toBeNull();
+    vm.release = { ...release, commit_path: '/commit/example' };
+
+    vm.$nextTick()
+      .then(() => {
+        expect(vm.$el.querySelector('a[href="/commit/example"]')).not.toBeNull();
+      })
+      .then(done)
+      .catch(done);
   });
 
-  it('renders tag name', () => {
+  it('renders tag name', done => {
     expect(vm.$el.textContent).toContain(release.tag_name);
+    expect(vm.$el.querySelector('a[href="/tag/example"]')).toBeNull();
+    vm.release = { ...release, tag_path: '/tag/example' };
+
+    vm.$nextTick()
+      .then(() => {
+        expect(vm.$el.querySelector('a[href="/tag/example"]')).not.toBeNull();
+      })
+      .then(done)
+      .catch(done);
   });
 
   it('renders release date', () => {

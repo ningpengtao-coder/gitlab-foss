@@ -1281,7 +1281,8 @@ module API
       expose :commit, using: Entities::Commit, if: lambda { |_, _| can_download_code? }
       expose :upcoming_release?, as: :upcoming_release
       expose :milestone, using: Entities::Milestone, if: -> (release, _) { release.milestone.present? }
-
+      expose :commit_path, if: lambda { |_, _| can_download_code? }
+      expose :tag_path, if: lambda { |_, _| can_download_code? }
       expose :assets do
         expose :assets_count, as: :count do |release, _|
           assets_to_exclude = can_download_code? ? [] : [:sources]
@@ -1297,6 +1298,14 @@ module API
 
       def can_download_code?
         Ability.allowed?(options[:current_user], :download_code, object.project)
+      end
+
+      def commit_path
+        Gitlab::Routing.url_helpers.project_commit_path(object.project, object.commit.id)
+      end
+
+      def tag_path
+        Gitlab::Routing.url_helpers.project_tag_path(object.project, object.tag)
       end
     end
 
