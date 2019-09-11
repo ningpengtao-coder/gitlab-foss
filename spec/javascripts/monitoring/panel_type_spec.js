@@ -2,7 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 import PanelType from '~/monitoring/components/panel_type.vue';
 import EmptyChart from '~/monitoring/components/charts/empty_chart.vue';
 import TimeSeriesChart from '~/monitoring/components/charts/time_series.vue';
-import { graphDataPrometheusQueryRange } from './mock_data';
+import AnomalyChart from '~/monitoring/components/charts/anomaly.vue';
+import ChartDropdown from '~/monitoring/components/chart_dropdown.vue';
+import { graphDataPrometheusQueryRange, graphDataPrometheusQueryAnomalyResult } from './mock_data';
 import { createStore } from '~/monitoring/stores';
 
 describe('Panel Type component', () => {
@@ -52,27 +54,44 @@ describe('Panel Type component', () => {
 
     beforeEach(() => {
       store = createStore();
-      panelType = shallowMount(PanelType, {
-        propsData: {
-          clipboardText: exampleText,
-          dashboardWidth,
-          graphData: graphDataPrometheusQueryRange,
-        },
-        store,
-      });
+      panelType = type =>
+        shallowMount(PanelType, {
+          propsData: {
+            clipboardText: exampleText,
+            dashboardWidth,
+            graphData: { ...graphDataPrometheusQueryAnomalyResult, type },
+          },
+          store,
+        });
     });
 
     describe('Time Series Chart panel type', () => {
       it('is rendered', () => {
-        expect(panelType.find(TimeSeriesChart).isVueInstance()).toBe(true);
-        expect(panelType.find(TimeSeriesChart).exists()).toBe(true);
+        const areaPanelType = panelType('area');
+
+        expect(areaPanelType.find(TimeSeriesChart).isVueInstance()).toBe(true);
+        expect(areaPanelType.find(TimeSeriesChart).exists()).toBe(true);
       });
 
       it('sets clipboard text on the dropdown', () => {
-        const link = () => panelType.find('.js-chart-link');
-        const clipboardText = () => link().element.dataset.clipboardText;
+        const dropdown = () => panelType('area').find(ChartDropdown);
 
-        expect(clipboardText()).toBe(exampleText);
+        expect(dropdown().props('chartLink')).toEqual(exampleText);
+      });
+    });
+
+    describe('Anomaly Chart panel type', () => {
+      it('is rendered', () => {
+        const anomalyChart = panelType('anomaly');
+
+        expect(anomalyChart.find(AnomalyChart).isVueInstance()).toBe(true);
+        expect(anomalyChart.find(AnomalyChart).exists()).toBe(true);
+      });
+
+      it('sets clipboard text on the dropdown', () => {
+        const dropdown = () => panelType('anomaly').find(ChartDropdown);
+
+        expect(dropdown().props('chartLink')).toEqual(exampleText);
       });
     });
   });
