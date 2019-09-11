@@ -58,7 +58,9 @@ describe IssueEntity do
     let(:new_issue) { create(:issue, project: private_project) }
 
     before do
-      Issues::DuplicateService.new(project, member).execute(issue, new_issue)
+      Issues::DuplicateService
+        .new(project, member)
+        .execute(issue, new_issue)
     end
 
     context 'when user cannot read new issue' do
