@@ -8,12 +8,13 @@
 >   login to GitLab's Container Registry.
 > - Multiple level image names support was added in GitLab 9.1.
 
-With the Docker Container Registry integrated into GitLab, every project can
-have its own space to store its Docker images.
-
+NOTE: **Note:**
 This document is the user guide. To learn how to enable GitLab Container
 Registry across your GitLab instance, visit the
 [administrator documentation](../../../administration/packages/container_registry.md).
+
+With the Docker Container Registry integrated into GitLab, every project can
+have its own space to store its Docker images.
 
 You can read more about Docker Registry at <https://docs.docker.com/registry/introduction/>.
 
