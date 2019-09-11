@@ -452,7 +452,6 @@ describe API::Internal::Base do
 
     context "custom action" do
       let(:access_checker) { double(Gitlab::GitAccess) }
-      let(:message) { 'CustomActionError message' }
       let(:payload) do
         {
           'action' => 'geo_proxy_to_primary',
@@ -463,8 +462,8 @@ describe API::Internal::Base do
           }
         }
       end
-
-      let(:custom_action_result) { Gitlab::GitAccessResult::CustomAction.new(payload, message) }
+      let(:console_messages) { ['informational message'] }
+      let(:custom_action_result) { Gitlab::GitAccessResult::CustomAction.new(payload, console_messages) }
 
       before do
         project.add_guest(user)
@@ -491,8 +490,8 @@ describe API::Internal::Base do
 
           expect(response).to have_gitlab_http_status(300)
           expect(json_response['status']).to be_truthy
-          expect(json_response['message']).to eql(message)
           expect(json_response['payload']).to eql(payload)
+          expect(json_response['gl_console_messages']).to eql(console_messages)
           expect(user.reload.last_activity_on).to be_nil
         end
       end
