@@ -118,11 +118,7 @@ export default class ProjectFindFile {
       results.push(this.element.find('.tree-table > tbody').append(html));
     }
 
-    if (!results.length) {
-      $('.empty-state').removeClass('hidden');
-    } else {
-      $('.empty-state').addClass('hidden');
-    }
+    this.element.find('.empty-state').toggleClass('hidden', !results.length);
 
     return results;
   }
