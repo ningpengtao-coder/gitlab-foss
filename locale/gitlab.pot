@@ -14401,3 +14401,6 @@ msgstr[1] ""
 
 msgid "yaml invalid"
 msgstr ""
+
+msgid "cannot be modified"
+msgstr ""
