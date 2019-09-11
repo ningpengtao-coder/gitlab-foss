@@ -11,7 +11,10 @@ export const getTimeDiff = timeWindow => {
   };
 };
 
-export const uniqMetricsId = metric => metric.metric_id + metric.id;
+// This is hopefully a temporary fix until BE fixes it.
+// refer https://gitlab.com/gitlab-org/gitlab-ce/issues/64481 for more info
+// metric_id or id can be a number. To avoid NaN, casting them to string.
+export const uniqMetricsId = metric => String(metric.metric_id) + String(metric.id);
 
 export const getTimeWindow = ({ start, end }) =>
   Object.entries(secondsIn).reduce((acc, [timeRange, value]) => {

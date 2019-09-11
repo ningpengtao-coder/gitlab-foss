@@ -1,6 +1,7 @@
 import mutations from '~/monitoring/stores/mutations';
 import * as types from '~/monitoring/stores/mutation_types';
 import state from '~/monitoring/stores/state';
+import { uniqMetricsId } from '~/monitoring/utils';
 import {
   metricsGroupsAPIResponse,
   deploymentData,
@@ -128,6 +129,7 @@ describe('Monitoring mutations', () => {
 
   describe('SET_QUERY_RESULT', () => {
     const metricId = 12;
+    const id = 'system_metrics_kubernetes_container_memory_total';
     const result = [{ values: [[0, 1], [1, 1], [1, 3]] }];
 
     beforeEach(() => {
@@ -147,11 +149,11 @@ describe('Monitoring mutations', () => {
 
     it('sets metricsWithData value', () => {
       mutations[types.SET_QUERY_RESULT](stateCopy, {
-        metricId,
+        metricId: uniqMetricsId({ metric_id: metricId, id }),
         result,
       });
 
-      expect(stateCopy.metricsWithData).toEqual([12]);
+      expect(stateCopy.metricsWithData).toEqual([uniqMetricsId({ metric_id: metricId, id })]);
     });
 
     it('does not store empty results', () => {
