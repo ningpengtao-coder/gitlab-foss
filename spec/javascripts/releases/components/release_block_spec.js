@@ -107,7 +107,7 @@ describe('Release block', () => {
         expect(vm.$el.querySelector('a[href="/commit/example"]')).not.toBeNull();
       })
       .then(done)
-      .catch(done);
+      .catch(done.fail);
   });
 
   it('renders tag name', done => {
@@ -120,7 +120,7 @@ describe('Release block', () => {
         expect(vm.$el.querySelector('a[href="/tag/example"]')).not.toBeNull();
       })
       .then(done)
-      .catch(done);
+      .catch(done.fail);
   });
 
   it('renders release date', () => {
