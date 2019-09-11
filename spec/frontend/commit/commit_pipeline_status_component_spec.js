@@ -110,7 +110,7 @@ describe('Commit pipeline status component', () => {
     describe('is successful', () => {
       beforeEach(() => {
         pollConfig.successCallback({
-          data: { pipelines: [{ details: { status: mockCiStatus } }] },
+          data: { pipelines: [...pipelines[0]] },
         });
         return wrapper.vm.$nextTick();
       });
