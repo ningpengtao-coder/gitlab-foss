@@ -40,4 +40,9 @@ class ProtectedBranch < ApplicationRecord
   def self.protected_refs(project)
     project.protected_branches.select(:name)
   end
+
+  def self.branch_requires_code_owner_approval?(project, branch_name)
+    # NOOP
+    #
+  end
 end
