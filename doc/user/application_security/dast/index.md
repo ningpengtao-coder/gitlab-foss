@@ -84,7 +84,7 @@ There are two ways to define the URL to be scanned by DAST:
 - Set the `DAST_WEBSITE` [variable](../../../ci/yaml/README.md#variables).
 - Add it in an `environment_url.txt` file at the root of your project.
 
-If both values are set, the `DAST_WEBSITE` value will take precedence.  
+If both values are set, the `DAST_WEBSITE` value will take precedence.
 
 The included template will create a `dast` job in your CI/CD pipeline and scan
 your project's source code for possible vulnerabilities.
@@ -134,11 +134,13 @@ variables:
 
 #### Domain validation
 
+Domain validation is disabled by default. You can enable it by setting the environment variable `DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED` to true.
+
 Since ZAP full scan actively attacks the target application, DAST sends a ping to the target (normally `DAST_WEBSITE` or `environment_url.txt`) beforehand.
 The target's response must include a `Gitlab-DAST-Confirmation` header. The value of the header can be anything.
 If DAST does not see the header in the response, it will not perform the scan.
 
-![IMAGE OF DAST ERROR MESSAGE]()
+![Error message displayed when DAST domain validation fails](img/dast-domain-validation-error.png)
 
 Here are examples of adding the `Gitlab-DAST-Confirmation` header to a response in Rails, Django, and Node with Express.
 
@@ -172,6 +174,43 @@ app.get('/dast-website-target', function(req, res) {
   res.append('Gitlab-DAST-Confirmation', 'true')
   res.send('Respond to DAST ping')
 })
+```
+
+##### Domain validation header via proxy
+
+It's also possible to add the `Gitlab-DAST-Confirmation` header via a proxy.
+DAST's test suite uses an nginx proxy in a Docker container to allow us to add the
+header without modifying our test application directly.
+
+The proxy container is very simple:
+
+```
+docker run --rm --network test --name test-proxy -v PATH-TO-NGINX-CONFIG:/etc/nginx/conf.d/default.conf nginx:alpine
+```
+
+The nginx config sets up the proxy to add the header:
+
+```json
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        proxy_pass http://test-application;
+        add_header Gitlab-DAST-Confirmation true;
+    }
+}
+```
+
+Then update `DAST_WEBSITE` or `environment_url.txt` to point to the proxy container.
+
+In this example, running DAST manually looks like:
+
+```
+docker run -e DAST_FULL_SCAN_ENABLED -e DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED --rm \
+  --network test --volume "$PWD":/output \
+  registry.gitlab.com/gitlab-org/security-products/dast:${VERSION:-latest} \
+  /analyze -t http://test-proxy
 ```
 
 ### Customizing the DAST settings
@@ -236,6 +275,7 @@ variable value.
 | `DAST_AUTH_EXCLUDE_URLS` | no | The URLs to skip during the authenticated scan; comma-separated, no spaces in between. |
 | `DAST_TARGET_AVAILABILITY_TIMEOUT` | no | Time limit in seconds to wait for target availability. Scan is attempted nevertheless if it runs out. Integer. Defaults to `60`. |
 | `DAST_FULL_SCAN_ENABLED` | no | Switches the tool to execute [ZAP Full Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Full-Scan) instead of [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan). Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
+| `DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED` | no | Enables [domain validation](#domain-validation) when running DAST full scans. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
 
 ## Security Dashboard
 
