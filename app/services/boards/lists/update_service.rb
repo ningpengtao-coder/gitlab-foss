@@ -5,13 +5,21 @@ module Boards
     class UpdateService < Boards::BaseService
       def execute(list)
         return not_authorized if preferences? && !can_read?(list)
-        return not_authorized if position? && !can_admin?(list)
+        return not_authorized if list_properties? && !can_admin?(list)
 
-        if update_preferences(list) || update_position(list)
+        if execute_by_params(list)
           success(list: list)
         else
           error(list.errors.messages, 422)
         end
+      end
+
+      def execute_by_params(list)
+        update_preferences(list) || update_position(list)
+      end
+
+      def list_properties?
+        position?
       end
 
       def update_preferences(list)

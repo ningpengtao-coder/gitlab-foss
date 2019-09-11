@@ -1972,6 +1972,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
     t.datetime "updated_at", null: false
     t.integer "milestone_id"
     t.integer "user_id"
+    t.integer "max_issue_count", default: 0, null: false
     t.index ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true
     t.index ["label_id"], name: "index_lists_on_label_id"
     t.index ["list_type"], name: "index_lists_on_list_type"
