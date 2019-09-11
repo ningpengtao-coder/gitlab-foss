@@ -190,7 +190,7 @@ docker run --rm --network test --name test-proxy -v PATH-TO-NGINX-CONFIG:/etc/ng
 
 The nginx config sets up the proxy to add the header:
 
-```json
+```
 server {
     listen 80;
     server_name localhost;
