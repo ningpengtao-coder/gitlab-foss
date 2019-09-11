@@ -52,3 +52,5 @@ module Metrics
     end
   end
 end
+
+Metrics::Dashboard::SystemDashboardService.prepend_if_ee('EE::Metrics::Dashboard::SystemDashboardService')
