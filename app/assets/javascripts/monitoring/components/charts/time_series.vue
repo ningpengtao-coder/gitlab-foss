@@ -214,8 +214,8 @@ export default {
     containerWidth: 'onResize',
   },
   mounted() {
-    const chartTitleEl = this.$refs.chartTitle;
-    if (chartTitleEl && chartTitleEl.scrollWidth > chartTitleEl.offsetWidth) {
+    const graphTitleEl = this.$refs.graphTitle;
+    if (graphTitleEl && graphTitleEl.scrollWidth > graphTitleEl.offsetWidth) {
       this.showTitleTooltip = true;
     }
   },
@@ -287,12 +287,12 @@ export default {
     <div :class="{ 'prometheus-graph-embed w-100 p-3': showBorder }">
       <div class="prometheus-graph-header">
         <h5
-          ref="chartTitle"
+          ref="graphTitle"
           class="prometheus-graph-title js-graph-title text-truncate append-right-8"
         >
           {{ graphData.title }}
         </h5>
-        <gl-tooltip :target="() => $refs.chartTitle" :disabled="!showTitleTooltip">
+        <gl-tooltip :target="() => $refs.graphTitle" :disabled="!showTitleTooltip">
           {{ graphData.title }}
         </gl-tooltip>
         <gl-button
