@@ -4,8 +4,7 @@ type: reference, howto, concepts
 
 # Subgroups
 
-NOTE: **Note:**
-[Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/2772) in GitLab 9.0.
+>[Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/2772) in GitLab 9.0.
 
 Subgroups, also known as nested groups or hierarchical groups, allow you to have up to 20
 levels of groups.
@@ -116,6 +115,11 @@ Follow the same process to create any subsequent groups.
 When you add a member to a subgroup, they inherit the membership and permission
 level from the parent group. This model allows access to nested groups if you
 have membership in one of its parents.
+
+NOTE: **Note:**
+GitLab [runners](../../../ci/runners/README.md) are unconditionally
+inherited by subgroups. Creating a runner in a parent group and then creating
+subgroup with additional maintainers gives those maintainers full access to the runner.
 
 The group permissions for a member can be changed only by Owners, and only on
 the **Members** page of the group the member was added.
