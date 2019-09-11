@@ -1,7 +1,7 @@
 <script>
   import { __ } from '~/locale';
   import { mapActions, mapState } from 'vuex';
-  import { GlAreaChart, GlLineChart } from '@gitlab/ui/dist/charts';
+  import { GlAreaChart, GlLineChart, GlDiscreteScatterChart, GlColumnChart } from '@gitlab/ui/dist/charts';
   import { GlLoadingIcon, GlDropdown, GlDropdownItem, GlFormTextarea, GlButton } from '@gitlab/ui';
   import syntaxHighlight from './../utils/beautify';
 
@@ -17,6 +17,8 @@
       GlLoadingIcon,
       GlAreaChart,
       GlLineChart,
+      GlDiscreteScatterChart,
+      GlColumnChart,
       GlDropdown,
       GlDropdownItem,
       GlFormTextarea,
@@ -114,6 +116,7 @@
 
         <div class="row">
             <div class="col-4">
+                <h5>User sample json</h5>
                 <gl-form-textarea
                         v-if="!formattedInput"
                         v-model="userJson"
@@ -130,6 +133,7 @@
                 </div>
             </div>
             <div class="col-4">
+                <h5>Transformation rules</h5>
                 <gl-form-textarea
                         v-model="formatterFn"
                         rows="15"></gl-form-textarea>
@@ -139,6 +143,8 @@
                 </gl-button>
             </div>
             <div class="col-4">
+                <h5>Transformed / chart json</h5>
+
                 <pre v-html="chartJson"/>
             </div>
         </div>
@@ -163,7 +169,21 @@
             ></gl-area-chart>
             <gl-line-chart :data="data"
                            :option="chartOptions"/>
+            <gl-column-chart :data="data"
+                             :option="chartOptions"/>
+
+            <!--     <gl-discrete-scatter-chart
+                         :data="data"
+                         :option="chartOptions"/>-->
         </div>
 
     </div>
 </template>
+
+<style>
+    pre {
+        height: 330px;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+    }
+</style>
