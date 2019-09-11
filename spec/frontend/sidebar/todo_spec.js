@@ -88,27 +88,13 @@ describe('SidebarTodo', () => {
       expect(wrapper.emitted().toggleTodo).toBeTruthy();
     });
 
-    it('renders component container element', () => {
+    it('renders component container element with proper data attributes', () => {
       createComponent({
         issuableId: 1,
         issuableType: 'epic',
       });
 
-      const dataAttributes = {
-        issuableId: '1',
-        issuableType: 'epic',
-        originalTitle: '',
-        placement: 'left',
-        container: 'body',
-        boundary: 'viewport',
-      };
-
-      expect(wrapper.element.nodeName).toBe('BUTTON');
-
-      const elDataAttrs = wrapper.element.dataset;
-      Object.keys(elDataAttrs).forEach(attr => {
-        expect(elDataAttrs[attr]).toBe(dataAttributes[attr]);
-      });
+      expect(wrapper.element).toMatchSnapshot();
     });
 
     it('check button label computed property', () => {
