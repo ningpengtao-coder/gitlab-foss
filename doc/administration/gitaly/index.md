@@ -169,6 +169,9 @@ Check the directory layout on your Gitaly server to be sure.
    # node_exporter['enable'] = false
    # prometheus['enable'] = false
 
+   # Enable prometheus monitoring - comment out if you disable monitoring services above
+   prometheus['listen_address'] = '0.0.0.0:9090'
+
    # Prevent database connections during 'gitlab-ctl reconfigure'
    gitlab_rails['rake_cache_clear'] = false
    gitlab_rails['auto_migrate'] = false
