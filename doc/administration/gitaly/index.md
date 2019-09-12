@@ -158,7 +158,6 @@ Check the directory layout on your Gitaly server to be sure.
    postgresql['enable'] = false
    redis['enable'] = false
    nginx['enable'] = false
-   prometheus['enable'] = false
    unicorn['enable'] = false
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
