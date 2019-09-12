@@ -229,8 +229,10 @@ Example response:
       "updated_at":"2019-07-12T19:45:44.256Z",
       "due_date":"2019-08-16T11:00:00.256Z",
       "start_date":"2019-07-30T12:00:00.256Z",
-      "web_url":"http://localhost:3000/root/awesome-app/-/milestones/1"
+      "web_url":"https://gitlab.example.com/root/awesome-app/-/milestones/1"
    },
+   "commit_path":"/root/awesome-app/commit/588440f66559714280628a4f9799f0c4eb880a4a",
+   "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "assets":{
       "count":4,
       "sources":[
@@ -334,6 +336,8 @@ Example response:
       "start_date":"2019-07-30T12:00:00.256Z",
       "web_url":"http://localhost:3000/root/awesome-app/-/milestones/1"
    },
+   "commit_path":"/root/awesome-app/commit/588440f66559714280628a4f9799f0c4eb880a4a",
+   "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "assets":{
       "count":5,
       "sources":[
@@ -436,6 +440,8 @@ Example response:
       "start_date":"2019-09-05T12:00:00.256Z",
       "web_url":"http://localhost:3000/root/awesome-app/-/milestones/3"
    },
+   "commit_path":"/root/awesome-app/commit/588440f66559714280628a4f9799f0c4eb880a4a",
+   "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "assets":{
       "count":4,
       "sources":[
@@ -516,6 +522,8 @@ Example response:
       "committer_email":"admin@example.com",
       "committed_date":"2019-01-03T01:53:28.000Z"
    },
+   "commit_path":"/root/awesome-app/commit/588440f66559714280628a4f9799f0c4eb880a4a",
+   "tag_path":"/root/awesome-app/-/tags/v0.11.1",
    "assets":{
       "count":4,
       "sources":[
