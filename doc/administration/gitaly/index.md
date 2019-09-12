@@ -201,7 +201,7 @@ Git operations in GitLab will result in an API error.
    NOTE: **Note:**
    In some cases, you'll have to set `path` for `gitaly['storage']` in the
    format `'path' => '/mnt/gitlab/<storage name>/repositories'`.
-   
+
    NOTE: **Note:**
    In most or all cases, the storage paths below end in `/repositories` which is
    not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
@@ -247,7 +247,7 @@ Git operations in GitLab will result in an API error.
    NOTE: **Note:**
    In some cases, you'll have to set `path` for each `[[storage]]` in the
    format `path = '/mnt/gitlab/<storage name>/repositories'`.
-   
+
    NOTE: **Note:**
    In most or all cases, the storage paths below end in `/repositories` which is
    not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
