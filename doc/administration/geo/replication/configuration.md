@@ -25,7 +25,7 @@ Any change that requires access to the **Admin Area** needs to be done in the
 
 GitLab stores a number of secret values in the `/etc/gitlab/gitlab-secrets.json`
 file which *must* be the same on all nodes. Until there is
-a means of automatically replicating these between nodes (see issue [gitlab-org/gitlab-ee#3789]),
+a means of automatically replicating these between nodes (see [issue #3789](https://gitlab.com/gitlab-org/gitlab-ee/issues/3789)),
 they must be manually replicated to the **secondary** node.
 
 1. SSH into the **primary** node, and execute the command below:
@@ -75,7 +75,7 @@ they must be manually replicated to the **secondary** node.
 ### Step 2. Manually replicate the **primary** node's SSH host keys
 
 GitLab integrates with the system-installed SSH daemon, designating a user
-(typically named git) through which all access requests are handled.
+(typically named `git`) through which all access requests are handled.
 
 In a [Disaster Recovery] situation, GitLab system
 administrators will promote a **secondary** node to the **primary** node. DNS records for the
