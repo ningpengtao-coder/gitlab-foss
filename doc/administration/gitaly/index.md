@@ -173,15 +173,13 @@ Check the directory layout on your Gitaly server to be sure.
    # Don't forget to copy `/etc/gitlab/gitlab-secrets.json` from web server to Gitaly server.
    gitlab_rails['internal_api_url'] = 'https://gitlab.example.com'
 
+   # Authentication token to ensure only authorized servers can communicate with 
+   # Gitaly server
+   gitaly['auth_token'] = 'abc123secret'
+
    # Make Gitaly accept connections on all network interfaces. You must use
    # firewalls to restrict access to this address/port.
    gitaly['listen_addr'] = "0.0.0.0:8075"
-   gitaly['auth_token'] = 'abc123secret'
-
-   # To use TLS for Gitaly you need to add
-   gitaly['tls_listen_addr'] = "0.0.0.0:9999"
-   gitaly['certificate_path'] = "path/to/cert.pem"
-   gitaly['key_path'] = "path/to/key.pem"
    ```
 
 1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
@@ -215,11 +213,6 @@ Check the directory layout on your Gitaly server to be sure.
 
    ```toml
    listen_addr = '0.0.0.0:8075'
-   tls_listen_addr = '0.0.0.0:9999'
-
-   [tls]
-   certificate_path = /path/to/cert.pem
-   key_path = /path/to/key.pem
 
    [auth]
    token = 'abc123secret'
@@ -365,7 +358,7 @@ To disable Gitaly on a client node:
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22602) in GitLab 11.8.
 
 Gitaly supports TLS encryption. To be able to communicate
-with a Gitaly instance that listens for secure connections you will need to use `tls://` url
+with a Gitaly instance that listens for secure connections you will need to use `tls://` URL
 scheme in the `gitaly_address` of the corresponding storage entry in the GitLab configuration.
 
 You will need to bring your own certificates as this isn't provided automatically.
@@ -383,7 +376,7 @@ To configure Gitaly with TLS:
 
 **For Omnibus GitLab**
 
-1. On the client nodes, edit `/etc/gitlab/gitlab.rb`:
+1. On the client node(s), edit `/etc/gitlab/gitlab.rb` as follows:
 
    ```ruby
    git_data_dirs({
@@ -395,8 +388,8 @@ To configure Gitaly with TLS:
    gitlab_rails['gitaly_token'] = 'abc123secret'
    ```
 
-1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
-1. On the Gitaly server nodes, edit `/etc/gitlab/gitlab.rb`:
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
+1. On the Gitaly server node(s), edit `/etc/gitlab/gitlab.rb` and add:
 
    ```ruby
    gitaly['tls_listen_addr'] = "0.0.0.0:9999"
@@ -404,11 +397,11 @@ To configure Gitaly with TLS:
    gitaly['key_path'] = "path/to/key.pem"
    ```
 
-1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on Gitaly server node(s).
 
 **For installations from source**
 
-1. On the client nodes, edit `/home/git/gitlab/config/gitlab.yml`:
+1. On the client node(s), edit `/home/git/gitlab/config/gitlab.yml` as follows:
 
    ```yaml
    gitlab:
@@ -433,18 +426,18 @@ To configure Gitaly with TLS:
    data will be stored in this folder. This will no longer be necessary after
    [this issue](https://gitlab.com/gitlab-org/gitaly/issues/1282) is resolved.
 
-1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
-1. On the Gitaly server nodes, edit `/home/git/gitaly/config.toml`:
+1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on client node(s).
+1. On the Gitaly server node(s), edit `/home/git/gitaly/config.toml` and add:
 
    ```toml
    tls_listen_addr = '0.0.0.0:9999'
 
    [tls]
-   certificate_path = '/path/to/cert.pem'
-   key_path = '/path/to/key.pem'
+   certificate_path = /path/to/cert.pem
+   key_path = /path/to/key.pem
    ```
 
-1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
+1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on Gitaly server node(s).
 
 To observe what type of connections are actually being used in a
 production environment you can use the following Prometheus query:
