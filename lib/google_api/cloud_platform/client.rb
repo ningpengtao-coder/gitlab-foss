@@ -58,8 +58,7 @@ module GoogleApi
         service = Google::Apis::ContainerV1beta1::ContainerService.new
         service.authorization = access_token
 
-        cluster_options = make_cluster_options(cluster_name, cluster_size, machine_type, legacy_abac)
-        enable_addons!(cluster_options, enable_addons)
+        cluster_options = make_cluster_options(cluster_name, cluster_size, machine_type, legacy_abac, enable_addons)
 
         request_body = Google::Apis::ContainerV1beta1::CreateClusterRequest.new(cluster_options)
 
@@ -80,7 +79,7 @@ module GoogleApi
 
       private
 
-      def make_cluster_options(cluster_name, cluster_size, machine_type, legacy_abac)
+      def make_cluster_options(cluster_name, cluster_size, machine_type, legacy_abac, enable_addons)
         {
           cluster: {
             name: cluster_name,
@@ -96,19 +95,12 @@ module GoogleApi
             },
             legacy_abac: {
               enabled: legacy_abac
-            }
+            },
+            addons_config: enable_addons.each_with_object({}) do |addon, hash|
+              hash[addon] = { disabled: false }
+            end
           }
         }
-      end
-
-      def enable_addons!(cluster_options, enable_addons)
-        (cluster_options[:cluster][:addons_config] ||= {}).tap do |addons_config|
-          enable_addons.each do |addon|
-            (addons_config[addon] ||= {}).tap do |addon_config|
-              addon_config[:disabled] = false
-            end
-          end
-        end
       end
 
       def token_life_time(expires_at)
