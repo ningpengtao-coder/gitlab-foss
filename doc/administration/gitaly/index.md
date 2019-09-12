@@ -137,11 +137,6 @@ the Gitaly server. The easiest way to accomplish this is to copy `/etc/gitlab/gi
 from an existing GitLab server to the Gitaly server. Without this shared secret,
 Git operations in GitLab will result in an API error.
 
-NOTE: **Note:**
-In most or all cases, the storage paths below end in `/repositories` which is
-not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
-Check the directory layout on your Gitaly server to be sure.
-
 **For Omnibus GitLab**
 
 1. Edit `/etc/gitlab/gitlab.rb`:
@@ -206,6 +201,11 @@ Check the directory layout on your Gitaly server to be sure.
    NOTE: **Note:**
    In some cases, you'll have to set `path` for `gitaly['storage']` in the
    format `'path' => '/mnt/gitlab/<storage name>/repositories'`.
+   
+   NOTE: **Note:**
+   In most or all cases, the storage paths below end in `/repositories` which is
+   not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
+   Check the directory layout on your Gitaly server to be sure.
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
@@ -247,6 +247,11 @@ Check the directory layout on your Gitaly server to be sure.
    NOTE: **Note:**
    In some cases, you'll have to set `path` for each `[[storage]]` in the
    format `path = '/mnt/gitlab/<storage name>/repositories'`.
+   
+   NOTE: **Note:**
+   In most or all cases, the storage paths below end in `/repositories` which is
+   not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
+   Check the directory layout on your Gitaly server to be sure.
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
 
