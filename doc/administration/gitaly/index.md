@@ -398,6 +398,11 @@ To configure Gitaly with TLS:
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on Gitaly server node(s).
+1. (Optional) After [verifying that all Gitaly traffic is being served over TLS](#observe-type-of-gitaly-connections),
+   you can improve security by disabling non-TLS connections by commenting out
+   or deleting `gitaly['listen_addr']` in `/etc/gitlab/gitlab.rb`, saving the file,
+   and [reconfiguring GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure)
+   on Gitaly server node(s).
 
 **For installations from source**
 
@@ -433,11 +438,18 @@ To configure Gitaly with TLS:
    tls_listen_addr = '0.0.0.0:9999'
 
    [tls]
-   certificate_path = /path/to/cert.pem
-   key_path = /path/to/key.pem
+   certificate_path = '/path/to/cert.pem'
+   key_path = '/path/to/key.pem'
    ```
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on Gitaly server node(s).
+1. (Optional) After [verifying that all Gitaly traffic is being served over TLS](#observe-type-of-gitaly-connections),
+   you can improve security by disabling non-TLS connections by commenting out
+   or deleting `listen_addr` in `/home/git/gitaly/config.toml`, saving the file,
+   and [restarting GitLab](../restart_gitlab.md#installations-from-source)
+   on Gitaly server node(s).
+
+### Observe type of Gitaly connections
 
 To observe what type of connections are actually being used in a
 production environment you can use the following Prometheus query:
