@@ -1,10 +1,21 @@
 /**
+ * Adds the line number property
+ * @param Object line
+ * @param Number lineNumber
+ */
+export const parseLine = (line = {}, lineNumber) => ({
+  ...line,
+  lineNumber,
+});
+
+/**
  * Parses the job log content into a structure usable by the template
  *
  * For collaspible lines (section_header = true):
  *    - creates a new array to hold the lines that are collpasible,
  *    - adds a isClosed property to handle toggle
  *    - adds a isHeader property to handle template logic
+ *    - adds the section_duration
  * For each line:
  *    - adds the index as  lineNumber
  *
@@ -18,23 +29,20 @@ export const logLinesParser = (lines = [], lineNumberStart) =>
       acc.push({
         isClosed: true,
         isHeader: true,
-        line: {
-          ...line,
-          lineNumber,
-        },
-
+        line: parseLine(line, lineNumber),
         lines: [],
       });
-    } else if (acc.length && acc[acc.length - 1].isHeader) {
-      acc[acc.length - 1].lines.push({
-        ...line,
-        lineNumber,
-      });
-    } else {
-      acc.push({
-        ...line,
-        lineNumber,
-      });
+    } else if (
+      acc.length &&
+      acc[acc.length - 1].isHeader &&
+      !line.section_duration &&
+      line.content.length
+    ) {
+      acc[acc.length - 1].lines.push(parseLine(line, lineNumber));
+    } else if (acc.length && acc[acc.length - 1].isHeader && line.section_duration) {
+      acc[acc.length - 1].section_duration = line.section_duration;
+    } else if (line.content.length) {
+      acc.push(parseLine(line, lineNumber));
     }
 
     return acc;
