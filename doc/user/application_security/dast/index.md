@@ -144,8 +144,6 @@ includes a `Gitlab-DAST-Permission` header with a value of `deny`.
 If `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` is true, the scan will _exit_ unless the response to the ping
 includes a `Gitlab-DAST-Permission` header with a value of `allow`.
 
-![Error message displayed when DAST domain validation fails](img/dast-domain-validation-error.png)
-
 Here are some examples of adding the `Gitlab-DAST-Permission` header to a response in Rails, Django, and Node (with Express).
 
 ##### Ruby on Rails
