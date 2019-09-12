@@ -134,17 +134,19 @@ variables:
 
 #### Domain validation
 
-Domain validation is disabled by default. You can enable it by setting the environment variable `DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED` to true.
+Domain validation is disabled by default. You can enable it by setting the [environment variable](#available-variables) `DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED` to true.
 
-Since ZAP full scan actively attacks the target application, DAST sends a ping to the target (normally `DAST_WEBSITE` or `environment_url.txt`) beforehand.
+Since ZAP full scan actively attacks the target application, DAST sends a ping to the target (normally defined in `DAST_WEBSITE` or `environment_url.txt`) beforehand.
 The target's response must include a `Gitlab-DAST-Confirmation` header. The value of the header can be anything.
-If DAST does not see the header in the response, it will not perform the scan.
+If DAST does not see the header in the response, it will not perform the scan and the job will fail with an error.
 
 ![Error message displayed when DAST domain validation fails](img/dast-domain-validation-error.png)
 
-Here are examples of adding the `Gitlab-DAST-Confirmation` header to a response in Rails, Django, and Node with Express.
+Here are some examples of adding the `Gitlab-DAST-Confirmation` header to a response in Rails, Django, and Node (with Express).
 
-##### [Ruby on Rails](https://guides.rubyonrails.org/action_controller_overview.html#setting-custom-headers)
+##### Ruby on Rails
+
+Here's how you would add a [custom header in Ruby on Rails](https://guides.rubyonrails.org/action_controller_overview.html#setting-custom-headers):
 
 ```ruby
 class DastWebsiteTargetController < ActionController::Base
@@ -156,7 +158,9 @@ class DastWebsiteTargetController < ActionController::Base
 end
 ```
 
-##### [Django](https://docs.djangoproject.com/en/2.2/ref/request-response/#setting-header-fields)
+##### Django
+
+Here's how you would add a [custom header in Django](https://docs.djangoproject.com/en/2.2/ref/request-response/#setting-header-fields):
 
 ```python
 class DastWebsiteTargetView(View):
@@ -168,6 +172,9 @@ class DastWebsiteTargetView(View):
 ```
 
 ##### [Node (with Express)](http://expressjs.com/en/5x/api.html#res.append)
+##### Node (with Express)
+
+Here's how you would add a [custom header in Node (with Express)](http://expressjs.com/en/5x/api.html#res.append):
 
 ```javascript
 app.get('/dast-website-target', function(req, res) {
@@ -176,19 +183,19 @@ app.get('/dast-website-target', function(req, res) {
 })
 ```
 
-##### Domain validation header via proxy
+##### Domain validation header via a proxy
 
 It's also possible to add the `Gitlab-DAST-Confirmation` header via a proxy.
 DAST's test suite uses an nginx proxy in a Docker container to allow us to add the
-header without modifying our test application directly.
+header without modifying the tested application directly.
 
 The proxy container is very simple:
 
 ```
-docker run --rm --network test --name test-proxy -v PATH-TO-NGINX-CONFIG:/etc/nginx/conf.d/default.conf nginx:alpine
+docker run --rm --network test --name test-proxy -v <path_to_nginx_config>:/etc/nginx/conf.d/default.conf nginx:alpine
 ```
 
-The nginx config sets up the proxy to add the header:
+The NGINX config sets up the proxy to add the header:
 
 ```
 server {
@@ -202,7 +209,7 @@ server {
 }
 ```
 
-Then update `DAST_WEBSITE` or `environment_url.txt` to point to the proxy container.
+Then, update `DAST_WEBSITE` or `environment_url.txt` to point to the proxy container.
 
 In this example, running DAST manually looks like:
 
