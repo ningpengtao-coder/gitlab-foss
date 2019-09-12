@@ -187,16 +187,16 @@ app.get('/dast-website-target', function(req, res) {
 ##### Domain validation header via a proxy
 
 It's also possible to add the `Gitlab-DAST-Permission` header via a proxy.
-DAST's test suite uses an nginx proxy in a Docker container to allow us to add the
-header without modifying the tested application directly.
+DAST's test suite uses an NGINX proxy in a Docker container to allow us to add the
+header without modifying the tested application directly. You can use the same approach.
 
-The proxy container is very simple:
+Create an NGINX config that adds the header and run a Docker container with NGINX that uses that config and acts as a proxy to the test application:
 
 ```
 docker run --rm --network test --name test-proxy -v <path_to_nginx_config>:/etc/nginx/conf.d/default.conf nginx:alpine
 ```
 
-The NGINX config sets up the proxy to add the header:
+The NGINX config sets up the proxy to [add the header](http://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header):
 
 ```
 server {
