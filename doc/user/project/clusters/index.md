@@ -347,7 +347,7 @@ applications running on the cluster.
 You can choose to use Cloud Run on GKE in place of installing Knative and Istio
 separately after the cluster has been created. This means that Cloud Run
 (Knative), Istio, and HTTP Load Balancing will be enabled on the cluster at
-create time and cannot be installed or uninstalled separately.
+create time and cannot be [installed or uninstalled](../../clusters/applications.md) separately.
 
 ### GitLab-managed clusters
 
