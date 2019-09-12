@@ -1,15 +1,24 @@
 <script>
   import { __ } from '~/locale';
   import { mapActions, mapState } from 'vuex';
-  import { GlAreaChart, GlLineChart, GlDiscreteScatterChart, GlColumnChart } from '@gitlab/ui/dist/charts';
-  import { GlLoadingIcon, GlDropdown, GlDropdownItem, GlFormTextarea, GlButton } from '@gitlab/ui';
+  import { GlAreaChart, GlLineChart } from '@gitlab/ui/dist/charts';
+  import {
+    GlLoadingIcon,
+    GlDropdown,
+    GlDropdownItem,
+    GlFormTextarea,
+    GlButton,
+    GlFormGroup,
+    GlFormInput,
+  } from '@gitlab/ui';
   import syntaxHighlight from './../utils/beautify';
 
   import Icon from '~/vue_shared/components/icon.vue';
   import json2json from 'awesome-json2json';
   import formatHighlight from 'json-format-highlight';
+  import prometheus from '../sample_data/prometheus';
   // eslint-disable-next-line global-require
-  const grafanaJSON = require('./../sample_data/grafana.json');
+  // const grafanaJSON = require('./../sample_data/grafana.json');
 
   export default {
     components: {
@@ -17,32 +26,35 @@
       GlLoadingIcon,
       GlAreaChart,
       GlLineChart,
-      GlDiscreteScatterChart,
-      GlColumnChart,
       GlDropdown,
       GlDropdownItem,
       GlFormTextarea,
       GlButton,
+      GlFormGroup,
+      GlFormInput,
     },
     data() {
       return {
         chartUrl: '',
-        userJson: '',
+        //userJson: '',
         chartJson: '',
         formatterFn: '',
         syntaxHighlight,
         formatHighlight,
         formattedInput: '',
+        config: {
+          prometheus,
+        },
       };
     },
     computed: {
-      ...mapState('dataSource', ['chartData', 'loading']),
+      ...mapState('dataSource', ['chartData', 'loading', 'userJson']),
       data() {
         return this.chartHasData() && this.chartData.source;
       },
       dataSources() {
         return [
-          'Grafana', 'Prometheus', 'InfluxDB',
+          'grafana', 'prometheus', 'influxdb',
         ];
       },
       chartOptions() {
@@ -56,6 +68,9 @@
       showChart() {
         return !this.loading && this.chartHasData();
       },
+      formattedJSON() {
+        return this.formatHighlight(this.userJson);
+      },
     },
     methods: {
       ...mapActions('dataSource', ['fetchChartData', 'setChartData']),
@@ -63,14 +78,14 @@
         this.chart = chart;
       },
       onBlur(event) {
-        this.formattedInput = this.formatHighlight(event.target.value);
+        this.formattedInput = this.syntaxHighlight(event.target.value);
         this.json2json();
       },
       chartHasData() {
         return Boolean(this.chartData);
       },
-      getChartData(event) {
-        this.fetchChartData(event.target.value);
+      getChartData() {
+        this.fetchChartData(this.chartUrl);
       },
       updateJSON() {
         this.formattedInput = '';
@@ -87,6 +102,12 @@
         this.setChartData(transformed);
         this.chartJson = this.formatHighlight(transformed.source);
       },
+      setDataSource(source) {
+        if (this.config[source]) {
+          const config = this.config[source];
+          this.chartUrl = config.url;
+        }
+      },
     },
   };
 </script>
@@ -96,35 +117,51 @@
             <gl-loading-icon :inline="true" :size="4"/>
         </div>
 
-        <!--   <h4 class="chart-title">Select data source</h4>
-         <div class="row">
-           <gl-dropdown
-                   class="col-8 col-md-9 gl-pr-0"
-                   menu-class="w-100 mw-100"
-                   toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
-                   text="&#45;&#45; Select datasource &#45;&#45;"
-           >
-             <gl-dropdown-item
-                     v-for="source in dataSources"
-                     class="w-100"
-                     @click="$emit('select-project', source)">
-               <li>{{source}}</li>
-             </gl-dropdown-item>
+        <h4 class="chart-title">Select data source</h4>
+        <div class="row">
+            <gl-dropdown
+                    class="col-8 col-md-9 gl-pr-0"
+                    menu-class="w-100 mw-100"
+                    toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
+                    text="-- Select datasource --"
+            >
+                <gl-dropdown-item
+                        v-for="source in dataSources"
+                        class="w-100"
+                        @click="setDataSource(source)">
+                    <li>{{source}}</li>
+                </gl-dropdown-item>
 
-           </gl-dropdown>
-         </div>-->
+            </gl-dropdown>
+        </div>
+
+        <div class="row">
+            <label class="col-8 col-md-9 gl-pr-0 w-100 mt-2" @click.stop>
+                <input
+                        ref="searchInput"
+                        v-model="chartUrl"
+                        :placeholder="__('Chart url')"
+                        type="search"
+                        class="form-control dropdown-input-field"
+                />
+            </label>
+            <gl-button
+                    @click="getChartData">
+                Request sample data
+            </gl-button>
+        </div>
 
         <div class="row">
             <div class="col-4">
                 <h5>User sample json</h5>
-                <gl-form-textarea
-                        v-if="!formattedInput"
-                        v-model="userJson"
-                        rows="15"
-                        @blur="onBlur"
-                ></gl-form-textarea>
-                <div v-if="formattedInput">
-                    <pre v-html="formattedInput"/>
+                <!--                <gl-form-textarea-->
+                <!--                        v-if="!formattedInput"-->
+                <!--                        v-model="userJson"-->
+                <!--                        rows="15"-->
+                <!--                        @blur="onBlur"-->
+                <!--                ></gl-form-textarea>-->
+                <div v-if="formattedJSON">
+                    <pre v-html="formattedJSON"/>
 
                     <gl-button
                             @click="updateJSON">
@@ -148,18 +185,19 @@
                 <pre v-html="chartJson"/>
             </div>
         </div>
-        <!--        <div class="row">
-                    <label class="dropdown-input pt-3 pb-3 mb-0 border-bottom block position-relative" @click.stop>
-                        <input
-                                ref="searchInput"
-                                v-model="chartUrl"
-                                :placeholder="__('Chart url')"
-                                type="search"
-                                class="form-control dropdown-input-field"
-                                @blur="getChartData"
-                        />
-                    </label>
-                </div>-->
+
+        <!--   <div class="row">
+               <gl-form-group
+                       :label="xAxisLabel"
+                       label-for="xAxislabel"
+               >
+                   <gl-form-input
+                           id="xAxislabel"
+                           v-model="xAxislabel"
+                           placeholder="XAxis Label"
+                   />
+               </gl-form-group>
+           </div>-->
 
 
         <div v-if="showChart" class="issues-analytics-chart">
@@ -169,12 +207,6 @@
             ></gl-area-chart>
             <gl-line-chart :data="data"
                            :option="chartOptions"/>
-            <gl-column-chart :data="data"
-                             :option="chartOptions"/>
-
-            <!--     <gl-discrete-scatter-chart
-                         :data="data"
-                         :option="chartOptions"/>-->
         </div>
 
     </div>

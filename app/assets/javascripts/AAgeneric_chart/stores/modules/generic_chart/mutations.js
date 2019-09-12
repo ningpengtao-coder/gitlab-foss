@@ -9,6 +9,11 @@ export default {
       chartData,
     });
   },
+  [types.SET_USER_JSON](state, userJson) {
+    Object.assign(state, {
+      userJson: JSON.stringify(userJson.data),
+    });
+  },
   [types.SET_FILTERS](state, value) {
     state.filters = value;
   },

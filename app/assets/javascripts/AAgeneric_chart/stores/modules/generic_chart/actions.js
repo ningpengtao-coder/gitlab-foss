@@ -19,17 +19,19 @@ export const setLoadingState = ({ commit }, value) => {
   commit(types.SET_LOADING_STATE, value);
 };
 
-export const fetchChartData = ({ commit, dispatch, getters }, url) => {
+export const fetchChartData = ({ commit, dispatch }, url) => {
   dispatch('setLoadingState', true);
+
+  const datasourceUrl = `http://localhost:3000/h5bp/html5-boilerplate/chart?url=${encodeURIComponent(url)}`;
 
   removeFlashError();
 
   return service
-    .fetchChartData(url)
+    .fetchChartData(datasourceUrl)
     .then(res => res)
-    .then(data => commit(types.SET_CHART_DATA, data))
+    .then(data => commit(types.SET_USER_JSON, data))
     .catch(() => {
-      commit(types.SET_CHART_DATA, null);
+      commit(types.SET_USER_JSON, null);
       flash(__('An error occurred while loading chart data'));
       setTimeout(removeFlashError, 2000);
     })

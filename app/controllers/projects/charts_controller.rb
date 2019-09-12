@@ -19,7 +19,7 @@ module Projects
       return { error: 'No URL provided' } if params[:url].blank?
 
       result = Gitlab::HTTP.get(params[:url])
-      JSON.parse(result.bokdy)
+      JSON.parse(result.body)
     rescue
       { error: 'The content is not a valid JSON' }
     end

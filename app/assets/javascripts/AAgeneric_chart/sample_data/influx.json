@@ -1,0 +1,32 @@
+{
+    "results": [
+        {
+            "statement_id": 0,
+            "series": [
+                {
+                    "name": "mymeas",
+                    "columns": [
+                        "time",
+                        "myfield",
+                        "mytag1",
+                        "mytag2"
+                    ],
+                    "values": [
+                        [
+                            "2017-03-01T00:16:18Z",
+                            33.1,
+                            null,
+                            null
+                        ],
+                        [
+                            "2017-03-01T00:17:18Z",
+                            12.4,
+                            "12",
+                            "14"
+                        ]
+                    ]
+                }
+            ]
+        }
+    ]
+}
