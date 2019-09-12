@@ -11,6 +11,7 @@ module Clusters
         configure_provider
         create_gitlab_service_account!
         configure_kubernetes
+        configure_pre_installed_knative if provider.knative_pre_installed?
         cluster.save!
       rescue Google::Apis::ServerError, Google::Apis::ClientError, Google::Apis::AuthorizationError => e
         log_service_error(e.class.name, provider.id, e.message)
@@ -46,6 +47,14 @@ module Clusters
           password: gke_cluster.master_auth.password,
           authorization_type: authorization_type,
           token: request_kubernetes_token)
+      end
+
+      def configure_pre_installed_knative
+        knative = cluster.build_application_knative(
+          hostname: 'example.com'
+        )
+        installed_via = s_('ClusterIntegration|Cloud Run')
+        knative.make_pre_installed!(s_('ClusterIntegration|installed via %{installed_via}') % { installed_via: installed_via })
       end
 
       def request_kubernetes_token

@@ -27,6 +27,7 @@ module Clusters
           state :update_errored, value: 6
           state :uninstalling, value: 7
           state :uninstall_errored, value: 8
+          state :pre_installed, value: 9
 
           event :make_scheduled do
             transition [:installable, :errored, :installed, :updated, :update_errored, :uninstall_errored] => :scheduled
@@ -39,6 +40,10 @@ module Clusters
           event :make_installed do
             transition [:installing] => :installed
             transition [:updating] => :updated
+          end
+
+          event :make_pre_installed do
+            transition any => :pre_installed
           end
 
           event :make_errored do
@@ -84,6 +89,11 @@ module Clusters
             application.cluster.application_helm.update!(version: Gitlab::Kubernetes::Helm::HELM_VERSION)
           end
 
+          before_transition any => [:pre_installed] do |application, transition|
+            status_reason = transition.args.first
+            application.status_reason = status_reason if status_reason
+          end
+
           after_transition any => [:uninstalling], :use_transactions => false do |application, _|
             application.prepare_uninstall
           end
@@ -101,7 +111,7 @@ module Clusters
       end
 
       def available?
-        installed? || updated?
+        pre_installed? || installed? || updated?
       end
 
       def update_in_progress?

@@ -37,7 +37,6 @@ export default class ClusterStore {
       deployBoardsHelpPath: null,
       status: null,
       rbac: false,
-      cloudRun: false,
       statusReason: null,
       applications: {
         helm: {
@@ -95,7 +94,6 @@ export default class ClusterStore {
     environmentsHelpPath,
     clustersHelpPath,
     deployBoardsHelpPath,
-    cloudRunHelpPath,
   ) {
     this.state.helpPath = helpPath;
     this.state.ingressHelpPath = ingressHelpPath;
@@ -103,7 +101,6 @@ export default class ClusterStore {
     this.state.environmentsHelpPath = environmentsHelpPath;
     this.state.clustersHelpPath = clustersHelpPath;
     this.state.deployBoardsHelpPath = deployBoardsHelpPath;
-    this.state.cloudRunHelpPath = cloudRunHelpPath;
   }
 
   setManagePrometheusPath(managePrometheusPath) {
@@ -116,10 +113,6 @@ export default class ClusterStore {
 
   updateRbac(rbac) {
     this.state.rbac = parseBoolean(rbac);
-  }
-
-  updateCloudRun(cloudRun) {
-    this.state.cloudRun = parseBoolean(cloudRun);
   }
 
   updateStatusReason(reason) {

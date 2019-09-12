@@ -73,14 +73,6 @@ export default {
       required: false,
       default: false,
     },
-    installedVia: {
-      type: String,
-      required: false,
-    },
-    installedViaLink: {
-      type: String,
-      required: false,
-    },
     installFailed: {
       type: Boolean,
       required: false,
@@ -253,6 +245,9 @@ export default {
         title: this.title,
       });
     },
+    isPreInstalled() {
+      return this.status === APPLICATION_STATUS.PRE_INSTALLED;
+    },
   },
   watch: {
     updateSuccessful(updateSuccessful) {
@@ -319,16 +314,8 @@ export default {
           >
           <span v-else class="js-cluster-application-title">{{ title }}</span>
         </strong>
-        <span v-if="installedVia" class="js-cluster-application-installed-via">
-          installed via
-          <a
-            v-if="installedViaLink"
-            :href="installedViaLink"
-            target="blank"
-            rel="noopener noreferrer"
-            >{{ installedVia }}</a
-          >
-          <span v-else>{{ installedVia }}</span>
+        <span v-if="isPreInstalled" class="js-cluster-application-pre-installed">
+          {{ statusReason }}
         </span>
         <slot name="description"></slot>
         <div v-if="hasError" class="cluster-application-error text-danger prepend-top-10">

@@ -2551,6 +2551,9 @@ msgstr ""
 msgid "ClusterIntegration|Choose which of your environments will use this cluster."
 msgstr ""
 
+msgid "ClusterIntegration|Cloud Run"
+msgstr ""
+
 msgid "ClusterIntegration|Cluster name is required."
 msgstr ""
 
@@ -2960,6 +2963,9 @@ msgid "ClusterIntegration|documentation"
 msgstr ""
 
 msgid "ClusterIntegration|help page"
+msgstr ""
+
+msgid "ClusterIntegration|installed via %{installed_via}"
 msgstr ""
 
 msgid "ClusterIntegration|meets the requirements"

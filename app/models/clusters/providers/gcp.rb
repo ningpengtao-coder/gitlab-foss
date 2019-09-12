@@ -80,6 +80,10 @@ module Clusters
 
         @api_client ||= GoogleApi::CloudPlatform::Client.new(access_token, nil)
       end
+
+      def knative_pre_installed?
+        cloud_run?
+      end
     end
   end
 end

@@ -19,6 +19,7 @@ export const APPLICATION_STATUS = {
   UNINSTALLING: 'uninstalling',
   UNINSTALL_ERRORED: 'uninstall_errored',
   ERROR: 'errored',
+  PRE_INSTALLED: 'pre_installed',
 };
 
 /*
@@ -29,6 +30,7 @@ export const APPLICATION_INSTALLED_STATUSES = [
   APPLICATION_STATUS.INSTALLED,
   APPLICATION_STATUS.UPDATING,
   APPLICATION_STATUS.UNINSTALLING,
+  APPLICATION_STATUS.PRE_INSTALLED,
 ];
 
 // These are only used client-side
