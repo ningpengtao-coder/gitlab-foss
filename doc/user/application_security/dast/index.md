@@ -136,6 +136,15 @@ variables:
 
 Domain validation is not required by default. It can be required by setting the [environment variable](#available-variables) `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` to true.
 
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_FULL_SCAN_ENABLED: "true"
+  DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED: "true"
+```
+
 Since ZAP full scan actively attacks the target application, DAST sends a ping to the target (normally defined in `DAST_WEBSITE` or `environment_url.txt`) beforehand.
 
 If `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` is false or unset, the scan will _proceed_ unless the response to the ping
