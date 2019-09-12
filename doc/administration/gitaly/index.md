@@ -391,6 +391,11 @@ To configure Gitaly with TLS:
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
 1. On the Gitaly server node(s), edit `/etc/gitlab/gitlab.rb` and add:
 
+   <!--
+   updates to following example must also be made at
+   https://gitlab.com/gitlab-org/charts/gitlab/blob/master/doc/advanced/external-gitaly/external-omnibus-gitaly.md#configure-omnibus-gitlab
+   -->
+
    ```ruby
    gitaly['tls_listen_addr'] = "0.0.0.0:9999"
    gitaly['certificate_path'] = "path/to/cert.pem"
