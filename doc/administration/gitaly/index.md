@@ -82,7 +82,8 @@ Below we describe how to configure two Gitaly servers one at
 `gitaly1.internal` and the other at `gitaly2.internal`
 with secret token `abc123secret`. We assume
 your GitLab installation has three repository storages: `default`,
-`storage1` and `storage2`.
+`storage1` and `storage2`. You can use as list as just one server with one
+repository storage if desired.
 
 ### 1. Installation
 
@@ -186,7 +187,7 @@ Check the directory layout on your Gitaly server to be sure.
 
 1. Append the following to `/etc/gitlab/gitlab.rb` for each respective server:
 
-   For `gitaly1.internal`:
+   On `gitaly1.internal`:
 
    ```
    gitaly['storage'] = [
@@ -195,7 +196,7 @@ Check the directory layout on your Gitaly server to be sure.
    ]
    ```
 
-   For `gitaly2.internal`:
+   On `gitaly2.internal`:
 
    ```
    gitaly['storage'] = [
@@ -227,7 +228,7 @@ Check the directory layout on your Gitaly server to be sure.
 
 1. Append the following to `/home/git/gitaly/config.toml` for each respective server:
 
-   For `gitaly1.internal`:
+   On `gitaly1.internal`:
 
    ```toml
    [[storage]]
@@ -237,7 +238,7 @@ Check the directory layout on your Gitaly server to be sure.
    name = 'storage1'
    ```
 
-   For `gitaly2.internal`:
+   On `gitaly2.internal`:
 
    ```toml
    [[storage]]
