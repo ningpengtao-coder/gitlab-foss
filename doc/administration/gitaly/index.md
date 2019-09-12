@@ -173,7 +173,7 @@ Check the directory layout on your Gitaly server to be sure.
    # Don't forget to copy `/etc/gitlab/gitlab-secrets.json` from web server to Gitaly server.
    gitlab_rails['internal_api_url'] = 'https://gitlab.example.com'
 
-   # Authentication token to ensure only authorized servers can communicate with 
+   # Authentication token to ensure only authorized servers can communicate with
    # Gitaly server
    gitaly['auth_token'] = 'abc123secret'
 
