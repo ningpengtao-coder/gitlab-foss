@@ -157,13 +157,13 @@ export const fetchTrace = ({ dispatch, state }) =>
       dispatch('toggleScrollisInBottom', isScrolledToBottom());
       dispatch('receiveTraceSuccess', data);
 
-      if (!data.complete) {
-        traceTimeout = setTimeout(() => {
-          dispatch('fetchTrace');
-        }, 4000);
-      } else {
+      // if (!data.complete) {
+      //   traceTimeout = setTimeout(() => {
+      //     dispatch('fetchTrace');
+      //   }, 4000);
+      // } else {
         dispatch('stopPollingTrace');
-      }
+      // }
     })
     .catch(() => dispatch('receiveTraceError'));
 

@@ -17,10 +17,10 @@ export default {
       offset: 1042,
       content: [
         {
-          text: __('Not downloading anything '),
+          text:'Not downloading anything ',
         },
         {
-          text: __(' id'),
+          text: ' id',
           style: 'term-fg-l-green term-bold',
         },
         {
@@ -34,10 +34,10 @@ export default {
       offset: 1043,
       content: [
         {
-          text: __('A filipa é fixe e o resto que se lixe '),
+          text: 'A filipa é fixe e o resto que se lixe ',
         },
         {
-          text: __(' id'),
+          text: ' id',
           style: 'term-fg-l-green term-bold',
         },
         {

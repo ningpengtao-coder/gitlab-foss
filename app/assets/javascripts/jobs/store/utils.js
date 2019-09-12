@@ -1,4 +1,10 @@
 import _ from 'underscore';
+
+export const parseLine = (line = {}, lineNumber) => ({
+  ...line,
+  lineNumber,
+});
+
 /**
  * Parses the job log content into a structure usable by the template
  *
@@ -6,10 +12,10 @@ import _ from 'underscore';
  *    - creates a new array to hold the lines that are collpasible,
  *    - adds a isClosed property to handle toggle
  *    - adds a isHeader property to handle template logic
- * For each line:
- *    - adds the index as  lineNumber
+ *    - adds the section_duration
  *
- * TODO: Check if line has content before adding it to the array
+ * For each line:
+ *    - adds the index as lineNumber
  *
  * @param {Array} lines
  * @returns {Array}
@@ -21,22 +27,20 @@ export const logLinesParser = (lines = [], lineNumberStart) =>
       acc.push({
         isClosed: true,
         isHeader: true,
-        line: {
-          ...line,
-          lineNumber,
-        },
+        line: parseLine(line, lineNumber),
         lines: [],
       });
-    } else if (acc.length && acc[acc.length - 1].isHeader) {
-      acc[acc.length - 1].lines.push({
-        ...line,
-        lineNumber,
-      });
-    } else {
-      acc.push({
-        ...line,
-        lineNumber,
-      });
+    } else if (
+      acc.length &&
+      acc[acc.length - 1].isHeader &&
+      !line.section_duration &&
+      line.content.length
+    ) {
+      acc[acc.length - 1].lines.push(parseLine(line, lineNumber));
+    } else if (acc.length && acc[acc.length - 1].isHeader && line.section_duration) {
+      acc[acc.length - 1].section_duration = line.section_duration;
+    } else if (line.content.length) {
+      acc.push(parseLine(line, lineNumber));
     }
 
     return acc;
@@ -64,6 +68,8 @@ export const updateIncrementalTrace = (originalTrace = [], oldLog = [], newLog =
 
   const lastIndex = cloneOldLog.length - 1;
   const lastLine = cloneOldLog[lastIndex];
+
+  // TODO: Keep the isClosed state!!!
 
   // The last line may be inside a collpasible section
   // If it is, we use the not parsed saved log, remove the last element

@@ -29,21 +29,21 @@ export default {
     }
 
     if (log.append) {
-      state.originalTrace = state.originalTrace.concat(log.trace);
-      state.trace = updateIncrementalTrace(state.originalTrace, state.trace, log.lines)
+      // state.originalTrace = state.originalTrace.concat(log.trace);
+      // state.trace = updateIncrementalTrace(state.originalTrace, state.trace, log.lines)
       state.traceSize += log.size;
     } else {
       // When the job still does not have a trace
       // the trace response will not have a defined
       // html or size. We keep the old value otherwise these
       // will be set to `undefined`
-      state.originalTrace = log.lines || state.trace;
-      state.trace = logLinesParser(log.lines) || state.trace;
+      // state.originalTrace = log.lines || state.trace;
+      // state.trace = logLinesParser(log.lines) || state.trace;
       state.traceSize = log.size || state.traceSize;
     }
 
     state.originalTrace = oldLog.lines;
-    state.trace = updateIncrementalTrace(state.originalTrace, logLinesParser(oldLog.lines), newLog.lines)
+    state.trace = logLinesParser(oldLog.lines);
 
     if (state.traceSize < log.total) {
       state.isTraceSizeVisible = true;
