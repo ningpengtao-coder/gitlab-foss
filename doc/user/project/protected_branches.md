@@ -84,6 +84,20 @@ Click **Protect** and the branch will appear in the "Protected branch" list.
 
 ![Roles and users list](img/protected_branches_select_roles_and_users_list.png)
 
+## Code Owners approvals **(PREMIUM)**
+
+It is possible to require at least one approval for each entry in the
+[`CODEOWNERS` file](code_owners.md) that matches a file changed in
+the merge request. To enable this feature:
+
+1. Toggle the **Require approval from code owners** slider.
+
+1. Click **Protect**.
+
+When this feature is enabled, all merge requests will need approval
+from one code owner per matched rule before it can be merged. Additionally,
+pushes to the protected branch will be denied if a matched rule occurs.
+
 ## Wildcard protected branches
 
 > [Introduced][ce-4665] in GitLab 8.10.
