@@ -84,6 +84,9 @@ gem 'rack-cors', '~> 1.0.0', require: 'rack/cors'
 
 # GraphQL API
 gem 'graphql', '~> 1.9.11'
+# NOTE: graphiql-rails v1.5+ doesn't work: https://gitlab.com/gitlab-org/gitlab-ce/issues/67293
+# TODO: remove app/views/graphiql/rails/editors/show.html.erb when https://github.com/rmosolgo/graphiql-rails/pull/71 is released:
+# https://gitlab.com/gitlab-org/gitlab-ce/issues/67263
 gem 'graphiql-rails', '~> 1.4.10'
 gem 'apollo_upload_server', '~> 2.0.0.beta3'
 gem 'graphql-docs', '~> 1.6.0', group: [:development, :test]
@@ -263,7 +266,7 @@ gem 'fast_blank'
 
 # Parse time & duration
 gem 'chronic', '~> 0.10.2'
-gem 'chronic_duration', '~> 0.10.6'
+gem 'gitlab_chronic_duration', '~> 0.10.6.1'
 
 gem 'webpack-rails', '~> 0.9.10'
 gem 'rack-proxy', '~> 0.6.0'
@@ -445,3 +448,6 @@ gem 'unleash', '~> 0.1.5'
 # Structured logging
 gem 'lograge', '~> 0.5'
 gem 'grape_logging', '~> 1.7'
+
+# Countries list
+gem 'countries', '~> 3.0'

@@ -8,8 +8,8 @@ export default {
     LogLine,
     LogLineHeader,
   },
-  computed:{
-    ...mapState(['traceEndpoint', 'trace'])
+  computed: {
+    ...mapState(['traceEndpoint', 'trace']),
   },
   methods: {
     ...mapActions(['toggleCollapsibleLine']),
@@ -31,7 +31,12 @@ export default {
           @toggleLine="handleOnClickCollapsibleLine(section)"
         />
         <template v-if="!section.isClosed">
-          <log-line v-for="line in section.lines" :key="line.offset" :line="line" :path="traceEndpoint" />
+          <log-line
+            v-for="line in section.lines"
+            :key="line.offset"
+            :line="line"
+            :path="traceEndpoint"
+          />
         </template>
       </template>
       <log-line v-else :key="section.offset" :line="section" :path="traceEndpoint" />

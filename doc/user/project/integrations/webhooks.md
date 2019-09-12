@@ -1001,6 +1001,7 @@ X-Gitlab-Event: Pipeline Hook
       "tag": false,
       "sha": "bcbb5ec396a2c0f828686f14fac9b80b780504f2",
       "before_sha": "bcbb5ec396a2c0f828686f14fac9b80b780504f2",
+      "source": "merge_request_event",
       "status": "success",
       "stages":[
          "build",
@@ -1016,6 +1017,18 @@ X-Gitlab-Event: Pipeline Hook
           "value": "us-west-1"
         }
       ]
+   },
+    "merge_request": {
+      "id": 1,
+      "iid": 1,
+      "title": "Test",
+      "source_branch": "test",
+      "source_project_id": 1,
+      "target_branch": "master",
+      "target_project_id": 1,
+      "state": "opened",
+      "merge_status": "can_be_merged",
+      "url": "http://192.168.64.1:3005/gitlab-org/gitlab-test/merge_requests/1"
    },
    "user":{
       "name": "Administrator",
@@ -1327,3 +1340,6 @@ console:
 example.com - - [14/May/2014:07:45:26 EDT] "POST / HTTP/1.1" 200 0
 - -> /
 ```
+
+NOTE: **Note:**
+You may need to [allow requests to the local network](../../../security/webhooks.md) for this receiver to be added.

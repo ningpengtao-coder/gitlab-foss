@@ -14,40 +14,33 @@ import _ from 'underscore';
  * @param {Array} lines
  * @returns {Array}
  */
-export const logLinesParser = (lines = []) =>
+export const logLinesParser = (lines = [], lineNumberStart) =>
   lines.reduce((acc, line, index) => {
+    const lineNumber = lineNumberStart ? lineNumberStart + index : index;
     if (line.section_header) {
       acc.push({
         isClosed: true,
         isHeader: true,
         line: {
           ...line,
-          lineNumber: index,
+          lineNumber,
         },
         lines: [],
       });
     } else if (acc.length && acc[acc.length - 1].isHeader) {
       acc[acc.length - 1].lines.push({
         ...line,
-        lineNumber: index,
+        lineNumber,
       });
     } else {
       acc.push({
         ...line,
-        lineNumber: index,
+        lineNumber,
       });
     }
 
     return acc;
   }, []);
-
-/**
- * When the trace is not complete, backend may send the last received line
- * in the new response.
- *
- * We need to check if that is the case by looking for the offset property
- * before parsing the incremental part
- */
 
 /**
  * When the trace is not complete, backend may send the last received line
@@ -84,15 +77,12 @@ export const updateIncrementalTrace = (originalTrace = [], oldLog = [], newLog =
     const cloneOriginal = [...originalTrace];
     cloneOriginal.splice(cloneOriginal.length - 1);
     return logLinesParser(cloneOriginal.concat(newLog));
-
   } else if (lastLine.offset === firstLineOffset) {
     cloneOldLog.splice(lastIndex);
-    return cloneOldLog.concat(logLinesParser(newLog));
-
-  } 
-    // there are no matches, let's parse the new log and return them together
-    return cloneOldLog.concat(logLinesParser(newLog));
-  
+    return cloneOldLog.concat(logLinesParser(newLog, cloneOldLog.length));
+  }
+  // there are no matches, let's parse the new log and return them together
+  return cloneOldLog.concat(logLinesParser(newLog, cloneOldLog.length));
 };
 
 export const isNewJobLogActive = () => gon && gon.features && gon.features.jobLogJson;

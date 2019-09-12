@@ -20,6 +20,7 @@ import Log from './log/log.vue';
 
 import { sprintf } from '~/locale';
 import delayedJobMixin from '../mixins/delayed_job_mixin';
+import { isNewJobLogActive } from '../store/utils';
 
 export default {
   name: 'JobPageApp',

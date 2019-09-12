@@ -50,6 +50,7 @@ The following table depicts the various user permission levels in a project.
 | View License Compliance reports **(ULTIMATE)**    | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View Security reports **(ULTIMATE)**              | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View Dependency list **(ULTIMATE)**               | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
+| View licenses in Dependency list **(ULTIMATE)**   | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View [Design Management](project/issues/design_management.md) pages **(PREMIUM)** | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | View project code                                 | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
 | Pull project code                                 | ✓ (*1*) | ✓          | ✓           | ✓        | ✓      |
@@ -151,13 +152,9 @@ which visibility level you select on project settings.
 
 ### Protected branches
 
-To prevent people from messing with history or pushing code without
-review, we've created protected branches. Read through the documentation on
-[protected branches](project/protected_branches.md)
-to learn more.
-
-Additionally, you can allow or forbid users with Maintainer and/or
-Developer permissions to push to a protected branch. Read through the documentation on
+Additional restrictions can be applied on a per-branch basis with [protected branches](project/protected_branches.md).
+Additionally, you can customize permissions to allow or prevent project
+Maintainers and Developers from pushing to a protected branch. Read through the documentation on
 [Allowed to Merge and Allowed to Push settings](project/protected_branches.md#using-the-allowed-to-merge-and-allowed-to-push-settings)
 to learn more.
 

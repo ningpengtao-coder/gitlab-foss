@@ -231,7 +231,7 @@ module Ci
       where('EXISTS (?)', ::Ci::Build.latest.with_reports(reports_scope).where('ci_pipelines.id=ci_builds.commit_id').select(1))
     end
 
-    scope :without_interruptible_builds, -> do
+    scope :with_only_interruptible_builds, -> do
       where('NOT EXISTS (?)',
         Ci::Build.where('ci_builds.commit_id = ci_pipelines.id')
                  .with_status(:running, :success, :failed)
@@ -835,12 +835,12 @@ module Ci
       return unless merge_request_event?
 
       strong_memoize(:merge_request_event_type) do
-        if detached_merge_request_pipeline?
-          :detached
+        if merge_train_pipeline?
+          :merge_train
         elsif merge_request_pipeline?
           :merged_result
-        elsif merge_train_pipeline?
-          :merge_train
+        elsif detached_merge_request_pipeline?
+          :detached
         end
       end
     end

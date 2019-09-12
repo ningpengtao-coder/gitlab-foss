@@ -1,3 +1,5 @@
+import { isNewJobLogActive } from '../store/utils';
+
 export default () => ({
   jobEndpoint: null,
   traceEndpoint: null,

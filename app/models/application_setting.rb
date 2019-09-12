@@ -8,6 +8,7 @@ class ApplicationSetting < ApplicationRecord
 
   add_authentication_token_field :runners_registration_token, encrypted: -> { Feature.enabled?(:application_settings_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
   add_authentication_token_field :health_check_access_token
+  add_authentication_token_field :static_objects_external_storage_auth_token
 
   belongs_to :instance_administration_project, class_name: "Project"
 
@@ -30,15 +31,6 @@ class ApplicationSetting < ApplicationRecord
   serialize :domain_blacklist, Array # rubocop:disable Cop/ActiveRecordSerialize
   serialize :repository_storages # rubocop:disable Cop/ActiveRecordSerialize
   serialize :asset_proxy_whitelist, Array # rubocop:disable Cop/ActiveRecordSerialize
-
-  self.ignored_columns += %i[
-    clientside_sentry_dsn
-    clientside_sentry_enabled
-    koding_enabled
-    koding_url
-    sentry_dsn
-    sentry_enabled
-  ]
 
   cache_markdown_field :sign_in_text
   cache_markdown_field :help_page_text
@@ -210,6 +202,13 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             allow_blank: false,
             if: :asset_proxy_enabled?
+
+  validates :static_objects_external_storage_url,
+            addressable_url: true, allow_blank: true
+
+  validates :static_objects_external_storage_auth_token,
+            presence: true,
+            if: :static_objects_external_storage_url?
 
   SUPPORTED_KEY_TYPES.each do |type|
     validates :"#{type}_key_restriction", presence: true, key_restriction: { type: type }

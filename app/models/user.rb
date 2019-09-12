@@ -23,14 +23,9 @@ class User < ApplicationRecord
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
-  self.ignored_columns += %i[
-    authentication_token
-    email_provider
-    external_email
-  ]
-
   add_authentication_token_field :incoming_email_token, token_generator: -> { SecureRandom.hex.to_i(16).to_s(36) }
   add_authentication_token_field :feed_token
+  add_authentication_token_field :static_object_token
 
   default_value_for :admin, false
   default_value_for(:external) { Gitlab::CurrentSettings.user_default_external }
@@ -60,6 +55,9 @@ class User < ApplicationRecord
 
   BLOCKED_MESSAGE = "Your account has been blocked. Please contact your GitLab " \
                     "administrator if you think this is an error."
+
+  # Removed in GitLab 12.3. Keep until after 2019-09-22.
+  self.ignored_columns += %i[support_bot]
 
   # Override Devise::Models::Trackable#update_tracked_fields!
   # to limit database writes to at most once every hour
@@ -1435,6 +1433,13 @@ class User < ApplicationRecord
   # solution.
   def feed_token
     ensure_feed_token!
+  end
+
+  # Each existing user needs to have a `static_object_token`.
+  # We do this on read since migrating all existing users is not a feasible
+  # solution.
+  def static_object_token
+    ensure_static_object_token!
   end
 
   def sync_attribute?(attribute)

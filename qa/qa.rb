@@ -54,7 +54,7 @@ module QA
     autoload :MergeRequestFromFork, 'qa/resource/merge_request_from_fork'
     autoload :DeployKey, 'qa/resource/deploy_key'
     autoload :DeployToken, 'qa/resource/deploy_token'
-    autoload :Branch, 'qa/resource/branch'
+    autoload :ProtectedBranch, 'qa/resource/protected_branch'
     autoload :CiVariable, 'qa/resource/ci_variable'
     autoload :Runner, 'qa/resource/runner'
     autoload :PersonalAccessToken, 'qa/resource/personal_access_token'
@@ -66,6 +66,7 @@ module QA
     autoload :Fork, 'qa/resource/fork'
     autoload :SSHKey, 'qa/resource/ssh_key'
     autoload :Snippet, 'qa/resource/snippet'
+    autoload :ProjectMember, 'qa/resource/project_member'
 
     module Events
       autoload :Base, 'qa/resource/events/base'
