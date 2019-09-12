@@ -78,11 +78,13 @@ describe GoogleApi::CloudPlatform::Client do
     let(:machine_type) { 'n1-standard-2' }
     let(:legacy_abac) { true }
     let(:enable_addons) { [] }
+
     let(:addons_config) do
       enable_addons.each_with_object({}) do |addon, hash|
         hash[addon] = { disabled: false }
       end
     end
+
     let(:cluster_options) do
       {
         cluster: {
@@ -104,6 +106,7 @@ describe GoogleApi::CloudPlatform::Client do
         }
       }
     end
+
     let(:create_cluster_request_body) { double('Google::Apis::ContainerV1beta1::CreateClusterRequest') }
     let(:operation) { double }
 
