@@ -179,6 +179,7 @@ Check the directory layout on your Gitaly server to be sure.
 
    # Make Gitaly accept connections on all network interfaces. You must use
    # firewalls to restrict access to this address/port.
+   # Comment out following line if you only want to support TLS connections
    gitaly['listen_addr'] = "0.0.0.0:8075"
    ```
 
