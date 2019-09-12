@@ -734,6 +734,36 @@ Avoid passing secrets as Docker build arguments if possible, as they may be
 persisted in your image. See
 [this discussion](https://github.com/moby/moby/issues/13490) for details.
 
+### Passing secrets to `docker build` (beta)
+
+CI environment variables can be passed as [build
+secrets](https://docs.docker.com/develop/develop-images/build_enhancements/#new-docker-build-secret-information) to the `docker build` command by listing them comma separated by name in the
+`AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES` variable. For example, in order to forward the variables `CI_COMMIT_SHA` and `CI_ENVIRONMENT_NAME`, one would set `AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES` to `CI_COMMIT_SHA,CI_ENVIRONMENT_NAME`.
+
+Unlike build arguments, these are not persisted by docker in the final image
+(though you can still persist them yourself, so be careful).
+
+In projects without a `Dockerfile`, these will be transparently available as environment variables, but projects with a `Dockerfile` need two additional adjustments:
+
+1. Activate the experimental `Dockerfile` syntax by adding this to the top of the file:
+
+   ```Dockerfile
+   # syntax = docker/dockerfile:experimental
+   ```
+
+1. To make secrets available in any `RUN $COMMAND` in the `Dockerfile`, mount
+the secret file and source it prior to running `$COMMAND`:
+
+   ```Dockerfile
+   RUN --mount=type=secret,id=auto-devops-build-secrets . /run/secrets/auto-devops-build-secrets && $COMMAND
+   ```
+
+NOTE: **Note:**
+When `AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES` is set, Auto DevOps
+uses [Docker BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/)
+to enable the `--secret` flag. Docker BuildKit is still experimental, and not compatible
+with every kind of build.
+
 ### Custom Helm Chart
 
 Auto DevOps uses [Helm](https://helm.sh/) to deploy your application to Kubernetes.
@@ -827,6 +857,7 @@ applications.
 | `ADDITIONAL_HOSTS`                      | Fully qualified domain names specified as a comma-separated list that are added to the ingress hosts. |
 | `<ENVIRONMENT>_ADDITIONAL_HOSTS`        | For a specific environment, the fully qualified domain names specified as a comma-separated list that are added to the ingress hosts. This takes precedence over `ADDITIONAL_HOSTS`. |
 | `AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS`    | Extra arguments to be passed to the `docker build` command. Note that using quotes will not prevent word splitting. [More details](#passing-arguments-to-docker-build). |
+| `AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES` | A comma separated list of CI variable names to be passed to the `docker build` command as secrets. [More details](#passing-secrets-to-docker-build-beta). |
 | `AUTO_DEVOPS_CHART`                     | Helm Chart used to deploy your apps. Defaults to the one [provided by GitLab](https://gitlab.com/gitlab-org/charts/auto-deploy-app). |
 | `AUTO_DEVOPS_CHART_REPOSITORY`          | Helm Chart repository used to search for charts. Defaults to `https://charts.gitlab.io`. |
 | `AUTO_DEVOPS_CHART_REPOSITORY_NAME`     | From Gitlab 11.11, used to set the name of the helm repository. Defaults to `gitlab`. |
