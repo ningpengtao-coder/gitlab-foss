@@ -363,9 +363,9 @@ with a Gitaly instance that listens for secure connections you will need to use 
 scheme in the `gitaly_address` of the corresponding storage entry in the GitLab configuration.
 
 You will need to bring your own certificates as this isn't provided automatically.
-The certificate to be used needs to be installed on all Gitaly nodes, and the 
+The certificate to be used needs to be installed on all Gitaly nodes, and the
 certificate (or CA of certificate) on all
-client nodes that communicate with it as well, following the procedure described in
+client nodes that communicate with it following the procedure described in
 [GitLab custom certificate configuration](https://docs.gitlab.com/omnibus/settings/ssl.html#install-custom-public-certificates).
 
 NOTE: **Note:**
@@ -391,6 +391,14 @@ To configure Gitaly with TLS:
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on client node(s).
+1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
+
+   ```sh
+   sudo mkdir -p /etc/gitlab/ssl
+   sudo chmod 700 /etc/gitlab/ssl
+   sudo cp key.pem cert.pem /etc/gitlab/ssl/
+   ```
+
 1. On the Gitaly server node(s), edit `/etc/gitlab/gitlab.rb` and add:
 
    <!--
@@ -400,8 +408,8 @@ To configure Gitaly with TLS:
 
    ```ruby
    gitaly['tls_listen_addr'] = "0.0.0.0:9999"
-   gitaly['certificate_path'] = "path/to/cert.pem"
-   gitaly['key_path'] = "path/to/key.pem"
+   gitaly['certificate_path'] = "/etc/gitlab/ssl/cert.pem"
+   gitaly['key_path'] = "/etc/gitlab/ssl/key.pem"
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) on Gitaly server node(s).
@@ -439,14 +447,22 @@ To configure Gitaly with TLS:
    [this issue](https://gitlab.com/gitlab-org/gitaly/issues/1282) is resolved.
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on client node(s).
+1. Create the `/etc/gitlab/ssl` directory and copy your key and certificate there:
+
+   ```sh
+   sudo mkdir -p /etc/gitlab/ssl
+   sudo chmod 700 /etc/gitlab/ssl
+   sudo cp key.pem cert.pem /etc/gitlab/ssl/
+   ```
+
 1. On the Gitaly server node(s), edit `/home/git/gitaly/config.toml` and add:
 
    ```toml
    tls_listen_addr = '0.0.0.0:9999'
 
    [tls]
-   certificate_path = '/path/to/cert.pem'
-   key_path = '/path/to/key.pem'
+   certificate_path = '/etc/gitlab/ssl/cert.pem'
+   key_path = '/etc/gitlab/ssl/key.pem'
    ```
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) on Gitaly server node(s).
