@@ -186,6 +186,8 @@ app.get('/dast-website-target', function(req, res) {
 
 ##### Domain validation header via a proxy
 
+###### NGINX
+
 It's also possible to add the `Gitlab-DAST-Permission` header via a proxy.
 DAST's test suite uses an NGINX proxy in a Docker container to allow us to add the
 header without modifying the tested application directly. You can use the same approach.
@@ -219,6 +221,17 @@ docker run -e DAST_FULL_SCAN_ENABLED -e DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED
   --network test --volume "$PWD":/output \
   registry.gitlab.com/gitlab-org/security-products/dast:${VERSION:-latest} \
   /analyze -t http://test-proxy
+```
+
+###### Apache
+
+Apache can also be used as a [proxy](https://httpd.apache.org/docs/2.4/mod/mod_proxy.html) to add the Gitlab-DAST-Permission [header](https://httpd.apache.org/docs/current/mod/mod_headers.html).
+
+```
+# httpd.conf
+ProxyPass "/" "http://test-application.com"
+ProxyPassReverse "/" "http://test-application.com"
+Header set Gitlab-DAST-Permission "allow"
 ```
 
 ### Customizing the DAST settings
