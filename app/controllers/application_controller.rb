@@ -125,6 +125,11 @@ class ApplicationController < ActionController::Base
 
   protected
 
+  def track_event(action = action_name, **args)
+    category = args.delete(:category) || self.class.name
+    Gitlab::Tracking.event(category, action.to_s, **args)
+  end
+
   def workhorse_excluded_content_types
     @workhorse_excluded_content_types ||= %w(text/html application/json)
   end
