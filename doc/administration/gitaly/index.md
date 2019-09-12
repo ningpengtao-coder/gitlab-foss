@@ -82,7 +82,7 @@ Below we describe how to configure two Gitaly servers one at
 `gitaly1.internal` and the other at `gitaly2.internal`
 with secret token `abc123secret`. We assume
 your GitLab installation has three repository storages: `default`,
-`storage1` and `storage2`. You can use as list as just one server with one
+`storage1` and `storage2`. You can use as little as just one server with one
 repository storage if desired.
 
 ### 1. Installation
