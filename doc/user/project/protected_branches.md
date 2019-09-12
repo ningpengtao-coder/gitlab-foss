@@ -87,7 +87,11 @@ Click **Protect** and the branch will appear in the "Protected branch" list.
 ## Code Owners approvals **(PREMIUM)**
 
 It is possible to require at least one approval for each entry in the
+<<<<<<< HEAD
 [`CODEOWNERS` file](code_owners.md) that matches a file changed in
+=======
+[`CODEOWNERS` file](../code_owners.md) that matches a file changed in
+>>>>>>> Update docs to reflect changes to API and UI
 the merge request. To enable this feature:
 
 1. Toggle the **Require approval from code owners** slider.
