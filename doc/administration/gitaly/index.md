@@ -162,6 +162,13 @@ Check the directory layout on your Gitaly server to be sure.
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
 
+   # If you don't want to run monitoring services uncomment the following (not recommended)
+   # alertmanager['enable'] = false
+   # gitlab_exporter['enable'] = false
+   # grafana['enable'] = false
+   # node_exporter['enable'] = false
+   # prometheus['enable'] = false
+
    # Prevent database connections during 'gitlab-ctl reconfigure'
    gitlab_rails['rake_cache_clear'] = false
    gitlab_rails['auto_migrate'] = false
