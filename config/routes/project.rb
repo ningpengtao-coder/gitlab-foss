@@ -228,6 +228,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :mattermost, only: [:new, :create]
 
+      resource :chart, only: :show
+
       namespace :prometheus do
         resources :metrics, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy] do
           get :active_common, on: :collection
