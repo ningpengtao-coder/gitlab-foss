@@ -122,7 +122,7 @@ Configure a token on the instance that runs the GitLab Rails application.
 
 ### 3. Gitaly server configuration
 
-Next, on the Gitaly servers, you need to configure storage paths, enable
+Next, on the Gitaly servers, you need to configure repository storages, enable
 the network listener and configure the token.
 
 NOTE: **Note:** if you want to reduce the risk of downtime when you enable
