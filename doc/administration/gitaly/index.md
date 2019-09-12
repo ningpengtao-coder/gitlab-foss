@@ -126,7 +126,7 @@ Configure a token on the instance that runs the GitLab Rails application.
 Next, on the Gitaly servers, you need to configure storage paths, enable
 the network listener and configure the token.
 
-NOTE: **Note:** if you want to reduce the risk of downtime when you enable
+NOTE: **Note:** If you want to reduce the risk of downtime when you enable
 authentication you can temporarily disable enforcement, see [the
 documentation on configuring Gitaly
 authentication](https://gitlab.com/gitlab-org/gitaly/blob/master/doc/configuration/README.md#authentication)
