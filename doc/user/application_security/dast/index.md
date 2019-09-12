@@ -134,15 +134,19 @@ variables:
 
 #### Domain validation
 
-Domain validation is disabled by default. You can enable it by setting the [environment variable](#available-variables) `DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED` to true.
+Domain validation is not required by default. It can be required by setting the [environment variable](#available-variables) `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` to true.
 
 Since ZAP full scan actively attacks the target application, DAST sends a ping to the target (normally defined in `DAST_WEBSITE` or `environment_url.txt`) beforehand.
-The target's response must include a `Gitlab-DAST-Confirmation` header. The value of the header can be anything.
-If DAST does not see the header in the response, it will not perform the scan and the job will fail with an error.
+
+If `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` is false or unset, the scan will _proceed_ unless the response to the ping
+includes a `Gitlab-DAST-Permission` header with a value of `deny`.
+
+If `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` is true, the scan will _exit_ unless the response to the ping
+includes a `Gitlab-DAST-Permission` header with a value of `allow`.
 
 ![Error message displayed when DAST domain validation fails](img/dast-domain-validation-error.png)
 
-Here are some examples of adding the `Gitlab-DAST-Confirmation` header to a response in Rails, Django, and Node (with Express).
+Here are some examples of adding the `Gitlab-DAST-Permission` header to a response in Rails, Django, and Node (with Express).
 
 ##### Ruby on Rails
 
@@ -151,7 +155,7 @@ Here's how you would add a [custom header in Ruby on Rails](https://guides.rubyo
 ```ruby
 class DastWebsiteTargetController < ActionController::Base
   def dast_website_target
-    response.headers['Gitlab-DAST-Confirmation'] = true
+    response.headers['Gitlab-DAST-Permission'] = 'allow'
 
     head :ok
   end
@@ -166,26 +170,25 @@ Here's how you would add a [custom header in Django](https://docs.djangoproject.
 class DastWebsiteTargetView(View):
     def head(self, *args, **kwargs):
       response = HttpResponse()
-      response['Gitlab-Dast-Confirmation'] = true
+      response['Gitlab-Dast-Permission'] = 'allow'
 
       return response
 ```
 
-##### [Node (with Express)](http://expressjs.com/en/5x/api.html#res.append)
 ##### Node (with Express)
 
 Here's how you would add a [custom header in Node (with Express)](http://expressjs.com/en/5x/api.html#res.append):
 
 ```javascript
 app.get('/dast-website-target', function(req, res) {
-  res.append('Gitlab-DAST-Confirmation', 'true')
+  res.append('Gitlab-DAST-Permission', 'allow')
   res.send('Respond to DAST ping')
 })
 ```
 
 ##### Domain validation header via a proxy
 
-It's also possible to add the `Gitlab-DAST-Confirmation` header via a proxy.
+It's also possible to add the `Gitlab-DAST-Permission` header via a proxy.
 DAST's test suite uses an nginx proxy in a Docker container to allow us to add the
 header without modifying the tested application directly.
 
@@ -204,7 +207,7 @@ server {
 
     location / {
         proxy_pass http://test-application;
-        add_header Gitlab-DAST-Confirmation true;
+        add_header Gitlab-DAST-Permission allow;
     }
 }
 ```
@@ -282,7 +285,7 @@ variable value.
 | `DAST_AUTH_EXCLUDE_URLS` | no | The URLs to skip during the authenticated scan; comma-separated, no spaces in between. |
 | `DAST_TARGET_AVAILABILITY_TIMEOUT` | no | Time limit in seconds to wait for target availability. Scan is attempted nevertheless if it runs out. Integer. Defaults to `60`. |
 | `DAST_FULL_SCAN_ENABLED` | no | Switches the tool to execute [ZAP Full Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Full-Scan) instead of [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan). Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
-| `DAST_FULL_SCAN_DOMAIN_VALIDATION_ENABLED` | no | Enables [domain validation](#domain-validation) when running DAST full scans. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
+| `DAST_FULL_SCAN_DOMAIN_VALIDATION_REQUIRED` | no | Requires [domain validation](#domain-validation) when running DAST full scans. Boolean. `true`, `True`, or `1` are considered as true value, otherwise false. Defaults to `false`. |
 
 ## Security Dashboard
 
