@@ -42,14 +42,11 @@ export default {
   },
   methods: {
     setGraphPadding() {
-      const container = document.querySelector('.content .container-limited');
+      const container = document.querySelector('.js-pipeline-container');
       if (!container) return;
 
-      const containerRightPadding = 16;
-
       this.graphLeftPadding = container.offsetLeft;
-      this.graphRightPadding =
-        window.innerWidth - container.offsetLeft - container.offsetWidth + containerRightPadding;
+      this.graphRightPadding = window.innerWidth - container.offsetLeft - container.offsetWidth;
     },
     handleLayoutChange() {
       // wait until animations finish, then recalculate padding
