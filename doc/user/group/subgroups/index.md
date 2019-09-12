@@ -117,10 +117,9 @@ level from the parent group. This model allows access to nested groups if you
 have membership in one of its parents.
 
 NOTE: **Note:**
-GitLab [runners](../../../ci/runners/README.md) are unconditionally
-inherited by subgroups. Creating a runner in a parent group and then creating a
-subgroup with additional maintainers gives those maintainers full access to the
-runner.
+GitLab [Runners](../../../ci/runners/README.md) are unconditionally inherited by
+subgroups. Creating a Runner in a parent group and then creating a subgroup with
+additional maintainers gives those maintainers full access to the Runner.
 
 The group permissions for a member can be changed only by Owners, and only on
 the **Members** page of the group the member was added.
