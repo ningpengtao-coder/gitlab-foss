@@ -10,6 +10,8 @@
     GlButton,
     GlFormGroup,
     GlFormInput,
+    GlFormRadioGroup,
+    GlFormSelect,
   } from '@gitlab/ui';
   import syntaxHighlight from './../utils/beautify';
 
@@ -17,6 +19,7 @@
   import json2json from 'awesome-json2json';
   import formatHighlight from 'json-format-highlight';
   import prometheus from '../sample_data/prometheus';
+  import influxdb from '../sample_data/influxdb';
   // eslint-disable-next-line global-require
   // const grafanaJSON = require('./../sample_data/grafana.json');
 
@@ -32,11 +35,11 @@
       GlButton,
       GlFormGroup,
       GlFormInput,
+      GlFormRadioGroup,
+      GlFormSelect,
     },
     data() {
       return {
-        chartUrl: '',
-        //userJson: '',
         chartJson: '',
         formatterFn: '',
         syntaxHighlight,
@@ -44,24 +47,45 @@
         formattedInput: '',
         config: {
           prometheus,
+          influxdb,
         },
+        chartUrl: '',
+        axisType: 'value',
+        axisTypeOptions: [
+          {
+            text: 'Time', value: 'time',
+          },
+          {
+            text: 'Category', value: 'category',
+          },
+          {
+            text: 'Value', value: 'value',
+          },
+        ],
+        dataSource: null,
+        dataSources: [
+          {
+            text: 'Grafana', value: 'grafana',
+          },
+          {
+            text: 'Prometheus', value: 'prometheus',
+          },
+          {
+            text: 'InfluxDB', value: 'influxdb',
+          }],
       };
+
     },
     computed: {
       ...mapState('dataSource', ['chartData', 'loading', 'userJson']),
       data() {
         return this.chartHasData() && this.chartData.source;
       },
-      dataSources() {
-        return [
-          'grafana', 'prometheus', 'influxdb',
-        ];
-      },
       chartOptions() {
         return {
           'xAxis': {
             'name': 'Series Name',
-            'type': 'value',
+            'type': this.axisType,
           },
         };
       },
@@ -102,10 +126,12 @@
         this.setChartData(transformed);
         this.chartJson = this.formatHighlight(transformed.source);
       },
-      setDataSource(source) {
-        if (this.config[source]) {
-          const config = this.config[source];
-          this.chartUrl = config.url;
+      onDataSourceUpdate() {
+        if (this.dataSource) {
+          this.userJson = '';
+          this.chartJson = '';
+          this.setChartData(null);
+          this.chartUrl = this.config[this.dataSource].url;
         }
       },
     },
@@ -119,20 +145,11 @@
 
         <h4 class="chart-title">Select data source</h4>
         <div class="row">
-            <gl-dropdown
-                    class="col-8 col-md-9 gl-pr-0"
-                    menu-class="w-100 mw-100"
-                    toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
-                    text="-- Select datasource --"
-            >
-                <gl-dropdown-item
-                        v-for="source in dataSources"
-                        class="w-100"
-                        @click="setDataSource(source)">
-                    <li>{{source}}</li>
-                </gl-dropdown-item>
-
-            </gl-dropdown>
+            <gl-form-select
+                    v-model="dataSource"
+                    :options="dataSources"
+                    @change="onDataSourceUpdate">
+            </gl-form-select>
         </div>
 
         <div class="row">
@@ -154,12 +171,6 @@
         <div class="row">
             <div class="col-4">
                 <h5>User sample json</h5>
-                <!--                <gl-form-textarea-->
-                <!--                        v-if="!formattedInput"-->
-                <!--                        v-model="userJson"-->
-                <!--                        rows="15"-->
-                <!--                        @blur="onBlur"-->
-                <!--                ></gl-form-textarea>-->
                 <div v-if="formattedJSON">
                     <pre v-html="formattedJSON"/>
 
@@ -198,6 +209,8 @@
                    />
                </gl-form-group>
            </div>-->
+
+        <gl-form-radio-group v-model="axisType" :options="axisTypeOptions"/>
 
 
         <div v-if="showChart" class="issues-analytics-chart">
