@@ -67,9 +67,9 @@ Another example of GitLab as a company would be the following:
 The maximum subgroups a group can have, including the first one in the
 hierarchy, is 21.
 
-Actions such as transferring or importing a project inside subgroups, work like
-when performing these actions the traditional way with the `group/project`
-structure.
+When performing actions such as transferring or importing a project between
+subgroups, the behavior is the same as when performing these actions at the
+`group/project` level.
 
 ## Creating a subgroup
 
