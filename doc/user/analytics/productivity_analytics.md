@@ -28,7 +28,7 @@ To access the **Productivity Analytics** page:
 1. Go to **Analytics** from the top navigation bar.
 1. Select **Productivity Analytics** from the menu.
 
-The following metrics and visualizations are available on a project or group level:
+The following metrics and visualizations are available on a project or group level - currently only covering **merged** merge requests:
 
 - Histogram showing the number of merge request that took a specified number of days to merge after creation. Select a specific column to filter down subsequent charts.
 - Histogram showing a breakdown of the time taken (in hours) to merge a merge request. The following intervals are available:
@@ -40,11 +40,9 @@ The following metrics and visualizations are available on a project or group lev
   - Number of lines of code per commit.
   - Number of files touched.
 - Scatterplot showing all MRs merged on a certain date, together with the days it took to complete the action and a 30 day rolling median.
-
-  Users can zoom in and out on specific days of interest.
+  - Users can zoom in and out on specific days of interest.
 - Table showing list of merge requests with their respective times and size metrics.
-
-  Users can sort by any of the above metrics.
+  - Users can sort by any of the above metrics.
 
 ## Retrieving data
 
