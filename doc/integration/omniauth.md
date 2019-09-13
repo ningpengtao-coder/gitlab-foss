@@ -25,6 +25,7 @@ contains some settings that are common for all providers.
 - [Google](google.md)
 - [Facebook](facebook.md)
 - [Twitter](twitter.md)
+- [Shibboleth](shibboleth.md)
 - [SAML](saml.md)
 - [Crowd](../administration/auth/crowd.md)
 - [Azure](azure.md)
