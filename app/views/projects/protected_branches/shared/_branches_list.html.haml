@@ -23,9 +23,9 @@
             = s_("ProtectedBranch|Allowed to merge")
           %th
             = s_("ProtectedBranch|Allowed to push")
-          - if @project.merge_requests_require_code_owner_approval
-            %th
-              = s_("ProtectedBranch|Code owner approval")
+
+          = render_if_exists 'shared/projects/code_owner_approval_table_head'
+
           - if can_admin_project
             %th
       %tbody
