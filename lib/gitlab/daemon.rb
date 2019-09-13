@@ -10,6 +10,14 @@ module Gitlab
       @instance
     end
 
+    def self.reinitialize_instance(*args)
+      @instance.stop if @instance
+
+      @instance = new(*args)
+      Kernel.at_exit(&@instance.method(:stop))
+      @instance
+    end
+
     def self.instance
       @instance ||= initialize_instance
     end
