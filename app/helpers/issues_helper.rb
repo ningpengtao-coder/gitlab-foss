@@ -152,9 +152,19 @@ module IssuesHelper
 
   def issue_closed_link(issue, current_user, css_class: '')
     if issue.moved? && can?(current_user, :read_issue, issue.moved_to)
-      link_to('(moved)', issue.moved_to, class: css_class)
+      link_to(s_('IssuableStatus|moved'), issue.moved_to, class: css_class)
     elsif issue.duplicated? && can?(current_user, :read_issue, issue.duplicated_to)
-      link_to('(duplicated)', issue.duplicated_to, class: css_class)
+      link_to(s_('IssuableStatus|duplicated'), issue.duplicated_to, class: css_class)
+    end
+  end
+
+  def issue_closed_text(issue, current_user)
+    link = issue_closed_link(issue, current_user, css_class: 'text-white text-underline')
+
+    if link
+      s_('IssuableStatus|Closed (%{link})').html_safe % { link: link }
+    else
+      s_('IssuableStatus|Closed')
     end
   end
 

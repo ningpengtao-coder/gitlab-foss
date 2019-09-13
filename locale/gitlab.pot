@@ -6228,6 +6228,15 @@ msgstr ""
 msgid "Invocations"
 msgstr ""
 
+msgid "IssuableStatus|Closed"
+msgstr ""
+
+msgid "IssuableStatus|Closed (%{link})"
+msgstr ""
+
+msgid "IssuableStatus|duplicated"
+msgstr ""
+
 msgid "IssuableStatus|moved"
 msgstr ""
 
