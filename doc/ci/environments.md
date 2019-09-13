@@ -136,6 +136,11 @@ In summary, with the above `.gitlab-ci.yml` we have achieved the following:
 > second is a "cleaned-up" version of the name, suitable for use in URLs, DNS,
 > etc.
 >
+> If you change the name of an existing environment, the `$CI_ENVIRONMENT_NAME`
+> will be updated with the new environment name but the `$CI_ENVIRONMENT_SLUG`
+> won't be updated and will remain unchanged in order to prevent unintended
+> side effects.
+>
 > Starting with GitLab 9.3, the environment URL is exposed to the Runner via
 > `$CI_ENVIRONMENT_URL`. The URL is expanded from `.gitlab-ci.yml`, or if
 > the URL was not defined there, the external URL from the environment is used.
