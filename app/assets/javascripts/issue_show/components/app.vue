@@ -102,10 +102,9 @@ export default {
       required: false,
       default: '',
     },
-    issuableTemplates: {
-      type: Array,
-      required: false,
-      default: () => [],
+    issuableTemplateNamesPath: {
+      type: String,
+      required: true,
     },
     markdownPreviewPath: {
       type: String,
@@ -156,9 +155,13 @@ export default {
       store,
       state: store.state,
       showForm: false,
+      templatesRequested: false,
     };
   },
   computed: {
+    issuableTemplates() {
+      return this.store.formState.issuableTemplates;
+    },
     formState() {
       return this.store.formState;
     },
@@ -233,6 +236,7 @@ export default {
       }
       return undefined;
     },
+
     updateStoreState() {
       return this.service
         .getData()
@@ -245,7 +249,7 @@ export default {
         });
     },
 
-    openForm() {
+    updateAndShowForm(templates = []) {
       if (!this.showForm) {
         this.showForm = true;
         this.store.setFormState({
@@ -254,9 +258,32 @@ export default {
           lock_version: this.state.lock_version,
           lockedWarningVisible: false,
           updateLoading: false,
+          issuableTemplates: templates,
         });
       }
     },
+
+    requestTemplatesAndShowForm() {
+      return this.service
+        .loadTemplates(this.issuableTemplateNamesPath)
+        .then(res => {
+          this.updateAndShowForm(res.data);
+        })
+        .catch(() => {
+          createFlash(this.defaultErrorMessage);
+          this.updateAndShowForm();
+        });
+    },
+
+    openForm() {
+      if (!this.templatesRequested) {
+        this.templatesRequested = true;
+        this.requestTemplatesAndShowForm();
+      } else {
+        this.updateAndShowForm(this.issuableTemplates);
+      }
+    },
+
     closeForm() {
       this.showForm = false;
     },

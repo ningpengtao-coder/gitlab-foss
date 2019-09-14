@@ -17,4 +17,9 @@ export default class Service {
   updateIssuable(data) {
     return axios.put(this.endpoint, data);
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  loadTemplates(templateNamesEndpoint) {
+    return axios.get(templateNamesEndpoint);
+  }
 }
