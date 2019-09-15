@@ -1,5 +1,6 @@
 <script>
 import eventHub from '../event_hub';
+import PipelinesActionsWrapper from './pipelines_actions_wrapper.vue';
 import PipelinesActionsComponent from './pipelines_actions.vue';
 import PipelinesArtifactsComponent from './pipelines_artifacts.vue';
 import CiBadge from '../../vue_shared/components/ci_badge_link.vue';
@@ -19,6 +20,7 @@ import { PIPELINES_TABLE } from '../constants';
  */
 export default {
   components: {
+    PipelinesActionsWrapper,
     PipelinesActionsComponent,
     PipelinesArtifactsComponent,
     CommitComponent,
@@ -330,11 +332,11 @@ export default {
 
     <pipelines-timeago :duration="pipelineDuration" :finished-time="pipelineFinishedAt" />
 
-    <div
+    <pipelines-actions-wrapper
       v-if="displayPipelineActions"
       class="table-section section-20 table-button-footer pipeline-actions"
     >
-      <div class="btn-group table-action-buttons">
+      <template slot="action-buttons">
         <pipelines-actions-component v-if="actions.length > 0" :actions="actions" />
 
         <pipelines-artifacts-component
@@ -364,7 +366,7 @@ export default {
         >
           <icon name="close" />
         </loading-button>
-      </div>
-    </div>
+      </template>
+    </pipelines-actions-wrapper>
   </div>
 </template>
