@@ -26,7 +26,7 @@ Event tracking can be implemented on either the frontend or the backend layers, 
 
 In GitLab, many actions can be initiated via the web interface, but they can also be initiated via an API client (an iOS applications is a good example of this), or via `git` directly. Crucially, this means that tracking should be considered holistically for the feature that's being instrumented.
 
-The data team should be involved when defining analytics and can be consulted when coming up with ways of presenting data that's being tracked. This allows our event data to be considered carefully and presented in ways that may reveal details about user engagement that may not be fully understood or interactions where we can make improvements.
+The data team should be involved when defining analytics and can be consulted when coming up with ways of presenting data that's being tracked. This allows our event data to be considered carefully and presented in ways that may reveal details about user engagement that may not be fully understood or interactions where we can make improvements. You can [contact the data team](https://about.gitlab.com/handbook/business-ops/data-team/#contact-us) and consult with them when defining tracking strategies.
 
 ### Frontend
 
