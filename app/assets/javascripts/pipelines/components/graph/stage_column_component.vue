@@ -61,7 +61,12 @@ export default {
 
     <div class="builds-container">
       <ul>
-        <li v-for="group in groups" :id="groupId(group)" :key="group.id" class="build">
+        <li
+          v-for="group in groups"
+          :id="groupId(group)"
+          :key="group.id"
+          class="build list-unstyled"
+        >
           <job-item
             v-if="group.size === 1"
             :job="group.jobs[0]"
