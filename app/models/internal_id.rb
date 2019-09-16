@@ -19,7 +19,15 @@ class InternalId < ApplicationRecord
   belongs_to :project
   belongs_to :namespace
 
-  enum usage: { issues: 0, merge_requests: 1, deployments: 2, milestones: 3, epics: 4, ci_pipelines: 5 }
+  enum usage: {
+    issues: 0,
+    merge_requests: 1,
+    deployments: 2,
+    milestones: 3,
+    epics: 4,
+    ci_pipelines: 5,
+    vulnerabilities: 6
+  }
 
   validates :usage, presence: true
 
