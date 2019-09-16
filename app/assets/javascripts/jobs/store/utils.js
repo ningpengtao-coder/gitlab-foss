@@ -25,6 +25,8 @@ export const parseLine = (line = {}, lineNumber) => ({
 export const logLinesParser = (lines = [], lineNumberStart) =>
   lines.reduce((acc, line, index) => {
     const lineNumber = lineNumberStart ? lineNumberStart + index : index;
+    const last = acc[acc.length - 1];
+
     if (line.section_header) {
       acc.push({
         isClosed: true,
@@ -32,15 +34,10 @@ export const logLinesParser = (lines = [], lineNumberStart) =>
         line: parseLine(line, lineNumber),
         lines: [],
       });
-    } else if (
-      acc.length &&
-      acc[acc.length - 1].isHeader &&
-      !line.section_duration &&
-      line.content.length
-    ) {
-      acc[acc.length - 1].lines.push(parseLine(line, lineNumber));
-    } else if (acc.length && acc[acc.length - 1].isHeader && line.section_duration) {
-      acc[acc.length - 1].section_duration = line.section_duration;
+    } else if (acc.length && last.isHeader && !line.section_duration && line.content.length) {
+      last.lines.push(parseLine(line, lineNumber));
+    } else if (acc.length && last.isHeader && line.section_duration) {
+      last.section_duration = line.section_duration;
     } else if (line.content.length) {
       acc.push(parseLine(line, lineNumber));
     }

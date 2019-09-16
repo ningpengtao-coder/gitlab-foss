@@ -20,7 +20,7 @@ export default {
 };
 </script>
 <template>
-  <code class="job-log">
+  <code class="job-log d-block">
     <template v-for="(section, index) in trace">
       <template v-if="section.isHeader">
         <log-line-header
