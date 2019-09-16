@@ -4,7 +4,7 @@
 #
 # Contains common functionality shared between Issues and MergeRequests
 #
-# Used by Issue, MergeRequest
+# Used by Issue, MergeRequest, Epic
 #
 module Issuable
   extend ActiveSupport::Concern
@@ -25,6 +25,11 @@ module Issuable
   include UpdatedAtFilterable
   include IssuableStates
   include ClosedAtFilterable
+
+  TITLE_LENGTH_MAX = 255
+  TITLE_HTML_LENGTH_MAX = 800
+  DESCRIPTION_LENGTH_MAX = 16000
+  DESCRIPTION_HTML_LENGTH_MAX = 48000
 
   # This object is used to gather issuable meta data for displaying
   # upvotes, downvotes, notes and closing merge requests count for issues and merge requests
@@ -72,8 +77,8 @@ module Issuable
              prefix: true
 
     validates :author, presence: true
-    validates :title, presence: true, length: { maximum: 255 }
-    validates :description, length: { maximum: Gitlab::Database::MAX_TEXT_SIZE_LIMIT }, allow_blank: true
+    validates :title, presence: true, length: { maximum: TITLE_LENGTH_MAX }
+    validates :description, length: { maximum: DESCRIPTION_LENGTH_MAX }, allow_blank: true
     validate :milestone_is_valid
 
     scope :authored, ->(user) { where(author_id: user) }
