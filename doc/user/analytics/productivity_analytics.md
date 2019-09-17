@@ -44,11 +44,12 @@ The following metrics and visualizations are available on a project or group lev
 - Table showing list of merge requests with their respective times and size metrics.
   - Users can sort by any of the above metrics.
 
-## Retrieving data
+## Changing data timespan **(PREMIUM ONLY)**
 
-Users can retrieve three months of data when they deploy Productivity Analytics for the first time.
+By default, three months of data is available when deploying Productivity Analytics for the first time.
 
-To retrieve data for a different time span, run the following in the GitLab directory:
+To retrieve data for a different time span, a GitLab administrator can
+run the following in the GitLab directory:
 
 ```sh
 MERGED_AT_AFTER = <your_date> rake gitlab:productivity_analytics:recalc
