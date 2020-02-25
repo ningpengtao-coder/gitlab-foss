@@ -403,6 +403,21 @@ If Auto Build fails despite the project meeting the buildpack requirements, set
 a project variable `TRACE=true` to enable verbose logging, which may help to
 troubleshoot.
 
+#### Auto Build using non officially supported buildpacks
+
+If your project needs to a buildpack that is not among the
+[Heroku officially supported buildpacks](https://devcenter.heroku.com/articles/buildpacks#officially-supported-buildpacks),
+you may be able to use it instead.
+
+First please make sure that you trust what the buildpack does and what
+it will do in the future. To ensure that you might want to fork or
+import the buildpack project into a new GitLab project that you
+properly control. (Don't setup mirroring!)
+
+Then in Settings -> CI / CD -> Variables you might want to set a
+BUILDPACK_URL variable to the properly controled buildpack project
+URL.
+
 ### Auto Test
 
 Auto Test automatically runs the appropriate tests for your application using
